@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { RotateCcw, Lightbulb, Heart, Star } from 'lucide-react';
+import { RotateCcw, Lightbulb, Heart, Star, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface CardData {
@@ -90,64 +90,90 @@ export function Corner3() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 py-20">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Góc Phát Triển
-          </h2>
-          <p className="text-xl md:text-2xl text-gray-600">
-            Khám phá những bài học và thử thách để phát triển bản thân
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 lg:py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-6"
+          >
+            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              Góc Phát Triển
+            </h2>
+            <p className="text-xl sm:text-2xl lg:text-3xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+              Khám phá những bài học và thử thách để phát triển bản thân
+            </p>
+          </motion.div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {CARD_DATA.map((card) => (
-            <div key={card.id} className="relative">
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
+          {CARD_DATA.map((card, index) => (
+            <motion.div
+              key={card.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              className="relative group"
+            >
               <motion.div
-                className="relative w-full h-80 cursor-pointer"
+                className="relative w-full h-96 cursor-pointer"
                 onClick={() => handleCardFlip(card.id)}
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ scale: 1.02, y: -5 }}
                 whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.3 }}
               >
                 {/* Card Container */}
-                <div className="relative w-full h-full">
+                <div className="relative w-full h-full perspective-1000">
                   {/* Front Card */}
                   <motion.div
-                    className={`absolute inset-0 bg-gradient-to-br ${card.front.color} rounded-2xl shadow-xl p-6 flex flex-col justify-center items-center text-white`}
+                    className={`absolute inset-0 bg-gradient-to-br ${card.front.color} rounded-3xl shadow-2xl p-8 flex flex-col justify-center items-center text-white transform-gpu`}
                     animate={{
                       rotateY: flippedCard === card.id ? 180 : 0,
                     }}
-                    transition={{ duration: 0.6 }}
-                    style={{ backfaceVisibility: 'hidden' }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    style={{ 
+                      backfaceVisibility: 'hidden',
+                      transformStyle: 'preserve-3d'
+                    }}
                   >
-                    <div className="text-center space-y-4">
-                      <div className="flex justify-center">
+                    <div className="text-center space-y-6">
+                      <motion.div 
+                        className="flex justify-center"
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        transition={{ duration: 0.3 }}
+                      >
                         {card.front.icon}
-                      </div>
-                      <h3 className="text-2xl font-bold">
+                      </motion.div>
+                      <h3 className="text-2xl lg:text-3xl font-bold leading-tight">
                         {card.front.title}
                       </h3>
                       <p className="text-lg opacity-90 leading-relaxed">
                         {card.front.content}
                       </p>
                     </div>
-                    <div className="absolute bottom-4 right-4">
-                      <RotateCcw className="w-6 h-6 opacity-70" />
+                    <div className="absolute bottom-6 right-6 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
+                      <RotateCcw className="w-6 h-6" />
                     </div>
                   </motion.div>
 
                   {/* Back Card */}
                   <motion.div
-                    className={`absolute inset-0 bg-gradient-to-br ${card.back.color} rounded-2xl shadow-xl p-6 flex flex-col justify-center items-center text-white`}
+                    className={`absolute inset-0 bg-gradient-to-br ${card.back.color} rounded-3xl shadow-2xl p-8 flex flex-col justify-center items-center text-white transform-gpu`}
                     animate={{
                       rotateY: flippedCard === card.id ? 0 : -180,
                     }}
-                    transition={{ duration: 0.6 }}
-                    style={{ backfaceVisibility: 'hidden' }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    style={{ 
+                      backfaceVisibility: 'hidden',
+                      transformStyle: 'preserve-3d'
+                    }}
                   >
-                    <div className="text-center space-y-4">
-                      <h3 className="text-2xl font-bold">
+                    <div className="text-center space-y-6 w-full">
+                      <h3 className="text-2xl lg:text-3xl font-bold leading-tight">
                         {card.back.title}
                       </h3>
                       <p className="text-lg opacity-90 leading-relaxed">
@@ -155,14 +181,14 @@ export function Corner3() {
                       </p>
                       
                       {/* Action Input */}
-                      <div className="space-y-3 w-full">
-                        <p className="text-sm opacity-80">
+                      <div className="space-y-4 w-full">
+                        <p className="text-sm opacity-80 font-medium">
                           {card.back.action}
                         </p>
                         <input
                           type="text"
                           placeholder="Nhập câu trả lời của bạn..."
-                          className="w-full px-4 py-2 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50"
+                          className="w-full px-4 py-3 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/90 backdrop-blur-sm"
                           value={userActions[card.id] || ''}
                           onChange={(e) => setUserActions(prev => ({
                             ...prev,
@@ -178,9 +204,9 @@ export function Corner3() {
                             }
                           }}
                           disabled={!userActions[card.id]}
-                          className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30"
+                          className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-xl py-3 font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Xác nhận
+                          ✨ Xác nhận
                         </Button>
                       </div>
                     </div>
@@ -191,34 +217,77 @@ export function Corner3() {
               {/* Success Message */}
               {userActions[card.id] && (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute -bottom-16 left-0 right-0 bg-green-500 text-white p-3 rounded-lg text-center"
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                  className="absolute -bottom-20 left-0 right-0 bg-gradient-to-r from-green-500 to-emerald-500 text-white p-4 rounded-2xl text-center shadow-2xl"
                 >
-                  <p className="font-semibold">Tuyệt vời!</p>
-                  <p className="text-sm opacity-90">
-                    Bạn đã hoàn thành thử thách này.
-                  </p>
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="font-bold">Tuyệt vời!</p>
+                      <p className="text-sm opacity-90">
+                        Bạn đã hoàn thành thử thách này.
+                      </p>
+                    </div>
+                  </div>
                 </motion.div>
               )}
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Instructions */}
-        <div className="mt-16 text-center">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 max-w-2xl mx-auto shadow-lg">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              Cách sử dụng
-            </h3>
-            <div className="space-y-3 text-gray-700">
-              <p>• Nhấn vào thẻ để lật và xem thử thách</p>
-              <p>• Đọc kỹ nội dung và hoàn thành hành động</p>
-              <p>• Nhập câu trả lời và nhấn "Xác nhận"</p>
-              <p>• Thẻ sẽ tự động lật lại sau khi hoàn thành</p>
+        {/* Instructions Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="mt-20"
+        >
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 lg:p-12 max-w-4xl mx-auto shadow-2xl">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                Cách sử dụng
+              </h3>
+              <p className="text-gray-600 text-lg">
+                Hướng dẫn để bạn có trải nghiệm tốt nhất
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    1
+                  </div>
+                  <p className="text-gray-700 text-lg">Nhấn vào thẻ để lật và xem thử thách</p>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    2
+                  </div>
+                  <p className="text-gray-700 text-lg">Đọc kỹ nội dung và hoàn thành hành động</p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    3
+                  </div>
+                  <p className="text-gray-700 text-lg">Nhập câu trả lời và nhấn "Xác nhận"</p>
+                </div>
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gradient-to-r from-rose-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    4
+                  </div>
+                  <p className="text-gray-700 text-lg">Thẻ sẽ tự động lật lại sau khi hoàn thành</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
