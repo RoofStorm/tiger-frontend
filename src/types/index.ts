@@ -5,9 +5,36 @@ export interface User {
   name: string;
   avatar?: string;
   points: number;
-  role: 'user' | 'admin';
+  role: 'USER' | 'ADMIN';
   createdAt: string;
   updatedAt: string;
+}
+
+// NextAuth Types
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name: string;
+      image?: string;
+      role: 'USER' | 'ADMIN';
+    };
+  }
+
+  interface User {
+    id: string;
+    email: string;
+    name: string;
+    image?: string;
+    role: 'USER' | 'ADMIN';
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    role: 'USER' | 'ADMIN';
+  }
 }
 
 export interface AuthResponse {
@@ -59,10 +86,11 @@ export interface Post {
   user: User;
   imageUrl: string;
   caption: string;
-  likes: number;
-  shares: number;
+  likeCount: number;
+  shareCount: number;
+  commentCount: number;
   isLiked: boolean;
-  isPinned: boolean;
+  isHighlighted: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -153,4 +181,3 @@ export interface AdminStats {
     timestamp: string;
   }>;
 }
-

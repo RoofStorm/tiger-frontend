@@ -17,7 +17,7 @@ export function Corner0() {
   const [showControls, setShowControls] = useState(true);
   const [isVideoEnded, setIsVideoEnded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // Sử dụng context để chia sẻ trạng thái video
   const { setIsVideoPlaying } = useVideo();
 
@@ -56,7 +56,7 @@ export function Corner0() {
       setIsVideoEnded(true);
       setShowControls(true);
     };
-    const handleError = (e: any) => {
+    const handleError = (e: Event) => {
       console.error('Video error:', e);
       setIsLoading(false);
       setVideoError('Không thể tải video. Vui lòng kiểm tra format file.');
@@ -102,17 +102,20 @@ export function Corner0() {
           console.log('Video not ready, waiting...');
           return;
         }
-        
+
         // Reset video về đầu nếu đã kết thúc
         if (video.ended) {
           video.currentTime = 0;
         }
-        
+
         await video.play();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Play failed:', err);
-      setVideoError('Không thể phát video: ' + err.message);
+      setVideoError(
+        'Không thể phát video: ' +
+          (err instanceof Error ? err.message : 'Unknown error')
+      );
     }
   };
 
@@ -141,11 +144,17 @@ export function Corner0() {
 
   // Debug: Log states để kiểm tra
   useEffect(() => {
-    console.log('States:', { isPlaying, showControls, isVideoEnded, isLoading, isVideoReady });
+    console.log('States:', {
+      isPlaying,
+      showControls,
+      isVideoEnded,
+      isLoading,
+      isVideoReady,
+    });
   }, [isPlaying, showControls, isVideoEnded, isLoading, isVideoReady]);
 
   return (
-    <div 
+    <div
       className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 overflow-hidden"
       onMouseMove={handleMouseMove}
     >
@@ -181,7 +190,7 @@ export function Corner0() {
             <div className="text-center text-white">
               <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                 className="w-12 h-12 mx-auto mb-4"
               >
                 <Loader2 className="w-12 h-12 text-white" />
@@ -204,7 +213,7 @@ export function Corner0() {
               <p>• Đảm bảo format MP4 với codec H.264</p>
               <p>• Thử refresh trang</p>
             </div>
-            <button 
+            <button
               onClick={() => setVideoError(null)}
               className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 rounded"
             >
@@ -263,8 +272,8 @@ export function Corner0() {
                   <Button
                     size="lg"
                     className={`w-20 h-20 rounded-full shadow-2xl hover:scale-105 transition-all duration-300 ${
-                      isVideoReady 
-                        ? 'bg-white/90 hover:bg-white text-black' 
+                      isVideoReady
+                        ? 'bg-white/90 hover:bg-white text-black'
                         : 'bg-gray-500 text-gray-300 cursor-not-allowed'
                     }`}
                     onClick={togglePlay}

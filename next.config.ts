@@ -4,11 +4,14 @@ const nextConfig: NextConfig = {
   /* config options here */
   output: 'standalone',
   images: {
-    domains: ['localhost', 'res.cloudinary.com', 's3.amazonaws.com'],
+    domains: [
+      'localhost',
+      'res.cloudinary.com',
+      's3.amazonaws.com',
+      'example.com',
+    ],
   },
-  experimental: {
-    serverComponentsExternalPackages: ['html2canvas'],
-  },
+  serverExternalPackages: ['html2canvas'],
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },

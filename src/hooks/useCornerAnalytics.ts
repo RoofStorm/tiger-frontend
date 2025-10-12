@@ -27,37 +27,6 @@ export function useCornerAnalytics() {
     });
   }, []);
 
-  const stopTimer = useCallback((corner: number) => {
-    const timer = timers.current.get(corner);
-    if (!timer || !timer.isActive) return;
-
-    const durationSec = Math.floor((Date.now() - timer.startTime) / 1000);
-    
-    // Only track if user spent at least 3 seconds in the corner
-    if (durationSec >= 3) {
-      const analyticsEvent: CornerAnalytics = {
-        corner,
-        durationSec,
-        timestamp: new Date().toISOString(),
-      };
-
-      analyticsQueue.current.push(analyticsEvent);
-      
-      // Send batch if we reach the batch size
-      if (analyticsQueue.current.length >= ANALYTICS_BATCH_SIZE) {
-        sendAnalyticsBatch();
-      } else {
-        // Set timeout to send batch after delay
-        if (batchTimeout.current) {
-          clearTimeout(batchTimeout.current);
-        }
-        batchTimeout.current = setTimeout(sendAnalyticsBatch, ANALYTICS_BATCH_DELAY);
-      }
-    }
-
-    timer.isActive = false;
-  }, []);
-
   const sendAnalyticsBatch = useCallback(async () => {
     if (analyticsQueue.current.length === 0) return;
 
@@ -74,6 +43,43 @@ export function useCornerAnalytics() {
       batchTimeout.current = null;
     }
   }, []);
+
+  const stopTimer = useCallback(
+    (corner: number) => {
+      const timer = timers.current.get(corner);
+      if (!timer || !timer.isActive) return;
+
+      const durationSec = Math.floor((Date.now() - timer.startTime) / 1000);
+
+      // Only track if user spent at least 3 seconds in the corner
+      if (durationSec >= 3) {
+        const analyticsEvent: CornerAnalytics = {
+          corner,
+          durationSec,
+          timestamp: new Date().toISOString(),
+        };
+
+        analyticsQueue.current.push(analyticsEvent);
+
+        // Send batch if we reach the batch size
+        if (analyticsQueue.current.length >= ANALYTICS_BATCH_SIZE) {
+          sendAnalyticsBatch();
+        } else {
+          // Set timeout to send batch after delay
+          if (batchTimeout.current) {
+            clearTimeout(batchTimeout.current);
+          }
+          batchTimeout.current = setTimeout(
+            sendAnalyticsBatch,
+            ANALYTICS_BATCH_DELAY
+          );
+        }
+      }
+
+      timer.isActive = false;
+    },
+    [sendAnalyticsBatch]
+  );
 
   // Send remaining analytics on page unload
   useEffect(() => {
@@ -102,4 +108,3 @@ export function useCornerAnalytics() {
     stopTimer,
   };
 }
-

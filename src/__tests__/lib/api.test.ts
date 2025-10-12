@@ -75,7 +75,9 @@ describe('API Client', () => {
       const error = new Error('Login failed');
       mockAxiosInstance.post.mockRejectedValue(error);
 
-      await expect(apiClient.login('test@example.com', 'wrong-password')).rejects.toThrow('Login failed');
+      await expect(
+        apiClient.login('test@example.com', 'wrong-password')
+      ).rejects.toThrow('Login failed');
     });
   });
 
@@ -94,7 +96,11 @@ describe('API Client', () => {
 
       mockAxiosInstance.post.mockResolvedValue(mockResponse);
 
-      const result = await apiClient.register('test@example.com', 'password', 'Test User');
+      const result = await apiClient.register(
+        'test@example.com',
+        'password',
+        'Test User'
+      );
 
       expect(mockAxiosInstance.post).toHaveBeenCalledWith('/auth/register', {
         email: 'test@example.com',
@@ -138,20 +144,30 @@ describe('API Client', () => {
   describe('getPosts', () => {
     it('should call getPosts endpoint with default parameters', async () => {
       const mockResponse = {
-        data: { data: [], total: 0, page: 1, limit: 10 },
+        data: {
+          success: true,
+          data: { posts: [], pagination: { total: 0, page: 1, limit: 10 } },
+          message: 'Success',
+        },
       };
 
       mockAxiosInstance.get.mockResolvedValue(mockResponse);
 
       const result = await apiClient.getPosts();
 
-      expect(mockAxiosInstance.get).toHaveBeenCalledWith('/posts?page=1&limit=10');
-      expect(result).toEqual(mockResponse.data);
+      expect(mockAxiosInstance.get).toHaveBeenCalledWith(
+        '/posts?page=1&limit=10'
+      );
+      expect(result).toEqual(mockResponse.data.data);
     });
 
     it('should call getPosts endpoint with custom parameters', async () => {
       const mockResponse = {
-        data: { data: [], total: 0, page: 2, limit: 20 },
+        data: {
+          success: true,
+          data: { posts: [], pagination: { total: 0, page: 2, limit: 20 } },
+          message: 'Success',
+        },
       };
 
       mockAxiosInstance.get.mockResolvedValue(mockResponse);
@@ -159,7 +175,7 @@ describe('API Client', () => {
       const result = await apiClient.getPosts(2, 20);
 
       expect(mockedAxios.get).toHaveBeenCalledWith('/posts?page=2&limit=20');
-      expect(result).toEqual(mockResponse.data);
+      expect(result).toEqual(mockResponse.data.data);
     });
   });
 
@@ -182,7 +198,9 @@ describe('API Client', () => {
         caption: 'Test caption',
       };
 
-      const mockResponse = { data: { success: true, data: { id: '1', ...postData } } };
+      const mockResponse = {
+        data: { success: true, data: { id: '1', ...postData } },
+      };
       mockAxiosInstance.post.mockResolvedValue(mockResponse);
 
       const result = await apiClient.createPost(postData);
@@ -192,4 +210,3 @@ describe('API Client', () => {
     });
   });
 });
-

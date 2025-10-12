@@ -15,13 +15,13 @@ interface MoodCardCanvasProps {
   onShare?: (imageData: string) => void;
 }
 
-export function MoodCardCanvas({ 
-  selectedEmojis, 
-  whisper, 
-  reminder, 
+export function MoodCardCanvas({
+  selectedEmojis,
+  whisper,
+  reminder,
   category,
-  onSave, 
-  onShare 
+  onSave,
+  onShare,
 }: MoodCardCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -35,15 +35,15 @@ export function MoodCardCanvas({
         backgroundColor: null,
         scale: 2,
         useCORS: true,
-        allowTaint: true
+        allowTaint: true,
       });
-      
+
       const imageData = canvas.toDataURL('image/png');
-      
+
       if (onSave) {
         onSave(imageData);
       }
-      
+
       return imageData;
     } catch (error) {
       console.error('Error generating image:', error);
@@ -104,7 +104,9 @@ export function MoodCardCanvas({
       >
         {/* Category Badge */}
         {category && (
-          <div className={`absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r ${getCategoryColor()} text-white text-xs font-medium`}>
+          <div
+            className={`absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r ${getCategoryColor()} text-white text-xs font-medium`}
+          >
             {getCategoryLabel()}
           </div>
         )}
@@ -126,7 +128,7 @@ export function MoodCardCanvas({
         <div className="text-center mb-8">
           <h3 className="text-lg font-semibold text-gray-700 mb-4">Whisper</h3>
           <p className="text-gray-600 leading-relaxed italic">
-            "{whisper}"
+            &quot;{whisper}&quot;
           </p>
         </div>
 
@@ -136,9 +138,7 @@ export function MoodCardCanvas({
         {/* Reminder */}
         <div className="text-center">
           <h3 className="text-lg font-semibold text-gray-700 mb-4">Reminder</h3>
-          <p className="text-gray-600 leading-relaxed">
-            {reminder}
-          </p>
+          <p className="text-gray-600 leading-relaxed">{reminder}</p>
         </div>
 
         {/* Footer */}
@@ -159,7 +159,7 @@ export function MoodCardCanvas({
           <Download className="w-4 h-4 mr-2" />
           {isGenerating ? 'Đang tạo...' : 'Tải xuống'}
         </Button>
-        
+
         <Button
           onClick={handleShare}
           disabled={isGenerating}

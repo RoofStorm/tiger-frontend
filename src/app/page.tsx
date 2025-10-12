@@ -21,11 +21,13 @@ function HomePageContent() {
   useEffect(() => {
     const handleScroll = () => {
       const corners = document.querySelectorAll('[data-corner]');
-      
-      corners.forEach((corner) => {
+
+      corners.forEach(corner => {
         const rect = corner.getBoundingClientRect();
-        const cornerNumber = parseInt(corner.getAttribute('data-corner') || '0');
-        
+        const cornerNumber = parseInt(
+          corner.getAttribute('data-corner') || '0'
+        );
+
         // Check if corner is in viewport
         if (rect.top < window.innerHeight && rect.bottom > 0) {
           startTimer(cornerNumber);
@@ -66,7 +68,7 @@ function HomePageContent() {
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       <main className="relative">
         {/* Corner 0: Video Player */}
         <section data-corner="0" className="min-h-screen w-full">
@@ -108,9 +110,9 @@ function HomePageContent() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <NavigationDots 
-              currentSection={currentSection} 
-              onSectionChange={setCurrentSection} 
+            <NavigationDots
+              currentSection={currentSection}
+              onSectionChange={setCurrentSection}
             />
           </motion.div>
         )}

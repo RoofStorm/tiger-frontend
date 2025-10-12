@@ -6,22 +6,31 @@ import { EmojiGrid } from '@/components/EmojiGrid';
 import { MoodCardCanvas } from '@/components/MoodCardCanvas';
 import { Button } from '@/components/ui/button';
 import { EmojiSelection } from '@/types';
-import { EMOJI_COMBINATIONS, findCombinationByEmojis, getAllEmojis } from '@/constants/emojiCombinations';
+import {
+  findCombinationByEmojis,
+  getAllEmojis,
+} from '@/constants/emojiCombinations';
 
 export function Corner1() {
   const [selectedEmojis, setSelectedEmojis] = useState<EmojiSelection[]>([]);
   const [showMoodCard, setShowMoodCard] = useState(false);
   const [whisper, setWhisper] = useState('');
   const [reminder, setReminder] = useState('');
-  const [combinationCategory, setCombinationCategory] = useState<'mindful' | 'tiger-linked' | 'trendy' | null>(null);
+  const [combinationCategory, setCombinationCategory] = useState<
+    'mindful' | 'tiger-linked' | 'trendy' | null
+  >(null);
 
   const handleEmojiSelect = (emoji: EmojiSelection) => {
     // Check if emoji is already selected
-    const isAlreadySelected = selectedEmojis.some(selected => selected.id === emoji.id);
-    
+    const isAlreadySelected = selectedEmojis.some(
+      selected => selected.id === emoji.id
+    );
+
     if (isAlreadySelected) {
       // If already selected, remove it (toggle off)
-      setSelectedEmojis(prev => prev.filter(selected => selected.id !== emoji.id));
+      setSelectedEmojis(prev =>
+        prev.filter(selected => selected.id !== emoji.id)
+      );
     } else {
       // If not selected and we have space, add it
       if (selectedEmojis.length < 3) {
@@ -39,28 +48,37 @@ export function Corner1() {
 
     // Get emoji strings
     const emojiStrings = selectedEmojis.map(emoji => emoji.emoji);
-    
+
     // Find matching combination
     const combination = findCombinationByEmojis(emojiStrings);
-    
+
     if (combination) {
       setWhisper(combination.whisper);
       setReminder(combination.reminder);
       setCombinationCategory(combination.category);
     } else {
       // Fallback for non-matching combinations
-      setWhisper("Bạn đã tạo ra một tổ hợp cảm xúc độc đáo. Hãy để những emoji này nói lên điều bạn đang cảm nhận.");
-      setReminder("Mỗi cảm xúc đều có giá trị. Hãy lắng nghe và chấp nhận những gì bạn đang trải qua.");
+      setWhisper(
+        'Bạn đã tạo ra một tổ hợp cảm xúc độc đáo. Hãy để những emoji này nói lên điều bạn đang cảm nhận.'
+      );
+      setReminder(
+        'Mỗi cảm xúc đều có giá trị. Hãy lắng nghe và chấp nhận những gì bạn đang trải qua.'
+      );
       setCombinationCategory(null);
     }
-    
+
     setShowMoodCard(true);
   };
 
   const handleSaveMoodCard = async () => {
     try {
       // TODO: Implement save to backend
-      console.log('Saving mood card:', { selectedEmojis, whisper, reminder, combinationCategory });
+      console.log('Saving mood card:', {
+        selectedEmojis,
+        whisper,
+        reminder,
+        combinationCategory,
+      });
       // Reset state
       setSelectedEmojis([]);
       setShowMoodCard(false);
@@ -79,7 +97,10 @@ export function Corner1() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div
+      id="corner-1"
+      className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 py-12 px-4 sm:px-6 lg:px-8"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -92,7 +113,8 @@ export function Corner1() {
             Emoji Mood Corner
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-            Chọn 3 emoji để tạo ra mood card cá nhân của bạn. Mỗi tổ hợp sẽ mang đến một thông điệp đặc biệt.
+            Chọn 3 emoji để tạo ra mood card cá nhân của bạn. Mỗi tổ hợp sẽ mang
+            đến một thông điệp đặc biệt.
           </p>
         </motion.div>
 
@@ -105,14 +127,16 @@ export function Corner1() {
             className="space-y-6"
           >
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Chọn Emoji</h2>
-              
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Chọn Emoji
+              </h2>
+
               {/* Emoji Grid */}
-              <EmojiGrid 
+              <EmojiGrid
                 emojis={getAllEmojis().map((emoji, index) => ({
                   id: `emoji-${index}`,
                   emoji,
-                  label: `Emoji ${index + 1}`
+                  label: `Emoji ${index + 1}`,
                 }))}
                 selectedEmojis={selectedEmojis}
                 onEmojiSelect={handleEmojiSelect}
@@ -126,9 +150,11 @@ export function Corner1() {
                   disabled={selectedEmojis.length !== 3}
                   className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                 >
-                  {selectedEmojis.length === 3 ? 'Tạo Mood Card' : `Chọn thêm ${3 - selectedEmojis.length} emoji`}
+                  {selectedEmojis.length === 3
+                    ? 'Tạo Mood Card'
+                    : `Chọn thêm ${3 - selectedEmojis.length} emoji`}
                 </Button>
-                
+
                 {selectedEmojis.length > 0 && (
                   <Button
                     onClick={handleReset}
@@ -150,8 +176,10 @@ export function Corner1() {
             className="space-y-6"
           >
             <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Mood Card</h2>
-              
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Mood Card
+              </h2>
+
               {showMoodCard ? (
                 <MoodCardCanvas
                   selectedEmojis={selectedEmojis}
@@ -176,7 +204,7 @@ export function Corner1() {
                   >
                     Lưu Mood Card
                   </Button>
-                  
+
                   <Button
                     onClick={handleReset}
                     variant="outline"
@@ -197,15 +225,21 @@ export function Corner1() {
                 className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/50"
               >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 rounded-full ${
-                    combinationCategory === 'mindful' ? 'bg-green-500' :
-                    combinationCategory === 'tiger-linked' ? 'bg-orange-500' :
-                    'bg-blue-500'
-                  }`} />
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      combinationCategory === 'mindful'
+                        ? 'bg-green-500'
+                        : combinationCategory === 'tiger-linked'
+                          ? 'bg-orange-500'
+                          : 'bg-blue-500'
+                    }`}
+                  />
                   <span className="text-sm font-medium text-gray-600">
-                    {combinationCategory === 'mindful' ? 'Mindful & Touching' :
-                     combinationCategory === 'tiger-linked' ? 'Tiger-linked' :
-                     'Trendy & Playful'}
+                    {combinationCategory === 'mindful'
+                      ? 'Mindful & Touching'
+                      : combinationCategory === 'tiger-linked'
+                        ? 'Tiger-linked'
+                        : 'Trendy & Playful'}
                   </span>
                 </div>
               </motion.div>

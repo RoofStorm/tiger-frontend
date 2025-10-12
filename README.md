@@ -5,6 +5,7 @@ A modern React/Next.js frontend application for the Tiger social platform that a
 ## 🚀 Features
 
 ### Core Features
+
 - **5 Interactive Corners**: Video player, emoji mood selection, image sharing, flip cards, and rewards
 - **Mood Card Generation**: Create beautiful mood cards with html2canvas and share them
 - **Image Upload & Gallery**: Upload images with captions and browse community posts
@@ -12,6 +13,7 @@ A modern React/Next.js frontend application for the Tiger social platform that a
 - **Admin Panel**: Manage posts, approve redeem requests, and view analytics
 
 ### Technical Features
+
 - **Next.js 14** with App Router
 - **TypeScript** for type safety
 - **TailwindCSS** for styling
@@ -38,22 +40,26 @@ A modern React/Next.js frontend application for the Tiger social platform that a
 ## 📦 Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd tiger-frontend
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.local.example .env.local
    ```
-   
+
    Edit `.env.local` with your configuration:
+
    ```env
    # API Configuration
    NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
@@ -73,6 +79,7 @@ A modern React/Next.js frontend application for the Tiger social platform that a
    ```
 
 4. **Run the development server**
+
    ```bash
    npm run dev
    ```
@@ -117,28 +124,33 @@ src/
 ## 🎨 Corner Features
 
 ### Corner 0: Video Player
+
 - Interactive video player with controls
 - Auto-play and loop functionality
 - Responsive design
 
 ### Corner 1: Mood Selection
+
 - Emoji grid with 16 emotion options
 - Select exactly 3 emojis
 - Generate mood cards with whisper and reminder
 - Share functionality with image generation
 
 ### Corner 2: Image Gallery
+
 - Upload images with captions
 - Browse community posts
 - Like and share functionality
 - Responsive gallery layout
 
 ### Corner 3: Flip Cards
+
 - Interactive flip cards for personal development
 - Action-based challenges
 - Progress tracking
 
 ### Corner 4: Rewards
+
 - Browse available rewards
 - Redeem with points
 - Track redemption history
@@ -147,6 +159,7 @@ src/
 ## 🔐 Authentication
 
 The app supports multiple authentication methods:
+
 - Email/Password registration and login
 - Google OAuth
 - Facebook OAuth
@@ -170,12 +183,14 @@ The app supports multiple authentication methods:
 ## 🧪 Testing
 
 The project includes comprehensive testing setup:
+
 - Unit tests with Jest
 - Component tests with React Testing Library
 - API client tests
 - Coverage reporting
 
 Run tests:
+
 ```bash
 npm run test
 npm run test:coverage
@@ -184,11 +199,13 @@ npm run test:coverage
 ## 🐳 Docker Deployment
 
 ### Using Docker Compose
+
 ```bash
 docker-compose up -d
 ```
 
 ### Using Docker
+
 ```bash
 docker build -t tiger-frontend .
 docker run -p 3000:3000 tiger-frontend
@@ -196,22 +213,23 @@ docker run -p 3000:3000 tiger-frontend
 
 ## 🌐 Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_API_BASE_URL` | Backend API URL | Yes |
-| `NEXTAUTH_URL` | Application URL | Yes |
-| `NEXTAUTH_SECRET` | NextAuth secret key | Yes |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID | No |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | No |
-| `FACEBOOK_CLIENT_ID` | Facebook OAuth client ID | No |
-| `FACEBOOK_CLIENT_SECRET` | Facebook OAuth client secret | No |
-| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | No |
-| `NEXT_PUBLIC_CLOUDINARY_API_KEY` | Cloudinary API key | No |
-| `CLOUDINARY_API_SECRET` | Cloudinary API secret | No |
+| Variable                            | Description                  | Required |
+| ----------------------------------- | ---------------------------- | -------- |
+| `NEXT_PUBLIC_API_BASE_URL`          | Backend API URL              | Yes      |
+| `NEXTAUTH_URL`                      | Application URL              | Yes      |
+| `NEXTAUTH_SECRET`                   | NextAuth secret key          | Yes      |
+| `GOOGLE_CLIENT_ID`                  | Google OAuth client ID       | No       |
+| `GOOGLE_CLIENT_SECRET`              | Google OAuth client secret   | No       |
+| `FACEBOOK_CLIENT_ID`                | Facebook OAuth client ID     | No       |
+| `FACEBOOK_CLIENT_SECRET`            | Facebook OAuth client secret | No       |
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name        | No       |
+| `NEXT_PUBLIC_CLOUDINARY_API_KEY`    | Cloudinary API key           | No       |
+| `CLOUDINARY_API_SECRET`             | Cloudinary API secret        | No       |
 
 ## 📊 Analytics
 
 The app includes built-in analytics tracking:
+
 - Corner visit duration tracking
 - User interaction analytics
 - Batched data transmission
@@ -220,6 +238,7 @@ The app includes built-in analytics tracking:
 ## 🔧 API Integration
 
 The frontend integrates with a RESTful API:
+
 - Authentication endpoints
 - Posts management
 - Mood card creation
@@ -230,11 +249,13 @@ The frontend integrates with a RESTful API:
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
+
 1. Connect your GitHub repository
 2. Set environment variables
 3. Deploy automatically
 
 ### Other Platforms
+
 - Netlify
 - AWS Amplify
 - DigitalOcean App Platform
@@ -255,6 +276,7 @@ This project is licensed under the MIT License.
 ## 🆘 Support
 
 For support and questions:
+
 - Create an issue in the repository
 - Contact the development team
 - Check the documentation

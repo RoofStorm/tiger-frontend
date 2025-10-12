@@ -11,11 +11,21 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1 minute
-            retry: (failureCount, error: any) => {
-              if (error?.response?.status === 401) return false;
-              return failureCount < 3;
+            staleTime: 5 * 60 * 1000, // 5 minutes
+            gcTime: 10 * 60 * 1000, // 10 minutes
+            refetchOnWindowFocus: false, // Prevent refetch on window focus
+            refetchOnMount: false, // Prevent refetch on component mount
+            retry: (failureCount, error: unknown) => {
+              if (
+                (error as { response?: { status?: number } })?.response
+                  ?.status === 401
+              )
+                return false;
+              return failureCount < 1; // Reduce retry attempts
             },
+          },
+          mutations: {
+            retry: false, // Don't retry mutations
           },
         },
       })
@@ -23,11 +33,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider>
+      <SessionProvider
+        refetchInterval={0} // Disable automatic refetch
+        refetchOnWindowFocus={false} // Don't refetch on window focus
+        refetchWhenOffline={false} // Don't refetch when offline
+      >
         {children}
         <Toaster />
       </SessionProvider>
     </QueryClientProvider>
   );
 }
-

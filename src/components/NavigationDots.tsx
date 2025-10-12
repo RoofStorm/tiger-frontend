@@ -8,8 +8,11 @@ interface NavigationDotsProps {
   onSectionChange: (section: number) => void;
 }
 
-export function NavigationDots({ currentSection, onSectionChange }: NavigationDotsProps) {
-  const [isVisible, setIsVisible] = useState(true);
+export function NavigationDots({
+  currentSection,
+  onSectionChange,
+}: NavigationDotsProps) {
+  const [isVisible] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,7 +21,10 @@ export function NavigationDots({ currentSection, onSectionChange }: NavigationDo
 
       sections.forEach((section, index) => {
         const rect = section.getBoundingClientRect();
-        if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+        if (
+          rect.top <= window.innerHeight / 2 &&
+          rect.bottom >= window.innerHeight / 2
+        ) {
           current = index;
         }
       });
@@ -37,18 +43,18 @@ export function NavigationDots({ currentSection, onSectionChange }: NavigationDo
     if (section) {
       section.scrollIntoView({
         behavior: 'smooth',
-        block: 'start'
+        block: 'start',
       });
     }
   };
 
   const cornerLabels = [
     'Video',
-    'Mood', 
+    'Mood',
     'Products',
     'Gallery',
     'Cards',
-    'Rewards'
+    'Rewards',
   ];
 
   return (
@@ -59,7 +65,7 @@ export function NavigationDots({ currentSection, onSectionChange }: NavigationDo
       className="fixed right-8 top-1/2 transform -translate-y-1/2 z-50"
     >
       <div className="flex flex-col items-center space-y-4">
-        {[0, 1, 2, 3, 4, 5].map((index) => (
+        {[0, 1, 2, 3, 4, 5].map(index => (
           <motion.div
             key={index}
             whileHover={{ scale: 1.2 }}
@@ -75,7 +81,7 @@ export function NavigationDots({ currentSection, onSectionChange }: NavigationDo
                   : 'bg-blue-600 hover:bg-blue-700 hover:scale-110'
               }`}
             />
-            
+
             {/* Label Tooltip */}
             <motion.div
               initial={{ opacity: 0, x: 10 }}

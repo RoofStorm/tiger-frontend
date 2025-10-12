@@ -3,39 +3,81 @@
 import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Upload, Heart, Share2, MessageCircle, Pin, MoreHorizontal } from 'lucide-react';
+import Image from 'next/image';
+import {
+  Upload,
+  Heart,
+  Share2,
+  MessageCircle,
+  MoreHorizontal,
+  Star,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Post, CreatePostData } from '@/types';
 import apiClient from '@/lib/api';
-import { useAuth } from '@/hooks/useAuth';
+import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 
 export function Corner2_2() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Fetch posts
+  // Fetch highlighted posts only
   const { data: postsData, isLoading } = useQuery({
-    queryKey: ['posts'],
-    queryFn: () => apiClient.getPosts(),
+    queryKey: ['highlighted-posts', user?.id], // Include user ID in query key
+    queryFn: () => apiClient.getHighlightedPosts(),
     enabled: isAuthenticated,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchOnWindowFocus: false,
   });
 
-  const posts = postsData?.data || [];
+  const posts = postsData?.data?.posts || [];
+
+  // Fetch user actions to check which posts are liked
+  const { data: userActionsData } = useQuery({
+    queryKey: ['user-actions', user?.id], // Include user ID in query key
+    queryFn: () => apiClient.getUserActions(),
+    enabled: isAuthenticated && !!user,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    refetchOnWindowFocus: false,
+  });
+
+  const userActions = userActionsData?.data || [];
+  const likedPostIds = userActions
+    .filter(
+      (action: { type: string; postId: string }) => action.type === 'LIKE'
+    )
+    .map((action: { type: string; postId: string }) => action.postId);
 
   // Like mutation
   const likeMutation = useMutation({
     mutationFn: (postId: string) => apiClient.likePost(postId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
-      toast({
-        title: 'Đã thích bài viết!',
-        description: 'Cảm ơn bạn đã chia sẻ cảm xúc.',
+    onSuccess: data => {
+      // Invalidate posts and user actions to refresh data
+      queryClient.invalidateQueries({
+        queryKey: ['highlighted-posts', user?.id],
       });
+      queryClient.invalidateQueries({ queryKey: ['user-actions', user?.id] });
+      // Invalidate user details to refresh points
+      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+
+      if (data.action === 'liked') {
+        toast({
+          title: 'Đã thích bài viết!',
+          description: 'Cảm ơn bạn đã chia sẻ cảm xúc.',
+        });
+      } else if (data.action === 'unliked') {
+        toast({
+          title: 'Đã bỏ thích bài viết',
+          description: 'Bạn đã bỏ thích bài viết này.',
+        });
+      }
     },
     onError: () => {
       toast({
@@ -50,7 +92,13 @@ export function Corner2_2() {
   const shareMutation = useMutation({
     mutationFn: (postId: string) => apiClient.sharePost(postId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      // Invalidate posts to refresh global counts
+      queryClient.invalidateQueries({
+        queryKey: ['highlighted-posts', user?.id],
+      });
+      // Invalidate user details to refresh points
+      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+
       toast({
         title: 'Đã chia sẻ!',
         description: 'Bài viết đã được chia sẻ thành công.',
@@ -58,7 +106,9 @@ export function Corner2_2() {
     },
   });
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -71,54 +121,86 @@ export function Corner2_2() {
       return;
     }
 
+    // Set selected file and create preview
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+  };
+
+  const handleUploadPost = async () => {
+    if (!selectedFile) {
+      toast({
+        title: 'Chưa chọn ảnh',
+        description: 'Vui lòng chọn ảnh để đăng bài.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setUploading(true);
     try {
-      // Get signed upload URL
-      const { data: uploadData } = await apiClient.getSignedUploadUrl(
-        file.name,
-        file.type
-      );
+      console.log('Starting upload for file:', selectedFile.name);
 
-      // Upload file to S3
-      const formData = new FormData();
-      Object.entries(uploadData.fields).forEach(([key, value]) => {
-        formData.append(key, value as string);
+      // Upload file directly to backend
+      const uploadResult = await apiClient.uploadFile(selectedFile);
+      console.log('Upload result:', uploadResult);
+
+      // Show upload success notification
+      toast({
+        title: 'Upload thành công!',
+        description: 'Ảnh đã được tải lên thành công.',
+        variant: 'success',
       });
-      formData.append('file', file);
-
-      const uploadResponse = await fetch(uploadData.signedUrl, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('Upload failed');
-      }
 
       // Create post
       const postData: CreatePostData = {
-        imageUrl: uploadData.publicUrl,
+        imageUrl: uploadResult.data.url, // Fix: use uploadResult.data.url instead of uploadResult.url
         caption: caption || '',
       };
+      console.log('Post data:', postData);
 
-      await apiClient.createPost(postData);
-      
-      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      const createdPost = await apiClient.createPost(postData);
+      console.log('Created post:', createdPost);
+
+      queryClient.invalidateQueries({
+        queryKey: ['highlighted-posts', user?.id],
+      });
+      // Invalidate user details to refresh points
+      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+
+      // Reset form
       setCaption('');
-      
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
       toast({
-        title: 'Đã chia sẻ!',
-        description: 'Ảnh của bạn đã được đăng thành công.',
+        title: 'Đăng bài thành công!',
+        description: 'Bài viết của bạn đã được chia sẻ.',
+        variant: 'success',
       });
     } catch (error) {
       console.error('Upload failed:', error);
       toast({
-        title: 'Lỗi upload',
-        description: 'Không thể tải lên ảnh. Vui lòng thử lại.',
+        title: 'Đăng bài thất bại',
+        description: 'Vui lòng thử lại sau.',
         variant: 'destructive',
       });
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -131,6 +213,14 @@ export function Corner2_2() {
       });
       return;
     }
+
+    // Prevent duplicate calls
+    if (likeMutation.isPending) {
+      console.log('Like mutation already in progress, skipping...');
+      return;
+    }
+
+    console.log(`Frontend: Liking post ${postId}`);
     likeMutation.mutate(postId);
   };
 
@@ -161,7 +251,7 @@ export function Corner2_2() {
               Góc Chia Sẻ
             </h2>
             <p className="text-xl sm:text-2xl lg:text-3xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              Chia sẻ khoảnh khắc đẹp và kết nối với cộng đồng
+              Những khoảnh khắc đẹp được highlight bởi admin
             </p>
           </motion.div>
         </div>
@@ -174,34 +264,83 @@ export function Corner2_2() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 lg:p-8 mb-12"
           >
-            <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
-              <div className="flex-1 w-full">
-                <textarea
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                  placeholder="Chia sẻ cảm xúc của bạn..."
-                  className="w-full p-4 border-2 border-gray-200 rounded-2xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg"
-                  rows={3}
-                />
+            <h3 className="text-xl font-bold text-gray-800 mb-6">
+              Chia sẻ khoảnh khắc của bạn
+            </h3>
+
+            {/* Caption Input */}
+            <div className="mb-6">
+              <textarea
+                value={caption}
+                onChange={e => setCaption(e.target.value)}
+                placeholder="Chia sẻ cảm xúc của bạn..."
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg"
+                rows={3}
+              />
+            </div>
+
+            {/* File Selection */}
+            <div className="mb-6">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-blue-500/25 hover:scale-105 transition-all duration-300"
+              >
+                <Upload className="w-5 h-5 mr-2" />
+                {selectedFile ? '📸 Chọn ảnh khác' : '📸 Chọn ảnh'}
+              </Button>
+            </div>
+
+            {/* Image Preview */}
+            {previewUrl && (
+              <div className="mb-6">
+                <div className="relative inline-block">
+                  <Image
+                    src={previewUrl}
+                    alt="Preview"
+                    width={400}
+                    height={256}
+                    className="max-w-full max-h-64 rounded-2xl shadow-lg object-cover"
+                  />
+                  <Button
+                    onClick={handleRemoveFile}
+                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 p-0 shadow-lg"
+                  >
+                    ×
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
+            )}
+
+            {/* Upload Button */}
+            {selectedFile && (
+              <div className="flex justify-end">
                 <Button
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={handleUploadPost}
                   disabled={uploading}
-                  className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-blue-500/25 hover:scale-105 transition-all duration-300"
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-8 py-3 text-lg rounded-xl shadow-lg hover:shadow-green-500/25 hover:scale-105 transition-all duration-300"
                 >
-                  <Upload className="w-5 h-5 mr-2" />
-                  {uploading ? 'Đang tải...' : '📸 Chọn ảnh'}
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Đang đăng...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-5 h-5 mr-2" />
+                      Đăng bài
+                    </>
+                  )}
                 </Button>
               </div>
-            </div>
+            )}
           </motion.div>
         )}
 
@@ -222,8 +361,12 @@ export function Corner2_2() {
               <div className="w-32 h-32 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Upload className="w-16 h-16 text-blue-400" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-700 mb-4">Chưa có bài viết nào</h3>
-              <p className="text-gray-500 text-lg">Hãy là người đầu tiên chia sẻ!</p>
+              <h3 className="text-2xl font-bold text-gray-700 mb-4">
+                Chưa có bài viết nổi bật nào
+              </h3>
+              <p className="text-gray-500 text-lg">
+                Admin sẽ highlight những bài viết đẹp nhất!
+              </p>
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -237,18 +380,20 @@ export function Corner2_2() {
                 >
                   {/* Post Image */}
                   <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                    <img
+                    <Image
                       src={post.imageUrl}
-                      alt={post.caption}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      alt={post.caption || 'Post image'}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    
-                    {/* Pin Badge */}
-                    {post.isPinned && (
-                      <div className="absolute top-3 right-3">
-                        <div className="bg-yellow-500 text-white p-2 rounded-full shadow-lg">
-                          <Pin className="w-4 h-4" />
+
+                    {/* Highlight Badge */}
+                    {post.isHighlighted && (
+                      <div className="absolute top-3 left-3">
+                        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full shadow-lg flex items-center space-x-1">
+                          <Star className="w-4 h-4" />
+                          <span className="text-xs font-semibold">Nổi bật</span>
                         </div>
                       </div>
                     )}
@@ -264,19 +409,27 @@ export function Corner2_2() {
                         </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 text-sm truncate">{post.user.name}</p>
+                        <p className="font-semibold text-gray-900 text-sm truncate">
+                          {post.user.name}
+                        </p>
                         <p className="text-xs text-gray-500">
                           {new Date(post.createdAt).toLocaleDateString('vi-VN')}
                         </p>
                       </div>
-                      <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </div>
 
                     {/* Caption */}
                     {post.caption && (
-                      <p className="text-gray-800 text-sm mb-4 line-clamp-2">{post.caption}</p>
+                      <p className="text-gray-800 text-sm mb-4 line-clamp-2">
+                        {post.caption}
+                      </p>
                     )}
 
                     {/* Actions */}
@@ -286,12 +439,20 @@ export function Corner2_2() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleLike(post.id)}
-                          className={`flex items-center space-x-1 text-sm ${
-                            post.isLiked ? 'text-red-500' : 'text-gray-500'
-                          } hover:bg-red-50`}
+                          className={`flex items-center space-x-1 text-sm transition-colors duration-200 ${
+                            likedPostIds.includes(post.id)
+                              ? 'text-red-500 hover:text-red-600 hover:bg-red-50'
+                              : 'text-gray-500 hover:text-red-400 hover:bg-red-50'
+                          }`}
                         >
-                          <Heart className={`w-4 h-4 ${post.isLiked ? 'fill-current' : ''}`} />
-                          <span>{post.likes}</span>
+                          <Heart
+                            className={`w-4 h-4 transition-colors duration-200 ${
+                              likedPostIds.includes(post.id)
+                                ? 'fill-red-500'
+                                : ''
+                            }`}
+                          />
+                          <span>{post.likeCount || 0}</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -299,7 +460,7 @@ export function Corner2_2() {
                           className="flex items-center space-x-1 text-gray-500 text-sm hover:bg-blue-50"
                         >
                           <MessageCircle className="w-4 h-4" />
-                          <span>0</span>
+                          <span>{post.commentCount || 0}</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -308,7 +469,7 @@ export function Corner2_2() {
                           className="flex items-center space-x-1 text-gray-500 text-sm hover:bg-green-50"
                         >
                           <Share2 className="w-4 h-4" />
-                          <span>{post.shares}</span>
+                          <span>{post.shareCount || 0}</span>
                         </Button>
                       </div>
                     </div>
@@ -322,4 +483,3 @@ export function Corner2_2() {
     </div>
   );
 }
-

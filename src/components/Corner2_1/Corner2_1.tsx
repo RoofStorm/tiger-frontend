@@ -1,25 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Star, Heart, Gift } from 'lucide-react';
+import { ArrowRight, Heart, Play, Pause } from 'lucide-react';
 
 export function Corner2_1() {
-  const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-
-  // Auto-play logic
-  useEffect(() => {
-    if (!isAutoPlaying) return;
-    
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % products.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const products = [
     {
@@ -30,17 +22,17 @@ export function Corner2_1() {
       image: '/api/placeholder/200/250',
       color: 'from-red-600 to-red-800',
       icon: '📚',
-      brand: 'Fahasa.com'
+      brand: 'Fahasa.com',
     },
     {
       id: 'phone-coffee',
       title: 'DÒNG LÒNG ĐI CHILL',
-      subtitle: 'Dây đeo "Đồng Lòng Đi Chill"',
+      subtitle: 'Dây đeo &ldquo;Đồng Lòng Đi Chill&rdquo;',
       description: '01 Dây đeo đa năng + 01 sản phẩm Phê-la',
       image: '/api/placeholder/200/250',
       color: 'from-green-500 to-green-700',
       icon: '📱',
-      brand: 'Phe La'
+      brand: 'Phe La',
     },
     {
       id: 'cake',
@@ -50,7 +42,7 @@ export function Corner2_1() {
       image: '/api/placeholder/200/250',
       color: 'from-red-600 to-red-800',
       icon: '🎂',
-      brand: 'Vietnamese Cuisine'
+      brand: 'Vietnamese Cuisine',
     },
     {
       id: 'cosmetics',
@@ -60,7 +52,7 @@ export function Corner2_1() {
       image: '/api/placeholder/200/250',
       color: 'from-red-500 to-red-700',
       icon: '💄',
-      brand: 'EUNUOC'
+      brand: 'EUNUOC',
     },
     {
       id: 'coffee',
@@ -70,16 +62,96 @@ export function Corner2_1() {
       image: '/api/placeholder/200/250',
       color: 'from-red-600 to-red-800',
       icon: '☕',
-      brand: 'Highlands Coffee'
-    }
+      brand: 'Highlands Coffee',
+    },
   ];
+
+  // Navigation functions
+  const nextSlide = useCallback(() => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentSlide(prev => (prev + 1) % products.length);
+    setTimeout(() => setIsTransitioning(false), 500);
+  }, [isTransitioning, products.length]);
+
+  const prevSlide = useCallback(() => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentSlide(prev => (prev - 1 + products.length) % products.length);
+    setTimeout(() => setIsTransitioning(false), 500);
+  }, [isTransitioning, products.length]);
+
+  const goToSlide = useCallback(
+    (index: number) => {
+      if (isTransitioning || index === currentSlide) return;
+      setIsTransitioning(true);
+      setCurrentSlide(index);
+      setTimeout(() => setIsTransitioning(false), 500);
+    },
+    [isTransitioning, currentSlide]
+  );
+
+  // Auto-play logic
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+
+    const interval = setInterval(() => {
+      nextSlide();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, nextSlide]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        prevSlide();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        nextSlide();
+      } else if (event.key === ' ') {
+        event.preventDefault();
+        setIsAutoPlaying(!isAutoPlaying);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAutoPlaying, nextSlide, prevSlide]);
+
+  // Touch handlers for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      nextSlide();
+    } else if (isRightSwipe) {
+      prevSlide();
+    }
+  };
 
   const testimonials = [
     {
       name: 'Nguyễn Thị Nhật Lệ',
-      quote: 'Tinh thần yêu nước là một truyền thống quý báu của dân tộc Việt Nam. Từ xưa đến nay, mỗi khi Tổ quốc bị xâm lăng là...',
-      avatar: '/api/placeholder/60/60'
-    }
+      quote:
+        'Tinh thần yêu nước là một truyền thống quý báu của dân tộc Việt Nam. Từ xưa đến nay, mỗi khi Tổ quốc bị xâm lăng là...',
+      avatar: '/api/placeholder/60/60',
+    },
   ];
 
   return (
@@ -104,7 +176,8 @@ export function Corner2_1() {
               <div className="lg:col-span-1">
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 h-full flex items-center">
                   <p className="text-white text-lg leading-relaxed">
-                    Lan tỏa tình yêu nước bằng những sản phẩm "made in Vietnam" sáng tạo & chất lượng
+                    Lan tỏa tình yêu nước bằng những sản phẩm &ldquo;made in
+                    Vietnam&rdquo; sáng tạo & chất lượng
                   </p>
                 </div>
               </div>
@@ -113,26 +186,36 @@ export function Corner2_1() {
               <div className="lg:col-span-2">
                 <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 h-full">
                   <h2 className="text-xl font-bold text-white mb-4">
-                    Toplist uy tín do Ban biên tập Kenh14 thẩm định và bình chọn, dựa trên các tiêu chí rõ ràng:
+                    Toplist uy tín do Ban biên tập Kenh14 thẩm định và bình
+                    chọn, dựa trên các tiêu chí rõ ràng:
                   </h2>
-                  
+
                   <div className="space-y-4">
                     <div className="flex items-start space-x-3">
                       <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
                       <div>
-                        <h3 className="text-lg font-bold text-white mb-2">Made in Việt Nam</h3>
+                        <h3 className="text-lg font-bold text-white mb-2">
+                          Made in Việt Nam
+                        </h3>
                         <p className="text-white/80 leading-relaxed">
-                          Sản phẩm của thương hiệu nội địa phát triển, mang dấu ấn bản địa, được ra mắt dịp 2/9 hoặc lan tỏa tinh thần tích cực, yêu nước.
+                          Sản phẩm của thương hiệu nội địa phát triển, mang dấu
+                          ấn bản địa, được ra mắt dịp 2/9 hoặc lan tỏa tinh thần
+                          tích cực, yêu nước.
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start space-x-3">
                       <div className="w-2 h-2 bg-white rounded-full mt-2 flex-shrink-0"></div>
                       <div>
-                        <h3 className="text-lg font-bold text-white mb-2">Chất lượng và độ hoàn thiện</h3>
+                        <h3 className="text-lg font-bold text-white mb-2">
+                          Chất lượng và độ hoàn thiện
+                        </h3>
                         <p className="text-white/80 leading-relaxed">
-                          Sản phẩm được hoàn thiện tốt, sẵn sàng sử dụng hoặc kinh doanh, không vi phạm bản quyền và có nguồn gốc xuất xứ rõ ràng (đặc biệt đối với F&B và sản phẩm dành cho trẻ em).
+                          Sản phẩm được hoàn thiện tốt, sẵn sàng sử dụng hoặc
+                          kinh doanh, không vi phạm bản quyền và có nguồn gốc
+                          xuất xứ rõ ràng (đặc biệt đối với F&B và sản phẩm dành
+                          cho trẻ em).
                         </p>
                       </div>
                     </div>
@@ -162,252 +245,228 @@ export function Corner2_1() {
               </Button>
             </motion.div>
 
-            {/* Single Row Carousel */}
+            {/* 5-Slide Carousel with Center Highlight */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
               className="mb-12"
             >
-              <div className="relative h-[500px] flex items-center justify-center">
+              <div className="relative">
                 {/* Carousel Container */}
-                <div className="relative w-full max-w-7xl h-full">
-                  {/* Layered Row Layout */}
-                  <div className="flex items-center justify-center h-full relative">
-                    
-                    {/* Left Preview 2 - Outermost left, lowest z-index */}
+                <div
+                  ref={carouselRef}
+                  className="relative w-full max-w-7xl mx-auto"
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  {/* 5-Slide Display */}
+                  <div className="relative h-[500px] flex items-center justify-center overflow-hidden">
                     <motion.div
-                      initial={{ opacity: 0, x: -50 }}
-                      animate={{ opacity: 0.6, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.2 }}
-                      className="w-80 h-96 rounded-3xl shadow-xl border-4 border-white/30 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 absolute left-0 z-10"
-                      onClick={() => {
-                        const prevIndex = (currentSlide - 2 + products.length) % products.length;
-                        setCurrentSlide(prevIndex);
-                        setIsAutoPlaying(false);
-                      }}
+                      className="flex items-center justify-center space-x-2 relative"
+                      layout
                     >
-                      <div className={`bg-gradient-to-br ${products[(currentSlide - 2 + products.length) % products.length].color} h-full flex flex-col justify-center items-center text-center p-6`}>
-                        {/* Brand Logo */}
-                        <div className="mb-4">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
-                            <span className="text-white font-bold text-sm">{products[(currentSlide - 2 + products.length) % products.length].brand}</span>
-                          </div>
-                        </div>
-                        
-                        {/* Product Icon */}
-                        <div className="mb-6">
-                          <div className="text-white text-6xl opacity-90 drop-shadow-2xl">
-                            {products[(currentSlide - 2 + products.length) % products.length].icon}
-                          </div>
-                          <div className="w-20 h-1 bg-white/40 mx-auto rounded-full mt-3"></div>
-                        </div>
-                        
-                        {/* Product Info */}
-                        <div className="max-w-xs">
-                          <h3 className="text-white text-xl font-bold mb-3 leading-tight">
-                            {products[(currentSlide - 2 + products.length) % products.length].title}
-                          </h3>
-                          <p className="text-white/90 text-sm mb-4">
-                            {products[(currentSlide - 2 + products.length) % products.length].subtitle}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
+                      {/* Render 5 slides: 2 left, center, 2 right */}
+                      {[-2, -1, 0, 1, 2].map(offset => {
+                        const slideIndex =
+                          (currentSlide + offset + products.length) %
+                          products.length;
+                        const isCenter = offset === 0;
+                        const isLeft = offset < 0;
 
-                    {/* Left Preview 1 - Middle left, medium z-index */}
-                    <motion.div
-                      initial={{ opacity: 0, x: -50 }}
-                      animate={{ opacity: 0.8, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.1 }}
-                      className="w-80 h-96 rounded-3xl shadow-xl border-4 border-white/40 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 absolute left-12 z-20"
-                      onClick={() => {
-                        const prevIndex = (currentSlide - 1 + products.length) % products.length;
-                        setCurrentSlide(prevIndex);
-                        setIsAutoPlaying(false);
-                      }}
-                    >
-                      <div className={`bg-gradient-to-br ${products[(currentSlide - 1 + products.length) % products.length].color} h-full flex flex-col justify-center items-center text-center p-6`}>
-                        {/* Brand Logo */}
-                        <div className="mb-4">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
-                            <span className="text-white font-bold text-sm">{products[(currentSlide - 1 + products.length) % products.length].brand}</span>
-                          </div>
-                        </div>
-                        
-                        {/* Product Icon */}
-                        <div className="mb-6">
-                          <div className="text-white text-6xl opacity-90 drop-shadow-2xl">
-                            {products[(currentSlide - 1 + products.length) % products.length].icon}
-                          </div>
-                          <div className="w-20 h-1 bg-white/40 mx-auto rounded-full mt-3"></div>
-                        </div>
-                        
-                        {/* Product Info */}
-                        <div className="max-w-xs">
-                          <h3 className="text-white text-xl font-bold mb-3 leading-tight">
-                            {products[(currentSlide - 1 + products.length) % products.length].title}
-                          </h3>
-                          <p className="text-white/90 text-sm mb-4">
-                            {products[(currentSlide - 1 + products.length) % products.length].subtitle}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
+                        return (
+                          <motion.div
+                            key={`${currentSlide}-${offset}`}
+                            layout
+                            initial={{
+                              opacity: 0,
+                              scale: 0.8,
+                              x: isLeft ? -200 : !isLeft && !isCenter ? 200 : 0,
+                            }}
+                            animate={{
+                              opacity: isCenter ? 1 : 0.6,
+                              scale: isCenter ? 1 : 0.8,
+                              x: 0,
+                              zIndex: isCenter
+                                ? 50
+                                : Math.abs(offset) === 1
+                                  ? 40
+                                  : 30,
+                            }}
+                            whileInView={{
+                              scale: isCenter ? [1, 1.02, 1] : 0.8,
+                              transition: {
+                                duration: 0.6,
+                                ease: [0.25, 0.46, 0.45, 0.94],
+                                delay: 0.5,
+                              },
+                            }}
+                            transition={{
+                              duration: 0.8,
+                              ease: [0.25, 0.46, 0.45, 0.94],
+                              type: 'spring',
+                              stiffness: 100,
+                              damping: 20,
+                              delay: Math.abs(offset) * 0.1,
+                            }}
+                            className={`relative cursor-pointer transition-all duration-300 ease-in-out ${
+                              isCenter
+                                ? 'w-80 h-96'
+                                : `w-64 h-80 ${isLeft ? 'mr-2' : 'ml-2'}`
+                            }`}
+                            style={{}}
+                            whileHover={{
+                              scale: isCenter ? 1.05 : 0.85,
+                              transition: {
+                                duration: 0.3,
+                                ease: [0.25, 0.46, 0.45, 0.94],
+                                type: 'spring',
+                                stiffness: 300,
+                                damping: 20,
+                              },
+                            }}
+                            onClick={() => {
+                              if (!isCenter) {
+                                const targetIndex =
+                                  (currentSlide + offset + products.length) %
+                                  products.length;
+                                goToSlide(targetIndex);
+                              }
+                            }}
+                          >
+                            <div
+                              className={`bg-gradient-to-br ${products[slideIndex].color} h-full rounded-3xl shadow-xl border-4 ${
+                                isCenter
+                                  ? 'border-white/60 shadow-2xl'
+                                  : 'border-white/30 hover:border-white/50'
+                              } overflow-hidden relative transform transition-all duration-300 ${
+                                isCenter ? 'hover:scale-105' : 'hover:scale-110'
+                              }`}
+                            >
+                              {/* Background Pattern */}
+                              <div className="absolute inset-0 opacity-10">
+                                <div className="absolute top-8 right-8 w-24 h-24 bg-white/20 rounded-full"></div>
+                                <div className="absolute bottom-8 left-8 w-20 h-20 bg-white/20 rounded-full"></div>
+                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/10 rounded-full"></div>
+                              </div>
 
-                    {/* Center Slide - Highest z-index */}
-                    <motion.div
-                      key={currentSlide}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.5 }}
-                      className="w-80 h-96 rounded-3xl shadow-2xl border-4 border-white/50 overflow-hidden relative absolute left-24 z-30"
-                    >
-                      <div className={`bg-gradient-to-br ${products[currentSlide].color} h-full flex flex-col justify-center items-center text-center p-6`}>
-                        {/* Background Pattern */}
-                        <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-8 right-8 w-24 h-24 bg-white/20 rounded-full"></div>
-                          <div className="absolute bottom-8 left-8 w-20 h-20 bg-white/20 rounded-full"></div>
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-white/10 rounded-full"></div>
-                        </div>
-                        
-                        {/* Content */}
-                        <div className="relative z-10">
-                          {/* Brand Logo */}
-                          <div className="mb-4">
-                            <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
-                              <span className="text-white font-bold text-sm">{products[currentSlide].brand}</span>
+                              {/* Content */}
+                              <div className="relative z-10 h-full flex flex-col justify-center items-center text-center p-6">
+                                {/* Brand Logo */}
+                                <div className="mb-4">
+                                  <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
+                                    <span className="text-white font-bold text-sm">
+                                      {products[slideIndex].brand}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Product Icon */}
+                                <div className="mb-6">
+                                  <div
+                                    className={`text-white opacity-90 drop-shadow-2xl ${
+                                      isCenter ? 'text-6xl' : 'text-5xl'
+                                    }`}
+                                  >
+                                    {products[slideIndex].icon}
+                                  </div>
+                                  <div className="w-20 h-1 bg-white/40 mx-auto rounded-full mt-3"></div>
+                                </div>
+
+                                {/* Product Info */}
+                                <div className="max-w-xs">
+                                  <h2
+                                    className={`text-white font-bold mb-3 leading-tight ${
+                                      isCenter ? 'text-xl' : 'text-lg'
+                                    }`}
+                                  >
+                                    {products[slideIndex].title}
+                                  </h2>
+                                  <p
+                                    className={`text-white/90 mb-4 ${
+                                      isCenter ? 'text-sm' : 'text-xs'
+                                    }`}
+                                  >
+                                    {products[slideIndex].subtitle}
+                                  </p>
+
+                                  {/* Only show description and CTA for center slide */}
+                                  {isCenter && (
+                                    <>
+                                      <p className="text-white/80 text-xs leading-relaxed mb-6">
+                                        {products[slideIndex].description}
+                                      </p>
+
+                                      {/* CTA Button */}
+                                      <Button className="bg-white text-red-600 hover:bg-gray-100 font-bold text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                                        Khám phá ngay
+                                        <ArrowRight className="w-4 h-4 ml-2" />
+                                      </Button>
+                                    </>
+                                  )}
+                                </div>
+
+                                {/* Decorative Elements - only for center */}
+                                {isCenter && (
+                                  <>
+                                    <div className="absolute top-4 left-4 w-12 h-12 bg-white/10 rounded-full"></div>
+                                    <div className="absolute bottom-4 right-4 w-8 h-8 bg-white/10 rounded-full"></div>
+                                  </>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                          
-                          {/* Product Icon */}
-                          <div className="mb-6">
-                            <div className="text-white text-6xl opacity-90 drop-shadow-2xl">
-                              {products[currentSlide].icon}
-                            </div>
-                            <div className="w-20 h-1 bg-white/40 mx-auto rounded-full mt-3"></div>
-                          </div>
-                          
-                          {/* Product Info */}
-                          <div className="max-w-xs">
-                            <h2 className="text-white text-xl font-bold mb-3 leading-tight">
-                              {products[currentSlide].title}
-                            </h2>
-                            <p className="text-white/90 text-sm mb-4">
-                              {products[currentSlide].subtitle}
-                            </p>
-                            <p className="text-white/80 text-xs leading-relaxed mb-6">
-                              {products[currentSlide].description}
-                            </p>
-                            
-                            {/* CTA Button */}
-                            <Button className="bg-white text-red-600 hover:bg-gray-100 font-bold text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                              Khám phá ngay
-                              <ArrowRight className="w-4 h-4 ml-2" />
-                            </Button>
-                          </div>
-                          
-                          {/* Decorative Elements */}
-                          <div className="absolute top-4 left-4 w-12 h-12 bg-white/10 rounded-full"></div>
-                          <div className="absolute bottom-4 right-4 w-8 h-8 bg-white/10 rounded-full"></div>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Right Preview 1 - Middle right, medium z-index */}
-                    <motion.div
-                      initial={{ opacity: 0, x: 50 }}
-                      animate={{ opacity: 0.8, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.1 }}
-                      className="w-80 h-96 rounded-3xl shadow-xl border-4 border-white/40 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 absolute right-12 z-20"
-                      onClick={() => {
-                        const nextIndex = (currentSlide + 1) % products.length;
-                        setCurrentSlide(nextIndex);
-                        setIsAutoPlaying(false);
-                      }}
-                    >
-                      <div className={`bg-gradient-to-br ${products[(currentSlide + 1) % products.length].color} h-full flex flex-col justify-center items-center text-center p-6`}>
-                        {/* Brand Logo */}
-                        <div className="mb-4">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
-                            <span className="text-white font-bold text-sm">{products[(currentSlide + 1) % products.length].brand}</span>
-                          </div>
-                        </div>
-                        
-                        {/* Product Icon */}
-                        <div className="mb-6">
-                          <div className="text-white text-6xl opacity-90 drop-shadow-2xl">
-                            {products[(currentSlide + 1) % products.length].icon}
-                          </div>
-                          <div className="w-20 h-1 bg-white/40 mx-auto rounded-full mt-3"></div>
-                        </div>
-                        
-                        {/* Product Info */}
-                        <div className="max-w-xs">
-                          <h3 className="text-white text-xl font-bold mb-3 leading-tight">
-                            {products[(currentSlide + 1) % products.length].title}
-                          </h3>
-                          <p className="text-white/90 text-sm mb-4">
-                            {products[(currentSlide + 1) % products.length].subtitle}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Right Preview 2 - Outermost right, lowest z-index */}
-                    <motion.div
-                      initial={{ opacity: 0, x: 50 }}
-                      animate={{ opacity: 0.6, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.2 }}
-                      className="w-80 h-96 rounded-3xl shadow-xl border-4 border-white/30 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-300 absolute right-0 z-10"
-                      onClick={() => {
-                        const nextIndex = (currentSlide + 2) % products.length;
-                        setCurrentSlide(nextIndex);
-                        setIsAutoPlaying(false);
-                      }}
-                    >
-                      <div className={`bg-gradient-to-br ${products[(currentSlide + 2) % products.length].color} h-full flex flex-col justify-center items-center text-center p-6`}>
-                        {/* Brand Logo */}
-                        <div className="mb-4">
-                          <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
-                            <span className="text-white font-bold text-sm">{products[(currentSlide + 2) % products.length].brand}</span>
-                          </div>
-                        </div>
-                        
-                        {/* Product Icon */}
-                        <div className="mb-6">
-                          <div className="text-white text-6xl opacity-90 drop-shadow-2xl">
-                            {products[(currentSlide + 2) % products.length].icon}
-                          </div>
-                          <div className="w-20 h-1 bg-white/40 mx-auto rounded-full mt-3"></div>
-                        </div>
-                        
-                        {/* Product Info */}
-                        <div className="max-w-xs">
-                          <h3 className="text-white text-xl font-bold mb-3 leading-tight">
-                            {products[(currentSlide + 2) % products.length].title}
-                          </h3>
-                          <p className="text-white/90 text-sm mb-4">
-                            {products[(currentSlide + 2) % products.length].subtitle}
-                          </p>
-                        </div>
-                      </div>
+                          </motion.div>
+                        );
+                      })}
                     </motion.div>
                   </div>
 
                   {/* Auto-play Control */}
-                  <div className="absolute top-4 right-4 z-40">
+                  <div className="absolute top-4 right-4 z-50">
                     <button
                       onClick={() => setIsAutoPlaying(!isAutoPlaying)}
                       className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
-                        isAutoPlaying 
-                          ? 'bg-white/90 hover:bg-white' 
+                        isAutoPlaying
+                          ? 'bg-white/90 hover:bg-white'
                           : 'bg-white/60 hover:bg-white/80'
                       }`}
+                      aria-label={
+                        isAutoPlaying ? 'Pause slideshow' : 'Play slideshow'
+                      }
                     >
-                      <div className={`w-4 h-4 rounded-full ${isAutoPlaying ? 'bg-red-600' : 'bg-gray-400'}`}></div>
+                      {isAutoPlaying ? (
+                        <Pause className="w-5 h-5 text-red-600" />
+                      ) : (
+                        <Play className="w-5 h-5 text-red-600" />
+                      )}
                     </button>
+                  </div>
+
+                  {/* Navigation Dots */}
+                  <div className="flex justify-center mt-8 space-x-2">
+                    {products.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => goToSlide(index)}
+                        disabled={isTransitioning}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          index === currentSlide
+                            ? 'bg-white scale-125'
+                            : 'bg-white/50 hover:bg-white/70'
+                        }`}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Slide Counter */}
+                  <div className="absolute bottom-4 left-4 z-50">
+                    <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1 border border-white/30">
+                      <span className="text-white text-sm font-medium">
+                        {currentSlide + 1} / {products.length}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -428,16 +487,16 @@ export function Corner2_1() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-white mb-4">
                     {testimonials[0].name}
                   </h3>
                   <blockquote className="text-white/90 text-lg leading-relaxed italic">
-                    "{testimonials[0].quote}"
+                    &ldquo;{testimonials[0].quote}&rdquo;
                   </blockquote>
                 </div>
-                
+
                 <div className="flex-shrink-0">
                   <Button className="bg-white text-red-600 hover:bg-gray-100 font-medium px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
                     <Heart className="w-4 h-4 mr-2" />

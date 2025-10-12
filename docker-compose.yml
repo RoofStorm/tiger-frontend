@@ -6,10 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:4000/api
       - NEXTAUTH_URL=http://localhost:3000
       - NEXTAUTH_SECRET=your-secret-key-here
     volumes:
@@ -24,7 +24,7 @@ services:
   tiger-backend:
     image: tiger-backend:latest
     ports:
-      - "3001:3001"
+      - '4000:4000'
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://username:password@postgres:5432/tiger_db
@@ -37,7 +37,7 @@ services:
   postgres:
     image: postgres:15-alpine
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       - POSTGRES_DB=tiger_db
       - POSTGRES_USER=username
@@ -50,7 +50,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     networks:
@@ -63,4 +63,3 @@ volumes:
 networks:
   tiger-network:
     driver: bridge
-

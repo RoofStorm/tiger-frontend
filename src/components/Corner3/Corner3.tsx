@@ -26,13 +26,15 @@ const CARD_DATA: CardData[] = [
     id: 'motivation',
     front: {
       title: 'Động Lực Hàng Ngày',
-      content: 'Mỗi ngày là một cơ hội mới để phát triển và trở thành phiên bản tốt nhất của chính mình.',
+      content:
+        'Mỗi ngày là một cơ hội mới để phát triển và trở thành phiên bản tốt nhất của chính mình.',
       icon: <Lightbulb className="w-12 h-12" />,
       color: 'from-yellow-400 to-orange-500',
     },
     back: {
       title: 'Hành Động',
-      content: 'Hãy đặt ra một mục tiêu nhỏ cho hôm nay và thực hiện nó. Mỗi bước nhỏ đều có ý nghĩa.',
+      content:
+        'Hãy đặt ra một mục tiêu nhỏ cho hôm nay và thực hiện nó. Mỗi bước nhỏ đều có ý nghĩa.',
       action: 'Tôi sẽ...',
       color: 'from-orange-500 to-red-500',
     },
@@ -41,13 +43,15 @@ const CARD_DATA: CardData[] = [
     id: 'gratitude',
     front: {
       title: 'Lòng Biết Ơn',
-      content: 'Hãy dành thời gian để cảm ơn những điều tốt đẹp trong cuộc sống của bạn.',
+      content:
+        'Hãy dành thời gian để cảm ơn những điều tốt đẹp trong cuộc sống của bạn.',
       icon: <Heart className="w-12 h-12" />,
       color: 'from-pink-400 to-rose-500',
     },
     back: {
       title: 'Thực Hành',
-      content: 'Viết ra 3 điều bạn biết ơn hôm nay. Điều này sẽ giúp bạn cảm thấy tích cực hơn.',
+      content:
+        'Viết ra 3 điều bạn biết ơn hôm nay. Điều này sẽ giúp bạn cảm thấy tích cực hơn.',
       action: 'Tôi biết ơn vì...',
       color: 'from-rose-500 to-pink-600',
     },
@@ -56,13 +60,15 @@ const CARD_DATA: CardData[] = [
     id: 'growth',
     front: {
       title: 'Phát Triển Bản Thân',
-      content: 'Học hỏi không bao giờ là quá muộn. Mỗi ngày hãy học một điều mới.',
+      content:
+        'Học hỏi không bao giờ là quá muộn. Mỗi ngày hãy học một điều mới.',
       icon: <Star className="w-12 h-12" />,
       color: 'from-purple-400 to-indigo-500',
     },
     back: {
       title: 'Kế Hoạch',
-      content: 'Chọn một kỹ năng bạn muốn phát triển và dành 15 phút mỗi ngày để luyện tập.',
+      content:
+        'Chọn một kỹ năng bạn muốn phát triển và dành 15 phút mỗi ngày để luyện tập.',
       action: 'Tôi muốn học...',
       color: 'from-indigo-500 to-purple-600',
     },
@@ -82,7 +88,7 @@ export function Corner3() {
       ...prev,
       [cardId]: action,
     }));
-    
+
     // Reset flip after action
     setTimeout(() => {
       setFlippedCard(null);
@@ -134,14 +140,14 @@ export function Corner3() {
                     animate={{
                       rotateY: flippedCard === card.id ? 180 : 0,
                     }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                    style={{ 
+                    transition={{ duration: 0.8, ease: 'easeInOut' }}
+                    style={{
                       backfaceVisibility: 'hidden',
-                      transformStyle: 'preserve-3d'
+                      transformStyle: 'preserve-3d',
                     }}
                   >
                     <div className="text-center space-y-6">
-                      <motion.div 
+                      <motion.div
                         className="flex justify-center"
                         whileHover={{ scale: 1.1, rotate: 5 }}
                         transition={{ duration: 0.3 }}
@@ -166,10 +172,10 @@ export function Corner3() {
                     animate={{
                       rotateY: flippedCard === card.id ? 0 : -180,
                     }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                    style={{ 
+                    transition={{ duration: 0.8, ease: 'easeInOut' }}
+                    style={{
                       backfaceVisibility: 'hidden',
-                      transformStyle: 'preserve-3d'
+                      transformStyle: 'preserve-3d',
                     }}
                   >
                     <div className="text-center space-y-6 w-full">
@@ -179,7 +185,7 @@ export function Corner3() {
                       <p className="text-lg opacity-90 leading-relaxed">
                         {card.back.content}
                       </p>
-                      
+
                       {/* Action Input */}
                       <div className="space-y-4 w-full">
                         <p className="text-sm opacity-80 font-medium">
@@ -190,14 +196,16 @@ export function Corner3() {
                           placeholder="Nhập câu trả lời của bạn..."
                           className="w-full px-4 py-3 rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 bg-white/90 backdrop-blur-sm"
                           value={userActions[card.id] || ''}
-                          onChange={(e) => setUserActions(prev => ({
-                            ...prev,
-                            [card.id]: e.target.value,
-                          }))}
-                          onClick={(e) => e.stopPropagation()}
+                          onChange={e =>
+                            setUserActions(prev => ({
+                              ...prev,
+                              [card.id]: e.target.value,
+                            }))
+                          }
+                          onClick={e => e.stopPropagation()}
                         />
                         <Button
-                          onClick={(e) => {
+                          onClick={e => {
                             e.stopPropagation();
                             if (userActions[card.id]) {
                               handleActionSubmit(card.id, userActions[card.id]);
@@ -255,20 +263,24 @@ export function Corner3() {
                 Hướng dẫn để bạn có trải nghiệm tốt nhất
               </p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-4">
                 <div className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                     1
                   </div>
-                  <p className="text-gray-700 text-lg">Nhấn vào thẻ để lật và xem thử thách</p>
+                  <p className="text-gray-700 text-lg">
+                    Nhấn vào thẻ để lật và xem thử thách
+                  </p>
                 </div>
                 <div className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                     2
                   </div>
-                  <p className="text-gray-700 text-lg">Đọc kỹ nội dung và hoàn thành hành động</p>
+                  <p className="text-gray-700 text-lg">
+                    Đọc kỹ nội dung và hoàn thành hành động
+                  </p>
                 </div>
               </div>
               <div className="space-y-4">
@@ -276,13 +288,17 @@ export function Corner3() {
                   <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                     3
                   </div>
-                  <p className="text-gray-700 text-lg">Nhập câu trả lời và nhấn "Xác nhận"</p>
+                  <p className="text-gray-700 text-lg">
+                    Nhập câu trả lời và nhấn &quot;Xác nhận&quot;
+                  </p>
                 </div>
                 <div className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-gradient-to-r from-rose-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
                     4
                   </div>
-                  <p className="text-gray-700 text-lg">Thẻ sẽ tự động lật lại sau khi hoàn thành</p>
+                  <p className="text-gray-700 text-lg">
+                    Thẻ sẽ tự động lật lại sau khi hoàn thành
+                  </p>
                 </div>
               </div>
             </div>
@@ -292,4 +308,3 @@ export function Corner3() {
     </div>
   );
 }
-
