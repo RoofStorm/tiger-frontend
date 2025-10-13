@@ -45,6 +45,7 @@ export function Corner4() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['auth'] });
       queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['redeemHistory'] });
       setShowRedeemModal(false);
       setSelectedReward(null);
       setRedeemForm({

@@ -1,17 +1,43 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Heart, Play, Pause } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import apiClient from '@/lib/api';
 
 export function Corner2_1() {
+  const router = useRouter();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  // Fetch highlighted wishes for testimonials
+  const { data: wishesData } = useQuery({
+    queryKey: ['highlighted-wishes-testimonials'],
+    queryFn: () => apiClient.getHighlightedWishes(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
+
+  const highlightedWishes = wishesData?.data || [];
+
+  // Auto-slide testimonials every 4 seconds
+  useEffect(() => {
+    if (highlightedWishes.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentTestimonial(prev => (prev + 1) % highlightedWishes.length);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [highlightedWishes.length]);
 
   const products = [
     {
@@ -145,14 +171,27 @@ export function Corner2_1() {
     }
   };
 
-  const testimonials = [
+  // Create testimonials from highlighted wishes
+  const testimonials = highlightedWishes.map(
+    (wish: { user?: { name?: string; image?: string }; content: string }) => ({
+      name: wish.user?.name || 'Người dùng ẩn danh',
+      quote: wish.content,
+      avatar: wish.user?.image || null,
+    })
+  );
+
+  // Fallback testimonials if no highlighted wishes
+  const fallbackTestimonials = [
     {
       name: 'Nguyễn Thị Nhật Lệ',
       quote:
-        'Tinh thần yêu nước là một truyền thống quý báu của dân tộc Việt Nam. Từ xưa đến nay, mỗi khi Tổ quốc bị xâm lăng là...',
-      avatar: '/api/placeholder/60/60',
+        'Tinh thần yêu nước là một truyền thống quý báu của dân tộc Việt Nam. Từ xưa đến nay, mỗi khi Tổ quốc bị xâm lăng là tinh thần ấy lại kết thành một làn sóng mạnh mẽ.',
+      avatar: null,
     },
   ];
+
+  const displayTestimonials =
+    testimonials.length > 0 ? testimonials : fallbackTestimonials;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-600 via-red-700 to-red-800 relative overflow-hidden">
@@ -444,7 +483,7 @@ export function Corner2_1() {
                   </div>
 
                   {/* Navigation Dots */}
-                  <div className="flex justify-center mt-8 space-x-2">
+                  {/* <div className="flex justify-center mt-8 space-x-2">
                     {products.map((_, index) => (
                       <button
                         key={index}
@@ -458,7 +497,7 @@ export function Corner2_1() {
                         aria-label={`Go to slide ${index + 1}`}
                       />
                     ))}
-                  </div>
+                  </div> */}
 
                   {/* Slide Counter */}
                   <div className="absolute bottom-4 left-4 z-50">
@@ -479,7 +518,7 @@ export function Corner2_1() {
               transition={{ duration: 0.6, delay: 1.0 }}
               className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20"
             >
-              <div className="flex flex-col md:flex-row items-start space-y-6 md:space-y-0 md:space-x-8">
+              <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
                 <div className="flex-shrink-0">
                   <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center">
                     <div className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center">
@@ -489,16 +528,35 @@ export function Corner2_1() {
                 </div>
 
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-white mb-4">
-                    {testimonials[0].name}
-                  </h3>
-                  <blockquote className="text-white/90 text-lg leading-relaxed italic">
-                    &ldquo;{testimonials[0].quote}&rdquo;
-                  </blockquote>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentTestimonial}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <h3 className="text-xl font-bold text-white mb-4">
+                        {displayTestimonials[currentTestimonial]?.name}
+                      </h3>
+                      <blockquote className="text-white/90 text-lg leading-relaxed italic">
+                        &ldquo;
+                        {displayTestimonials[currentTestimonial]?.quote &&
+                        displayTestimonials[currentTestimonial].quote.length >
+                          100
+                          ? `${displayTestimonials[currentTestimonial].quote.substring(0, 100)}...`
+                          : displayTestimonials[currentTestimonial]?.quote}
+                        &rdquo;
+                      </blockquote>
+                    </motion.div>
+                  </AnimatePresence>
                 </div>
 
                 <div className="flex-shrink-0">
-                  <Button className="bg-white text-red-600 hover:bg-gray-100 font-medium px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Button
+                    onClick={() => router.push('/wishes')}
+                    className="bg-white text-red-600 hover:bg-gray-100 font-medium px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
                     <Heart className="w-4 h-4 mr-2" />
                     GỬI LỜI CHÚC NGAY
                   </Button>

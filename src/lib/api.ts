@@ -34,6 +34,7 @@ class ApiClient {
           '/admin',
           '/points',
           '/users',
+          '/wishes',
         ];
 
         // For rewards, only protect non-GET methods (POST, PATCH, DELETE)
@@ -50,10 +51,15 @@ class ApiClient {
 
         if (needsAuth) {
           const session = await getSession();
+
           if (session?.user) {
-            // For NextAuth, we'll use the session directly
-            // The backend should accept the session token
             config.headers.Authorization = `Bearer ${session.user.id}`;
+          } else {
+            // Try to get from localStorage as fallback
+            const storedUserId = localStorage.getItem('userId');
+            if (storedUserId) {
+              config.headers.Authorization = `Bearer ${storedUserId}`;
+            }
           }
         }
         return config;
@@ -66,8 +72,13 @@ class ApiClient {
       response => response,
       async error => {
         if (error.response?.status === 401) {
-          // Redirect to login on 401
-          window.location.href = '/auth/login';
+          // Check if we actually have a session before redirecting
+          const session = await getSession();
+          if (!session?.user) {
+            setTimeout(() => {
+              window.location.href = '/auth/login';
+            }, 100);
+          }
         }
         return Promise.reject(error);
       }
@@ -172,6 +183,52 @@ class ApiClient {
 
   async getRedeemHistory(): Promise<any> {
     const response = await this.client.get('/redeems');
+    return response.data;
+  }
+
+  // Wishes endpoints
+  async createWish(content: string): Promise<any> {
+    const response = await this.client.post('/wishes', { content });
+    return response.data;
+  }
+
+  async getAllWishes(
+    page = 1,
+    limit = 20,
+    isHighlighted?: boolean
+  ): Promise<any> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (isHighlighted !== undefined) {
+      params.append('isHighlighted', isHighlighted.toString());
+    }
+    const response = await this.client.get(`/wishes?${params}`);
+    return response.data;
+  }
+
+  async getHighlightedWishes(): Promise<any> {
+    const response = await this.client.get('/wishes/highlighted');
+    return response.data;
+  }
+
+  async getUserWishes(page = 1, limit = 20): Promise<any> {
+    const response = await this.client.get(
+      `/wishes/user?page=${page}&limit=${limit}`
+    );
+    return response.data;
+  }
+
+  async toggleWishHighlight(wishId: string): Promise<any> {
+    const response = await this.client.post(
+      `/wishes/${wishId}/toggle-highlight`
+    );
+    return response.data;
+  }
+
+  async deleteWish(wishId: string): Promise<any> {
+    const response = await this.client.delete(`/wishes/${wishId}`);
     return response.data;
   }
 

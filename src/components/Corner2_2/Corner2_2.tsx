@@ -380,12 +380,18 @@ export function Corner2_2() {
                 >
                   {/* Post Image */}
                   <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                    <Image
-                      src={post.imageUrl}
-                      alt={post.caption || 'Post image'}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                    {post.imageUrl ? (
+                      <Image
+                        src={post.imageUrl}
+                        alt={post.caption || 'Post image'}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <Upload className="w-16 h-16 text-gray-400" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                     {/* Highlight Badge */}

@@ -41,6 +41,18 @@ export function useNextAuth(): UseNextAuthReturn {
           throw new Error('Invalid credentials');
         }
 
+        // Store userId in localStorage for fallback
+        if (result?.ok) {
+          // Get the user ID from the session after successful login
+          setTimeout(async () => {
+            const { getSession } = await import('next-auth/react');
+            const session = await getSession();
+            if (session?.user?.id) {
+              localStorage.setItem('userId', session.user.id);
+            }
+          }, 100);
+        }
+
         // Only clear cache if login was successful
         // Use setTimeout to avoid blocking the UI
         setTimeout(() => {
@@ -100,6 +112,9 @@ export function useNextAuth(): UseNextAuthReturn {
 
   const logout = useCallback(async () => {
     try {
+      // Clear localStorage
+      localStorage.removeItem('userId');
+
       // Clear cache before logout to prevent stale data
       queryClient.clear();
 

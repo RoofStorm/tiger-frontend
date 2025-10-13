@@ -75,9 +75,11 @@ export default function ProfilePage() {
     isLoading: redeemHistoryLoading,
     error: redeemHistoryError,
   } = useQuery({
-    queryKey: ['redeemHistory'],
+    queryKey: ['redeemHistory', user?.id],
     queryFn: () => apiClient.getRedeemHistory(),
     enabled: isAuthenticated,
+    staleTime: 30 * 1000, // 30 seconds
+    refetchOnWindowFocus: true,
   });
 
   const redeemHistory = Array.isArray(redeemHistoryData?.data?.redeems)
