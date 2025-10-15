@@ -98,6 +98,7 @@ export function Corner1() {
 
   return (
     <div
+      data-corner="1"
       id="corner-1"
       className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 py-12 px-4 sm:px-6 lg:px-8"
     >

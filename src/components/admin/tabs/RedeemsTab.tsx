@@ -52,6 +52,9 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
         redeemStatusFilter || undefined
       ),
     enabled: isAdmin,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Update redeem status mutation
@@ -63,6 +66,7 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
         title: 'Cập nhật thành công',
         description: 'Trạng thái đổi thưởng đã được cập nhật',
         variant: 'success',
+        duration: 3000,
       });
       refetchRedeems();
     },
@@ -71,6 +75,7 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
         title: 'Lỗi',
         description: error.message || 'Có lỗi xảy ra',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });

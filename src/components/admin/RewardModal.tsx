@@ -90,6 +90,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({
         title: 'Upload thành công',
         description: 'Hình ảnh đã được tải lên thành công',
         variant: 'success',
+        duration: 3000,
       });
     } catch (error) {
       console.error('Upload error:', error);
@@ -97,6 +98,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({
         title: 'Upload thất bại',
         description: 'Không thể tải lên hình ảnh',
         variant: 'destructive',
+        duration: 4000,
       });
     } finally {
       setUploadingImage(false);
@@ -118,6 +120,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({
             title: 'Upload thành công',
             description: 'Hình ảnh đã được tải lên thành công',
             variant: 'success',
+            duration: 3000,
           });
         } catch (error) {
           console.error('Upload error:', error);
@@ -125,6 +128,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({
             title: 'Upload thất bại',
             description: 'Không thể tải lên hình ảnh',
             variant: 'destructive',
+            duration: 4000,
           });
           return; // Don't proceed with saving if upload fails
         } finally {
@@ -153,6 +157,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({
         title: 'Lưu thất bại',
         description: 'Không thể lưu phần thưởng',
         variant: 'destructive',
+        duration: 4000,
       });
     }
   }, [

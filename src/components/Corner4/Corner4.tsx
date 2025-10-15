@@ -56,6 +56,7 @@ export function Corner4() {
       toast({
         title: 'Đã gửi yêu cầu đổi quà!',
         description: 'Yêu cầu của bạn đang được xử lý.',
+        duration: 3000,
       });
     },
     onError: () => {
@@ -63,6 +64,7 @@ export function Corner4() {
         title: 'Lỗi',
         description: 'Không thể gửi yêu cầu. Vui lòng thử lại.',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });
@@ -73,6 +75,7 @@ export function Corner4() {
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để đổi quà.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
@@ -82,6 +85,7 @@ export function Corner4() {
         title: 'Không đủ điểm',
         description: `Bạn cần ${reward.pointsRequired} điểm để đổi quà này.`,
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
@@ -109,6 +113,7 @@ export function Corner4() {
 
   return (
     <div
+      data-corner="4"
       id="corner-4"
       className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-12 lg:py-20"
     >

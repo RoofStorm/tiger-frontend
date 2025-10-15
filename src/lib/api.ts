@@ -53,7 +53,9 @@ class ApiClient {
           const session = await getSession();
 
           if (session?.user) {
-            config.headers.Authorization = `Bearer ${session.user.id}`;
+            // Get JWT token from NextAuth.js session
+            const token = (session as any).accessToken || session.user.id;
+            config.headers.Authorization = `Bearer ${token}`;
           } else {
             // Try to get from localStorage as fallback
             const storedUserId = localStorage.getItem('userId');
@@ -183,6 +185,11 @@ class ApiClient {
 
   async getRedeemHistory(): Promise<any> {
     const response = await this.client.get('/redeems');
+    return response.data;
+  }
+
+  async getPointHistory(): Promise<any> {
+    const response = await this.client.get('/points/history');
     return response.data;
   }
 

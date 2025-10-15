@@ -50,6 +50,9 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
     queryKey: ['admin-posts'],
     queryFn: () => apiClient.getPosts(),
     enabled: isAdmin,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const allPosts = useMemo(() => postsData?.data?.posts || [], [postsData]);
@@ -83,6 +86,7 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
           title: 'Thành công!',
           description:
             'Bài viết đã được highlight và sẽ hiển thị trong Góc Chia Sẻ.',
+          duration: 3000,
         });
       } catch (error) {
         console.error('Failed to highlight post:', error);
@@ -90,6 +94,7 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
           title: 'Lỗi',
           description: 'Không thể highlight bài viết. Vui lòng thử lại.',
           variant: 'destructive',
+          duration: 4000,
         });
       } finally {
         setHighlightingPosts(prev => {
@@ -116,6 +121,7 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
         toast({
           title: 'Thành công!',
           description: 'Bài viết đã được bỏ highlight khỏi Góc Chia Sẻ.',
+          duration: 3000,
         });
       } catch (error) {
         console.error('Failed to unhighlight post:', error);
@@ -123,6 +129,7 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
           title: 'Lỗi',
           description: 'Không thể bỏ highlight bài viết. Vui lòng thử lại.',
           variant: 'destructive',
+          duration: 4000,
         });
       } finally {
         setHighlightingPosts(prev => {

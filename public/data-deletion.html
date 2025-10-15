@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hướng dẫn xóa dữ liệu - Tiger App</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        color: #333;
+      }
+      h1 {
+        color: #dc2626;
+        border-bottom: 2px solid #dc2626;
+        padding-bottom: 10px;
+      }
+      h2 {
+        color: #b91c1c;
+        margin-top: 30px;
+      }
+      .warning {
+        background-color: #fef2f2;
+        padding: 15px;
+        border-left: 4px solid #dc2626;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .steps {
+        background-color: #f8fafc;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+      .step {
+        margin: 15px 0;
+        padding: 10px;
+        background-color: white;
+        border-radius: 6px;
+        border-left: 3px solid #2563eb;
+      }
+      .contact-info {
+        background-color: #f0f9ff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 30px;
+      }
+      .data-list {
+        background-color: #fef3c7;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hướng dẫn xóa dữ liệu người dùng - Tiger App</h1>
+
+    <p><strong>Cập nhật lần cuối:</strong> 14 tháng 10, 2024</p>
+
+    <div class="warning">
+      <p>
+        <strong>⚠️ Lưu ý quan trọng:</strong> Việc xóa tài khoản là không thể
+        hoàn tác. Tất cả dữ liệu của bạn sẽ bị xóa vĩnh viễn.
+      </p>
+    </div>
+
+    <h2>📋 Cách xóa tài khoản và dữ liệu</h2>
+
+    <div class="steps">
+      <div class="step">
+        <h3>Bước 1: Đăng nhập vào Tiger App</h3>
+        <p>
+          Truy cập
+          <a href="http://localhost:3000/auth/login" target="_blank"
+            >http://localhost:3000/auth/login</a
+          >
+          và đăng nhập bằng tài khoản của bạn.
+        </p>
+      </div>
+
+      <div class="step">
+        <h3>Bước 2: Vào trang Profile</h3>
+        <p>Sau khi đăng nhập, click vào "Profile" hoặc "Cá nhân" trong menu.</p>
+      </div>
+
+      <div class="step">
+        <h3>Bước 3: Tìm nút "Xóa tài khoản"</h3>
+        <p>
+          Cuộn xuống cuối trang Profile, bạn sẽ thấy nút "Xóa tài khoản" màu đỏ.
+        </p>
+      </div>
+
+      <div class="step">
+        <h3>Bước 4: Xác nhận xóa tài khoản</h3>
+        <p>
+          Click "Xóa tài khoản" và xác nhận trong hộp thoại popup. Nhập "DELETE"
+          để xác nhận.
+        </p>
+      </div>
+
+      <div class="step">
+        <h3>Bước 5: Hoàn tất</h3>
+        <p>Tài khoản và tất cả dữ liệu của bạn sẽ bị xóa ngay lập tức.</p>
+      </div>
+    </div>
+
+    <h2>🗑️ Dữ liệu sẽ bị xóa</h2>
+
+    <div class="data-list">
+      <p>
+        <strong>Khi xóa tài khoản, các dữ liệu sau sẽ bị xóa vĩnh viễn:</strong>
+      </p>
+      <ul>
+        <li><strong>Thông tin cá nhân:</strong> Tên, email, ảnh đại diện</li>
+        <li>
+          <strong>Dữ liệu tài khoản:</strong> Phương thức đăng nhập, trạng thái
+          tài khoản
+        </li>
+        <li>
+          <strong>Điểm số và phần thưởng:</strong> Tất cả điểm tích lũy, lịch sử
+          cộng điểm
+        </li>
+        <li>
+          <strong>Hoạt động tương tác:</strong> Like, share, comment các bài
+          viết
+        </li>
+        <li>
+          <strong>Lịch sử đăng nhập:</strong> Thời gian và địa chỉ IP đăng nhập
+        </li>
+        <li><strong>Analytics:</strong> Dữ liệu thống kê thời gian sử dụng</li>
+        <li><strong>Lời chúc:</strong> Các lời chúc đã gửi (nếu có)</li>
+        <li><strong>Lịch sử đổi quà:</strong> Các yêu cầu đổi thưởng</li>
+      </ul>
+    </div>
+
+    <h2>⏱️ Thời gian xử lý</h2>
+
+    <p>Việc xóa dữ liệu sẽ được thực hiện:</p>
+    <ul>
+      <li><strong>Ngay lập tức:</strong> Tài khoản và dữ liệu chính</li>
+      <li><strong>Trong vòng 24 giờ:</strong> Dữ liệu backup và cache</li>
+      <li><strong>Trong vòng 30 ngày:</strong> Dữ liệu log và analytics</li>
+    </ul>
+
+    <h2>🔄 Khôi phục tài khoản</h2>
+
+    <div class="warning">
+      <p>
+        <strong>Không thể khôi phục:</strong> Sau khi xóa tài khoản, bạn không
+        thể khôi phục lại dữ liệu. Bạn sẽ cần tạo tài khoản mới nếu muốn sử dụng
+        lại Tiger App.
+      </p>
+    </div>
+
+    <h2>📧 Xóa dữ liệu thủ công</h2>
+
+    <p>Nếu bạn không thể xóa tài khoản qua ứng dụng, vui lòng:</p>
+    <ol>
+      <li>Gửi email đến <strong>support@tiger.com</strong></li>
+      <li>Tiêu đề: "Yêu cầu xóa tài khoản"</li>
+      <li>
+        Nội dung bao gồm:
+        <ul>
+          <li>Tên đầy đủ</li>
+          <li>Email đăng ký</li>
+          <li>Lý do xóa tài khoản</li>
+          <li>Xác nhận muốn xóa tất cả dữ liệu</li>
+        </ul>
+      </li>
+      <li>Chúng tôi sẽ xử lý trong vòng 48 giờ</li>
+    </ol>
+
+    <h2>🔒 Bảo mật trong quá trình xóa</h2>
+
+    <p>Chúng tôi đảm bảo:</p>
+    <ul>
+      <li>Xác thực danh tính trước khi xóa</li>
+      <li>Xóa hoàn toàn khỏi tất cả hệ thống</li>
+      <li>Không lưu trữ bất kỳ dữ liệu nào sau khi xóa</li>
+      <li>Tuân thủ các quy định về bảo vệ dữ liệu</li>
+    </ul>
+
+    <div class="contact-info">
+      <h2>📞 Liên hệ hỗ trợ</h2>
+      <p>Nếu bạn gặp khó khăn trong việc xóa tài khoản:</p>
+      <ul>
+        <li><strong>Email:</strong> support@tiger.com</li>
+        <li><strong>Thời gian phản hồi:</strong> 24-48 giờ</li>
+        <li><strong>Hỗ trợ:</strong> 24/7 cho các yêu cầu xóa tài khoản</li>
+      </ul>
+    </div>
+
+    <hr style="margin: 40px 0" />
+    <p style="text-align: center; color: #666; font-size: 14px">
+      © 2024 Tiger App. Tất cả quyền được bảo lưu.
+    </p>
+  </body>
+</html>

@@ -71,11 +71,13 @@ export function Corner2_2() {
         toast({
           title: 'Đã thích bài viết!',
           description: 'Cảm ơn bạn đã chia sẻ cảm xúc.',
+          duration: 3000,
         });
       } else if (data.action === 'unliked') {
         toast({
           title: 'Đã bỏ thích bài viết',
           description: 'Bạn đã bỏ thích bài viết này.',
+          duration: 3000,
         });
       }
     },
@@ -84,6 +86,7 @@ export function Corner2_2() {
         title: 'Lỗi',
         description: 'Không thể thích bài viết. Vui lòng thử lại.',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });
@@ -102,6 +105,7 @@ export function Corner2_2() {
       toast({
         title: 'Đã chia sẻ!',
         description: 'Bài viết đã được chia sẻ thành công.',
+        duration: 3000,
       });
     },
   });
@@ -117,6 +121,7 @@ export function Corner2_2() {
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để chia sẻ ảnh.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
@@ -133,6 +138,7 @@ export function Corner2_2() {
         title: 'Chưa chọn ảnh',
         description: 'Vui lòng chọn ảnh để đăng bài.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
@@ -150,6 +156,7 @@ export function Corner2_2() {
         title: 'Upload thành công!',
         description: 'Ảnh đã được tải lên thành công.',
         variant: 'success',
+        duration: 3000,
       });
 
       // Create post
@@ -180,6 +187,7 @@ export function Corner2_2() {
         title: 'Đăng bài thành công!',
         description: 'Bài viết của bạn đã được chia sẻ.',
         variant: 'success',
+        duration: 3000,
       });
     } catch (error) {
       console.error('Upload failed:', error);
@@ -187,6 +195,7 @@ export function Corner2_2() {
         title: 'Đăng bài thất bại',
         description: 'Vui lòng thử lại sau.',
         variant: 'destructive',
+        duration: 4000,
       });
     } finally {
       setUploading(false);
@@ -210,6 +219,7 @@ export function Corner2_2() {
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để thích bài viết.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
@@ -230,6 +240,7 @@ export function Corner2_2() {
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để chia sẻ bài viết.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
@@ -237,7 +248,10 @@ export function Corner2_2() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 py-12 lg:py-20">
+    <div
+      data-corner="2"
+      className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 py-12 lg:py-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-16">

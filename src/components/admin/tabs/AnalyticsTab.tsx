@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { BarChart3, Users, Clock, TrendingUp } from 'lucide-react';
+// import { BarChart3, Users, Clock, TrendingUp } from 'lucide-react';
 import apiClient from '@/lib/api';
 import { Pagination } from '../Pagination';
 
@@ -48,6 +48,9 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
     queryKey: ['admin-analytics'],
     queryFn: () => apiClient.getCornerAnalytics(),
     enabled: isAdmin,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const analytics: AnalyticsItem[] = analyticsData?.data || [];

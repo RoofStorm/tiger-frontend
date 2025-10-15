@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { Button } from '@/components/ui/button';
@@ -146,9 +147,22 @@ export function Header() {
                             className="text-blue-700 hover:text-blue-900 font-medium flex items-center space-x-2"
                           >
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-sm">
-                                {user?.name?.charAt(0).toUpperCase()}
-                              </span>
+                              {user?.image ? (
+                                <Image
+                                  src={user.image}
+                                  alt={user.name || 'User avatar'}
+                                  width={32}
+                                  height={32}
+                                  className="w-8 h-8 rounded-full object-cover"
+                                  unoptimized={user.image.includes(
+                                    'platform-lookaside.fbsbx.com'
+                                  )}
+                                />
+                              ) : (
+                                <span className="text-white font-bold text-sm">
+                                  {user?.name?.charAt(0).toUpperCase()}
+                                </span>
+                              )}
                             </div>
                             <span>{user?.name || 'User'}</span>
                             <ChevronDown

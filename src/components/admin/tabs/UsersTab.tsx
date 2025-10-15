@@ -42,6 +42,9 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
     queryKey: ['admin-users'],
     queryFn: () => apiClient.getUsers(),
     enabled: isAdmin,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const allUsers = useMemo(() => usersData?.data?.data || [], [usersData]);

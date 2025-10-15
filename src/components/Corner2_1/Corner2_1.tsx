@@ -194,7 +194,10 @@ export function Corner2_1() {
     testimonials.length > 0 ? testimonials : fallbackTestimonials;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-600 via-red-700 to-red-800 relative overflow-hidden">
+    <div
+      data-corner="2"
+      className="min-h-screen bg-gradient-to-br from-red-600 via-red-700 to-red-800 relative overflow-hidden"
+    >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-red-400 to-red-600 transform rotate-12 scale-150"></div>

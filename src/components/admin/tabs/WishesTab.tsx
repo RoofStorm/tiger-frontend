@@ -24,6 +24,9 @@ export const WishesTab = ({ isAdmin }: WishesTabProps) => {
   const { data: wishesData, isLoading: wishesLoading } = useQuery({
     queryKey: ['admin-wishes', page, highlightFilter],
     queryFn: () => apiClient.getAllWishes(page, perPage, highlightFilter),
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Toggle highlight mutation
@@ -35,6 +38,7 @@ export const WishesTab = ({ isAdmin }: WishesTabProps) => {
         title: 'Thành công',
         description: 'Trạng thái highlight đã được cập nhật',
         variant: 'success',
+        duration: 3000,
       });
     },
     onError: () => {
@@ -42,6 +46,7 @@ export const WishesTab = ({ isAdmin }: WishesTabProps) => {
         title: 'Lỗi',
         description: 'Không thể cập nhật trạng thái highlight',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });
@@ -55,6 +60,7 @@ export const WishesTab = ({ isAdmin }: WishesTabProps) => {
         title: 'Thành công',
         description: 'Lời chúc đã được xóa',
         variant: 'success',
+        duration: 3000,
       });
     },
     onError: () => {
@@ -62,6 +68,7 @@ export const WishesTab = ({ isAdmin }: WishesTabProps) => {
         title: 'Lỗi',
         description: 'Không thể xóa lời chúc',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });

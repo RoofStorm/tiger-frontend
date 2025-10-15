@@ -26,25 +26,28 @@ interface RedeemItem {
   };
 }
 
+interface PointLog {
+  id: string;
+  points: number;
+  reason: string;
+  createdAt: string;
+}
+
 export default function ProfilePage() {
   const { user, isAuthenticated, logout } = useNextAuth();
   const router = useRouter();
 
   // Function to scroll to corner
   const scrollToCorner = (cornerId: string) => {
-    console.log('Scrolling to corner:', cornerId);
     router.push('/');
     setTimeout(() => {
       const element = document.getElementById(cornerId);
-      console.log('Element found:', element);
       if (element) {
         element.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
-        console.log('Scrolled to element');
       } else {
-        console.log('Element not found, trying again...');
         // Try again after a longer delay
         setTimeout(() => {
           const retryElement = document.getElementById(cornerId);
@@ -53,9 +56,7 @@ export default function ProfilePage() {
               behavior: 'smooth',
               block: 'start',
             });
-            console.log('Scrolled to element on retry');
           } else {
-            console.log('Element still not found');
           }
         }, 500);
       }
@@ -82,29 +83,26 @@ export default function ProfilePage() {
     refetchOnWindowFocus: true,
   });
 
+  // Fetch point history
+  const {
+    data: pointHistoryData,
+    isLoading: pointHistoryLoading,
+    error: pointHistoryError,
+  } = useQuery({
+    queryKey: ['pointHistory', user?.id],
+    queryFn: () => apiClient.getPointHistory(),
+    enabled: isAuthenticated,
+    staleTime: 30 * 1000, // 30 seconds
+    refetchOnWindowFocus: true,
+  });
+
   const redeemHistory = Array.isArray(redeemHistoryData?.data?.redeems)
     ? redeemHistoryData.data.redeems
     : [];
 
-  console.log('Profile page redeem history debug:', {
-    redeemHistoryData,
-    redeemHistoryLoading,
-    redeemHistoryError,
-    isAuthenticated,
-    user: user?.id,
-    redeemHistoryLength: redeemHistory.length,
-    redeemHistoryArray: redeemHistory,
-    deliveredCount: redeemHistory.filter(
-      (r: RedeemItem) => r.status === 'DELIVERED'
-    ).length,
-    statusBreakdown: redeemHistory.reduce(
-      (acc: Record<string, number>, req: RedeemItem) => {
-        acc[req.status] = (acc[req.status] || 0) + 1;
-        return acc;
-      },
-      {}
-    ),
-  });
+  const pointHistory = Array.isArray(pointHistoryData?.data?.logs)
+    ? pointHistoryData.data.logs
+    : [];
 
   if (!isAuthenticated) {
     return (
@@ -139,6 +137,9 @@ export default function ProfilePage() {
                   width={96}
                   height={96}
                   className="w-24 h-24 rounded-full object-cover"
+                  unoptimized={user.image.includes(
+                    'platform-lookaside.fbsbx.com'
+                  )}
                 />
               ) : (
                 <span className="text-white font-bold text-3xl">
@@ -193,6 +194,60 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Point History */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Lịch sử cộng điểm
+            </h2>
+          </div>
+
+          {pointHistoryLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Đang tải lịch sử điểm...</p>
+            </div>
+          ) : pointHistoryError ? (
+            <div className="text-center py-12">
+              <p className="text-red-500">Lỗi khi tải lịch sử điểm</p>
+            </div>
+          ) : pointHistory.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Chưa có lịch sử cộng điểm</p>
+            </div>
+          ) : (
+            <div className="max-h-96 overflow-y-auto space-y-4 pr-2">
+              {pointHistory.map((log: PointLog) => (
+                <div
+                  key={log.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Star className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{log.reason}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(log.createdAt).toLocaleDateString('vi-VN')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p
+                      className={`font-bold ${log.points > 0 ? 'text-green-600' : 'text-red-600'}`}
+                    >
+                      {log.points > 0 ? '+' : ''}
+                      {log.points}
+                    </p>
+                    <p className="text-sm text-gray-500">điểm</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Redeem History */}

@@ -19,6 +19,7 @@ export const WishForm = () => {
         title: 'Thành công',
         description: 'Lời chúc của bạn đã được gửi!',
         variant: 'success',
+        duration: 3000,
       });
     },
     onError: () => {
@@ -26,6 +27,7 @@ export const WishForm = () => {
         title: 'Lỗi',
         description: 'Không thể gửi lời chúc. Vui lòng thử lại.',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });

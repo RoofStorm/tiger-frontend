@@ -99,6 +99,7 @@ export default function WishesPage() {
         title: 'Thành công',
         description: 'Lời chúc của bạn đã được gửi!',
         variant: 'success',
+        duration: 3000,
       });
     },
     onError: () => {
@@ -106,6 +107,7 @@ export default function WishesPage() {
         title: 'Lỗi',
         description: 'Không thể gửi lời chúc. Vui lòng thử lại.',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });
@@ -201,6 +203,9 @@ export default function WishesPage() {
                       width={64}
                       height={64}
                       className="w-16 h-16 rounded-full object-cover"
+                      unoptimized={user.image.includes(
+                        'platform-lookaside.fbsbx.com'
+                      )}
                     />
                   ) : (
                     <span className="text-white font-bold text-xl">

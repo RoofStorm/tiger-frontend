@@ -49,6 +49,9 @@ export const RewardsTab: React.FC<RewardsTabProps> = ({ isAdmin }) => {
     queryKey: ['admin-rewards', rewardsPage],
     queryFn: () => apiClient.getRewards(rewardsPage, rewardsPerPage),
     enabled: isAdmin,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Reward CRUD mutations
@@ -65,6 +68,7 @@ export const RewardsTab: React.FC<RewardsTabProps> = ({ isAdmin }) => {
         title: 'Thành công',
         description: 'Phần thưởng đã được tạo',
         variant: 'success',
+        duration: 3000,
       });
       queryClient.invalidateQueries({ queryKey: ['admin-rewards'] });
       setShowRewardModal(false);
@@ -75,6 +79,7 @@ export const RewardsTab: React.FC<RewardsTabProps> = ({ isAdmin }) => {
         title: 'Lỗi',
         description: error.message || 'Không thể tạo phần thưởng',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });
@@ -98,6 +103,7 @@ export const RewardsTab: React.FC<RewardsTabProps> = ({ isAdmin }) => {
         title: 'Thành công',
         description: 'Phần thưởng đã được cập nhật',
         variant: 'success',
+        duration: 3000,
       });
       queryClient.invalidateQueries({ queryKey: ['admin-rewards'] });
       setShowRewardModal(false);
@@ -109,6 +115,7 @@ export const RewardsTab: React.FC<RewardsTabProps> = ({ isAdmin }) => {
         title: 'Lỗi',
         description: error.message || 'Không thể cập nhật phần thưởng',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });
@@ -120,6 +127,7 @@ export const RewardsTab: React.FC<RewardsTabProps> = ({ isAdmin }) => {
         title: 'Thành công',
         description: 'Phần thưởng đã được xóa',
         variant: 'success',
+        duration: 3000,
       });
       queryClient.invalidateQueries({ queryKey: ['admin-rewards'] });
     },
@@ -128,6 +136,7 @@ export const RewardsTab: React.FC<RewardsTabProps> = ({ isAdmin }) => {
         title: 'Lỗi',
         description: error.message || 'Không thể xóa phần thưởng',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });

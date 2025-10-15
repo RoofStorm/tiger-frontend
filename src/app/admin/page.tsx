@@ -55,18 +55,27 @@ export default function AdminPage() {
     queryKey: ['admin-users'],
     queryFn: () => apiClient.getUsers(),
     enabled: isAdmin,
+    staleTime: 0, // Always consider data stale
+    refetchOnMount: true, // Always refetch on mount
+    refetchOnWindowFocus: true, // Refetch when window gains focus
   });
 
   const { data: rewardsData } = useQuery({
     queryKey: ['admin-rewards'],
     queryFn: () => apiClient.getRewards(1, 10),
     enabled: isAdmin,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const { data: postsData } = useQuery({
     queryKey: ['admin-posts'],
     queryFn: () => apiClient.getPosts(),
     enabled: isAdmin,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const allUsers = usersData?.data?.data || [];

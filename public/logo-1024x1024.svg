@@ -1,0 +1,46 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#1e40af" rx="200"/>
+  
+  <!-- Tiger head outline -->
+  <path d="M512 150c-200 0-362 162-362 362s162 362 362 362 362-162 362-362-162-362-362-362z" fill="none" stroke="#fbbf24" stroke-width="8"/>
+  
+  <!-- Tiger ears -->
+  <ellipse cx="350" cy="280" rx="60" ry="80" fill="#f59e0b" transform="rotate(-20 350 280)"/>
+  <ellipse cx="674" cy="280" rx="60" ry="80" fill="#f59e0b" transform="rotate(20 674 280)"/>
+  
+  <!-- Inner ears -->
+  <ellipse cx="350" cy="280" rx="35" ry="50" fill="#fbbf24" transform="rotate(-20 350 280)"/>
+  <ellipse cx="674" cy="280" rx="35" ry="50" fill="#fbbf24" transform="rotate(20 674 280)"/>
+  
+  <!-- Tiger eyes -->
+  <ellipse cx="420" cy="400" rx="45" ry="60" fill="#1f2937"/>
+  <ellipse cx="604" cy="400" rx="45" ry="60" fill="#1f2937"/>
+  
+  <!-- Eye highlights -->
+  <ellipse cx="430" cy="390" rx="15" ry="20" fill="#ffffff"/>
+  <ellipse cx="614" cy="390" rx="15" ry="20" fill="#ffffff"/>
+  
+  <!-- Tiger nose -->
+  <ellipse cx="512" cy="480" rx="25" ry="20" fill="#1f2937"/>
+  
+  <!-- Tiger mouth -->
+  <path d="M512 500 Q480 520 450 500" stroke="#1f2937" stroke-width="6" fill="none"/>
+  <path d="M512 500 Q544 520 574 500" stroke="#1f2937" stroke-width="6" fill="none"/>
+  
+  <!-- Tiger stripes -->
+  <path d="M300 350 Q350 380 300 420 Q350 450 300 480" stroke="#1f2937" stroke-width="12" fill="none"/>
+  <path d="M724 350 Q674 380 724 420 Q674 450 724 480" stroke="#1f2937" stroke-width="12" fill="none"/>
+  <path d="M400 500 Q450 530 400 560 Q450 590 400 620" stroke="#1f2937" stroke-width="10" fill="none"/>
+  <path d="M624 500 Q574 530 624 560 Q574 590 624 620" stroke="#1f2937" stroke-width="10" fill="none"/>
+  
+  <!-- App name -->
+  <text x="512" y="750" font-family="Arial, sans-serif" font-size="80" font-weight="bold" text-anchor="middle" fill="#ffffff">TIGER</text>
+  <text x="512" y="820" font-family="Arial, sans-serif" font-size="40" text-anchor="middle" fill="#fbbf24">APP</text>
+  
+  <!-- Decorative elements -->
+  <circle cx="200" cy="200" r="8" fill="#fbbf24" opacity="0.6"/>
+  <circle cx="824" cy="200" r="8" fill="#fbbf24" opacity="0.6"/>
+  <circle cx="200" cy="824" r="8" fill="#fbbf24" opacity="0.6"/>
+  <circle cx="824" cy="824" r="8" fill="#fbbf24" opacity="0.6"/>
+</svg>

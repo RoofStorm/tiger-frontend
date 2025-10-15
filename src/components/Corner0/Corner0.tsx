@@ -155,6 +155,7 @@ export function Corner0() {
 
   return (
     <div
+      data-corner="0"
       className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 overflow-hidden"
       onMouseMove={handleMouseMove}
     >
