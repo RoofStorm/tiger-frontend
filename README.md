@@ -165,30 +165,6 @@ The app supports multiple authentication methods:
 - Facebook OAuth
 - JWT token management with refresh
 
-## 📱 Responsive Design
-
-- Mobile-first approach
-- Responsive breakpoints for all screen sizes
-- Touch-friendly interactions
-- Optimized for both portrait and landscape orientations
-
-## ♿ Accessibility
-
-- Keyboard navigation support
-- Screen reader compatibility
-- High contrast support
-- Focus management
-- ARIA labels and descriptions
-
-## 🧪 Testing
-
-The project includes comprehensive testing setup:
-
-- Unit tests with Jest
-- Component tests with React Testing Library
-- API client tests
-- Coverage reporting
-
 Run tests:
 
 ```bash
@@ -291,3 +267,7 @@ For support and questions:
 ---
 
 Built with ❤️ by the Tiger Team
+
+How to run ngrok:
+ngrok http 3000
+curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url'

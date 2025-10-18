@@ -290,7 +290,6 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
                         });
                         if (confirmed) {
                           // TODO: Implement edit post functionality
-                          console.log('Edit post:', post.id);
                         }
                       }}
                     >
@@ -311,7 +310,6 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
                         });
                         if (confirmed) {
                           // TODO: Implement delete post functionality
-                          console.log('Delete post:', post.id);
                         }
                       }}
                     >

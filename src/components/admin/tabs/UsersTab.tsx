@@ -191,7 +191,6 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
                         });
                         if (confirmed) {
                           // TODO: Implement edit user functionality
-                          console.log('Edit user:', userItem.id);
                         }
                       }}
                     >
@@ -212,7 +211,6 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
                         });
                         if (confirmed) {
                           // TODO: Implement delete user functionality
-                          console.log('Delete user:', userItem.id);
                         }
                       }}
                     >

@@ -145,11 +145,8 @@ export function Corner2_2() {
 
     setUploading(true);
     try {
-      console.log('Starting upload for file:', selectedFile.name);
-
       // Upload file directly to backend
       const uploadResult = await apiClient.uploadFile(selectedFile);
-      console.log('Upload result:', uploadResult);
 
       // Show upload success notification
       toast({
@@ -164,10 +161,8 @@ export function Corner2_2() {
         imageUrl: uploadResult.data.url, // Fix: use uploadResult.data.url instead of uploadResult.url
         caption: caption || '',
       };
-      console.log('Post data:', postData);
 
-      const createdPost = await apiClient.createPost(postData);
-      console.log('Created post:', createdPost);
+      await apiClient.createPost(postData);
 
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts', user?.id],
@@ -226,15 +221,12 @@ export function Corner2_2() {
 
     // Prevent duplicate calls
     if (likeMutation.isPending) {
-      console.log('Like mutation already in progress, skipping...');
       return;
     }
-
-    console.log(`Frontend: Liking post ${postId}`);
     likeMutation.mutate(postId);
   };
 
-  const handleShare = (postId: string) => {
+  const handleShare = (post: Post) => {
     if (!isAuthenticated) {
       toast({
         title: 'Cần đăng nhập',
@@ -244,7 +236,58 @@ export function Corner2_2() {
       });
       return;
     }
-    shareMutation.mutate(postId);
+
+    // Tạo URL preview cho bài viết
+    const baseUrl =
+      process.env.NEXT_PUBLIC_PUBLIC_URL ||
+      process.env.NEXTAUTH_URL ||
+      'http://localhost:3000';
+    const postUrl = `${baseUrl}/posts/${post.id}`;
+    const postTitle = post.caption || 'Bài viết nổi bật từ Tiger Mood Corner';
+    const postDescription = post.caption
+      ? `${post.caption.substring(0, 160)}...`
+      : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.';
+    const postImage = `${baseUrl}/default-post-image.jpg`;
+
+    // Console log để kiểm tra URL preview
+    console.log('🔗 Share URL Preview:', {
+      postUrl,
+      postTitle,
+      postDescription,
+      postImage,
+      postId: post.id,
+      isHighlighted: post.isHighlighted,
+    });
+
+    // Tạo Facebook Share URL
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+    console.log('📱 Facebook Share URL:', facebookShareUrl);
+
+    // Mở popup Facebook Share Dialog
+    const popup = window.open(
+      facebookShareUrl,
+      'facebook-share-dialog',
+      'width=800,height=600,scrollbars=yes,resizable=yes'
+    );
+
+    // Kiểm tra nếu popup bị block
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      toast({
+        title: 'Popup bị chặn',
+        description: 'Vui lòng cho phép popup để chia sẻ.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Focus vào popup
+    if (popup) {
+      popup.focus();
+    }
+
+    // Cập nhật share count
+    shareMutation.mutate(post.id);
   };
 
   return (
@@ -485,7 +528,7 @@ export function Corner2_2() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleShare(post.id)}
+                          onClick={() => handleShare(post)}
                           className="flex items-center space-x-1 text-gray-500 text-sm hover:bg-green-50"
                         >
                           <Share2 className="w-4 h-4" />

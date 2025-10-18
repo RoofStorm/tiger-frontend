@@ -50,17 +50,20 @@ class ApiClient {
           isRewardsProtectedMethod;
 
         if (needsAuth) {
-          const session = await getSession();
+          // Only get session on client side
+          if (typeof window !== 'undefined') {
+            const session = await getSession();
 
-          if (session?.user) {
-            // Get JWT token from NextAuth.js session
-            const token = (session as any).accessToken || session.user.id;
-            config.headers.Authorization = `Bearer ${token}`;
-          } else {
-            // Try to get from localStorage as fallback
-            const storedUserId = localStorage.getItem('userId');
-            if (storedUserId) {
-              config.headers.Authorization = `Bearer ${storedUserId}`;
+            if (session?.user) {
+              // Get JWT token from NextAuth.js session
+              const token = (session as any).accessToken || session.user.id;
+              config.headers.Authorization = `Bearer ${token}`;
+            } else {
+              // Try to get from localStorage as fallback
+              const storedUserId = localStorage.getItem('userId');
+              if (storedUserId) {
+                config.headers.Authorization = `Bearer ${storedUserId}`;
+              }
             }
           }
         }
@@ -108,6 +111,11 @@ class ApiClient {
     const response = await this.client.get(
       `/posts?highlighted=true&page=${page}&limit=${limit}`
     );
+    return response.data;
+  }
+
+  async getPost(id: string): Promise<any> {
+    const response = await this.client.get(`/posts/${id}`);
     return response.data;
   }
 

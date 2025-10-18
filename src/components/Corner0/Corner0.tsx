@@ -30,12 +30,10 @@ export function Corner0() {
       setDuration(video.duration);
       setIsVideoReady(true);
       setIsLoading(false);
-      console.log('Video metadata loaded, duration:', video.duration);
     };
     const handleCanPlay = () => {
       setIsVideoReady(true);
       setIsLoading(false);
-      console.log('Video can play');
     };
     const handlePlay = () => {
       setIsPlaying(true);
@@ -62,7 +60,6 @@ export function Corner0() {
       setVideoError('Không thể tải video. Vui lòng kiểm tra format file.');
     };
     const handleLoadStart = () => {
-      console.log('Video loading started...');
       setVideoError(null);
       setIsVideoReady(false);
       setIsLoading(true);
@@ -99,7 +96,6 @@ export function Corner0() {
       } else {
         // Đảm bảo video đã sẵn sàng trước khi play
         if (!isVideoReady) {
-          console.log('Video not ready, waiting...');
           return;
         }
 
@@ -144,13 +140,7 @@ export function Corner0() {
 
   // Debug: Log states để kiểm tra
   useEffect(() => {
-    console.log('States:', {
-      isPlaying,
-      showControls,
-      isVideoEnded,
-      isLoading,
-      isVideoReady,
-    });
+    // States are tracked for debugging
   }, [isPlaying, showControls, isVideoEnded, isLoading, isVideoReady]);
 
   return (

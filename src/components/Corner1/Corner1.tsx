@@ -73,12 +73,6 @@ export function Corner1() {
   const handleSaveMoodCard = async () => {
     try {
       // TODO: Implement save to backend
-      console.log('Saving mood card:', {
-        selectedEmojis,
-        whisper,
-        reminder,
-        combinationCategory,
-      });
       // Reset state
       setSelectedEmojis([]);
       setShowMoodCard(false);
