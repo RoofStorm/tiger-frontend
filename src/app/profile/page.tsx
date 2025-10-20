@@ -1,13 +1,15 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNextAuth } from '@/hooks/useNextAuth';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Gift, Calendar, Star, LogOut, Home } from 'lucide-react';
+import { Gift, Calendar, Star, LogOut, Home, RefreshCw } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import ReferralSection from '@/components/ReferralSection';
 
 interface RedeemItem {
   id: string;
@@ -36,6 +38,18 @@ interface PointLog {
 export default function ProfilePage() {
   const { user, isAuthenticated, logout } = useNextAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  // Refetch all queries when user enters profile page
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      console.log('🔄 Refetching all queries for profile page');
+      queryClient.refetchQueries({ queryKey: ['userDetails', user.id] });
+      queryClient.refetchQueries({ queryKey: ['pointHistory', user.id] });
+      queryClient.refetchQueries({ queryKey: ['redeemHistory', user.id] });
+      queryClient.refetchQueries({ queryKey: ['referralStats'] });
+    }
+  }, [isAuthenticated, user?.id, queryClient]);
 
   // Function to scroll to corner
   const scrollToCorner = (cornerId: string) => {
@@ -65,9 +79,11 @@ export default function ProfilePage() {
 
   // Fetch user details including points
   const { data: userDetails } = useQuery({
-    queryKey: ['userDetails'],
+    queryKey: ['userDetails', user?.id],
     queryFn: () => apiClient.getCurrentUser(),
     enabled: isAuthenticated,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
 
   // Fetch redeem history
@@ -75,26 +91,40 @@ export default function ProfilePage() {
     data: redeemHistoryData,
     isLoading: redeemHistoryLoading,
     error: redeemHistoryError,
+    refetch: refetchRedeemHistory,
   } = useQuery({
     queryKey: ['redeemHistory', user?.id],
     queryFn: () => apiClient.getRedeemHistory(),
     enabled: isAuthenticated,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 60 * 1000, // 1 minute
     refetchOnWindowFocus: true,
   });
+
+  // Function to refresh redeem history
+  const handleRefreshRedeemHistory = () => {
+    console.log('🔄 Refreshing redeem history...');
+    refetchRedeemHistory();
+  };
 
   // Fetch point history
   const {
     data: pointHistoryData,
     isLoading: pointHistoryLoading,
     error: pointHistoryError,
+    refetch: refetchPointHistory,
   } = useQuery({
     queryKey: ['pointHistory', user?.id],
     queryFn: () => apiClient.getPointHistory(),
     enabled: isAuthenticated,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 60 * 1000, // 1 minute
     refetchOnWindowFocus: true,
   });
+
+  // Function to refresh point history
+  const handleRefreshPointHistory = () => {
+    console.log('🔄 Refreshing point history...');
+    refetchPointHistory();
+  };
 
   const redeemHistory = Array.isArray(redeemHistoryData?.data?.redeems)
     ? redeemHistoryData.data.redeems
@@ -162,35 +192,46 @@ export default function ProfilePage() {
                   {userDetails?.points || 0} điểm
                 </span>
               </div>
-
-              {/* Logout Button */}
-              <Button
-                variant="outline"
-                onClick={logout}
-                className="text-red-600 hover:text-red-800 hover:bg-red-50 border-red-200 hover:border-red-300"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Đăng xuất
-              </Button>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {redeemHistory.length}
-                </div>
-                <div className="text-sm text-gray-600">Lần đổi quà</div>
+            <div className="flex flex-col items-end space-y-6">
+              {/* Action Buttons */}
+              <div className="flex items-center space-x-3">
+                <Link href="/">
+                  <Button className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white border-0 transition-colors">
+                    <Home className="w-4 h-4" />
+                    <span>Trang chủ</span>
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  onClick={logout}
+                  className="text-red-600 hover:text-red-800 hover:bg-red-50 border-red-200 hover:border-red-300 transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Đăng xuất
+                </Button>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {
-                    redeemHistory.filter(
-                      (r: RedeemItem) => r.status === 'DELIVERED'
-                    ).length
-                  }
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {redeemHistory.length}
+                  </div>
+                  <div className="text-sm text-gray-600">Lần đổi quà</div>
                 </div>
-                <div className="text-sm text-gray-600">Quà đã nhận</div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {
+                      redeemHistory.filter(
+                        (r: RedeemItem) => r.status === 'DELIVERED'
+                      ).length
+                    }
+                  </div>
+                  <div className="text-sm text-gray-600">Quà đã nhận</div>
+                </div>
               </div>
             </div>
           </div>
@@ -202,6 +243,18 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-bold text-gray-900">
               Lịch sử cộng điểm
             </h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefreshPointHistory}
+              disabled={pointHistoryLoading}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+            >
+              <RefreshCw
+                className={`w-4 h-4 ${pointHistoryLoading ? 'animate-spin' : ''}`}
+              />
+              <span>Làm mới</span>
+            </Button>
           </div>
 
           {pointHistoryLoading ? (
@@ -251,21 +304,24 @@ export default function ProfilePage() {
         </div>
 
         {/* Redeem History */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-white rounded-2xl shadow-lg p-8 mt-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
               Lịch sử đổi quà
             </h2>
             <div className="flex items-center space-x-3">
-              <Link href="/">
-                <Button
-                  variant="outline"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-                >
-                  <Home className="w-4 h-4" />
-                  <span>Trang chủ</span>
-                </Button>
-              </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefreshRedeemHistory}
+                disabled={redeemHistoryLoading}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+              >
+                <RefreshCw
+                  className={`w-4 h-4 ${redeemHistoryLoading ? 'animate-spin' : ''}`}
+                />
+                <span>Làm mới</span>
+              </Button>
               <Link href="/#corner-4">
                 <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white">
                   Đổi quà mới
@@ -440,6 +496,11 @@ export default function ProfilePage() {
               </div>
             </div>
           </button>
+        </div>
+
+        {/* Referral Section */}
+        <div className="mb-8">
+          <ReferralSection />
         </div>
       </div>
     </div>

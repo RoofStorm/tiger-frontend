@@ -12,7 +12,8 @@ export const WishSection = () => {
   } = useQuery({
     queryKey: ['highlighted-wishes'],
     queryFn: () => apiClient.getHighlightedWishes(),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
 
   const wishes = wishesData?.data || [];

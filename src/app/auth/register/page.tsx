@@ -1,15 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Gift } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 
 const registerSchema = z
@@ -18,6 +18,7 @@ const registerSchema = z
     email: z.string().email('Email không hợp lệ'),
     password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
     confirmPassword: z.string(),
+    referralCode: z.string().optional(),
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Mật khẩu xác nhận không khớp',
@@ -32,24 +33,34 @@ export default function RegisterPage() {
   const { register: registerUser, loading } = useNextAuth();
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
 
+  // Get referral code from URL
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      setValue('referralCode', refCode);
+    }
+  }, [searchParams, setValue]);
+
   const onSubmit = async (data: RegisterForm) => {
     try {
-      await registerUser(data.email, data.password, data.name);
-      toast({
-        title: 'Đăng ký thành công!',
-        description: 'Chào mừng bạn đến với Tiger.',
-        duration: 3000,
-      });
-      router.push('/');
+      await registerUser(
+        data.email,
+        data.password,
+        data.name,
+        data.referralCode
+      );
+      // Success toast and navigation are handled in useNextAuth
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
@@ -274,6 +285,33 @@ export default function RegisterPage() {
               {errors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-600">
                   {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            {/* Referral Code Field */}
+            <div>
+              <label
+                htmlFor="referralCode"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Mã mời bạn (tùy chọn)
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Gift className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  {...register('referralCode')}
+                  type="text"
+                  id="referralCode"
+                  placeholder="Nhập mã mời bạn để nhận 50 điểm"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              {errors.referralCode && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.referralCode.message}
                 </p>
               )}
             </div>

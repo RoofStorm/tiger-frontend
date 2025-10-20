@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { Star, StarOff, Trash2, Eye } from 'lucide-react';
+import { Star, StarOff, Trash2 } from 'lucide-react';
 import apiClient from '@/lib/api';
 import { Wish } from '../types';
 import { ActionButton } from '../ActionButton';
@@ -23,7 +23,7 @@ export const WishesTab = ({ isAdmin }: WishesTabProps) => {
   // Fetch wishes data
   const { data: wishesData, isLoading: wishesLoading } = useQuery({
     queryKey: ['admin-wishes', page, highlightFilter],
-    queryFn: () => apiClient.getAllWishes(page, perPage, highlightFilter),
+    queryFn: () => apiClient.getAdminWishes(page, perPage, highlightFilter),
     staleTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,

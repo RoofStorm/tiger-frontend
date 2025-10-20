@@ -30,6 +30,9 @@ export function Corner0() {
       setDuration(video.duration);
       setIsVideoReady(true);
       setIsLoading(false);
+      console.log('✅ Video metadata loaded successfully');
+      console.log('📹 Video source:', video.currentSrc);
+      console.log('⏱️ Video duration:', video.duration, 'seconds');
     };
     const handleCanPlay = () => {
       setIsVideoReady(true);
@@ -55,14 +58,15 @@ export function Corner0() {
       setShowControls(true);
     };
     const handleError = (e: Event) => {
-      console.error('Video error:', e);
+      console.warn('Video loading error, trying fallback:', e);
+      setVideoError('Video loading failed, trying fallback...');
       setIsLoading(false);
-      setVideoError('Không thể tải video. Vui lòng kiểm tra format file.');
     };
     const handleLoadStart = () => {
       setVideoError(null);
       setIsVideoReady(false);
       setIsLoading(true);
+      console.log('🎬 Video loading started...');
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
@@ -158,11 +162,16 @@ export function Corner0() {
           loop
           playsInline
           preload="metadata"
+          crossOrigin="anonymous"
         >
-          {/* File MP4 mới của bạn - ưu tiên cao nhất */}
-          <source src="/videos/exampleclip.mp4" type="video/mp4" />
-          {/* Fallback video */}
-          <source src="/videos/exampleclip.mkv" type="video/x-matroska" />
+          {/* Load video từ MinIO - ưu tiên cao nhất */}
+          <source
+            src="http://localhost:4000/api/storage/video/exampleclip.mp4"
+            type="video/mp4"
+          />
+          {/* Fallback video từ local nếu MinIO không khả dụng */}
+          {/* <source src="/videos/exampleclip.mp4" type="video/mp4" /> */}
+          {/* <source src="/videos/exampleclip.mkv" type="video/x-matroska" /> */}
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
@@ -186,12 +195,30 @@ export function Corner0() {
               >
                 <Loader2 className="w-12 h-12 text-white" />
               </motion.div>
-              <h3 className="text-2xl font-bold mb-2">Video đang load</h3>
+              <h3 className="text-2xl font-bold mb-2">
+                Video đang load từ MinIO
+              </h3>
               <p className="text-white/70">Vui lòng chờ trong giây lát...</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Debug Info - Chỉ hiển thị trong development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute top-4 left-4 bg-black/70 text-white text-xs p-2 rounded z-40">
+          <div>
+            🎬 Video Source: {videoRef.current?.currentSrc || 'Loading...'}
+          </div>
+          <div>
+            📊 Status:{' '}
+            {isLoading ? 'Loading...' : isVideoReady ? 'Ready' : 'Not ready'}
+          </div>
+          <div>
+            ⏱️ Duration: {duration ? `${duration.toFixed(1)}s` : 'Unknown'}
+          </div>
+        </div>
+      )}
 
       {/* Error Message */}
       {videoError && (

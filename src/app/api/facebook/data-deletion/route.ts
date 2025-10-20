@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     console.log(`Facebook data deletion request for user: ${userId}`);
 
     return NextResponse.json({
-      url: 'http://localhost:3000/data-deletion.html',
+      url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/data-deletion.html`,
       confirmation_code: `DELETION_${userId}_${Date.now()}`,
     });
   } catch (error) {
@@ -88,6 +88,6 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     message: 'Facebook Data Deletion Callback URL is working',
     instructions: 'This endpoint handles Facebook data deletion requests',
-    test_url: 'http://localhost:3000/data-deletion.html',
+    test_url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/data-deletion.html`,
   });
 }

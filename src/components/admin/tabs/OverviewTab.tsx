@@ -1,49 +1,67 @@
 import React from 'react';
-import { Users, Gift, BarChart3, Settings } from 'lucide-react';
+import { Users, Gift, BarChart3, Settings, Clock } from 'lucide-react';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  points: number;
-  loginMethod: string;
-}
-
-interface Post {
-  id: string;
-  caption: string;
-  type: string;
-  likeCount: number;
-  shareCount: number;
-  commentCount: number;
-  isHighlighted: boolean;
-  user?: {
-    name: string;
-  };
-}
-
-interface Reward {
-  id: string;
-  name: string;
-  description: string;
-  pointsRequired: number;
-  imageUrl?: string;
-  isActive: boolean;
+interface AdminStats {
+  totalUsers: number;
+  totalPosts: number;
+  totalRedeems: number;
+  totalPointsAwarded: number;
+  recentActivity: Array<{
+    type: string;
+    description: string;
+    timestamp: string;
+  }>;
 }
 
 interface OverviewTabProps {
-  users: User[];
-  posts: Post[];
-  rewards: Reward[];
+  stats: AdminStats;
+  isLoading: boolean;
 }
 
 export const OverviewTab: React.FC<OverviewTabProps> = ({
-  users,
-  posts,
-  rewards,
+  stats,
+  isLoading,
 }) => {
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-xl shadow-lg p-6 animate-pulse"
+            >
+              <div className="flex items-center">
+                <div className="p-3 bg-gray-200 rounded-lg w-12 h-12"></div>
+                <div className="ml-4">
+                  <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
+                  <div className="h-8 bg-gray-200 rounded w-12"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="bg-white rounded-xl shadow-lg p-6 animate-pulse">
+          <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+          <div className="space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+              >
+                <div className="w-2 h-2 bg-gray-200 rounded-full"></div>
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-48 mb-1"></div>
+                  <div className="h-3 bg-gray-200 rounded w-20"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Stats Cards */}
@@ -55,7 +73,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Người dùng</p>
-              <p className="text-2xl font-bold text-gray-900">{users.length}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {stats.totalUsers}
+              </p>
             </div>
           </div>
         </div>
@@ -66,9 +86,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               <Gift className="w-6 h-6 text-green-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Phần thưởng</p>
+              <p className="text-sm font-medium text-gray-600">Đổi thưởng</p>
               <p className="text-2xl font-bold text-gray-900">
-                {rewards.length}
+                {stats.totalRedeems}
               </p>
             </div>
           </div>
@@ -81,7 +101,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Bài viết</p>
-              <p className="text-2xl font-bold text-gray-900">{posts.length}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {stats.totalPosts}
+              </p>
             </div>
           </div>
         </div>
@@ -92,8 +114,10 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               <Settings className="w-6 h-6 text-orange-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Cài đặt</p>
-              <p className="text-2xl font-bold text-gray-900">-</p>
+              <p className="text-sm font-medium text-gray-600">Tổng điểm</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {stats.totalPointsAwarded.toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -105,27 +129,30 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           Hoạt động gần đây
         </h3>
         <div className="space-y-3">
-          <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm text-gray-900">Người dùng mới đăng ký</p>
-              <p className="text-xs text-gray-500">2 phút trước</p>
+          {stats.recentActivity.length > 0 ? (
+            stats.recentActivity.map((activity, index) => (
+              <div
+                key={index}
+                className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+              >
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-900">
+                    {activity.description}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    <Clock className="w-3 h-3 inline mr-1" />
+                    {new Date(activity.timestamp).toLocaleString('vi-VN')}
+                  </p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p>Chưa có hoạt động nào</p>
             </div>
-          </div>
-          <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm text-gray-900">Bài viết mới được tạo</p>
-              <p className="text-xs text-gray-500">5 phút trước</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm text-gray-900">Phần thưởng được đổi</p>
-              <p className="text-xs text-gray-500">10 phút trước</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -33,8 +33,8 @@ export function Corner2_2() {
     queryKey: ['highlighted-posts', user?.id], // Include user ID in query key
     queryFn: () => apiClient.getHighlightedPosts(),
     enabled: isAuthenticated,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: false,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
 
   const posts = postsData?.data?.posts || [];
@@ -44,8 +44,8 @@ export function Corner2_2() {
     queryKey: ['user-actions', user?.id], // Include user ID in query key
     queryFn: () => apiClient.getUserActions(),
     enabled: isAuthenticated && !!user,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: false,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
 
   const userActions = userActionsData?.data || [];
@@ -94,18 +94,22 @@ export function Corner2_2() {
   // Share mutation
   const shareMutation = useMutation({
     mutationFn: (postId: string) => apiClient.sharePost(postId),
-    onSuccess: () => {
+    onSuccess: result => {
       // Invalidate posts to refresh global counts
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts', user?.id],
       });
       // Invalidate user details to refresh points
       queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      // Invalidate point logs to refresh point history
+      queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
+      // Show success message with points info
       toast({
-        title: 'Đã chia sẻ!',
-        description: 'Bài viết đã được chia sẻ thành công.',
-        duration: 3000,
+        title: 'Chia sẻ thành công!',
+        description:
+          result.pointsMessage || 'Bài viết đã được chia sẻ thành công.',
+        duration: 4000,
       });
     },
   });
@@ -162,13 +166,15 @@ export function Corner2_2() {
         caption: caption || '',
       };
 
-      await apiClient.createPost(postData);
+      const result = await apiClient.createPost(postData);
 
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts', user?.id],
       });
       // Invalidate user details to refresh points
       queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      // Invalidate point logs to refresh point history
+      queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
       // Reset form
       setCaption('');
@@ -178,11 +184,13 @@ export function Corner2_2() {
         fileInputRef.current.value = '';
       }
 
+      // Show success message with points info
       toast({
         title: 'Đăng bài thành công!',
-        description: 'Bài viết của bạn đã được chia sẻ.',
+        description:
+          result.pointsMessage || 'Bài viết của bạn đã được chia sẻ.',
         variant: 'success',
-        duration: 3000,
+        duration: 4000,
       });
     } catch (error) {
       console.error('Upload failed:', error);
@@ -442,6 +450,7 @@ export function Corner2_2() {
                         src={post.imageUrl}
                         alt={post.caption || 'Post image'}
                         fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     ) : (

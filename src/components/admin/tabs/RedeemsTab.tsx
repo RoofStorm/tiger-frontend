@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import apiClient from '@/lib/api';
 import { Pagination } from '../Pagination';
@@ -46,7 +45,7 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
   } = useQuery({
     queryKey: ['admin-redeems', redeemPage, redeemStatusFilter],
     queryFn: () =>
-      apiClient.getAllRedeems(
+      apiClient.getRedeemLogs(
         redeemPage,
         redeemPerPage,
         redeemStatusFilter || undefined

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { EmojiGrid } from '@/components/EmojiGrid';
 import { MoodCardCanvas } from '@/components/MoodCardCanvas';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { EmojiSelection } from '@/types';
 import {
   findCombinationByEmojis,
@@ -19,6 +20,8 @@ export function Corner1() {
   const [combinationCategory, setCombinationCategory] = useState<
     'mindful' | 'tiger-linked' | 'trendy' | null
   >(null);
+  const [moodCardImage, setMoodCardImage] = useState<string>('');
+  const { toast } = useToast();
 
   const handleEmojiSelect = (emoji: EmojiSelection) => {
     // Check if emoji is already selected
@@ -77,9 +80,124 @@ export function Corner1() {
       setSelectedEmojis([]);
       setShowMoodCard(false);
       setCombinationCategory(null);
+      setMoodCardImage('');
     } catch (error) {
       console.error('Failed to save mood card:', error);
     }
+  };
+
+  const handleMoodCardGenerated = (imageData: string) => {
+    setMoodCardImage(imageData);
+  };
+
+  // Auto-generate image when mood card is shown
+  const handleMoodCardReady = () => {
+    // Set a flag that mood card is ready for sharing
+    setMoodCardImage('ready');
+  };
+
+  const handleShareMoodCard = (imageData?: string) => {
+    if (!moodCardImage && !showMoodCard && !imageData) {
+      toast({
+        title: 'Lỗi',
+        description: 'Vui lòng tạo mood card trước khi chia sẻ.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Nếu có imageData từ MoodCardCanvas, mở Facebook dialog ngay lập tức
+    if (imageData) {
+      openFacebookShareDialog();
+      return;
+    }
+
+    // Fallback: mở dialog nếu không có imageData
+    openFacebookShareDialog();
+  };
+
+  const openFacebookShareDialog = () => {
+    // Tạo URL preview cho mood card
+    const baseUrl =
+      process.env.NEXT_PUBLIC_PUBLIC_URL ||
+      process.env.NEXTAUTH_URL ||
+      'http://localhost:3000';
+    const shareUrl = `${baseUrl}/mood-card?emojis=${selectedEmojis.map(e => e.id).join(',')}&whisper=${encodeURIComponent(whisper)}&reminder=${encodeURIComponent(reminder)}`;
+
+    // Tạo title và description cho mood card
+    const emojiLabels = selectedEmojis.map(e => e.label).join(', ');
+    const emojiString = selectedEmojis.map(e => e.emoji).join(' ');
+
+    // Tạo title từ reminder thay vì emojis
+    let moodCardTitle = '';
+    if (reminder) {
+      // Cắt reminder nếu quá dài (tối đa 50 ký tự)
+      const shortReminder =
+        reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
+      moodCardTitle = `${shortReminder} - Tiger Mood Corner`;
+    } else if (whisper) {
+      // Fallback về whisper nếu không có reminder
+      const shortWhisper =
+        whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
+      moodCardTitle = `"${shortWhisper}" - Tiger Mood Corner`;
+    } else {
+      // Fallback về emoji labels nếu không có cả reminder và whisper
+      moodCardTitle = `Mood Card: ${emojiLabels} - Tiger Mood Corner`;
+    }
+
+    // Tạo caption ngắn gọn cho Facebook preview (giống Open Graph)
+    let moodCardDescription = '';
+    if (whisper && reminder) {
+      moodCardDescription = `"${whisper}"\n\n${reminder}\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
+    } else if (whisper) {
+      moodCardDescription = `"${whisper}"\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
+    } else if (reminder) {
+      moodCardDescription = `${reminder}\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
+    } else {
+      moodCardDescription = `Khám phá cảm xúc của bạn qua emoji: ${emojiString}\n\n#TigerMoodCorner #MoodCard`;
+    }
+
+    // Console log để kiểm tra
+    console.log('🎨 Mood Card Share Preview:', {
+      shareUrl,
+      moodCardTitle,
+      moodCardDescription,
+      emojis: selectedEmojis.map(e => e.emoji),
+      whisper,
+      reminder,
+    });
+
+    // Tạo Facebook Share URL
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    console.log('📱 Facebook Share URL for Mood Card:', facebookShareUrl);
+
+    // Mở popup Facebook Share Dialog
+    const popup = window.open(
+      facebookShareUrl,
+      'facebook-share-dialog',
+      'width=800,height=600,scrollbars=yes,resizable=yes'
+    );
+
+    // Kiểm tra nếu popup bị block
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      toast({
+        title: 'Popup bị chặn',
+        description: 'Vui lòng cho phép popup để chia sẻ mood card.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Focus vào popup
+    popup.focus();
+
+    toast({
+      title: 'Chia sẻ mood card',
+      description: 'Đang mở Facebook để chia sẻ mood card của bạn.',
+      duration: 3000,
+    });
   };
 
   const handleReset = () => {
@@ -88,6 +206,7 @@ export function Corner1() {
     setWhisper('');
     setReminder('');
     setCombinationCategory(null);
+    setMoodCardImage('');
   };
 
   return (
@@ -181,6 +300,9 @@ export function Corner1() {
                   whisper={whisper}
                   reminder={reminder}
                   category={combinationCategory}
+                  onSave={handleMoodCardGenerated}
+                  onShare={handleShareMoodCard}
+                  onReady={handleMoodCardReady}
                 />
               ) : (
                 <div className="h-96 flex items-center justify-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { EmojiSelection } from '@/types';
 import { Download, Share2 } from 'lucide-react';
@@ -13,6 +13,7 @@ interface MoodCardCanvasProps {
   category?: 'mindful' | 'tiger-linked' | 'trendy' | null;
   onSave?: (imageData: string) => void;
   onShare?: (imageData: string) => void;
+  onReady?: () => void;
 }
 
 export function MoodCardCanvas({
@@ -22,9 +23,17 @@ export function MoodCardCanvas({
   category,
   onSave,
   onShare,
+  onReady,
 }: MoodCardCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Call onReady when component mounts (mood card is ready for sharing)
+  useEffect(() => {
+    if (onReady) {
+      onReady();
+    }
+  }, [onReady]);
 
   const generateImage = async () => {
     if (!canvasRef.current) return;
@@ -63,7 +72,9 @@ export function MoodCardCanvas({
   };
 
   const handleShare = async () => {
-    const imageData = await generateImage();
+    // const imageData = await generateImage();
+    const imageData =
+      'https://nonnomadically-remittent-abrielle.ngrok-free.dev/default-post-image.jpg';
     if (imageData && onShare) {
       onShare(imageData);
     }

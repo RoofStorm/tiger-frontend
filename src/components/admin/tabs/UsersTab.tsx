@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
@@ -37,32 +37,37 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
     status: '',
   });
 
-  // Fetch users data
+  // Fetch users data with server-side pagination
   const { data: usersData, isLoading: usersLoading } = useQuery({
-    queryKey: ['admin-users'],
-    queryFn: () => apiClient.getUsers(),
+    queryKey: ['admin-users', currentPage, userFilters],
+    queryFn: () =>
+      apiClient.getUsers(
+        currentPage,
+        10, // itemsPerPage
+        userFilters.role || undefined,
+        userFilters.status || undefined
+      ),
     enabled: isAdmin,
     staleTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
 
-  const allUsers = useMemo(() => usersData?.data?.data || [], [usersData]);
+  const users = useMemo(() => usersData?.data?.data || [], [usersData]);
+  const totalUsers = useMemo(() => usersData?.data?.total || 0, [usersData]);
+  const totalPages = useMemo(() => Math.ceil(totalUsers / 10), [totalUsers]);
 
-  // Filter functions
-  const filterUsers = useCallback(
-    (users: User[]) => {
-      return users.filter(user => {
-        const matchesRole = !userFilters.role || user.role === userFilters.role;
-        const matchesStatus =
-          !userFilters.status || user.status === userFilters.status;
-        return matchesRole && matchesStatus;
-      });
-    },
-    [userFilters]
-  );
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [userFilters]);
 
-  const users = useMemo(() => filterUsers(allUsers), [allUsers, filterUsers]);
+  // Reset to page 1 if current page is greater than total pages
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   if (usersLoading) {
     return <div className="text-center py-8">Đang tải...</div>;
@@ -86,12 +91,16 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
 
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          Hiển thị {users.length} trong tổng số {allUsers.length} người dùng
+          Hiển thị {users.length} trong tổng số {totalUsers} người dùng
+          {(userFilters.role || userFilters.status) && ' (đã lọc)'}
         </p>
-        {users.length === 0 && allUsers.length > 0 && (
+        {users.length === 0 && totalUsers > 0 && (
           <p className="text-sm text-amber-600">
             Không tìm thấy kết quả phù hợp với bộ lọc
           </p>
+        )}
+        {totalUsers === 0 && (
+          <p className="text-sm text-amber-600">Chưa có người dùng nào</p>
         )}
       </div>
 
@@ -224,9 +233,10 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
         </table>
       </div>
       <Pagination
-        total={users.length}
+        total={totalUsers}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
+        itemsPerPage={10}
       />
     </div>
   );

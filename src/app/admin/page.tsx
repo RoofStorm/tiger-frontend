@@ -50,37 +50,22 @@ export default function AdminPage() {
     }
   }, [isAuthenticated, isAdmin, router]);
 
-  // Fetch admin data
-  const { data: usersData } = useQuery({
-    queryKey: ['admin-users'],
-    queryFn: () => apiClient.getUsers(),
+  // Fetch admin stats for overview
+  const { data: adminStatsData, isLoading: statsLoading } = useQuery({
+    queryKey: ['admin-stats'],
+    queryFn: () => apiClient.getAdminStats(),
     enabled: isAdmin,
-    staleTime: 0, // Always consider data stale
-    refetchOnMount: true, // Always refetch on mount
-    refetchOnWindowFocus: true, // Refetch when window gains focus
-  });
-
-  const { data: rewardsData } = useQuery({
-    queryKey: ['admin-rewards'],
-    queryFn: () => apiClient.getRewards(1, 10),
-    enabled: isAdmin,
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
 
-  const { data: postsData } = useQuery({
-    queryKey: ['admin-posts'],
-    queryFn: () => apiClient.getPosts(),
-    enabled: isAdmin,
-    staleTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
-  });
+  // Remove old individual data fetches - not needed for overview
+  // const { data: usersData } = useQuery({...});
+  // const { data: rewardsData } = useQuery({...});
+  // const { data: postsData } = useQuery({...});
 
-  const allUsers = usersData?.data?.data || [];
-  const allRewards = rewardsData?.data?.data || [];
-  const allPosts = postsData?.data?.posts || [];
+  const adminStats = adminStatsData?.data || {};
 
   const tabs = [
     { id: 'overview', label: 'Tổng quan', icon: Home },
@@ -96,9 +81,7 @@ export default function AdminPage() {
   const renderContent = () => {
     switch (activeTab) {
       case 'overview':
-        return (
-          <OverviewTab users={allUsers} posts={allPosts} rewards={allRewards} />
-        );
+        return <OverviewTab stats={adminStats} isLoading={statsLoading} />;
       case 'users':
         return <UsersTab isAdmin={isAdmin} />;
       case 'rewards':
@@ -123,9 +106,7 @@ export default function AdminPage() {
           </div>
         );
       default:
-        return (
-          <OverviewTab users={allUsers} posts={allPosts} rewards={allRewards} />
-        );
+        return <OverviewTab stats={adminStats} isLoading={statsLoading} />;
     }
   };
 

@@ -4,6 +4,88 @@ import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
+import {
+  checkDailyBonusAwarded,
+  markDailyBonusAwarded,
+  getTodayDateString,
+} from './redis';
+import { POINTS } from '@/constants/points';
+
+// Helper function to award daily login bonus with Redis cache
+async function awardDailyLoginBonus(userId: string, provider: string) {
+  try {
+    const today = getTodayDateString();
+
+    // Check Redis cache first
+    const alreadyAwarded = await checkDailyBonusAwarded(userId, today);
+
+    if (alreadyAwarded) {
+      console.log(
+        `🎁 Daily login bonus already awarded today for ${provider} user:`,
+        userId
+      );
+      return;
+    }
+
+    // Double-check with database as fallback
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(todayDate);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const todayLogs = await prisma.pointLog.findMany({
+      where: {
+        userId: userId,
+        reason: 'Daily login bonus',
+        createdAt: {
+          gte: todayDate,
+          lt: tomorrow,
+        },
+      },
+    });
+
+    if (todayLogs.length > 0) {
+      console.log(
+        `🎁 Daily login bonus already awarded today (DB check) for ${provider} user:`,
+        userId
+      );
+      // Mark in Redis cache for future requests
+      await markDailyBonusAwarded(userId, today);
+      return;
+    }
+
+    // Award points
+    await prisma.pointLog.create({
+      data: {
+        userId: userId,
+        points: POINTS.DAILY_LOGIN_BONUS,
+        reason: 'Daily login bonus',
+      },
+    });
+
+    // Update user points
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        points: {
+          increment: POINTS.DAILY_LOGIN_BONUS,
+        },
+      },
+    });
+
+    // Mark as awarded in Redis cache
+    await markDailyBonusAwarded(userId, today);
+
+    console.log(
+      `🎁 Daily login bonus awarded successfully to ${provider} user: ${POINTS.DAILY_LOGIN_BONUS} points`
+    );
+  } catch (error) {
+    console.error(
+      `❌ Error awarding daily login bonus to ${provider} user:`,
+      error
+    );
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -30,7 +112,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           // Test database connection first
-          const testConnection = await prisma.user.count();
+          await prisma.user.count();
           const user = await prisma.user.findUnique({
             where: {
               email: credentials.email,
@@ -70,64 +152,13 @@ export const authOptions: NextAuthOptions = {
           console.log('✅ Login successful for user:', user.email);
 
           // Award daily login bonus points
-          try {
-            console.log(
-              '🎁 Attempting to award daily login bonus to user:',
-              user.id
-            );
-
-            // Check if user already got daily bonus today
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-
-            const todayLogs = await prisma.pointLog.findMany({
-              where: {
-                userId: user.id,
-                reason: 'Daily login bonus',
-                createdAt: {
-                  gte: today,
-                  lt: tomorrow,
-                },
-              },
-            });
-
-            if (todayLogs.length === 0) {
-              // Award points
-              await prisma.pointLog.create({
-                data: {
-                  userId: user.id,
-                  points: 50,
-                  reason: 'Daily login bonus',
-                },
-              });
-
-              // Update user points
-              await prisma.user.update({
-                where: { id: user.id },
-                data: {
-                  points: {
-                    increment: 50,
-                  },
-                },
-              });
-
-              console.log(
-                '🎁 Daily login bonus awarded successfully: 50 points'
-              );
-            } else {
-              console.log('🎁 Daily login bonus already awarded today');
-            }
-          } catch (error) {
-            console.error('❌ Error awarding daily login bonus:', error);
-          }
+          await awardDailyLoginBonus(user.id, 'credentials');
 
           return {
             id: user.id,
             email: user.email,
             name: user.name || 'User',
-            image: user.avatarUrl || user.image || undefined,
+            image: user.avatarUrl || undefined,
             role: user.role,
           };
         } catch (error: unknown) {
@@ -184,62 +215,16 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Award daily login bonus for all users (new and existing)
-          try {
-            const userId =
-              existingUser?.id ||
-              (
-                await prisma.user.findUnique({
-                  where: { email: user.email! },
-                })
-              )?.id;
+          const userId =
+            existingUser?.id ||
+            (
+              await prisma.user.findUnique({
+                where: { email: user.email! },
+              })
+            )?.id;
 
-            if (userId) {
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              const tomorrow = new Date(today);
-              tomorrow.setDate(tomorrow.getDate() + 1);
-
-              const todayLogs = await prisma.pointLog.findMany({
-                where: {
-                  userId: userId,
-                  reason: 'Daily login bonus',
-                  createdAt: {
-                    gte: today,
-                    lt: tomorrow,
-                  },
-                },
-              });
-
-              if (todayLogs.length === 0) {
-                await prisma.pointLog.create({
-                  data: {
-                    userId,
-                    points: 50,
-                    reason: 'Daily login bonus',
-                  },
-                });
-
-                await prisma.user.update({
-                  where: { id: userId },
-                  data: {
-                    points: {
-                      increment: 50,
-                    },
-                  },
-                });
-
-                console.log(
-                  '🎁 Daily login bonus awarded to Google user: 50 points'
-                );
-              } else {
-                console.log('🎁 Daily login bonus already awarded today');
-              }
-            }
-          } catch (error) {
-            console.error(
-              '❌ Error awarding daily login bonus to Google user:',
-              error
-            );
+          if (userId) {
+            await awardDailyLoginBonus(userId, 'google');
           }
         } catch (error) {
           console.error('❌ Error in Google sign in:', error);
@@ -283,61 +268,16 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Award daily login bonus for all users (new and existing)
-          try {
-            const userId =
-              existingUser?.id ||
-              (
-                await prisma.user.findUnique({
-                  where: { email: user.email! },
-                })
-              )?.id;
+          const userId =
+            existingUser?.id ||
+            (
+              await prisma.user.findUnique({
+                where: { email: user.email! },
+              })
+            )?.id;
 
-            if (userId) {
-              const today = new Date();
-              const tomorrow = new Date(today);
-              tomorrow.setDate(tomorrow.getDate() + 1);
-              tomorrow.setHours(0, 0, 0, 0);
-
-              const todayLogs = await prisma.pointLog.findMany({
-                where: {
-                  userId: userId,
-                  reason: 'Daily login bonus',
-                  createdAt: {
-                    gte: today,
-                    lt: tomorrow,
-                  },
-                },
-              });
-
-              if (todayLogs.length === 0) {
-                // Award points
-                await prisma.pointLog.create({
-                  data: {
-                    userId: userId,
-                    points: 50,
-                    reason: 'Daily login bonus',
-                  },
-                });
-
-                // Update user points
-                await prisma.user.update({
-                  where: { id: userId },
-                  data: {
-                    points: {
-                      increment: 50,
-                    },
-                  },
-                });
-
-                console.log(
-                  '🎁 Daily login bonus awarded successfully: 50 points'
-                );
-              } else {
-                console.log('🎁 Daily login bonus already awarded today');
-              }
-            }
-          } catch (error) {
-            console.error('❌ Error awarding daily login bonus:', error);
+          if (userId) {
+            await awardDailyLoginBonus(userId, 'facebook');
           }
         } catch (error) {
           console.error('❌ Error in Facebook sign in:', error);

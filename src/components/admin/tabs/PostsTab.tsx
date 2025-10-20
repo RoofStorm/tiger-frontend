@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Plus, Edit, Trash2, Eye, Star, StarOff } from 'lucide-react';
@@ -45,30 +45,40 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
     new Set()
   );
 
-  // Fetch posts data
+  // Fetch posts data with server-side pagination
   const { data: postsData, isLoading: postsLoading } = useQuery({
-    queryKey: ['admin-posts'],
-    queryFn: () => apiClient.getPosts(),
+    queryKey: ['admin-posts', currentPage, postFilters],
+    queryFn: () =>
+      apiClient.getAdminPosts(
+        currentPage,
+        10, // itemsPerPage
+        postFilters.type === 'highlighted'
+          ? true
+          : postFilters.type === 'normal'
+            ? false
+            : undefined
+      ),
     enabled: isAdmin,
     staleTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
   });
 
-  const allPosts = useMemo(() => postsData?.data?.posts || [], [postsData]);
+  const posts = useMemo(() => postsData?.data?.data || [], [postsData]);
+  const totalPosts = useMemo(() => postsData?.data?.total || 0, [postsData]);
+  const totalPages = useMemo(() => Math.ceil(totalPosts / 10), [totalPosts]);
 
-  // Filter functions
-  const filterPosts = useCallback(
-    (posts: Post[]) => {
-      return posts.filter(post => {
-        const matchesType = !postFilters.type || post.type === postFilters.type;
-        return matchesType;
-      });
-    },
-    [postFilters]
-  );
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [postFilters]);
 
-  const posts = useMemo(() => filterPosts(allPosts), [allPosts, filterPosts]);
+  // Reset to page 1 if current page is greater than total pages
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, totalPages]);
 
   // Highlight handlers
   const handleHighlightPost = useCallback(
@@ -164,12 +174,16 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
 
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-600">
-          Hiển thị {posts.length} trong tổng số {allPosts.length} bài viết
+          Hiển thị {posts.length} trong tổng số {totalPosts} bài viết
+          {postFilters.type && ' (đã lọc)'}
         </p>
-        {posts.length === 0 && allPosts.length > 0 && (
+        {posts.length === 0 && totalPosts > 0 && (
           <p className="text-sm text-amber-600">
             Không tìm thấy kết quả phù hợp với bộ lọc
           </p>
+        )}
+        {totalPosts === 0 && (
+          <p className="text-sm text-amber-600">Chưa có bài viết nào</p>
         )}
       </div>
 
@@ -323,9 +337,10 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
         </table>
       </div>
       <Pagination
-        total={posts.length}
+        total={totalPosts}
         currentPage={currentPage}
         onPageChange={setCurrentPage}
+        itemsPerPage={10}
       />
     </div>
   );

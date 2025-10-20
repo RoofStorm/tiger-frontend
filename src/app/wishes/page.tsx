@@ -91,15 +91,21 @@ export default function WishesPage() {
 
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
-    onSuccess: () => {
+    onSuccess: result => {
       setContent('');
       setSelectedSuggestion(null);
       queryClient.invalidateQueries({ queryKey: ['highlighted-wishes'] });
+      // Invalidate user details to refresh points
+      queryClient.invalidateQueries({ queryKey: ['userDetails'] });
+      // Invalidate point logs to refresh point history
+      queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
+
+      // Show success message with points info
       toast({
-        title: 'Thành công',
-        description: 'Lời chúc của bạn đã được gửi!',
+        title: 'Gửi lời chúc thành công!',
+        description: result.pointsMessage || 'Lời chúc của bạn đã được gửi!',
         variant: 'success',
-        duration: 3000,
+        duration: 4000,
       });
     },
     onError: () => {

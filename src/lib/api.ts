@@ -35,6 +35,7 @@ class ApiClient {
           '/points',
           '/users',
           '/wishes',
+          '/referral',
         ];
 
         // For rewards, only protect non-GET methods (POST, PATCH, DELETE)
@@ -281,7 +282,6 @@ class ApiClient {
     return response.data;
   }
 
-  // Admin endpoints
   async getAdminStats(): Promise<any> {
     const response = await this.client.get('/admin/stats');
     return response.data;
@@ -304,8 +304,53 @@ class ApiClient {
     return response.data;
   }
 
-  async getRedeemLogs(): Promise<any> {
-    const response = await this.client.get('/admin/redeems');
+  async getRedeemLogs(page = 1, limit = 10, status?: string): Promise<any> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    if (status) params.append('status', status);
+
+    const response = await this.client.get(
+      `/admin/redeems?${params.toString()}`
+    );
+    return response.data;
+  }
+
+  async getAdminPosts(
+    page = 1,
+    limit = 10,
+    highlighted?: boolean
+  ): Promise<any> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    if (highlighted !== undefined)
+      params.append('highlighted', highlighted.toString());
+
+    const response = await this.client.get(`/admin/posts?${params.toString()}`);
+    return response.data;
+  }
+
+  async getAdminWishes(
+    page = 1,
+    limit = 10,
+    highlighted?: boolean
+  ): Promise<any> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    if (highlighted !== undefined)
+      params.append('highlighted', highlighted.toString());
+
+    const response = await this.client.get(
+      `/admin/wishes?${params.toString()}`
+    );
     return response.data;
   }
 
@@ -315,8 +360,21 @@ class ApiClient {
   }
 
   // Admin methods
-  async getUsers(): Promise<any> {
-    const response = await this.client.get('/admin/users');
+  async getUsers(
+    page = 1,
+    limit = 10,
+    role?: string,
+    status?: string
+  ): Promise<any> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    if (role) params.append('role', role);
+    if (status) params.append('status', status);
+
+    const response = await this.client.get(`/admin/users?${params.toString()}`);
     return response.data;
   }
 
@@ -335,6 +393,25 @@ class ApiClient {
   async updateRedeemStatus(redeemId: string, status: string): Promise<any> {
     const response = await this.client.patch(`/redeems/${redeemId}/status`, {
       status,
+    });
+    return response.data;
+  }
+
+  // Referral methods
+  async getReferralCode(): Promise<any> {
+    const response = await this.client.get('/users/referral/code');
+    return response.data;
+  }
+
+  async getReferralStats(): Promise<any> {
+    const response = await this.client.get('/users/referral/stats');
+    return response.data;
+  }
+
+  async processReferral(userId: string, referralCode: string): Promise<any> {
+    const response = await this.client.post('/referral/process', {
+      userId,
+      referralCode,
     });
     return response.data;
   }
