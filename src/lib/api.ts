@@ -53,17 +53,22 @@ class ApiClient {
         if (needsAuth) {
           // Only get session on client side
           if (typeof window !== 'undefined') {
-            const session = await getSession();
-
-            if (session?.user) {
-              // Get JWT token from NextAuth.js session
-              const token = (session as any).accessToken || session.user.id;
-              config.headers.Authorization = `Bearer ${token}`;
+            // Try to get access token from localStorage first
+            const accessToken = localStorage.getItem('accessToken');
+            if (accessToken) {
+              config.headers.Authorization = `Bearer ${accessToken}`;
             } else {
-              // Try to get from localStorage as fallback
-              const storedUserId = localStorage.getItem('userId');
-              if (storedUserId) {
-                config.headers.Authorization = `Bearer ${storedUserId}`;
+              // Fallback to NextAuth session
+              const session = await getSession();
+              if (session?.user) {
+                const token = (session as any).accessToken || session.user.id;
+                config.headers.Authorization = `Bearer ${token}`;
+              } else {
+                // Try to get from localStorage as fallback
+                const storedUserId = localStorage.getItem('userId');
+                if (storedUserId) {
+                  config.headers.Authorization = `Bearer ${storedUserId}`;
+                }
               }
             }
           }
@@ -73,22 +78,88 @@ class ApiClient {
       error => Promise.reject(error)
     );
 
-    // Response interceptor to handle auth errors
+    // Response interceptor to handle auth errors and automatic token refresh
     this.client.interceptors.response.use(
       response => response,
       async error => {
-        if (error.response?.status === 401) {
-          // Check if we actually have a session before redirecting
-          const session = await getSession();
-          if (!session?.user) {
-            setTimeout(() => {
-              window.location.href = '/auth/login';
-            }, 100);
+        const originalRequest = error.config;
+
+        // Handle 401 errors with automatic token refresh
+        if (error.response?.status === 401 && !originalRequest._retry) {
+          originalRequest._retry = true;
+
+          try {
+            // Try to refresh token automatically
+            const newToken = await this.handleTokenRefresh();
+            if (newToken) {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              return this.client.request(originalRequest);
+            }
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
+            // If refresh fails, check if we have a session
+            const session = await getSession();
+            if (!session?.user) {
+              setTimeout(() => {
+                window.location.href = '/auth/login';
+              }, 100);
+            }
           }
         }
+
         return Promise.reject(error);
       }
     );
+  }
+
+  // Token refresh methods
+  private async handleTokenRefresh() {
+    // Prevent multiple simultaneous refresh calls
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.refreshPromise = this.refreshToken();
+    try {
+      const result = await this.refreshPromise;
+      return result;
+    } finally {
+      this.refreshPromise = null;
+    }
+  }
+
+  private async refreshToken() {
+    // Only refresh on client side
+    if (typeof window === 'undefined') {
+      throw new Error('Refresh token only available on client side');
+    }
+
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    try {
+      const response = await axios.post(
+        `${this.client.defaults.baseURL}/auth/refresh`,
+        {
+          refreshToken,
+        }
+      );
+
+      const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+      // Update tokens in storage
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+
+      return accessToken;
+    } catch (error) {
+      // Clear invalid tokens
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      throw error;
+    }
   }
 
   // Note: Auth methods are now handled by NextAuth.js

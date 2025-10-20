@@ -300,6 +300,11 @@ export const authOptions: NextAuthOptions = {
               token.accessToken = dbUser.id; // Use database user ID
               token.userId = dbUser.id;
               token.avatarUrl = dbUser.avatarUrl; // Add avatar URL to token
+
+              // Add refresh token if available
+              if (dbUser.refreshToken) {
+                token.refreshToken = dbUser.refreshToken;
+              }
             }
           } catch (error) {
             console.error('Error finding user in JWT callback:', error);
@@ -319,6 +324,9 @@ export const authOptions: NextAuthOptions = {
         session.user.image = avatarUrl || undefined;
         (session as { accessToken?: string }).accessToken =
           token.accessToken as string;
+        (session as { refreshToken?: string }).refreshToken = (
+          token as { refreshToken?: string }
+        ).refreshToken;
       }
       return session;
     },

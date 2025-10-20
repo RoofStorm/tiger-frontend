@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,7 +32,6 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register: registerUser, loading } = useNextAuth();
   const { toast } = useToast();
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const {
@@ -77,27 +76,14 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const result = await signIn('google', {
+      // Redirect to Google OAuth - let NextAuth handle the flow
+      await signIn('google', {
         callbackUrl: '/',
-        redirect: false,
+        redirect: true, // Allow redirect to OAuth provider
       });
-
-      if (result?.ok) {
-        toast({
-          title: 'Đăng nhập thành công!',
-          description: 'Chào mừng bạn đến với Tiger.',
-          duration: 3000,
-        });
-        router.push('/');
-      } else {
-        toast({
-          title: 'Đăng nhập thất bại',
-          description: 'Không thể đăng nhập với Google',
-          variant: 'destructive',
-          duration: 4000,
-        });
-      }
     } catch (error) {
+      // Only show error if there's an actual error, not OAuth flow
+      console.error('Google login error:', error);
       toast({
         title: 'Lỗi',
         description: 'Có lỗi xảy ra khi đăng nhập với Google',
@@ -109,27 +95,14 @@ export default function RegisterPage() {
 
   const handleFacebookLogin = async () => {
     try {
-      const result = await signIn('facebook', {
+      // Redirect to Facebook OAuth - let NextAuth handle the flow
+      await signIn('facebook', {
         callbackUrl: '/',
-        redirect: false,
+        redirect: true, // Allow redirect to OAuth provider
       });
-
-      if (result?.ok) {
-        toast({
-          title: 'Đăng nhập thành công!',
-          description: 'Chào mừng bạn đến với Tiger.',
-          duration: 3000,
-        });
-        router.push('/');
-      } else {
-        toast({
-          title: 'Đăng nhập thất bại',
-          description: 'Không thể đăng nhập với Facebook',
-          variant: 'destructive',
-          duration: 4000,
-        });
-      }
     } catch (error) {
+      // Only show error if there's an actual error, not OAuth flow
+      console.error('Facebook login error:', error);
       toast({
         title: 'Lỗi',
         description: 'Có lỗi xảy ra khi đăng nhập với Facebook',

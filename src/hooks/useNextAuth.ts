@@ -50,14 +50,27 @@ export function useNextAuth(): UseNextAuthReturn {
           );
         }
 
-        // Store userId in localStorage for fallback
+        // Store tokens in localStorage for fallback
         if (result?.ok) {
-          // Get the user ID from the session after successful login
+          // Get the user ID and tokens from the session after successful login
           setTimeout(async () => {
             const { getSession } = await import('next-auth/react');
             const session = await getSession();
             if (session?.user?.id) {
               localStorage.setItem('userId', session.user.id);
+
+              // Try to get tokens from session
+              const accessToken = (session as { accessToken?: string })
+                .accessToken;
+              const refreshToken = (session as { refreshToken?: string })
+                .refreshToken;
+
+              if (accessToken) {
+                localStorage.setItem('accessToken', accessToken);
+              }
+              if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+              }
             }
           }, 100);
         }
@@ -142,8 +155,10 @@ export function useNextAuth(): UseNextAuthReturn {
 
   const logout = useCallback(async () => {
     try {
-      // Clear localStorage
+      // Clear all auth-related data from localStorage
       localStorage.removeItem('userId');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
 
       // Clear cache before logout to prevent stale data
       queryClient.clear();

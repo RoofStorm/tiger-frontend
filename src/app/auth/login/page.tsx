@@ -58,27 +58,14 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const result = await signIn('google', {
+      // Redirect to Google OAuth - let NextAuth handle the flow
+      await signIn('google', {
         callbackUrl: '/',
-        redirect: false,
+        redirect: true, // Allow redirect to OAuth provider
       });
-
-      if (result?.ok) {
-        toast({
-          title: 'Đăng nhập thành công!',
-          description: 'Chào mừng bạn trở lại với Tiger.',
-          duration: 3000,
-        });
-        router.push('/');
-      } else {
-        toast({
-          title: 'Đăng nhập thất bại',
-          description: 'Không thể đăng nhập với Google',
-          variant: 'destructive',
-          duration: 4000,
-        });
-      }
-    } catch {
+    } catch (error) {
+      // Only show error if there's an actual error, not OAuth flow
+      console.error('Google login error:', error);
       toast({
         title: 'Lỗi',
         description: 'Có lỗi xảy ra khi đăng nhập với Google',
@@ -90,27 +77,14 @@ export default function LoginPage() {
 
   const handleFacebookLogin = async () => {
     try {
-      const result = await signIn('facebook', {
+      // Redirect to Facebook OAuth - let NextAuth handle the flow
+      await signIn('facebook', {
         callbackUrl: '/',
-        redirect: false,
+        redirect: true, // Allow redirect to OAuth provider
       });
-
-      if (result?.ok) {
-        toast({
-          title: 'Đăng nhập thành công!',
-          description: 'Chào mừng bạn đến với Tiger.',
-          duration: 3000,
-        });
-        router.push('/');
-      } else {
-        toast({
-          title: 'Đăng nhập thất bại',
-          description: 'Không thể đăng nhập với Facebook',
-          variant: 'destructive',
-          duration: 4000,
-        });
-      }
-    } catch {
+    } catch (error) {
+      // Only show error if there's an actual error, not OAuth flow
+      console.error('Facebook login error:', error);
       toast({
         title: 'Lỗi',
         description: 'Có lỗi xảy ra khi đăng nhập với Facebook',
