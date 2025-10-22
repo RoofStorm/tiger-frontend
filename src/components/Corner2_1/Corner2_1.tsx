@@ -829,18 +829,18 @@ export function Corner2_1() {
                     {/* Navigation Dots - Commented out */}
                     {/* <div className="flex justify-center mt-8 space-x-2">
                       {displayProducts.map((_: unknown, index: number) => (
-                        <button
-                          key={index}
-                          onClick={() => goToSlide(index)}
-                          disabled={isTransitioning}
-                          className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                            index === currentSlide
-                              ? 'bg-white scale-125'
-                              : 'bg-white/50 hover:bg-white/70'
-                          }`}
-                          aria-label={`Go to slide ${index + 1}`}
-                        />
-                      ))}
+                      <button
+                        key={index}
+                        onClick={() => goToSlide(index)}
+                        disabled={isTransitioning}
+                        className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                          index === currentSlide
+                            ? 'bg-white scale-125'
+                            : 'bg-white/50 hover:bg-white/70'
+                        }`}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
                     </div> */}
 
                     {/* Slide Counter */}

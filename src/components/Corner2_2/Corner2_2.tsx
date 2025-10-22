@@ -17,12 +17,16 @@ import { Post, CreatePostData } from '@/types';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useInputFix } from '@/hooks/useInputFix';
+import { EmojiPicker } from '@/components/EmojiPicker';
 
 export function Corner2_2() {
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { onKeyDown: handleInputKeyDown } = useInputFix();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -216,6 +220,17 @@ export function Corner2_2() {
     }
   };
 
+  const handleEmojiSelect = (emoji: string) => {
+    setCaption(prev => prev + emoji + ' ');
+  };
+
+  const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    console.log('e:', e);
+    console.log('Caption changed:', value);
+    setCaption(value);
+  };
+
   const handleLike = (postId: string) => {
     if (!isAuthenticated) {
       toast({
@@ -335,13 +350,31 @@ export function Corner2_2() {
 
             {/* Caption Input */}
             <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Caption
+                </label>
+                <EmojiPicker
+                  onEmojiSelect={handleEmojiSelect}
+                  textareaRef={captionTextareaRef}
+                />
+              </div>
               <textarea
+                ref={captionTextareaRef}
                 value={caption}
-                onChange={e => setCaption(e.target.value)}
+                onChange={handleCaptionChange}
+                onKeyDown={handleInputKeyDown}
                 placeholder="Chia sẻ cảm xúc của bạn..."
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg"
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg font-normal"
                 rows={3}
+                autoComplete="off"
+                spellCheck="false"
+                inputMode="text"
+                enterKeyHint="done"
               />
+              <div className="text-right text-sm text-gray-500 mt-1">
+                {caption.length}/500 ký tự
+              </div>
             </div>
 
             {/* File Selection */}

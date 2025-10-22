@@ -116,7 +116,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Tổng điểm</p>
               <p className="text-2xl font-bold text-gray-900">
-                {stats.totalPointsAwarded.toLocaleString()}
+                {stats.totalPointsAwarded?.toLocaleString()}
               </p>
             </div>
           </div>
@@ -129,8 +129,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           Hoạt động gần đây
         </h3>
         <div className="space-y-3">
-          {stats.recentActivity.length > 0 ? (
-            stats.recentActivity.map((activity, index) => (
+          {stats.recentActivity?.length > 0 ? (
+            stats.recentActivity?.map((activity, index) => (
               <div
                 key={index}
                 className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"

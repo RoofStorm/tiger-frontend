@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import apiClient from '@/lib/api';
 import { Pagination } from '../Pagination';
 import { ActionButton } from '../ActionButton';
+import { Tooltip } from '@/components/ui/tooltip';
 
 interface AdminRedeemItem {
   id: string;
@@ -118,7 +119,7 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
     updateRedeemStatusMutation.mutate({ redeemId, status: newStatus });
   };
 
-  const redeems: AdminRedeemItem[] = redeemData?.data?.redeems || [];
+  const redeems: AdminRedeemItem[] = redeemData?.data?.data || [];
   const totalRedeems = redeemData?.data?.total || 0;
 
   if (redeemLoading) {
@@ -168,7 +169,13 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
                       Phần thưởng
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Thông tin nhận
+                      Tên người nhận
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Số điện thoại
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-64">
+                      Địa chỉ
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Điểm sử dụng
@@ -215,17 +222,24 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
                         )}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">
+                          {redeem.receiverName}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          <div className="font-medium">
-                            {redeem.receiverName}
-                          </div>
-                          <div className="text-gray-500">
-                            {redeem.receiverPhone}
-                          </div>
-                          <div className="text-gray-500 break-words max-w-xs">
+                          {redeem.receiverPhone}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <Tooltip
+                          content={redeem.receiverAddress}
+                          maxWidth="400px"
+                        >
+                          <div className="text-sm text-gray-900 max-w-[350px] truncate cursor-help">
                             {redeem.receiverAddress}
                           </div>
-                        </div>
+                        </Tooltip>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         {redeem.pointsUsed} điểm

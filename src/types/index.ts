@@ -106,8 +106,10 @@ export interface Reward {
   name: string;
   description: string;
   pointsRequired: number;
+  lifeRequired?: number;
   imageUrl: string;
   isActive: boolean;
+  maxPerUser?: number;
   createdAt: string;
 }
 

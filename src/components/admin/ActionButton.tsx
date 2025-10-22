@@ -1,11 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip } from '@/components/ui/tooltip';
 
 interface ActionButtonProps {
   onClick?: () => void;
@@ -33,23 +28,16 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   children,
 }) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={variant}
-            size={size}
-            onClick={onClick}
-            disabled={disabled}
-            className={className}
-          >
-            {children}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{tooltip}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip content={tooltip}>
+      <Button
+        variant={variant}
+        size={size}
+        onClick={onClick}
+        disabled={disabled}
+        className={className}
+      >
+        {children}
+      </Button>
+    </Tooltip>
   );
 };

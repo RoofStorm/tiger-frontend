@@ -24,7 +24,7 @@ class ApiClient {
     // Request interceptor to add auth token
     this.client.interceptors.request.use(
       async config => {
-        // Only add auth header for protected endpoints and non-GET methods
+        // Add auth header for all protected endpoints
         const protectedEndpoints = [
           '/auth/me',
           '/posts',
@@ -36,39 +36,38 @@ class ApiClient {
           '/users',
           '/wishes',
           '/referral',
+          '/rewards',
+          '/storage',
+          '/mood-cards',
         ];
 
-        // For rewards, only protect non-GET methods (POST, PATCH, DELETE)
-        const isRewardsEndpoint = config.url?.includes('/rewards');
-        const isRewardsProtectedMethod =
-          isRewardsEndpoint &&
-          (config.method === 'post' ||
-            config.method === 'patch' ||
-            config.method === 'delete');
-
-        const needsAuth =
-          protectedEndpoints.some(endpoint => config.url?.includes(endpoint)) ||
-          isRewardsProtectedMethod;
+        const needsAuth = protectedEndpoints.some(endpoint =>
+          config.url?.includes(endpoint)
+        );
 
         if (needsAuth) {
           // Only get session on client side
           if (typeof window !== 'undefined') {
-            // Try to get access token from localStorage first
-            const accessToken = localStorage.getItem('accessToken');
-            if (accessToken) {
-              config.headers.Authorization = `Bearer ${accessToken}`;
-            } else {
-              // Fallback to NextAuth session
-              const session = await getSession();
-              if (session?.user) {
-                const token = (session as any).accessToken || session.user.id;
-                config.headers.Authorization = `Bearer ${token}`;
+            // Use JWT access token from NextAuth session for all endpoints
+            const session = await getSession();
+            if (session?.user) {
+              // Get accessToken from session (JWT token)
+              const accessToken = (session as any).accessToken;
+              if (accessToken) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
               } else {
-                // Try to get from localStorage as fallback
-                const storedUserId = localStorage.getItem('userId');
-                if (storedUserId) {
-                  config.headers.Authorization = `Bearer ${storedUserId}`;
-                }
+                // Fallback to user ID if accessToken not available
+                config.headers.Authorization = `Bearer ${session.user.id}`;
+              }
+            } else {
+              // Try to get from localStorage as fallback
+              const storedAccessToken = localStorage.getItem('accessToken');
+              const storedUserId = localStorage.getItem('userId');
+
+              if (storedAccessToken) {
+                config.headers.Authorization = `Bearer ${storedAccessToken}`;
+              } else if (storedUserId) {
+                config.headers.Authorization = `Bearer ${storedUserId}`;
               }
             }
           }
@@ -249,17 +248,7 @@ class ApiClient {
   }
 
   async createRedeemRequest(data: any): Promise<any> {
-    // Transform frontend data to backend format
-    const backendData = {
-      giftCode: data.rewardId, // Assuming rewardId is the gift code
-      receiverInfo: {
-        name: data.receiverName,
-        phone: data.receiverPhone,
-        address: data.receiverAddress,
-      },
-      payWith: 'points', // Default to points
-    };
-    const response = await this.client.post('/redeems', backendData);
+    const response = await this.client.post('/redeems', data);
     return response.data;
   }
 

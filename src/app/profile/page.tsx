@@ -10,6 +10,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import ReferralSection from '@/components/ReferralSection';
+import { Tooltip } from '@/components/ui/tooltip';
 
 interface RedeemItem {
   id: string;
@@ -378,9 +379,11 @@ export default function ProfilePage() {
                       </p>
                       <p className="text-sm text-gray-500">
                         Địa chỉ:{' '}
-                        <span className="break-words">
-                          {redeem.receiverAddress}
-                        </span>
+                        <Tooltip content={redeem.receiverAddress}>
+                          <span className="inline-block max-w-[300px] truncate cursor-help">
+                            {redeem.receiverAddress}
+                          </span>
+                        </Tooltip>
                       </p>
                       <p className="text-sm text-gray-500">
                         <Calendar className="w-4 h-4 inline mr-1" />

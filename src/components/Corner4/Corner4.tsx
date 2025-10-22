@@ -6,14 +6,23 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Gift, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Reward, CreateRedeemData } from '@/types';
+
+interface UserRedeem {
+  id: string;
+  rewardId: string;
+  status: string;
+}
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useInputFix } from '@/hooks/useInputFix';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 export function Corner4() {
   const { user, isAuthenticated } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { onKeyDown: handleInputKeyDown } = useInputFix();
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
   const [redeemForm, setRedeemForm] = useState({
@@ -36,8 +45,45 @@ export function Corner4() {
   });
 
   const rewards = Array.isArray(rewardsData?.data?.data)
-    ? rewardsData.data.data
+    ? rewardsData.data.data.sort((a: Reward, b: Reward) => {
+        // Sort by points required (smallest to largest)
+        const aPoints = a.lifeRequired
+          ? a.lifeRequired * 1000
+          : a.pointsRequired;
+        const bPoints = b.lifeRequired
+          ? b.lifeRequired * 1000
+          : b.pointsRequired;
+        return aPoints - bPoints;
+      })
     : [];
+
+  // Fetch user's redeem history
+  const { data: redeemHistory } = useQuery({
+    queryKey: ['redeemHistory', user?.id],
+    queryFn: () => apiClient.getRedeemHistory(),
+    enabled: isAuthenticated,
+  });
+
+  const userRedeems = Array.isArray(redeemHistory?.data?.redeems)
+    ? redeemHistory.data.redeems
+    : [];
+
+  // Function to calculate remaining redeem count for a reward
+  const getRemainingRedeems = (reward: Reward) => {
+    if (!reward.maxPerUser) {
+      return null; // No limit
+    }
+
+    const redeemedCount = userRedeems.filter(
+      (redeem: UserRedeem) => redeem.rewardId === reward.id
+    ).length;
+
+    return {
+      used: redeemedCount,
+      max: reward.maxPerUser,
+      remaining: Math.max(0, reward.maxPerUser - redeemedCount),
+    };
+  };
 
   // Redeem mutation
   const redeemMutation = useMutation({
@@ -80,14 +126,30 @@ export function Corner4() {
       return;
     }
 
-    if ((userDetails?.points || 0) < reward.pointsRequired) {
-      toast({
-        title: 'Không đủ điểm',
-        description: `Bạn cần ${reward.pointsRequired} điểm để đổi quà này.`,
-        variant: 'destructive',
-        duration: 4000,
-      });
-      return;
+    const userPoints = userDetails?.points || 0;
+
+    // Kiểm tra đủ điểm/nhịp sống
+    if (reward.lifeRequired && reward.lifeRequired > 0) {
+      const userLife = Math.floor(userPoints / 1000);
+      if (userLife < reward.lifeRequired) {
+        toast({
+          title: 'Không đủ Nhịp sống',
+          description: `Bạn cần ${reward.lifeRequired} Nhịp sống để đổi quà này. (Hiện tại: ${userLife} Nhịp sống)`,
+          variant: 'destructive',
+          duration: 4000,
+        });
+        return;
+      }
+    } else if (reward.pointsRequired > 0) {
+      if (userPoints < reward.pointsRequired) {
+        toast({
+          title: 'Không đủ điểm',
+          description: `Bạn cần ${reward.pointsRequired} điểm năng lượng để đổi quà này. (Hiện tại: ${userPoints} điểm)`,
+          variant: 'destructive',
+          duration: 4000,
+        });
+        return;
+      }
     }
 
     setSelectedReward(reward);
@@ -106,9 +168,28 @@ export function Corner4() {
   };
 
   const canRedeem = (reward: Reward) => {
-    return (
-      isAuthenticated && (userDetails?.points || 0) >= reward.pointsRequired
-    );
+    if (!isAuthenticated) return false;
+
+    const userPoints = userDetails?.points || 0;
+
+    // Kiểm tra giới hạn số lần đổi
+    const remainingRedeems = getRemainingRedeems(reward);
+    if (remainingRedeems && remainingRedeems.remaining <= 0) {
+      return false;
+    }
+
+    // Nếu cần Nhịp sống
+    if (reward.lifeRequired && reward.lifeRequired > 0) {
+      const userLife = Math.floor(userPoints / 1000);
+      return userLife >= reward.lifeRequired;
+    }
+
+    // Nếu cần điểm năng lượng
+    if (reward.pointsRequired > 0) {
+      return userPoints >= reward.pointsRequired;
+    }
+
+    return false;
   };
 
   return (
@@ -132,17 +213,54 @@ export function Corner4() {
             <p className="text-xl sm:text-2xl lg:text-3xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
               Đổi điểm của bạn lấy những phần quà ý nghĩa
             </p>
+
+            {/* Hint công thức đổi */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 max-w-4xl mx-auto border border-blue-200"
+            >
+              <h3 className="text-lg font-bold text-blue-800 mb-3 text-center">
+                💡 Công thức đổi điểm
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                <div className="bg-white rounded-xl p-4 shadow-sm">
+                  <div className="text-2xl font-bold text-blue-600 mb-1">
+                    1.000 điểm
+                  </div>
+                  <div className="text-sm text-gray-600">= 1 Nhịp sống</div>
+                </div>
+                <div className="bg-white rounded-xl p-4 shadow-sm">
+                  <div className="text-2xl font-bold text-green-600 mb-1">
+                    1 Nhịp sống
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    = 1.000 điểm năng lượng
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             {isAuthenticated && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="inline-flex items-center space-x-3 bg-gradient-to-r from-yellow-100 to-amber-100 px-8 py-4 rounded-full shadow-lg"
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
               >
-                <Gift className="w-8 h-8 text-yellow-600" />
-                <span className="text-2xl font-bold text-yellow-800">
-                  {userDetails?.points || 0} điểm
-                </span>
+                <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-yellow-100 to-amber-100 px-8 py-4 rounded-full shadow-lg">
+                  <Gift className="w-8 h-8 text-yellow-600" />
+                  <span className="text-2xl font-bold text-yellow-800">
+                    {userDetails?.points || 0} điểm năng lượng
+                  </span>
+                </div>
+                <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-green-100 to-emerald-100 px-8 py-4 rounded-full shadow-lg">
+                  <Star className="w-8 h-8 text-green-600" />
+                  <span className="text-2xl font-bold text-green-800">
+                    {Math.floor((userDetails?.points || 0) / 1000)} Nhịp sống
+                  </span>
+                </div>
               </motion.div>
             )}
           </motion.div>
@@ -175,7 +293,7 @@ export function Corner4() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={`bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 group ${
+                  className={`bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 group flex flex-col h-full ${
                     !canRedeem(reward) ? 'opacity-60' : ''
                   }`}
                 >
@@ -194,33 +312,81 @@ export function Corner4() {
                       <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white px-3 py-2 rounded-full shadow-lg flex items-center space-x-1">
                         <Star className="w-4 h-4 fill-current" />
                         <span className="font-bold">
-                          {reward.pointsRequired}
+                          {reward.lifeRequired
+                            ? `${reward.lifeRequired} Nhịp sống`
+                            : `${reward.pointsRequired} điểm`}
                         </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Reward Content */}
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                      {reward.name}
-                    </h3>
+                  <div className="p-6 flex flex-col h-full">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                        {reward.name}
+                      </h3>
 
-                    <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
-                      {reward.description}
-                    </p>
+                      <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
+                        {reward.description}
+                      </p>
+                    </div>
 
-                    <Button
-                      onClick={() => handleRedeem(reward)}
-                      disabled={!canRedeem(reward)}
-                      className={`w-full py-3 text-lg font-semibold rounded-xl transition-all duration-300 ${
-                        canRedeem(reward)
-                          ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-green-500/25 hover:scale-105'
-                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      }`}
-                    >
-                      {canRedeem(reward) ? '🎁 Đổi quà' : '❌ Không đủ điểm'}
-                    </Button>
+                    <div className="mt-auto">
+                      {/* Remaining Redeems Counter */}
+                      {(() => {
+                        const remainingRedeems = getRemainingRedeems(reward);
+                        if (remainingRedeems) {
+                          return (
+                            <div className="mb-3 text-center">
+                              <div className="inline-flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-full">
+                                <span className="text-sm font-medium text-blue-800">
+                                  Còn lại: {remainingRedeems.remaining}/
+                                  {remainingRedeems.max} lần
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
+
+                      <Button
+                        onClick={() => handleRedeem(reward)}
+                        disabled={!canRedeem(reward)}
+                        className={`w-full py-3 text-lg font-semibold rounded-xl transition-all duration-300 ${
+                          canRedeem(reward)
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-green-500/25 hover:scale-105'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {(() => {
+                          if (!isAuthenticated) return '🔒 Cần đăng nhập';
+
+                          const remainingRedeems = getRemainingRedeems(reward);
+                          if (
+                            remainingRedeems &&
+                            remainingRedeems.remaining <= 0
+                          ) {
+                            return '🚫 Hết lượt đổi';
+                          }
+
+                          const userPoints = userDetails?.points || 0;
+                          if (reward.lifeRequired && reward.lifeRequired > 0) {
+                            const userLife = Math.floor(userPoints / 1000);
+                            if (userLife < reward.lifeRequired) {
+                              return '❌ Không đủ Nhịp sống';
+                            }
+                          } else if (reward.pointsRequired > 0) {
+                            if (userPoints < reward.pointsRequired) {
+                              return '❌ Không đủ điểm';
+                            }
+                          }
+
+                          return '🎁 Đổi quà';
+                        })()}
+                      </Button>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -245,7 +411,9 @@ export function Corner4() {
                 <div className="inline-flex items-center space-x-2 bg-yellow-100 px-4 py-2 rounded-full mt-4">
                   <Star className="w-5 h-5 text-yellow-600 fill-current" />
                   <span className="font-bold text-yellow-800">
-                    {selectedReward.pointsRequired} điểm
+                    {selectedReward.lifeRequired
+                      ? `${selectedReward.lifeRequired} Nhịp sống`
+                      : `${selectedReward.pointsRequired} điểm năng lượng`}
                   </span>
                 </div>
               </div>
@@ -264,6 +432,7 @@ export function Corner4() {
                         receiverName: e.target.value,
                       }))
                     }
+                    onKeyDown={handleInputKeyDown}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 text-lg"
                     placeholder="Nhập tên người nhận"
                   />
@@ -273,13 +442,12 @@ export function Corner4() {
                   <label className="block text-sm font-bold text-gray-700 mb-3">
                     Số điện thoại
                   </label>
-                  <input
-                    type="tel"
+                  <PhoneInput
                     value={redeemForm.receiverPhone}
-                    onChange={e =>
+                    onChange={value =>
                       setRedeemForm(prev => ({
                         ...prev,
-                        receiverPhone: e.target.value,
+                        receiverPhone: value,
                       }))
                     }
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 text-lg"
@@ -299,6 +467,7 @@ export function Corner4() {
                         receiverAddress: e.target.value,
                       }))
                     }
+                    onKeyDown={handleInputKeyDown}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 resize-none text-lg"
                     rows={3}
                     placeholder="Nhập địa chỉ nhận quà"

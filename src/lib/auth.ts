@@ -4,6 +4,7 @@ import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import {
   checkDailyBonusAwarded,
   markDailyBonusAwarded,
@@ -290,16 +291,27 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
-        // For Google login, we need to get the database user ID
+        // For Google/Facebook login, we need to get the database user ID
         if (user.email) {
           try {
             const dbUser = await prisma.user.findUnique({
               where: { email: user.email },
             });
             if (dbUser) {
-              token.accessToken = dbUser.id; // Use database user ID
+              // Create a real JWT token with the user ID
+              const accessToken = jwt.sign(
+                {
+                  sub: dbUser.id,
+                  email: dbUser.email,
+                  role: dbUser.role,
+                },
+                process.env.NEXTAUTH_SECRET!,
+                { expiresIn: '1h' }
+              );
+
+              token.accessToken = accessToken; // Use real JWT token
               token.userId = dbUser.id;
-              token.avatarUrl = dbUser.avatarUrl; // Add avatar URL to token
+              token.avatarUrl = dbUser.avatarUrl;
 
               // Add refresh token if available
               if (dbUser.refreshToken) {
@@ -310,7 +322,18 @@ export const authOptions: NextAuthOptions = {
             console.error('Error finding user in JWT callback:', error);
           }
         } else {
-          token.accessToken = user.id; // Fallback for credentials login
+          // For credentials login, also create a real JWT token
+          const accessToken = jwt.sign(
+            {
+              sub: user.id,
+              email: user.email,
+              role: user.role,
+            },
+            process.env.NEXTAUTH_SECRET!,
+            { expiresIn: '1h' }
+          );
+
+          token.accessToken = accessToken; // Use real JWT token
         }
       }
       return token;
