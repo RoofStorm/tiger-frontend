@@ -21,6 +21,7 @@ interface RedeemItem {
   receiverName: string;
   receiverPhone: string;
   receiverAddress: string;
+  rejectionReason?: string;
   reward?: {
     id: string;
     name: string;
@@ -428,6 +429,16 @@ export default function ProfilePage() {
                             ? '❌ Từ chối'
                             : '⏳ Chờ duyệt'}
                     </div>
+                    {redeem.status === 'REJECTED' && redeem.rejectionReason && (
+                      <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-md">
+                        <p className="text-xs text-red-600 font-medium mb-1">
+                          Lý do từ chối:
+                        </p>
+                        <p className="text-xs text-red-700">
+                          {redeem.rejectionReason}
+                        </p>
+                      </div>
+                    )}
                     <div className="flex items-center space-x-1 text-sm text-gray-500">
                       <Star className="w-4 h-4" />
                       <span>-{redeem.pointsUsed} điểm</span>

@@ -15,6 +15,7 @@ interface AdminRedeemItem {
   receiverName: string;
   receiverPhone: string;
   receiverAddress: string;
+  rejectionReason?: string;
   user: {
     id: string;
     name: string;
@@ -37,6 +38,9 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
   const [redeemPage, setRedeemPage] = useState(1);
   const [redeemPerPage] = useState(20);
   const [redeemStatusFilter, setRedeemStatusFilter] = useState<string>('');
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [selectedRedeemId, setSelectedRedeemId] = useState<string>('');
+  const [rejectionReason, setRejectionReason] = useState<string>('');
 
   // Fetch redeem data
   const {
@@ -59,8 +63,15 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
 
   // Update redeem status mutation
   const updateRedeemStatusMutation = useMutation({
-    mutationFn: ({ redeemId, status }: { redeemId: string; status: string }) =>
-      apiClient.updateRedeemStatus(redeemId, status),
+    mutationFn: ({
+      redeemId,
+      status,
+      rejectionReason,
+    }: {
+      redeemId: string;
+      status: string;
+      rejectionReason?: string;
+    }) => apiClient.updateRedeemStatus(redeemId, status, rejectionReason),
     onSuccess: () => {
       toast({
         title: 'Cập nhật thành công',
@@ -69,6 +80,8 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
         duration: 3000,
       });
       refetchRedeems();
+      setShowRejectDialog(false);
+      setRejectionReason('');
     },
     onError: (error: Error) => {
       toast({
@@ -116,7 +129,29 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
   };
 
   const handleStatusUpdate = (redeemId: string, newStatus: string) => {
-    updateRedeemStatusMutation.mutate({ redeemId, status: newStatus });
+    if (newStatus === 'REJECTED') {
+      setSelectedRedeemId(redeemId);
+      setShowRejectDialog(true);
+    } else {
+      updateRedeemStatusMutation.mutate({ redeemId, status: newStatus });
+    }
+  };
+
+  const handleRejectConfirm = () => {
+    if (!rejectionReason.trim()) {
+      toast({
+        title: 'Lỗi',
+        description: 'Vui lòng nhập lý do từ chối',
+        variant: 'destructive',
+        duration: 3000,
+      });
+      return;
+    }
+    updateRedeemStatusMutation.mutate({
+      redeemId: selectedRedeemId,
+      status: 'REJECTED',
+      rejectionReason: rejectionReason.trim(),
+    });
   };
 
   const redeems: AdminRedeemItem[] = redeemData?.data?.data || [];
@@ -183,6 +218,9 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Trạng thái
                     </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
+                      Note
+                    </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Ngày tạo
                     </th>
@@ -246,6 +284,22 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         {getStatusBadge(redeem.status)}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900 w-40">
+                        {redeem.rejectionReason ? (
+                          <Tooltip content={redeem.rejectionReason}>
+                            <div className="bg-red-50 border border-red-200 rounded-md p-2 cursor-help hover:bg-red-100 transition-colors overflow-hidden">
+                              <p className="text-xs text-red-600 font-medium mb-1">
+                                Lý do từ chối:
+                              </p>
+                              <p className="text-xs text-red-700 truncate">
+                                {redeem.rejectionReason}
+                              </p>
+                            </div>
+                          </Tooltip>
+                        ) : (
+                          <span className="text-gray-400 text-xs">-</span>
+                        )}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(redeem.createdAt).toLocaleDateString('vi-VN')}
@@ -312,6 +366,41 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
           </>
         )}
       </div>
+
+      {/* Rejection Reason Dialog */}
+      {showRejectDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Nhập lý do từ chối</h3>
+            <textarea
+              value={rejectionReason}
+              onChange={e => setRejectionReason(e.target.value)}
+              placeholder="Nhập lý do từ chối yêu cầu đổi quà..."
+              className="w-full h-24 p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div className="flex justify-end space-x-3 mt-4">
+              <button
+                onClick={() => {
+                  setShowRejectDialog(false);
+                  setRejectionReason('');
+                }}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleRejectConfirm}
+                disabled={updateRedeemStatusMutation.isPending}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+              >
+                {updateRedeemStatusMutation.isPending
+                  ? 'Đang xử lý...'
+                  : 'Xác nhận từ chối'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

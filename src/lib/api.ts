@@ -450,9 +450,14 @@ class ApiClient {
     return response.data;
   }
 
-  async updateRedeemStatus(redeemId: string, status: string): Promise<any> {
+  async updateRedeemStatus(
+    redeemId: string,
+    status: string,
+    rejectionReason?: string
+  ): Promise<any> {
     const response = await this.client.patch(`/redeems/${redeemId}/status`, {
       status,
+      rejectionReason,
     });
     return response.data;
   }

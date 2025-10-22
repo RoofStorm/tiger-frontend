@@ -75,7 +75,11 @@ export function Corner4() {
     }
 
     const redeemedCount = userRedeems.filter(
-      (redeem: UserRedeem) => redeem.rewardId === reward.id
+      (redeem: UserRedeem) =>
+        redeem.rewardId === reward.id &&
+        (redeem.status === 'PENDING' ||
+          redeem.status === 'APPROVED' ||
+          redeem.status === 'DELIVERED')
     ).length;
 
     return {
