@@ -44,9 +44,8 @@ export function Corner2_1() {
 
   // Fetch highlighted posts for carousel
   const { data: postsData, isLoading: isLoadingPosts } = useQuery({
-    queryKey: ['highlighted-posts-carousel', user?.id],
+    queryKey: ['highlighted-posts-carousel'],
     queryFn: () => apiClient.getHighlightedPosts(),
-    enabled: isAuthenticated,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });

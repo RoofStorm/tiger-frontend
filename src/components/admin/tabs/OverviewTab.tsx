@@ -128,7 +128,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Hoạt động gần đây
         </h3>
-        <div className="space-y-3">
+        <div className="max-h-96 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {stats.recentActivity?.length > 0 ? (
             stats.recentActivity?.map((activity, index) => (
               <div

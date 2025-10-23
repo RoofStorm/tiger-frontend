@@ -60,9 +60,21 @@ class ApiClient {
           '/mood-cards',
         ];
 
-        const needsAuth = protectedEndpoints.some(endpoint =>
+        // Public endpoints that don't need authentication
+        const publicEndpoints = [
+          '/posts/highlighted',
+          '/wishes/highlighted',
+          '/rewards', // rewards is hybrid - works with or without auth
+          '/storage/video', // video streaming endpoints are public
+        ];
+
+        const isPublicEndpoint = publicEndpoints.some(endpoint =>
           config.url?.includes(endpoint)
         );
+
+        const needsAuth =
+          !isPublicEndpoint &&
+          protectedEndpoints.some(endpoint => config.url?.includes(endpoint));
 
         if (needsAuth) {
           // Only get session on client side
@@ -122,12 +134,33 @@ class ApiClient {
             }
           } catch (refreshError) {
             console.error('Token refresh failed:', refreshError);
+            // Clear all tokens on refresh failure
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+
             // If refresh fails, check if we have a session
             const session = await getSession();
             if (!session?.user && typeof window !== 'undefined') {
-              setTimeout(() => {
-                window.location.href = '/auth/login';
-              }, 100);
+              // Clear NextAuth session but don't auto redirect
+              // Let the user stay on the current page (e.g., homepage)
+              try {
+                await fetch('/api/auth/signout', { method: 'POST' });
+              } catch (signoutError) {
+                console.error('Error signing out from NextAuth:', signoutError);
+              }
+
+              // Only redirect to login if user is on a protected page
+              const currentPath = window.location.pathname;
+              const protectedPaths = ['/profile', '/admin', '/wishes'];
+              const isProtectedPage = protectedPaths.some(path =>
+                currentPath.startsWith(path)
+              );
+
+              if (isProtectedPage) {
+                setTimeout(() => {
+                  window.location.href = '/auth/login';
+                }, 100);
+              }
             }
           }
         }
@@ -164,7 +197,24 @@ class ApiClient {
       throw new Error('Refresh token only available on client side');
     }
 
-    const refreshToken = localStorage.getItem('refreshToken');
+    // Try to get refresh token from localStorage first
+    let refreshToken = localStorage.getItem('refreshToken');
+
+    // If not in localStorage, try to get from NextAuth session
+    if (!refreshToken) {
+      try {
+        const session = await getSession();
+        const sessionRefreshToken = (session as any).refreshToken;
+        if (sessionRefreshToken) {
+          refreshToken = sessionRefreshToken;
+          // Store in localStorage for future use
+          localStorage.setItem('refreshToken', sessionRefreshToken);
+        }
+      } catch (error) {
+        console.error('Error getting refresh token from session:', error);
+      }
+    }
+
     if (!refreshToken) {
       throw new Error('No refresh token available');
     }
@@ -183,11 +233,37 @@ class ApiClient {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', newRefreshToken);
 
+      // Update NextAuth session with new tokens
+      try {
+        const session = await getSession();
+        if (session) {
+          // Trigger session update to include new tokens
+          await fetch('/api/auth/update-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              accessToken,
+              refreshToken: newRefreshToken,
+            }),
+          });
+        }
+      } catch (error) {
+        console.error('Error updating NextAuth session:', error);
+      }
+
       return accessToken;
     } catch (error) {
       // Clear invalid tokens
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+
+      // Clear NextAuth session on refresh failure
+      try {
+        await fetch('/api/auth/signout', { method: 'POST' });
+      } catch (signoutError) {
+        console.error('Error signing out from NextAuth:', signoutError);
+      }
+
       throw error;
     }
   }
@@ -211,7 +287,7 @@ class ApiClient {
 
   async getHighlightedPosts(page = 1, limit = 10): Promise<any> {
     const response = await this.client.get(
-      `/posts?highlighted=true&page=${page}&limit=${limit}`
+      `/posts/highlighted?page=${page}&limit=${limit}`
     );
     return response.data;
   }

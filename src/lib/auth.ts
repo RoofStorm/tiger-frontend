@@ -175,7 +175,7 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 14 * 24 * 60 * 60, // 14 days
   },
   callbacks: {
     async signIn({ user, account }) {
@@ -316,6 +316,10 @@ export const authOptions: NextAuthOptions = {
               // Add refresh token if available
               if (dbUser.refreshToken) {
                 token.refreshToken = dbUser.refreshToken;
+                // Store refresh token in localStorage for API client
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('refreshToken', dbUser.refreshToken);
+                }
               }
             }
           } catch (error) {
