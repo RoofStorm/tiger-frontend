@@ -3,6 +3,19 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getSession } from 'next-auth/react';
 // Note: Auth types are now handled by NextAuth.js
 
+// Global loading state management
+let globalLoadingState: {
+  setLoading: (loading: boolean) => void;
+  setLoadingMessage: (message: string) => void;
+} | null = null;
+
+export function setGlobalLoadingState(state: {
+  setLoading: (loading: boolean) => void;
+  setLoadingMessage: (message: string) => void;
+}) {
+  globalLoadingState = state;
+}
+
 class ApiClient {
   private client: AxiosInstance;
   private refreshPromise: Promise<string> | null = null;
@@ -24,6 +37,12 @@ class ApiClient {
     // Request interceptor to add auth token
     this.client.interceptors.request.use(
       async config => {
+        // Show loading for non-GET requests or important endpoints
+        if (config.method !== 'get' || config.url?.includes('/auth/')) {
+          globalLoadingState?.setLoading(true);
+          globalLoadingState?.setLoadingMessage('Đang xử lý...');
+        }
+
         // Add auth header for all protected endpoints
         const protectedEndpoints = [
           '/auth/me',
@@ -79,8 +98,15 @@ class ApiClient {
 
     // Response interceptor to handle auth errors and automatic token refresh
     this.client.interceptors.response.use(
-      response => response,
+      response => {
+        // Hide loading on successful response
+        globalLoadingState?.setLoading(false);
+        return response;
+      },
       async error => {
+        // Hide loading on error
+        globalLoadingState?.setLoading(false);
+
         const originalRequest = error.config;
 
         // Handle 401 errors with automatic token refresh
@@ -98,7 +124,7 @@ class ApiClient {
             console.error('Token refresh failed:', refreshError);
             // If refresh fails, check if we have a session
             const session = await getSession();
-            if (!session?.user) {
+            if (!session?.user && typeof window !== 'undefined') {
               setTimeout(() => {
                 window.location.href = '/auth/login';
               }, 100);
@@ -113,6 +139,11 @@ class ApiClient {
 
   // Token refresh methods
   private async handleTokenRefresh() {
+    // Only refresh on client side
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
     // Prevent multiple simultaneous refresh calls
     if (this.refreshPromise) {
       return this.refreshPromise;
@@ -167,7 +198,7 @@ class ApiClient {
   // User endpoints
   async getCurrentUser(): Promise<any> {
     const response = await this.client.get('/auth/me');
-    return response.data.data;
+    return response.data?.data || null;
   }
 
   // Posts endpoints

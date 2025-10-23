@@ -8,9 +8,9 @@ import { Gift, Calendar, Star, LogOut, Home, RefreshCw } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import ReferralSection from '@/components/ReferralSection';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
 interface RedeemItem {
   id: string;
@@ -39,8 +39,8 @@ interface PointLog {
 
 export default function ProfilePage() {
   const { user, isAuthenticated, logout } = useNextAuth();
-  const router = useRouter();
   const queryClient = useQueryClient();
+  const { navigateWithLoading } = useGlobalNavigationLoading();
 
   // Refetch all queries when user enters profile page
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function ProfilePage() {
 
   // Function to scroll to corner
   const scrollToCorner = (cornerId: string) => {
-    router.push('/');
+    navigateWithLoading('/', 'Đang chuyển về trang chủ...');
     setTimeout(() => {
       const element = document.getElementById(cornerId);
       if (element) {
@@ -172,12 +172,20 @@ export default function ProfilePage() {
                   unoptimized={user.image.includes(
                     'platform-lookaside.fbsbx.com'
                   )}
+                  onError={e => {
+                    // Hide the image and show fallback
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove(
+                      'hidden'
+                    );
+                  }}
                 />
-              ) : (
-                <span className="text-white font-bold text-3xl">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </span>
-              )}
+              ) : null}
+              <span
+                className={`text-white font-bold text-3xl ${user?.image ? 'hidden' : ''}`}
+              >
+                {user?.name?.charAt(0).toUpperCase()}
+              </span>
             </div>
 
             {/* User Info */}
@@ -409,9 +417,9 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-right flex flex-col items-end">
                     <div
-                      className={`px-3 py-1 rounded-full text-sm font-medium mb-2 ${
+                      className={`px-3 py-1 rounded-full text-sm font-medium mb-2 w-fit ${
                         redeem.status === 'DELIVERED'
                           ? 'bg-green-100 text-green-800'
                           : redeem.status === 'APPROVED'
@@ -430,7 +438,7 @@ export default function ProfilePage() {
                             : '⏳ Chờ duyệt'}
                     </div>
                     {redeem.status === 'REJECTED' && redeem.rejectionReason && (
-                      <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-md">
+                      <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-md w-fit max-w-xs">
                         <p className="text-xs text-red-600 font-medium mb-1">
                           Lý do từ chối:
                         </p>

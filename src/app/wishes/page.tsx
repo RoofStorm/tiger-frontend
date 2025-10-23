@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import apiClient from '@/lib/api';
 import { WishSection } from '@/components/WishSection';
+import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
 const suggestedWishes = [
   {
@@ -88,6 +89,7 @@ export default function WishesPage() {
   const { user, isAuthenticated } = useNextAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { navigateWithLoading } = useGlobalNavigationLoading();
 
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
@@ -152,16 +154,17 @@ export default function WishesPage() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
       {/* Back Button */}
       <div className="max-w-7xl mx-auto px-4 pt-4">
-        <Link href="/">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-gray-600 hover:text-gray-800 hover:bg-white/50"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Về trang chủ
-          </Button>
-        </Link>
+        <Button
+          onClick={() =>
+            navigateWithLoading('/', 'Đang chuyển về trang chủ...')
+          }
+          variant="ghost"
+          size="sm"
+          className="text-gray-600 hover:text-gray-800 hover:bg-white/50"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Về trang chủ
+        </Button>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">

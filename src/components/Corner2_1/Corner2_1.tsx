@@ -4,12 +4,12 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Heart, Play, Pause, Share2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
 interface Post {
   id: string;
@@ -22,10 +22,10 @@ interface Post {
 }
 
 export function Corner2_1() {
-  const router = useRouter();
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { navigateWithLoading } = useGlobalNavigationLoading();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -705,7 +705,10 @@ export function Corner2_1() {
                                             const postId = displayProducts[
                                               slideIndex
                                             ].id.replace('post-', '');
-                                            router.push(`/posts/${postId}`);
+                                            navigateWithLoading(
+                                              `/posts/${postId}`,
+                                              'Đang chuyển đến bài viết...'
+                                            );
                                           }}
                                           className="bg-white text-red-600 hover:bg-gray-100 font-bold text-sm px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                                         >
@@ -872,7 +875,12 @@ export function Corner2_1() {
                     Hãy tạo bài viết đầu tiên để xuất hiện ở đây!
                   </p>
                   <Button
-                    onClick={() => router.push('/#corner-2')}
+                    onClick={() =>
+                      navigateWithLoading(
+                        '/#corner-2',
+                        'Đang chuyển đến góc chia sẻ...'
+                      )
+                    }
                     className="bg-white text-red-600 hover:bg-gray-100 font-bold px-6 py-3 rounded-xl"
                   >
                     Tạo bài viết
@@ -959,7 +967,12 @@ export function Corner2_1() {
 
                 <div className="flex-shrink-0">
                   <Button
-                    onClick={() => router.push('/wishes')}
+                    onClick={() =>
+                      navigateWithLoading(
+                        '/wishes',
+                        'Đang chuyển đến trang lời chúc...'
+                      )
+                    }
                     className="bg-white text-red-600 hover:bg-gray-100 font-medium px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     <Heart className="w-4 h-4 mr-2" />

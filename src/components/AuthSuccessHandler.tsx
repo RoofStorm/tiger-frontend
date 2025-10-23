@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
@@ -10,16 +10,24 @@ export function AuthSuccessHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const hasShownToast = useRef(false);
 
   useEffect(() => {
-    // Check if user just logged in via OAuth
-    const isOAuthCallback =
-      searchParams.get('callbackUrl') ||
-      (window.location.pathname === '/' &&
-        status === 'authenticated' &&
-        session?.user);
+    // Only show toast once per session and only for OAuth callbacks
+    const isOAuthCallback = searchParams.get('callbackUrl');
+    const isOAuthLogin = searchParams.get('oauth') === 'success';
 
-    if (isOAuthCallback && session?.user) {
+    // Reset the flag when session changes (new login)
+    if (status === 'unauthenticated') {
+      hasShownToast.current = false;
+    }
+
+    if (
+      !hasShownToast.current &&
+      (isOAuthCallback || isOAuthLogin) &&
+      session?.user &&
+      status === 'authenticated'
+    ) {
       // Show success toast for OAuth login
       toast({
         title: 'Đăng nhập thành công!',
@@ -27,10 +35,19 @@ export function AuthSuccessHandler() {
         duration: 3000,
       });
 
+      hasShownToast.current = true;
+
       // Clear the callbackUrl from URL
-      if (searchParams.get('callbackUrl')) {
+      if (isOAuthCallback) {
         const newUrl = new URL(window.location.href);
         newUrl.searchParams.delete('callbackUrl');
+        window.history.replaceState({}, '', newUrl.toString());
+      }
+
+      // Clear oauth success param
+      if (isOAuthLogin) {
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('oauth');
         window.history.replaceState({}, '', newUrl.toString());
       }
     }

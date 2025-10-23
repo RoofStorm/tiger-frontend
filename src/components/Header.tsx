@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { Button } from '@/components/ui/button';
+import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import {
   User,
   Menu,
@@ -19,6 +20,7 @@ import {
 
 export function Header() {
   const { user, isAuthenticated, logout, isAdmin } = useNextAuth();
+  const { navigateWithLoading } = useGlobalNavigationLoading();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -190,14 +192,19 @@ export function Header() {
                                 </p>
                               </div>
                               <div className="py-1">
-                                <Link
-                                  href="/profile"
-                                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                                  onClick={() => setIsUserDropdownOpen(false)}
+                                <button
+                                  onClick={() => {
+                                    setIsUserDropdownOpen(false);
+                                    navigateWithLoading(
+                                      '/profile',
+                                      'Đang chuyển đến hồ sơ cá nhân...'
+                                    );
+                                  }}
+                                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 w-full text-left"
                                 >
                                   <User className="w-4 h-4 mr-3" />
                                   Hồ sơ cá nhân
-                                </Link>
+                                </button>
                                 <Link
                                   href="/settings"
                                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
@@ -207,14 +214,19 @@ export function Header() {
                                   Cài đặt
                                 </Link>
                                 {isAdmin && (
-                                  <Link
-                                    href="/admin"
-                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                                    onClick={() => setIsUserDropdownOpen(false)}
+                                  <button
+                                    onClick={() => {
+                                      setIsUserDropdownOpen(false);
+                                      navigateWithLoading(
+                                        '/admin',
+                                        'Đang chuyển đến CMS...'
+                                      );
+                                    }}
+                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 w-full text-left"
                                   >
                                     <Shield className="w-4 h-4 mr-3" />
                                     Quản lý CMS
-                                  </Link>
+                                  </button>
                                 )}
                                 <button
                                   onClick={() => {
@@ -307,14 +319,19 @@ export function Header() {
                             {user?.name || 'User'}
                           </span>
                         </div>
-                        <Link
-                          href="/profile"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg"
-                          onClick={() => setIsMenuOpen(false)}
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            navigateWithLoading(
+                              '/profile',
+                              'Đang chuyển đến hồ sơ cá nhân...'
+                            );
+                          }}
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg w-full text-left"
                         >
                           <User className="w-4 h-4 mr-3" />
                           Hồ sơ cá nhân
-                        </Link>
+                        </button>
                         <Link
                           href="/settings"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg"
@@ -324,14 +341,19 @@ export function Header() {
                           Cài đặt
                         </Link>
                         {isAdmin && (
-                          <Link
-                            href="/admin"
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg"
-                            onClick={() => setIsMenuOpen(false)}
+                          <button
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              navigateWithLoading(
+                                '/admin',
+                                'Đang chuyển đến CMS...'
+                              );
+                            }}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg w-full text-left"
                           >
                             <Shield className="w-4 h-4 mr-3" />
                             Quản lý CMS
-                          </Link>
+                          </button>
                         )}
                         <button
                           onClick={() => {
