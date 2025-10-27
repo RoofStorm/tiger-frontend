@@ -21,6 +21,56 @@ export function Corner0() {
   // Sử dụng context để chia sẻ trạng thái video
   const { setIsVideoPlaying } = useVideo();
 
+  // Fetch signed URL from backend
+  useEffect(() => {
+    const fetchVideoUrl = async () => {
+      if (!videoRef.current) return;
+
+      try {
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+        const videoFilename =
+          process.env.NEXT_PUBLIC_VIDEO_FILENAME || 'exampleclip.mp4';
+
+        const response = await fetch(
+          `${apiUrl}/storage/video-signed/${videoFilename}`
+        );
+        if (response.ok) {
+          const result = await response.json();
+          // API response format: { success: true, data: { url: "..." }, message: "Success" }
+          const videoUrl = result.data?.url;
+          if (videoUrl) {
+            videoRef.current.src = videoUrl;
+            console.log(
+              '✅ Loaded video with Signed URL from MinIO:',
+              videoUrl
+            );
+          } else {
+            // Fallback to NestJS streaming endpoint
+            videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
+            console.log('⚠️ No URL in response, using fallback');
+          }
+        } else {
+          // Fallback to NestJS streaming endpoint
+          videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
+          console.log('⚠️ Using fallback streaming endpoint');
+        }
+      } catch (error) {
+        console.error('❌ Error fetching signed URL:', error);
+        // Fallback to NestJS streaming endpoint
+        if (videoRef.current) {
+          const apiUrl =
+            process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+          const videoFilename =
+            process.env.NEXT_PUBLIC_VIDEO_FILENAME || 'exampleclip.mp4';
+          videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
+        }
+      }
+    };
+
+    fetchVideoUrl();
+  }, []);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -164,14 +214,7 @@ export function Corner0() {
           preload="metadata"
           crossOrigin="anonymous"
         >
-          {/* Load video từ MinIO - ưu tiên cao nhất */}
-          <source
-            src="http://localhost:4000/api/storage/video/exampleclip.mp4"
-            type="video/mp4"
-          />
-          {/* Fallback video từ local nếu MinIO không khả dụng */}
-          {/* <source src="/videos/exampleclip.mp4" type="video/mp4" /> */}
-          {/* <source src="/videos/exampleclip.mkv" type="video/x-matroska" /> */}
+          {/* Video URL will be loaded dynamically via Signed URL */}
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
