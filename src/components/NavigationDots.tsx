@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface NavigationDotsProps {
@@ -14,33 +14,17 @@ export function NavigationDots({
 }: NavigationDotsProps) {
   const [isVisible] = useState(true);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const sections = document.querySelectorAll('[data-corner]');
-      let current = 0;
-
-      sections.forEach((section, index) => {
-        const rect = section.getBoundingClientRect();
-        if (
-          rect.top <= window.innerHeight / 2 &&
-          rect.bottom >= window.innerHeight / 2
-        ) {
-          current = index;
-        }
-      });
-
-      onSectionChange(current);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial check
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [onSectionChange]);
+  // Removed automatic scroll detection - highlighting is now manual only via click
 
   const scrollToSection = (sectionIndex: number) => {
     const section = document.querySelector(`[data-corner="${sectionIndex}"]`);
     if (section) {
+      console.log('🖱️ NavigationDots: Clicked on dot', sectionIndex);
+
+      // Update current section immediately
+      onSectionChange(sectionIndex);
+      console.log('📍 NavigationDots: Highlighting section', sectionIndex);
+
       section.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
