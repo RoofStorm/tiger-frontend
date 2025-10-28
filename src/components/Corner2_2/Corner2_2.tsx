@@ -17,12 +17,16 @@ import { Post, CreatePostData } from '@/types';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useInputFix } from '@/hooks/useInputFix';
+import { EmojiPicker } from '@/components/EmojiPicker';
 
 export function Corner2_2() {
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { onKeyDown: handleInputKeyDown } = useInputFix();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const [uploading, setUploading] = useState(false);
   const [caption, setCaption] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -33,8 +37,8 @@ export function Corner2_2() {
     queryKey: ['highlighted-posts', user?.id], // Include user ID in query key
     queryFn: () => apiClient.getHighlightedPosts(),
     enabled: isAuthenticated,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: false,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
 
   const posts = postsData?.data?.posts || [];
@@ -44,8 +48,8 @@ export function Corner2_2() {
     queryKey: ['user-actions', user?.id], // Include user ID in query key
     queryFn: () => apiClient.getUserActions(),
     enabled: isAuthenticated && !!user,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchOnWindowFocus: false,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
 
   const userActions = userActionsData?.data || [];
@@ -71,11 +75,13 @@ export function Corner2_2() {
         toast({
           title: 'Đã thích bài viết!',
           description: 'Cảm ơn bạn đã chia sẻ cảm xúc.',
+          duration: 3000,
         });
       } else if (data.action === 'unliked') {
         toast({
           title: 'Đã bỏ thích bài viết',
           description: 'Bạn đã bỏ thích bài viết này.',
+          duration: 3000,
         });
       }
     },
@@ -84,6 +90,7 @@ export function Corner2_2() {
         title: 'Lỗi',
         description: 'Không thể thích bài viết. Vui lòng thử lại.',
         variant: 'destructive',
+        duration: 4000,
       });
     },
   });
@@ -91,17 +98,22 @@ export function Corner2_2() {
   // Share mutation
   const shareMutation = useMutation({
     mutationFn: (postId: string) => apiClient.sharePost(postId),
-    onSuccess: () => {
+    onSuccess: result => {
       // Invalidate posts to refresh global counts
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts', user?.id],
       });
       // Invalidate user details to refresh points
       queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      // Invalidate point logs to refresh point history
+      queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
+      // Show success message with points info
       toast({
-        title: 'Đã chia sẻ!',
-        description: 'Bài viết đã được chia sẻ thành công.',
+        title: 'Chia sẻ thành công!',
+        description:
+          result.pointsMessage || 'Bài viết đã được chia sẻ thành công.',
+        duration: 4000,
       });
     },
   });
@@ -117,6 +129,7 @@ export function Corner2_2() {
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để chia sẻ ảnh.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
@@ -133,23 +146,22 @@ export function Corner2_2() {
         title: 'Chưa chọn ảnh',
         description: 'Vui lòng chọn ảnh để đăng bài.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
 
     setUploading(true);
     try {
-      console.log('Starting upload for file:', selectedFile.name);
-
       // Upload file directly to backend
       const uploadResult = await apiClient.uploadFile(selectedFile);
-      console.log('Upload result:', uploadResult);
 
       // Show upload success notification
       toast({
         title: 'Upload thành công!',
         description: 'Ảnh đã được tải lên thành công.',
         variant: 'success',
+        duration: 3000,
       });
 
       // Create post
@@ -157,16 +169,16 @@ export function Corner2_2() {
         imageUrl: uploadResult.data.url, // Fix: use uploadResult.data.url instead of uploadResult.url
         caption: caption || '',
       };
-      console.log('Post data:', postData);
 
-      const createdPost = await apiClient.createPost(postData);
-      console.log('Created post:', createdPost);
+      const result = await apiClient.createPost(postData);
 
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts', user?.id],
       });
       // Invalidate user details to refresh points
       queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      // Invalidate point logs to refresh point history
+      queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
       // Reset form
       setCaption('');
@@ -176,10 +188,13 @@ export function Corner2_2() {
         fileInputRef.current.value = '';
       }
 
+      // Show success message with points info
       toast({
         title: 'Đăng bài thành công!',
-        description: 'Bài viết của bạn đã được chia sẻ.',
+        description:
+          result.pointsMessage || 'Bài viết của bạn đã được chia sẻ.',
         variant: 'success',
+        duration: 4000,
       });
     } catch (error) {
       console.error('Upload failed:', error);
@@ -187,6 +202,7 @@ export function Corner2_2() {
         title: 'Đăng bài thất bại',
         description: 'Vui lòng thử lại sau.',
         variant: 'destructive',
+        duration: 4000,
       });
     } finally {
       setUploading(false);
@@ -204,40 +220,104 @@ export function Corner2_2() {
     }
   };
 
+  const handleEmojiSelect = (emoji: string) => {
+    setCaption(prev => prev + emoji + ' ');
+  };
+
+  const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    console.log('e:', e);
+    console.log('Caption changed:', value);
+    setCaption(value);
+  };
+
   const handleLike = (postId: string) => {
     if (!isAuthenticated) {
       toast({
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để thích bài viết.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
 
     // Prevent duplicate calls
     if (likeMutation.isPending) {
-      console.log('Like mutation already in progress, skipping...');
       return;
     }
-
-    console.log(`Frontend: Liking post ${postId}`);
     likeMutation.mutate(postId);
   };
 
-  const handleShare = (postId: string) => {
+  const handleShare = (post: Post) => {
     if (!isAuthenticated) {
       toast({
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để chia sẻ bài viết.',
         variant: 'destructive',
+        duration: 4000,
       });
       return;
     }
-    shareMutation.mutate(postId);
+
+    // Tạo URL preview cho bài viết
+    const baseUrl =
+      process.env.NEXT_PUBLIC_PUBLIC_URL ||
+      process.env.NEXTAUTH_URL ||
+      'http://localhost:3000';
+    const postUrl = `${baseUrl}/posts/${post.id}`;
+    const postTitle = post.caption || 'Bài viết nổi bật từ Tiger Mood Corner';
+    const postDescription = post.caption
+      ? `${post.caption.substring(0, 160)}...`
+      : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.';
+    const postImage = `${baseUrl}/default-post-image.jpg`;
+
+    // Console log để kiểm tra URL preview
+    console.log('🔗 Share URL Preview:', {
+      postUrl,
+      postTitle,
+      postDescription,
+      postImage,
+      postId: post.id,
+      isHighlighted: post.isHighlighted,
+    });
+
+    // Tạo Facebook Share URL
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+    console.log('📱 Facebook Share URL:', facebookShareUrl);
+
+    // Mở popup Facebook Share Dialog
+    const popup = window.open(
+      facebookShareUrl,
+      'facebook-share-dialog',
+      'width=800,height=600,scrollbars=yes,resizable=yes'
+    );
+
+    // Kiểm tra nếu popup bị block
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      toast({
+        title: 'Popup bị chặn',
+        description: 'Vui lòng cho phép popup để chia sẻ.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Focus vào popup
+    if (popup) {
+      popup.focus();
+    }
+
+    // Cập nhật share count
+    shareMutation.mutate(post.id);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 py-12 lg:py-20">
+    <div
+      data-corner="2"
+      className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 py-12 lg:py-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-16">
@@ -270,13 +350,31 @@ export function Corner2_2() {
 
             {/* Caption Input */}
             <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Caption
+                </label>
+                <EmojiPicker
+                  onEmojiSelect={handleEmojiSelect}
+                  textareaRef={captionTextareaRef}
+                />
+              </div>
               <textarea
+                ref={captionTextareaRef}
                 value={caption}
-                onChange={e => setCaption(e.target.value)}
+                onChange={handleCaptionChange}
+                onKeyDown={handleInputKeyDown}
                 placeholder="Chia sẻ cảm xúc của bạn..."
-                className="w-full p-4 border-2 border-gray-200 rounded-2xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg"
+                className="w-full p-4 border-2 border-gray-200 rounded-2xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg font-normal"
                 rows={3}
+                autoComplete="off"
+                spellCheck="false"
+                inputMode="text"
+                enterKeyHint="done"
               />
+              <div className="text-right text-sm text-gray-500 mt-1">
+                {caption.length}/500 ký tự
+              </div>
             </div>
 
             {/* File Selection */}
@@ -380,12 +478,19 @@ export function Corner2_2() {
                 >
                   {/* Post Image */}
                   <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                    <Image
-                      src={post.imageUrl}
-                      alt={post.caption || 'Post image'}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                    {post.imageUrl ? (
+                      <Image
+                        src={post.imageUrl}
+                        alt={post.caption || 'Post image'}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                        <Upload className="w-16 h-16 text-gray-400" />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                     {/* Highlight Badge */}
@@ -465,7 +570,7 @@ export function Corner2_2() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleShare(post.id)}
+                          onClick={() => handleShare(post)}
                           className="flex items-center space-x-1 text-gray-500 text-sm hover:bg-green-50"
                         >
                           <Share2 className="w-4 h-4" />

@@ -1,13 +1,16 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNextAuth } from '@/hooks/useNextAuth';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Gift, Calendar, Star, LogOut, Home } from 'lucide-react';
+import { Gift, Calendar, Star, LogOut, Home, RefreshCw } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import ReferralSection from '@/components/ReferralSection';
+import { Tooltip } from '@/components/ui/tooltip';
+import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
 interface RedeemItem {
   id: string;
@@ -18,6 +21,7 @@ interface RedeemItem {
   receiverName: string;
   receiverPhone: string;
   receiverAddress: string;
+  rejectionReason?: string;
   reward?: {
     id: string;
     name: string;
@@ -26,25 +30,40 @@ interface RedeemItem {
   };
 }
 
+interface PointLog {
+  id: string;
+  points: number;
+  reason: string;
+  createdAt: string;
+}
+
 export default function ProfilePage() {
   const { user, isAuthenticated, logout } = useNextAuth();
-  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { navigateWithLoading } = useGlobalNavigationLoading();
+
+  // Refetch all queries when user enters profile page
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      console.log('🔄 Refetching all queries for profile page');
+      queryClient.refetchQueries({ queryKey: ['userDetails', user.id] });
+      queryClient.refetchQueries({ queryKey: ['pointHistory', user.id] });
+      queryClient.refetchQueries({ queryKey: ['redeemHistory', user.id] });
+      queryClient.refetchQueries({ queryKey: ['referralStats'] });
+    }
+  }, [isAuthenticated, user?.id, queryClient]);
 
   // Function to scroll to corner
   const scrollToCorner = (cornerId: string) => {
-    console.log('Scrolling to corner:', cornerId);
-    router.push('/');
+    navigateWithLoading('/', 'Đang chuyển về trang chủ...');
     setTimeout(() => {
       const element = document.getElementById(cornerId);
-      console.log('Element found:', element);
       if (element) {
         element.scrollIntoView({
           behavior: 'smooth',
           block: 'start',
         });
-        console.log('Scrolled to element');
       } else {
-        console.log('Element not found, trying again...');
         // Try again after a longer delay
         setTimeout(() => {
           const retryElement = document.getElementById(cornerId);
@@ -53,9 +72,7 @@ export default function ProfilePage() {
               behavior: 'smooth',
               block: 'start',
             });
-            console.log('Scrolled to element on retry');
           } else {
-            console.log('Element still not found');
           }
         }, 500);
       }
@@ -64,9 +81,11 @@ export default function ProfilePage() {
 
   // Fetch user details including points
   const { data: userDetails } = useQuery({
-    queryKey: ['userDetails'],
+    queryKey: ['userDetails', user?.id],
     queryFn: () => apiClient.getCurrentUser(),
     enabled: isAuthenticated,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
 
   // Fetch redeem history
@@ -74,35 +93,48 @@ export default function ProfilePage() {
     data: redeemHistoryData,
     isLoading: redeemHistoryLoading,
     error: redeemHistoryError,
+    refetch: refetchRedeemHistory,
   } = useQuery({
-    queryKey: ['redeemHistory'],
+    queryKey: ['redeemHistory', user?.id],
     queryFn: () => apiClient.getRedeemHistory(),
     enabled: isAuthenticated,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
   });
+
+  // Function to refresh redeem history
+  const handleRefreshRedeemHistory = () => {
+    console.log('🔄 Refreshing redeem history...');
+    refetchRedeemHistory();
+  };
+
+  // Fetch point history
+  const {
+    data: pointHistoryData,
+    isLoading: pointHistoryLoading,
+    error: pointHistoryError,
+    refetch: refetchPointHistory,
+  } = useQuery({
+    queryKey: ['pointHistory', user?.id],
+    queryFn: () => apiClient.getPointHistory(),
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
+  });
+
+  // Function to refresh point history
+  const handleRefreshPointHistory = () => {
+    console.log('🔄 Refreshing point history...');
+    refetchPointHistory();
+  };
 
   const redeemHistory = Array.isArray(redeemHistoryData?.data?.redeems)
     ? redeemHistoryData.data.redeems
     : [];
 
-  console.log('Profile page redeem history debug:', {
-    redeemHistoryData,
-    redeemHistoryLoading,
-    redeemHistoryError,
-    isAuthenticated,
-    user: user?.id,
-    redeemHistoryLength: redeemHistory.length,
-    redeemHistoryArray: redeemHistory,
-    deliveredCount: redeemHistory.filter(
-      (r: RedeemItem) => r.status === 'DELIVERED'
-    ).length,
-    statusBreakdown: redeemHistory.reduce(
-      (acc: Record<string, number>, req: RedeemItem) => {
-        acc[req.status] = (acc[req.status] || 0) + 1;
-        return acc;
-      },
-      {}
-    ),
-  });
+  const pointHistory = Array.isArray(pointHistoryData?.data?.logs)
+    ? pointHistoryData.data.logs
+    : [];
 
   if (!isAuthenticated) {
     return (
@@ -137,12 +169,23 @@ export default function ProfilePage() {
                   width={96}
                   height={96}
                   className="w-24 h-24 rounded-full object-cover"
+                  unoptimized={user.image.includes(
+                    'platform-lookaside.fbsbx.com'
+                  )}
+                  onError={e => {
+                    // Hide the image and show fallback
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove(
+                      'hidden'
+                    );
+                  }}
                 />
-              ) : (
-                <span className="text-white font-bold text-3xl">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </span>
-              )}
+              ) : null}
+              <span
+                className={`text-white font-bold text-3xl ${user?.image ? 'hidden' : ''}`}
+              >
+                {user?.name?.charAt(0).toUpperCase()}
+              </span>
             </div>
 
             {/* User Info */}
@@ -159,56 +202,136 @@ export default function ProfilePage() {
                   {userDetails?.points || 0} điểm
                 </span>
               </div>
-
-              {/* Logout Button */}
-              <Button
-                variant="outline"
-                onClick={logout}
-                className="text-red-600 hover:text-red-800 hover:bg-red-50 border-red-200 hover:border-red-300"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Đăng xuất
-              </Button>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {redeemHistory.length}
-                </div>
-                <div className="text-sm text-gray-600">Lần đổi quà</div>
+            <div className="flex flex-col items-end space-y-6">
+              {/* Action Buttons */}
+              <div className="flex items-center space-x-3">
+                <Link href="/">
+                  <Button className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white border-0 transition-colors">
+                    <Home className="w-4 h-4" />
+                    <span>Trang chủ</span>
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  onClick={logout}
+                  className="text-red-600 hover:text-red-800 hover:bg-red-50 border-red-200 hover:border-red-300 transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Đăng xuất
+                </Button>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {
-                    redeemHistory.filter(
-                      (r: RedeemItem) => r.status === 'DELIVERED'
-                    ).length
-                  }
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {redeemHistory.length}
+                  </div>
+                  <div className="text-sm text-gray-600">Lần đổi quà</div>
                 </div>
-                <div className="text-sm text-gray-600">Quà đã nhận</div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">
+                    {
+                      redeemHistory.filter(
+                        (r: RedeemItem) => r.status === 'DELIVERED'
+                      ).length
+                    }
+                  </div>
+                  <div className="text-sm text-gray-600">Quà đã nhận</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Redeem History */}
+        {/* Point History */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Lịch sử cộng điểm
+            </h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefreshPointHistory}
+              disabled={pointHistoryLoading}
+              className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+            >
+              <RefreshCw
+                className={`w-4 h-4 ${pointHistoryLoading ? 'animate-spin' : ''}`}
+              />
+              <span>Làm mới</span>
+            </Button>
+          </div>
+
+          {pointHistoryLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Đang tải lịch sử điểm...</p>
+            </div>
+          ) : pointHistoryError ? (
+            <div className="text-center py-12">
+              <p className="text-red-500">Lỗi khi tải lịch sử điểm</p>
+            </div>
+          ) : pointHistory.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500">Chưa có lịch sử cộng điểm</p>
+            </div>
+          ) : (
+            <div className="max-h-96 overflow-y-auto space-y-4 pr-2">
+              {pointHistory.map((log: PointLog) => (
+                <div
+                  key={log.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Star className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{log.reason}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(log.createdAt).toLocaleDateString('vi-VN')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p
+                      className={`font-bold ${log.points > 0 ? 'text-green-600' : 'text-red-600'}`}
+                    >
+                      {log.points > 0 ? '+' : ''}
+                      {log.points}
+                    </p>
+                    <p className="text-sm text-gray-500">điểm</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Redeem History */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mt-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
               Lịch sử đổi quà
             </h2>
             <div className="flex items-center space-x-3">
-              <Link href="/">
-                <Button
-                  variant="outline"
-                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
-                >
-                  <Home className="w-4 h-4" />
-                  <span>Trang chủ</span>
-                </Button>
-              </Link>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefreshRedeemHistory}
+                disabled={redeemHistoryLoading}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+              >
+                <RefreshCw
+                  className={`w-4 h-4 ${redeemHistoryLoading ? 'animate-spin' : ''}`}
+                />
+                <span>Làm mới</span>
+              </Button>
               <Link href="/#corner-4">
                 <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white">
                   Đổi quà mới
@@ -265,9 +388,11 @@ export default function ProfilePage() {
                       </p>
                       <p className="text-sm text-gray-500">
                         Địa chỉ:{' '}
-                        <span className="break-words">
-                          {redeem.receiverAddress}
-                        </span>
+                        <Tooltip content={redeem.receiverAddress}>
+                          <span className="inline-block max-w-[300px] truncate cursor-help">
+                            {redeem.receiverAddress}
+                          </span>
+                        </Tooltip>
                       </p>
                       <p className="text-sm text-gray-500">
                         <Calendar className="w-4 h-4 inline mr-1" />
@@ -292,9 +417,9 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-right flex flex-col items-end">
                     <div
-                      className={`px-3 py-1 rounded-full text-sm font-medium mb-2 ${
+                      className={`px-3 py-1 rounded-full text-sm font-medium mb-2 w-fit ${
                         redeem.status === 'DELIVERED'
                           ? 'bg-green-100 text-green-800'
                           : redeem.status === 'APPROVED'
@@ -312,6 +437,16 @@ export default function ProfilePage() {
                             ? '❌ Từ chối'
                             : '⏳ Chờ duyệt'}
                     </div>
+                    {redeem.status === 'REJECTED' && redeem.rejectionReason && (
+                      <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded-md w-fit max-w-xs">
+                        <p className="text-xs text-red-600 font-medium mb-1">
+                          Lý do từ chối:
+                        </p>
+                        <p className="text-xs text-red-700">
+                          {redeem.rejectionReason}
+                        </p>
+                      </div>
+                    )}
                     <div className="flex items-center space-x-1 text-sm text-gray-500">
                       <Star className="w-4 h-4" />
                       <span>-{redeem.pointsUsed} điểm</span>
@@ -383,6 +518,11 @@ export default function ProfilePage() {
               </div>
             </div>
           </button>
+        </div>
+
+        {/* Referral Section */}
+        <div className="mb-8">
+          <ReferralSection />
         </div>
       </div>
     </div>

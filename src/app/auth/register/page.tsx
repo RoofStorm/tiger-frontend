@@ -1,15 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Gift } from 'lucide-react';
+import { signIn } from 'next-auth/react';
 
 const registerSchema = z
   .object({
@@ -17,6 +18,7 @@ const registerSchema = z
     email: z.string().email('Email không hợp lệ'),
     password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
     confirmPassword: z.string(),
+    referralCode: z.string().optional(),
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Mật khẩu xác nhận không khớp',
@@ -25,29 +27,39 @@ const registerSchema = z
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
-export default function RegisterPage() {
+function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register: registerUser, loading } = useNextAuth();
   const { toast } = useToast();
-  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
 
+  // Get referral code from URL
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      setValue('referralCode', refCode);
+    }
+  }, [searchParams, setValue]);
+
   const onSubmit = async (data: RegisterForm) => {
     try {
-      await registerUser(data.email, data.password, data.name);
-      toast({
-        title: 'Đăng ký thành công!',
-        description: 'Chào mừng bạn đến với Tiger.',
-      });
-      router.push('/');
+      await registerUser(
+        data.email,
+        data.password,
+        data.name,
+        data.referralCode
+      );
+      // Success toast and navigation are handled in useNextAuth
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
@@ -57,6 +69,45 @@ export default function RegisterPage() {
         title: 'Đăng ký thất bại',
         description: errorMessage,
         variant: 'destructive',
+        duration: 4000,
+      });
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      // Redirect to Google OAuth - let NextAuth handle the flow
+      await signIn('google', {
+        callbackUrl: '/',
+        redirect: true, // Allow redirect to OAuth provider
+      });
+    } catch (error) {
+      // Only show error if there's an actual error, not OAuth flow
+      console.error('Google login error:', error);
+      toast({
+        title: 'Lỗi',
+        description: 'Có lỗi xảy ra khi đăng nhập với Google',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    try {
+      // Redirect to Facebook OAuth - let NextAuth handle the flow
+      await signIn('facebook', {
+        callbackUrl: '/',
+        redirect: true, // Allow redirect to OAuth provider
+      });
+    } catch (error) {
+      // Only show error if there's an actual error, not OAuth flow
+      console.error('Facebook login error:', error);
+      toast({
+        title: 'Lỗi',
+        description: 'Có lỗi xảy ra khi đăng nhập với Facebook',
+        variant: 'destructive',
+        duration: 4000,
       });
     }
   };
@@ -211,6 +262,33 @@ export default function RegisterPage() {
               )}
             </div>
 
+            {/* Referral Code Field */}
+            <div>
+              <label
+                htmlFor="referralCode"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Mã mời bạn (tùy chọn)
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Gift className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  {...register('referralCode')}
+                  type="text"
+                  id="referralCode"
+                  placeholder="Nhập mã mời bạn để nhận 50 điểm"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              {errors.referralCode && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.referralCode.message}
+                </p>
+              )}
+            </div>
+
             {/* Submit Button */}
             <Button
               type="submit"
@@ -238,7 +316,8 @@ export default function RegisterPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center space-x-2 py-3"
+              className="w-full flex items-center justify-center space-x-2 py-3 hover:bg-gray-50"
+              onClick={handleGoogleLogin}
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -264,7 +343,8 @@ export default function RegisterPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full flex items-center justify-center space-x-2 py-3"
+              className="w-full flex items-center justify-center space-x-2 py-3 hover:bg-blue-50"
+              onClick={handleFacebookLogin}
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -288,5 +368,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }

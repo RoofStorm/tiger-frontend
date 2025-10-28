@@ -14,7 +14,12 @@ interface UseNextAuthReturn {
   } | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    name: string,
+    referralCode?: string
+  ) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -38,7 +43,36 @@ export function useNextAuth(): UseNextAuthReturn {
         });
 
         if (result?.error) {
-          throw new Error('Invalid credentials');
+          throw new Error(
+            result.error === 'CredentialsSignin'
+              ? 'Email hoặc mật khẩu không đúng'
+              : 'Đăng nhập thất bại'
+          );
+        }
+
+        // Store tokens in localStorage for fallback
+        if (result?.ok) {
+          // Get the user ID and tokens from the session after successful login
+          setTimeout(async () => {
+            const { getSession } = await import('next-auth/react');
+            const session = await getSession();
+            if (session?.user?.id) {
+              localStorage.setItem('userId', session.user.id);
+
+              // Try to get tokens from session
+              const accessToken = (session as { accessToken?: string })
+                .accessToken;
+              const refreshToken = (session as { refreshToken?: string })
+                .refreshToken;
+
+              if (accessToken) {
+                localStorage.setItem('accessToken', accessToken);
+              }
+              if (refreshToken) {
+                localStorage.setItem('refreshToken', refreshToken);
+              }
+            }
+          }, 100);
         }
 
         // Only clear cache if login was successful
@@ -62,7 +96,12 @@ export function useNextAuth(): UseNextAuthReturn {
   );
 
   const register = useCallback(
-    async (email: string, password: string, name: string) => {
+    async (
+      email: string,
+      password: string,
+      name: string,
+      referralCode?: string
+    ) => {
       try {
         // Call your custom register API
         const response = await fetch('/api/auth/register', {
@@ -70,25 +109,41 @@ export function useNextAuth(): UseNextAuthReturn {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email, password, name }),
+          body: JSON.stringify({ email, password, name, referralCode }),
         });
 
         if (!response.ok) {
-          throw new Error('Registration failed');
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Đăng ký thất bại');
         }
 
         // After successful registration, sign in
-        await signIn('credentials', {
+        const signInResult = await signIn('credentials', {
           email,
           password,
           redirect: false,
         });
 
-        // Only clear cache if registration was successful
+        if (signInResult?.error) {
+          throw new Error(
+            'Đăng nhập tự động thất bại. Vui lòng đăng nhập thủ công.'
+          );
+        }
+
+        // Only clear cache if registration and sign in were successful
         setTimeout(() => {
           queryClient.clear();
         }, 100);
 
+        // Show success toast
+        const { toast } = await import('@/hooks/use-toast');
+        toast({
+          title: 'Đăng ký thành công!',
+          description: 'Chào mừng bạn đến với Tiger.',
+          duration: 3000,
+        });
+
+        // Navigate to home page
         router.push('/');
       } catch (error) {
         console.error('Registration failed:', error);
@@ -100,6 +155,11 @@ export function useNextAuth(): UseNextAuthReturn {
 
   const logout = useCallback(async () => {
     try {
+      // Clear all auth-related data from localStorage
+      localStorage.removeItem('userId');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+
       // Clear cache before logout to prevent stale data
       queryClient.clear();
 

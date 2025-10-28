@@ -21,6 +21,56 @@ export function Corner0() {
   // Sử dụng context để chia sẻ trạng thái video
   const { setIsVideoPlaying } = useVideo();
 
+  // Fetch signed URL from backend
+  useEffect(() => {
+    const fetchVideoUrl = async () => {
+      if (!videoRef.current) return;
+
+      try {
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+        const videoFilename =
+          process.env.NEXT_PUBLIC_VIDEO_FILENAME || 'exampleclip.mp4';
+
+        const response = await fetch(
+          `${apiUrl}/storage/video-signed/${videoFilename}`
+        );
+        if (response.ok) {
+          const result = await response.json();
+          // API response format: { success: true, data: { url: "..." }, message: "Success" }
+          const videoUrl = result.data?.url;
+          if (videoUrl) {
+            videoRef.current.src = videoUrl;
+            console.log(
+              '✅ Loaded video with Signed URL from MinIO:',
+              videoUrl
+            );
+          } else {
+            // Fallback to NestJS streaming endpoint
+            videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
+            console.log('⚠️ No URL in response, using fallback');
+          }
+        } else {
+          // Fallback to NestJS streaming endpoint
+          videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
+          console.log('⚠️ Using fallback streaming endpoint');
+        }
+      } catch (error) {
+        console.error('❌ Error fetching signed URL:', error);
+        // Fallback to NestJS streaming endpoint
+        if (videoRef.current) {
+          const apiUrl =
+            process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+          const videoFilename =
+            process.env.NEXT_PUBLIC_VIDEO_FILENAME || 'exampleclip.mp4';
+          videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
+        }
+      }
+    };
+
+    fetchVideoUrl();
+  }, []);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -30,12 +80,13 @@ export function Corner0() {
       setDuration(video.duration);
       setIsVideoReady(true);
       setIsLoading(false);
-      console.log('Video metadata loaded, duration:', video.duration);
+      console.log('✅ Video metadata loaded successfully');
+      console.log('📹 Video source:', video.currentSrc);
+      console.log('⏱️ Video duration:', video.duration, 'seconds');
     };
     const handleCanPlay = () => {
       setIsVideoReady(true);
       setIsLoading(false);
-      console.log('Video can play');
     };
     const handlePlay = () => {
       setIsPlaying(true);
@@ -57,15 +108,15 @@ export function Corner0() {
       setShowControls(true);
     };
     const handleError = (e: Event) => {
-      console.error('Video error:', e);
+      console.warn('Video loading error, trying fallback:', e);
+      setVideoError('Video loading failed, trying fallback...');
       setIsLoading(false);
-      setVideoError('Không thể tải video. Vui lòng kiểm tra format file.');
     };
     const handleLoadStart = () => {
-      console.log('Video loading started...');
       setVideoError(null);
       setIsVideoReady(false);
       setIsLoading(true);
+      console.log('🎬 Video loading started...');
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
@@ -99,7 +150,6 @@ export function Corner0() {
       } else {
         // Đảm bảo video đã sẵn sàng trước khi play
         if (!isVideoReady) {
-          console.log('Video not ready, waiting...');
           return;
         }
 
@@ -144,17 +194,12 @@ export function Corner0() {
 
   // Debug: Log states để kiểm tra
   useEffect(() => {
-    console.log('States:', {
-      isPlaying,
-      showControls,
-      isVideoEnded,
-      isLoading,
-      isVideoReady,
-    });
+    // States are tracked for debugging
   }, [isPlaying, showControls, isVideoEnded, isLoading, isVideoReady]);
 
   return (
     <div
+      data-corner="0"
       className="relative min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 overflow-hidden"
       onMouseMove={handleMouseMove}
     >
@@ -167,11 +212,9 @@ export function Corner0() {
           loop
           playsInline
           preload="metadata"
+          crossOrigin="anonymous"
         >
-          {/* File MP4 mới của bạn - ưu tiên cao nhất */}
-          <source src="/videos/exampleclip.mp4" type="video/mp4" />
-          {/* Fallback video */}
-          <source src="/videos/exampleclip.mkv" type="video/x-matroska" />
+          {/* Video URL will be loaded dynamically via Signed URL */}
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
@@ -195,12 +238,30 @@ export function Corner0() {
               >
                 <Loader2 className="w-12 h-12 text-white" />
               </motion.div>
-              <h3 className="text-2xl font-bold mb-2">Video đang load</h3>
+              <h3 className="text-2xl font-bold mb-2">
+                Video đang load từ MinIO
+              </h3>
               <p className="text-white/70">Vui lòng chờ trong giây lát...</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Debug Info - Chỉ hiển thị trong development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="absolute top-4 left-4 bg-black/70 text-white text-xs p-2 rounded z-40">
+          <div>
+            🎬 Video Source: {videoRef.current?.currentSrc || 'Loading...'}
+          </div>
+          <div>
+            📊 Status:{' '}
+            {isLoading ? 'Loading...' : isVideoReady ? 'Ready' : 'Not ready'}
+          </div>
+          <div>
+            ⏱️ Duration: {duration ? `${duration.toFixed(1)}s` : 'Unknown'}
+          </div>
+        </div>
+      )}
 
       {/* Error Message */}
       {videoError && (

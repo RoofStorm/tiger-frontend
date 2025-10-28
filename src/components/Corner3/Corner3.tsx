@@ -96,7 +96,10 @@ export function Corner3() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 lg:py-20">
+    <div
+      data-corner="3"
+      className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12 lg:py-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="text-center mb-16">

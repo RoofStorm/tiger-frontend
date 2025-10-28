@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { Button } from '@/components/ui/button';
+import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import {
   User,
   Menu,
@@ -18,6 +20,7 @@ import {
 
 export function Header() {
   const { user, isAuthenticated, logout, isAdmin } = useNextAuth();
+  const { navigateWithLoading } = useGlobalNavigationLoading();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -146,9 +149,22 @@ export function Header() {
                             className="text-blue-700 hover:text-blue-900 font-medium flex items-center space-x-2"
                           >
                             <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold text-sm">
-                                {user?.name?.charAt(0).toUpperCase()}
-                              </span>
+                              {user?.image ? (
+                                <Image
+                                  src={user.image}
+                                  alt={user.name || 'User avatar'}
+                                  width={32}
+                                  height={32}
+                                  className="w-8 h-8 rounded-full object-cover"
+                                  unoptimized={user.image.includes(
+                                    'platform-lookaside.fbsbx.com'
+                                  )}
+                                />
+                              ) : (
+                                <span className="text-white font-bold text-sm">
+                                  {user?.name?.charAt(0).toUpperCase()}
+                                </span>
+                              )}
                             </div>
                             <span>{user?.name || 'User'}</span>
                             <ChevronDown
@@ -176,14 +192,19 @@ export function Header() {
                                 </p>
                               </div>
                               <div className="py-1">
-                                <Link
-                                  href="/profile"
-                                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                                  onClick={() => setIsUserDropdownOpen(false)}
+                                <button
+                                  onClick={() => {
+                                    setIsUserDropdownOpen(false);
+                                    navigateWithLoading(
+                                      '/profile',
+                                      'Đang chuyển đến hồ sơ cá nhân...'
+                                    );
+                                  }}
+                                  className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 w-full text-left"
                                 >
                                   <User className="w-4 h-4 mr-3" />
                                   Hồ sơ cá nhân
-                                </Link>
+                                </button>
                                 <Link
                                   href="/settings"
                                   className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
@@ -193,14 +214,19 @@ export function Header() {
                                   Cài đặt
                                 </Link>
                                 {isAdmin && (
-                                  <Link
-                                    href="/admin"
-                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                                    onClick={() => setIsUserDropdownOpen(false)}
+                                  <button
+                                    onClick={() => {
+                                      setIsUserDropdownOpen(false);
+                                      navigateWithLoading(
+                                        '/admin',
+                                        'Đang chuyển đến CMS...'
+                                      );
+                                    }}
+                                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 w-full text-left"
                                   >
                                     <Shield className="w-4 h-4 mr-3" />
                                     Quản lý CMS
-                                  </Link>
+                                  </button>
                                 )}
                                 <button
                                   onClick={() => {
@@ -293,14 +319,19 @@ export function Header() {
                             {user?.name || 'User'}
                           </span>
                         </div>
-                        <Link
-                          href="/profile"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg"
-                          onClick={() => setIsMenuOpen(false)}
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            navigateWithLoading(
+                              '/profile',
+                              'Đang chuyển đến hồ sơ cá nhân...'
+                            );
+                          }}
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg w-full text-left"
                         >
                           <User className="w-4 h-4 mr-3" />
                           Hồ sơ cá nhân
-                        </Link>
+                        </button>
                         <Link
                           href="/settings"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg"
@@ -310,14 +341,19 @@ export function Header() {
                           Cài đặt
                         </Link>
                         {isAdmin && (
-                          <Link
-                            href="/admin"
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg"
-                            onClick={() => setIsMenuOpen(false)}
+                          <button
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              navigateWithLoading(
+                                '/admin',
+                                'Đang chuyển đến CMS...'
+                              );
+                            }}
+                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg w-full text-left"
                           >
                             <Shield className="w-4 h-4 mr-3" />
                             Quản lý CMS
-                          </Link>
+                          </button>
                         )}
                         <button
                           onClick={() => {

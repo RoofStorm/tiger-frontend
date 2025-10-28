@@ -4,6 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { Toaster } from '@/components/ui/toaster';
+import { LoadingProvider } from '@/contexts/LoadingContext';
+import { LoadingOverlay } from '@/components/LoadingOverlay';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -38,8 +40,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         refetchOnWindowFocus={false} // Don't refetch on window focus
         refetchWhenOffline={false} // Don't refetch when offline
       >
-        {children}
-        <Toaster />
+        <LoadingProvider>
+          {children}
+          <LoadingOverlay />
+          <Toaster />
+        </LoadingProvider>
       </SessionProvider>
     </QueryClientProvider>
   );

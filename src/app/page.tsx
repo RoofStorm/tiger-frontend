@@ -28,8 +28,10 @@ function HomePageContent() {
           corner.getAttribute('data-corner') || '0'
         );
 
+        const isInViewport = rect.top < window.innerHeight && rect.bottom > 0;
+
         // Check if corner is in viewport
-        if (rect.top < window.innerHeight && rect.bottom > 0) {
+        if (isInViewport) {
           startTimer(cornerNumber);
         } else {
           stopTimer(cornerNumber);
