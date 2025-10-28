@@ -8,34 +8,171 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  name          String?
-  email         String   @unique
-  passwordHash  String? 
-  avatarUrl     String?
-  loginMethod   LoginMethod @default(LOCAL)
-  providerId    String?
-  refreshToken  String?
-  role          Role      @default(USER)
-  status        UserStatus @default(ACTIVE)
-  points        Int       @default(0)
-  referralCode  String?   @unique
-  referredBy    String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  posts         Post[]
-  pointLogs     PointLog[]
-  pointsLogs    PointsLog[]
-  redeemLogs    RedeemLog[]
+  id             String            @id @default(uuid())
+  name           String?
+  email          String            @unique
+  passwordHash   String?
+  avatarUrl      String?
+  loginMethod    LoginMethod       @default(LOCAL)
+  providerId     String?
+  refreshToken   String?
+  role           Role              @default(USER)
+  status         UserStatus        @default(ACTIVE)
+  points         Int               @default(0)
+  referralCode   String?           @unique
+  referredBy     String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  analytics      CornerAnalytics[]
+  pointLogs      PointLog[]
+  posts          Post[]
+  redeemLogs     RedeemLog[]
   redeemRequests RedeemRequest[]
-  userActions   UserPostAction[]
-  analytics     CornerAnalytics[]
-  referrals     User[]    @relation("UserReferrals")
-  referrer      User?     @relation("UserReferrals", fields: [referredBy], references: [id])
-  referralLimits ReferralLimit[]
+  userLimits     UserLimit[]
+  userActions    UserPostAction[]
+  referrer       User?             @relation("UserReferrals", fields: [referredBy], references: [id])
+  referrals      User[]            @relation("UserReferrals")
+  wishes         Wish[]
 
   @@map("users")
+}
+
+model Post {
+  id            String           @id @default(uuid())
+  userId        String
+  type          PostType
+  caption       String?
+  url           String?
+  likeCount     Int              @default(0)
+  shareCount    Int              @default(0)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  isHighlighted Boolean          @default(false)
+  commentCount  Int              @default(0)
+  user          User             @relation(fields: [userId], references: [id])
+  actions       UserPostAction[]
+
+  @@map("posts")
+}
+
+model UserPostAction {
+  id        String     @id @default(uuid())
+  userId    String
+  postId    String
+  type      ActionType
+  createdAt DateTime   @default(now())
+  post      Post       @relation(fields: [postId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@unique([userId, postId, type])
+  @@map("user_post_actions")
+}
+
+model PointLog {
+  id          String   @id @default(uuid())
+  userId      String
+  points      Int
+  reason      String
+  referralUrl String?
+  note        String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@map("point_logs")
+}
+
+model UserLimit {
+  id        String    @id @default(uuid())
+  userId    String
+  limitType LimitType
+  period    DateTime
+  count     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, limitType, period])
+  @@map("user_limits")
+}
+
+model RedeemLog {
+  id           String       @id @default(uuid())
+  userId       String
+  giftCode     String
+  costPoints   Int
+  costLife     Int?
+  status       RedeemStatus @default(PENDING)
+  receiverInfo Json
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@map("redeem_logs")
+}
+
+model CornerAnalytics {
+  id        String   @id @default(uuid())
+  userId    String
+  corner    Int
+  duration  Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("corner_analytics")
+}
+
+model Reward {
+  id             String          @id @default(uuid())
+  name           String
+  description    String
+  pointsRequired Int
+  lifeRequired   Int?
+  imageUrl       String?
+  isActive       Boolean         @default(true)
+  maxPerUser     Int?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  redeemRequests RedeemRequest[]
+
+  @@map("rewards")
+}
+
+model Wish {
+  id            String   @id @default(uuid())
+  userId        String
+  content       String
+  isHighlighted Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@map("wishes")
+}
+
+model RedeemRequest {
+  id              String       @id @default(uuid())
+  userId          String
+  rewardId        String
+  receiverName    String
+  receiverPhone   String
+  receiverAddress String
+  status          RedeemStatus @default(PENDING)
+  pointsUsed      Int
+  rejectionReason String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  reward          Reward       @relation(fields: [rewardId], references: [id])
+  user            User         @relation(fields: [userId], references: [id])
+
+  @@map("redeem_requests")
+}
+
+
+enum LimitType {
+  REFERRAL_WEEKLY
+  POST_WEEKLY
+  WISH_WEEKLY
+  SHARE_DAILY
 }
 
 enum LoginMethod {
@@ -55,25 +192,6 @@ enum UserStatus {
   BANNED
 }
 
-model Post {
-  id            String  @id @default(uuid())
-  user          User    @relation(fields: [userId], references: [id])
-  userId        String
-  type          PostType
-  caption       String? 
-  url           String? 
-  isHighlighted Boolean @default(false)
-  likeCount     Int     @default(0)
-  shareCount    Int     @default(0)
-  commentCount  Int     @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  actions    UserPostAction[]
-
-  @@map("posts")
-}
-
 enum PostType {
   EMOJI_CARD
   IMAGE
@@ -81,50 +199,9 @@ enum PostType {
   CLIP
 }
 
-model UserPostAction {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    String
-  type      ActionType
-  createdAt DateTime @default(now())
-
-  @@unique([userId, postId, type])
-  @@map("user_post_actions")
-}
-
 enum ActionType {
   LIKE
   SHARE
-}
-
-model PointLog {
-  id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
-  points     Int
-  reason     String
-  referralUrl String?
-  note       String?
-  createdAt  DateTime @default(now())
-
-  @@map("point_logs")
-}
-
-model RedeemLog {
-  id           String   @id @default(uuid())
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String
-  giftCode     String
-  costPoints   Int
-  costLife     Int?
-  status       RedeemStatus @default(PENDING)
-  receiverInfo Json
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@map("redeem_logs")
 }
 
 enum RedeemStatus {
@@ -133,72 +210,3 @@ enum RedeemStatus {
   REJECTED
   DELIVERED
 }
-
-model CornerAnalytics {
-  id         String  @id @default(uuid())
-  user       User    @relation(fields: [userId], references: [id])
-  userId     String
-  corner     Int     // 0..4
-  duration   Int     // seconds
-  createdAt  DateTime @default(now())
-
-  @@map("corner_analytics")
-}
-
-model Reward {
-  id            String   @id @default(uuid())
-  name          String
-  description   String
-  pointsRequired Int
-  imageUrl      String?
-  isActive      Boolean  @default(true)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  redeemRequests RedeemRequest[]
-
-  @@map("rewards")
-}
-
-model RedeemRequest {
-  id              String        @id @default(uuid())
-  user            User          @relation(fields: [userId], references: [id])
-  userId          String
-  reward          Reward        @relation(fields: [rewardId], references: [id])
-  rewardId        String
-  receiverName    String
-  receiverPhone   String
-  receiverAddress String
-  status          RedeemStatus  @default(PENDING)
-  pointsUsed      Int
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  @@map("redeem_requests")
-}
-
-model PointsLog {
-  id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     String
-  points     Int
-  type       String
-  reason     String
-  createdAt  DateTime @default(now())
-
-  @@map("points_logs")
-}
-
-model ReferralLimit {
-  id        String   @id @default(uuid())
-  userId    String
-  weekStart DateTime // Start of the week (Monday)
-  count     Int      @default(0) // Number of referrals this week
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@unique([userId, weekStart])
-  @@map("referral_limits")
-}
-
