@@ -91,7 +91,7 @@ export default function AdminPage() {
       case 'redeems':
         return <RedeemsTab isAdmin={isAdmin} />;
       case 'wishes':
-        return <WishesTab isAdmin={isAdmin} />;
+        return <WishesTab />;
       case 'analytics':
         return <AnalyticsTab isAdmin={isAdmin} />;
       case 'settings':

@@ -29,10 +29,10 @@ export const WishCard = ({ wish }: WishCardProps) => {
 
           <div className="relative">
             <div className="absolute top-0 left-0 text-lg text-gray-400 font-bold">
-              "
+              &quot;
             </div>
             <div className="absolute bottom-0 right-0 text-lg text-gray-400 font-bold">
-              "
+              &quot;
             </div>
             <p className="text-gray-700 text-sm leading-relaxed px-4 py-2">
               {wish.content}

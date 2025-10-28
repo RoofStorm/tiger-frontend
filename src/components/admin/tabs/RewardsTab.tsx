@@ -367,7 +367,6 @@ export const RewardsTab: React.FC<RewardsTabProps> = ({ isAdmin }) => {
         setUploadingImage={setUploadingImage}
         createRewardMutation={createRewardMutation}
         updateRewardMutation={updateRewardMutation}
-        resetRewardForm={resetRewardForm}
       />
     </>
   );

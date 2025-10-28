@@ -19,11 +19,8 @@ export function NavigationDots({
   const scrollToSection = (sectionIndex: number) => {
     const section = document.querySelector(`[data-corner="${sectionIndex}"]`);
     if (section) {
-      console.log('🖱️ NavigationDots: Clicked on dot', sectionIndex);
-
       // Update current section immediately
       onSectionChange(sectionIndex);
-      console.log('📍 NavigationDots: Highlighting section', sectionIndex);
 
       section.scrollIntoView({
         behavior: 'smooth',

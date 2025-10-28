@@ -7,11 +7,7 @@ import apiClient from '@/lib/api';
 import { Wish } from '../types';
 import { ActionButton } from '../ActionButton';
 
-interface WishesTabProps {
-  isAdmin: boolean;
-}
-
-export const WishesTab = ({ isAdmin }: WishesTabProps) => {
+export const WishesTab = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [page, setPage] = useState(1);

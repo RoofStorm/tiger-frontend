@@ -1,6 +1,15 @@
 import { useState, useCallback } from 'react';
 import { FilterState } from '../types';
 
+interface User {
+  role?: string;
+  status?: string;
+}
+
+interface Post {
+  type?: string;
+}
+
 export const useFilters = () => {
   const [userFilters, setUserFilters] = useState<FilterState>({
     role: '',
@@ -12,7 +21,7 @@ export const useFilters = () => {
   const [redeemStatusFilter, setRedeemStatusFilter] = useState('');
 
   const filterUsers = useCallback(
-    (users: any[]) => {
+    (users: User[]) => {
       return users.filter(user => {
         const matchesRole = !userFilters.role || user.role === userFilters.role;
         const matchesStatus =
@@ -24,7 +33,7 @@ export const useFilters = () => {
   );
 
   const filterPosts = useCallback(
-    (posts: any[]) => {
+    (posts: Post[]) => {
       return posts.filter(post => {
         const matchesType = !postFilters.type || post.type === postFilters.type;
         return matchesType;

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
-import { POINTS } from '@/constants/points';
 
 const prisma = new PrismaClient();
 
@@ -106,65 +104,4 @@ export async function POST(request: NextRequest) {
     console.error('Registration error:', error);
     return NextResponse.json({ error: 'Lỗi máy chủ nội bộ' }, { status: 500 });
   }
-}
-
-// Fallback function for local user creation
-async function createUserLocally(
-  email: string,
-  password: string,
-  name: string,
-  referralCode?: string
-) {
-  // Hash password
-  const hashedPassword = await bcrypt.hash(password, 12);
-
-  // Create user
-  const user = await prisma.user.create({
-    data: {
-      email,
-      passwordHash: hashedPassword,
-      name,
-      role: 'USER',
-      status: 'ACTIVE',
-      points: 0,
-    },
-  });
-
-  // Process referral if provided
-  if (referralCode) {
-    try {
-      // Find referrer by referral code
-      const referrer = await prisma.user.findUnique({
-        where: { referralCode },
-      });
-
-      if (referrer) {
-        // Link the new user to referrer
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { referredBy: referrer.id },
-        });
-
-        // Referral bonus is now handled by Backend ReferralService
-        // to implement weekly limits and proper validation
-        console.log(
-          `✅ Referral linked: ${referrer.email} referred ${user.email} (points handled by Backend)`
-        );
-      } else {
-        console.log(`⚠️ Referral code not found: ${referralCode}`);
-      }
-    } catch (error) {
-      console.error('❌ Error processing referral:', error);
-      // Don't throw error, just log it - user registration should still succeed
-    }
-  }
-
-  // Return user without password
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { passwordHash, ...userWithoutPassword } = user;
-
-  return NextResponse.json({
-    message: 'User created successfully',
-    user: userWithoutPassword,
-  });
 }

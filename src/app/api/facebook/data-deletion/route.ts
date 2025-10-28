@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Decode the signature and payload
-    const sig = Buffer.from(
-      encodedSig.replace(/-/g, '+').replace(/_/g, '/'),
-      'base64'
-    );
+    // const sig = Buffer.from(
+    //   encodedSig.replace(/-/g, '+').replace(/_/g, '/'),
+    //   'base64'
+    // );
     const data = JSON.parse(
       Buffer.from(
         payload.replace(/-/g, '+').replace(/_/g, '/'),
@@ -81,13 +81,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-export async function GET(request: NextRequest) {
-  // Handle GET requests (for testing)
-  return NextResponse.json({
-    message: 'Facebook Data Deletion Callback URL is working',
-    instructions: 'This endpoint handles Facebook data deletion requests',
-    test_url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/data-deletion.html`,
-  });
 }

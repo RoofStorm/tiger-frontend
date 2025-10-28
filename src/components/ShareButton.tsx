@@ -14,7 +14,6 @@ interface ShareButtonProps {
 export default function ShareButton({
   postUrl,
   postTitle,
-  postDescription,
   className = '',
   variant = 'default',
   size = 'md',

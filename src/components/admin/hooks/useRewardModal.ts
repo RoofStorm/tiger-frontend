@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Reward } from './types';
+import { Reward } from '../types';
 
 export const useRewardModal = () => {
   const [showRewardModal, setShowRewardModal] = useState(false);

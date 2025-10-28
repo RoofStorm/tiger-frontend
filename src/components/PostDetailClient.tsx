@@ -1,7 +1,7 @@
 'use client';
 
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
-import Link from 'next/link';
+import Image from 'next/image';
 import { Post } from '@/types';
 
 interface PostDetailClientProps {
@@ -17,10 +17,12 @@ export default function PostDetailClient({ post }: PostDetailClientProps) {
         <article className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Post Image */}
           <div className="aspect-video relative overflow-hidden">
-            <img
+            <Image
               src={post.imageUrl}
               alt={post.caption || 'Post image'}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
             {/* Highlight Badge */}
             {post.isHighlighted && (

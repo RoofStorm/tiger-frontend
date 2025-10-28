@@ -2,8 +2,12 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { EmojiSelection } from '@/types';
-import { findCombinationByEmojis } from '@/constants/emojiCombinations';
+import {
+  EmojiCombination,
+  findCombinationByEmojis,
+} from '@/constants/emojiCombinations';
 import { EMOJI_OPTIONS } from '@/constants/emojis';
 
 export default function MoodCardDisplay() {
@@ -12,7 +16,7 @@ export default function MoodCardDisplay() {
     emojis: EmojiSelection[];
     whisper: string;
     reminder: string;
-    combination: any;
+    combination: EmojiCombination | null;
   } | null>(null);
 
   useEffect(() => {
@@ -89,7 +93,7 @@ export default function MoodCardDisplay() {
               {combination.category === 'tiger-linked' && '🐅 Tiger Spirit'}
               {combination.category === 'trendy' && '✨ Trendy'}
             </h3>
-            <p className="text-gray-700">{combination.description}</p>
+            <p className="text-gray-700">{combination.whisper}</p>
           </div>
         )}
 
@@ -99,7 +103,7 @@ export default function MoodCardDisplay() {
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               💭 Whisper
             </h3>
-            <p className="text-gray-700 italic">"{whisper}"</p>
+            <p className="text-gray-700 italic">&quot;{whisper}&quot;</p>
           </div>
         )}
 
@@ -142,12 +146,12 @@ export default function MoodCardDisplay() {
 
       {/* Call to Action */}
       <div className="text-center mt-8">
-        <a
+        <Link
           href="/"
           className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-full hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105"
         >
           🎨 Tạo Mood Card Của Bạn
-        </a>
+        </Link>
       </div>
     </div>
   );

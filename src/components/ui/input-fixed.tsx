@@ -16,5 +16,10 @@ export function InputFixed({
 }: InputFixedProps) {
   const { onKeyDown } = useInputFix();
 
-  return <Component {...props} onKeyDown={onKeyDown} />;
+  // Type assertion needed because the props type is for input
+  // but we might render a textarea
+  return React.createElement(Component, {
+    ...props,
+    onKeyDown,
+  });
 }

@@ -36,9 +36,33 @@ interface RewardModalProps {
   setImagePreview: React.Dispatch<React.SetStateAction<string | null>>;
   uploadingImage: boolean;
   setUploadingImage: React.Dispatch<React.SetStateAction<boolean>>;
-  createRewardMutation: UseMutationResult<any, Error, any, unknown>;
-  updateRewardMutation: UseMutationResult<any, Error, any, unknown>;
-  resetRewardForm: () => void;
+  createRewardMutation: UseMutationResult<
+    unknown,
+    Error,
+    {
+      name: string;
+      description: string;
+      pointsRequired: number;
+      imageUrl?: string;
+      isActive: boolean;
+    },
+    unknown
+  >;
+  updateRewardMutation: UseMutationResult<
+    unknown,
+    Error,
+    {
+      id: string;
+      data: {
+        name: string;
+        description: string;
+        pointsRequired: number;
+        imageUrl?: string;
+        isActive: boolean;
+      };
+    },
+    unknown
+  >;
 }
 
 export const RewardModal: React.FC<RewardModalProps> = ({
@@ -56,7 +80,6 @@ export const RewardModal: React.FC<RewardModalProps> = ({
   setUploadingImage,
   createRewardMutation,
   updateRewardMutation,
-  resetRewardForm,
 }) => {
   const { toast } = useToast();
   // Image upload handlers
@@ -103,7 +126,13 @@ export const RewardModal: React.FC<RewardModalProps> = ({
     } finally {
       setUploadingImage(false);
     }
-  }, [selectedImageFile, setRewardForm, setImagePreview, setUploadingImage]);
+  }, [
+    selectedImageFile,
+    setRewardForm,
+    setImagePreview,
+    setUploadingImage,
+    toast,
+  ]);
 
   const handleSaveReward = useCallback(async () => {
     try {
@@ -167,6 +196,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({
     updateRewardMutation,
     createRewardMutation,
     setUploadingImage,
+    toast,
   ]);
 
   if (!isOpen) return null;
