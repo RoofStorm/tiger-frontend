@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,78 +13,73 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'Email này đã được sử dụng' },
-        { status: 400 }
-      );
-    }
-
     // Call Backend API to create user with referral code
+    // Backend will handle user existence check and validation
     console.log(`🔄 Creating user via Backend API: ${email}`);
     try {
-      const response = await fetch(
-        `${process.env.BACKEND_URL || 'http://localhost:4000'}/api/auth/register`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            name,
-            referralCode: referralCode || null,
-          }),
-        }
-      );
+      const apiBaseUrl =
+        process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+      const response = await fetch(`${apiBaseUrl}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+          referralCode: referralCode || null,
+        }),
+      });
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('🔍 Backend response:', JSON.stringify(data, null, 2));
-
-        if (data.success && data.data?.user) {
-          console.log(
-            `✅ User created successfully via Backend: ${data.data.user.email}`
-          );
-          return NextResponse.json({
-            message: 'User created successfully',
-            user: data.data.user,
-          });
-        } else {
-          console.log(
-            '⚠️ Backend API returned error:',
-            data.error || data.message
-          );
-          return NextResponse.json(
-            {
-              error: data.error || data.message || 'Đăng ký thất bại',
-            },
-            { status: 400 }
-          );
-        }
-      } else {
-        const errorData = await response.json();
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({
+          message: 'Registration failed',
+        }));
         console.log(
           '⚠️ Backend API error response:',
           response.status,
           errorData
         );
 
-        // Return specific error from backend
+        // Extract error message from backend response
+        const errorMessage =
+          errorData.error ||
+          errorData.message ||
+          errorData.data?.message ||
+          `Lỗi API Backend (${response.status})`;
+
+        return NextResponse.json(
+          { error: errorMessage },
+          { status: response.status }
+        );
+      }
+
+      const data = await response.json();
+      console.log('🔍 Backend response:', JSON.stringify(data, null, 2));
+
+      // Handle backend response format: { success: true, data: { user, accessToken, ... } }
+      // or direct format: { user, accessToken, ... }
+      const userData =
+        data.success && data.data?.user
+          ? data.data.user
+          : data.user || data.data;
+
+      if (userData) {
+        console.log(
+          `✅ User created successfully via Backend: ${userData.email}`
+        );
+        return NextResponse.json({
+          message: 'User created successfully',
+          user: userData,
+        });
+      } else {
+        console.log('⚠️ Backend API returned unexpected format:', data);
         return NextResponse.json(
           {
-            error:
-              errorData.error ||
-              errorData.message ||
-              `Lỗi API Backend (${response.status})`,
+            error: data.error || data.message || 'Đăng ký thất bại',
           },
-          { status: response.status }
+          { status: 400 }
         );
       }
     } catch (error) {

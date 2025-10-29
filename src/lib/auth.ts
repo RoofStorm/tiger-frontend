@@ -3,7 +3,6 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import { prisma } from './prisma';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import {
   checkDailyBonusAwarded,
@@ -112,55 +111,44 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Test database connection first
-          await prisma.user.count();
-          const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email,
+          // Call backend API for login
+          const apiBaseUrl =
+            process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+
+          console.log('🔐 Calling backend login API...');
+          const response = await fetch(`${apiBaseUrl}/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
             },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
           });
 
-          if (user) {
-            console.log('👤 User details:', {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-              hasPasswordHash: !!user.passwordHash,
-              passwordHashLength: user.passwordHash?.length || 0,
-            });
-          }
-
-          if (!user) {
-            console.log('❌ User not found in database');
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({
+              message: 'Login failed',
+            }));
+            console.error('❌ Login failed:', errorData.message);
             return null;
           }
 
-          // Verify password
-          console.log('🔐 Verifying password...');
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password,
-            user.passwordHash || ''
-          );
+          const data = await response.json();
+          console.log('✅ Login successful for user:', data.user?.email);
 
-          console.log('🔐 Password valid:', isPasswordValid);
-
-          if (!isPasswordValid) {
-            console.log('❌ Invalid password');
-            return null;
-          }
-
-          console.log('✅ Login successful for user:', user.email);
-
-          // Award daily login bonus points
-          await awardDailyLoginBonus(user.id, 'credentials');
-
+          // Store tokens for later use in JWT callback
+          // We'll attach these to the user object so they're available in JWT callback
           return {
-            id: user.id,
-            email: user.email,
-            name: user.name || 'User',
-            image: user.avatarUrl || undefined,
-            role: user.role,
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.name || 'User',
+            image: data.user.avatarUrl || undefined,
+            role: data.user.role,
+            // Store tokens for JWT callback
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
           };
         } catch (error: unknown) {
           console.error('❌ Auth error:', error);
@@ -216,6 +204,8 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Award daily login bonus for all users (new and existing)
+          // NOTE: This uses direct DB access. If user already logged in with credentials today,
+          // Redis/DB check will prevent duplicate. Should refactor to use backend API for consistency.
           const userId =
             existingUser?.id ||
             (
@@ -269,6 +259,8 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Award daily login bonus for all users (new and existing)
+          // NOTE: This uses direct DB access. If user already logged in with credentials today,
+          // Redis/DB check will prevent duplicate. Should refactor to use backend API for consistency.
           const userId =
             existingUser?.id ||
             (
@@ -291,53 +283,51 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
-        // For Google/Facebook login, we need to get the database user ID
-        if (user.email) {
-          try {
-            const dbUser = await prisma.user.findUnique({
-              where: { email: user.email },
-            });
-            if (dbUser) {
-              // Create a real JWT token with the user ID
-              const accessToken = jwt.sign(
-                {
-                  sub: dbUser.id,
-                  email: dbUser.email,
-                  role: dbUser.role,
-                },
-                process.env.NEXTAUTH_SECRET!,
-                { expiresIn: '1h' }
-              );
+        token.userId = user.id;
 
-              token.accessToken = accessToken; // Use real JWT token
-              token.userId = dbUser.id;
-              token.avatarUrl = dbUser.avatarUrl;
+        // For credentials login, use tokens from backend API
+        interface UserWithTokens {
+          accessToken?: string;
+          refreshToken?: string;
+        }
+        const userWithTokens = user as UserWithTokens;
+        if (userWithTokens.accessToken) {
+          // Use accessToken from backend API
+          token.accessToken = userWithTokens.accessToken;
+          token.refreshToken = userWithTokens.refreshToken;
+        } else {
+          // For Google/Facebook login, we need to get the database user ID
+          // This still uses direct DB access for OAuth providers
+          // TODO: Refactor OAuth flow to use backend API as well
+          if (user.email) {
+            try {
+              const dbUser = await prisma.user.findUnique({
+                where: { email: user.email },
+              });
+              if (dbUser) {
+                // Create a real JWT token with the user ID
+                const accessToken = jwt.sign(
+                  {
+                    sub: dbUser.id,
+                    email: dbUser.email,
+                    role: dbUser.role,
+                  },
+                  process.env.NEXTAUTH_SECRET!,
+                  { expiresIn: '1h' }
+                );
 
-              // Add refresh token if available
-              if (dbUser.refreshToken) {
-                token.refreshToken = dbUser.refreshToken;
-                // Store refresh token in localStorage for API client
-                if (typeof window !== 'undefined') {
-                  localStorage.setItem('refreshToken', dbUser.refreshToken);
+                token.accessToken = accessToken; // Use real JWT token
+                token.avatarUrl = dbUser.avatarUrl;
+
+                // Add refresh token if available
+                if (dbUser.refreshToken) {
+                  token.refreshToken = dbUser.refreshToken;
                 }
               }
+            } catch (error) {
+              console.error('Error finding user in JWT callback:', error);
             }
-          } catch (error) {
-            console.error('Error finding user in JWT callback:', error);
           }
-        } else {
-          // For credentials login, also create a real JWT token
-          const accessToken = jwt.sign(
-            {
-              sub: user.id,
-              email: user.email,
-              role: user.role,
-            },
-            process.env.NEXTAUTH_SECRET!,
-            { expiresIn: '1h' }
-          );
-
-          token.accessToken = accessToken; // Use real JWT token
         }
       }
       return token;
