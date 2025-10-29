@@ -36,12 +36,12 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     try {
       await login(data.email, data.password);
+      // Don't call router.push here - login() already handles redirect
       toast({
         title: 'Đăng nhập thành công!',
         description: 'Chào mừng bạn trở lại với Tiger.',
         duration: 3000,
       });
-      router.push('/');
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error

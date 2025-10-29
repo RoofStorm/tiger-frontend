@@ -1,4 +1,4 @@
-import { signIn, signOut } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -27,6 +27,7 @@ interface UseNextAuthReturn {
 
 export function useNextAuth(): UseNextAuthReturn {
   const { user, loading, isAuthenticated } = useOptimizedSession();
+  const { data: session, update } = useSession();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -50,49 +51,54 @@ export function useNextAuth(): UseNextAuthReturn {
           );
         }
 
-        // Store tokens in localStorage for fallback
         if (result?.ok) {
-          // Get the user ID and tokens from the session after successful login
-          setTimeout(async () => {
-            const { getSession } = await import('next-auth/react');
-            const session = await getSession();
-            if (session?.user?.id) {
-              localStorage.setItem('userId', session.user.id);
+          // Force refresh session immediately
+          await update();
 
-              // Try to get tokens from session
-              const accessToken = (session as { accessToken?: string })
-                .accessToken;
-              const refreshToken = (session as { refreshToken?: string })
-                .refreshToken;
+          // Wait a bit for session to be ready
+          await new Promise(resolve => setTimeout(resolve, 200));
 
-              if (accessToken) {
-                localStorage.setItem('accessToken', accessToken);
-              }
-              if (refreshToken) {
-                localStorage.setItem('refreshToken', refreshToken);
-              }
+          // Get the updated session
+          const { getSession } = await import('next-auth/react');
+          const updatedSession = await getSession();
+
+          if (updatedSession?.user?.id) {
+            localStorage.setItem('userId', updatedSession.user.id);
+
+            // Try to get tokens from session
+            const accessToken = (updatedSession as { accessToken?: string })
+              .accessToken;
+            const refreshToken = (updatedSession as { refreshToken?: string })
+              .refreshToken;
+
+            if (accessToken) {
+              localStorage.setItem('accessToken', accessToken);
             }
-          }, 100);
-        }
+            if (refreshToken) {
+              localStorage.setItem('refreshToken', refreshToken);
+            }
+          }
 
-        // Only clear cache if login was successful
-        // Use setTimeout to avoid blocking the UI
-        setTimeout(() => {
+          // Clear cache after session is updated
           queryClient.clear();
-        }, 100);
 
-        // Redirect based on role
-        if (user?.role === 'ADMIN') {
-          router.push('/admin');
-        } else {
-          router.push('/');
+          // Refresh router to ensure all components update
+          router.refresh();
+
+          // Redirect based on role - use the user from updated session
+          const userRole = updatedSession?.user?.role;
+          if (userRole === 'ADMIN') {
+            router.push('/admin');
+          } else {
+            router.push('/');
+          }
         }
       } catch (error) {
         console.error('Login failed:', error);
         throw error;
       }
     },
-    [router, user?.role, queryClient]
+    [router, queryClient, update]
   );
 
   const register = useCallback(
@@ -130,10 +136,17 @@ export function useNextAuth(): UseNextAuthReturn {
           );
         }
 
-        // Only clear cache if registration and sign in were successful
-        setTimeout(() => {
+        // Force refresh session after registration login
+        if (signInResult?.ok) {
+          await update();
+
+          // Wait for session to update
+          await new Promise(resolve => setTimeout(resolve, 200));
+
+          // Clear cache and refresh router
           queryClient.clear();
-        }, 100);
+          router.refresh();
+        }
 
         // Show success toast
         const { toast } = await import('@/hooks/use-toast');

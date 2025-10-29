@@ -131,24 +131,42 @@ export const authOptions: NextAuthOptions = {
             const errorData = await response.json().catch(() => ({
               message: 'Login failed',
             }));
-            console.error('❌ Login failed:', errorData.message);
+            // Backend error format: { success: false, error: "...", message: "..." }
+            const errorMessage =
+              errorData.error ||
+              errorData.message ||
+              `Login failed with status ${response.status}`;
+            console.error('❌ Login failed:', errorMessage);
             return null;
           }
 
           const data = await response.json();
-          console.log('✅ Login successful for user:', data.user?.email);
+
+          // Backend wraps response in { success: true, data: {...} } format via ResponseInterceptor
+          // Handle both wrapped and unwrapped formats for flexibility
+          const responseData = data.success && data.data ? data.data : data;
+
+          if (!responseData.user) {
+            console.error(
+              '❌ Invalid response format: missing user data',
+              JSON.stringify(data, null, 2)
+            );
+            return null;
+          }
+
+          console.log('✅ Login successful for user:', responseData.user.email);
 
           // Store tokens for later use in JWT callback
           // We'll attach these to the user object so they're available in JWT callback
           return {
-            id: data.user.id,
-            email: data.user.email,
-            name: data.user.name || 'User',
-            image: data.user.avatarUrl || undefined,
-            role: data.user.role,
+            id: responseData.user.id,
+            email: responseData.user.email,
+            name: responseData.user.name || 'User',
+            image: responseData.user.avatarUrl || undefined,
+            role: responseData.user.role,
             // Store tokens for JWT callback
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
+            accessToken: responseData.accessToken,
+            refreshToken: responseData.refreshToken,
           };
         } catch (error: unknown) {
           console.error('❌ Auth error:', error);
