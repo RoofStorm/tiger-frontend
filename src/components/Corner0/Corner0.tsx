@@ -6,7 +6,12 @@ import { Play, Pause, Volume2, VolumeX, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useVideo } from '@/contexts/VideoContext';
 
-export function Corner0() {
+interface Corner0Props {
+  onVideoEnded?: () => void;
+  hideSkip?: boolean;
+}
+
+export function Corner0({ onVideoEnded, hideSkip = false }: Corner0Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -17,6 +22,7 @@ export function Corner0() {
   const [showControls, setShowControls] = useState(true);
   const [isVideoEnded, setIsVideoEnded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasShownIntro, setHasShownIntro] = useState(false);
 
   // Sử dụng context để chia sẻ trạng thái video
   const { setIsVideoPlaying } = useVideo();
@@ -106,6 +112,10 @@ export function Corner0() {
       setIsVideoPlaying(false); // Cập nhật context
       setIsVideoEnded(true);
       setShowControls(true);
+      if (!hasShownIntro) {
+        setHasShownIntro(true);
+        if (onVideoEnded) onVideoEnded();
+      }
     };
     const handleError = (e: Event) => {
       console.warn('Video loading error, trying fallback:', e);
@@ -138,7 +148,7 @@ export function Corner0() {
       video.removeEventListener('error', handleError);
       video.removeEventListener('loadstart', handleLoadStart);
     };
-  }, [setIsVideoPlaying]);
+  }, [setIsVideoPlaying, onVideoEnded, hasShownIntro]);
 
   const togglePlay = async () => {
     const video = videoRef.current;
@@ -167,6 +177,20 @@ export function Corner0() {
           (err instanceof Error ? err.message : 'Unknown error')
       );
     }
+  };
+
+  // Skip button: stop video and trigger intro modal immediately
+  const handleSkipIntro = () => {
+    const video = videoRef.current;
+    if (!video || hasShownIntro) return;
+    try {
+      video.pause();
+    } catch {}
+    setIsPlaying(false);
+    setIsVideoPlaying(false);
+    setIsVideoEnded(true);
+    setShowControls(true);
+    if (onVideoEnded) onVideoEnded();
   };
 
   const toggleMute = () => {
@@ -209,8 +233,8 @@ export function Corner0() {
           ref={videoRef}
           className="w-full h-full object-cover"
           muted={isMuted}
-          loop
           playsInline
+          autoPlay
           preload="metadata"
           crossOrigin="anonymous"
         >
@@ -247,8 +271,20 @@ export function Corner0() {
         )}
       </AnimatePresence>
 
-      {/* Debug Info - Chỉ hiển thị trong development */}
-      {process.env.NODE_ENV === 'development' && (
+      {/* Skip Intro Button - bottom-right over video */}
+      {!hideSkip && !isLoading && (
+        <div className="absolute bottom-6 right-6 z-40">
+          <button
+            onClick={handleSkipIntro}
+            className="px-3 py-1.5 text-xs md:text-sm rounded-full bg-black/60 hover:bg-black/75 text-white border border-white/20 transition-colors"
+          >
+            Bỏ qua
+          </button>
+        </div>
+      )}
+
+      {/* Debug Info - tắt hiển thị */}
+      {false && (
         <div className="absolute top-4 left-4 bg-black/70 text-white text-xs p-2 rounded z-40">
           <div>
             🎬 Video Source: {videoRef.current?.currentSrc || 'Loading...'}

@@ -1,16 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { EmojiGrid } from '@/components/EmojiGrid';
 import { MoodCardCanvas } from '@/components/MoodCardCanvas';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { EmojiSelection } from '@/types';
-import {
-  findCombinationByEmojis,
-  getAllEmojis,
-} from '@/constants/emojiCombinations';
+import { findCombinationByEmojis } from '@/constants/emojiCombinations';
+import { EMOJI_OPTIONS } from '@/constants/emojis';
+import { Download, Share2 } from 'lucide-react';
 
 export function Corner1() {
   const [selectedEmojis, setSelectedEmojis] = useState<EmojiSelection[]>([]);
@@ -21,6 +20,9 @@ export function Corner1() {
     'mindful' | 'tiger-linked' | 'trendy' | null
   >(null);
   const [moodCardImage, setMoodCardImage] = useState<string>('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const downloadHandlerRef = useRef<(() => Promise<void>) | null>(null);
+  const shareHandlerRef = useRef<(() => Promise<void>) | null>(null);
   const { toast } = useToast();
 
   const handleEmojiSelect = (emoji: EmojiSelection) => {
@@ -223,145 +225,161 @@ export function Corner1() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-4">
-            Emoji Mood Corner
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
-            Chọn 3 emoji để tạo ra mood card cá nhân của bạn. Mỗi tổ hợp sẽ mang
-            đến một thông điệp đặc biệt.
+          <p className="text-base sm:text-lg text-gray-700 mb-4">
+            Giữa muôn vàn hối hả, hãy giữ cho mình một nhịp riêng mà bạn muốn
           </p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent">
+            Chọn nhịp sống của bạn hôm nay
+          </h1>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Emoji Selection */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-6"
-          >
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                Chọn Emoji
-              </h2>
-
-              {/* Emoji Grid */}
-              <EmojiGrid
-                emojis={getAllEmojis().map((emoji, index) => ({
-                  id: `emoji-${index}`,
-                  emoji,
-                  label: `Emoji ${index + 1}`,
-                }))}
-                selectedEmojis={selectedEmojis}
-                onEmojiSelect={handleEmojiSelect}
-                onEmojiRemove={handleEmojiRemove}
-              />
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 mt-6">
-                <Button
-                  onClick={handleGenerateMoodCard}
-                  disabled={selectedEmojis.length !== 3}
-                  className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  {selectedEmojis.length === 3
-                    ? 'Tạo Mood Card'
-                    : `Chọn thêm ${3 - selectedEmojis.length} emoji`}
-                </Button>
-
-                {selectedEmojis.length > 0 && (
-                  <Button
-                    onClick={handleReset}
-                    variant="outline"
-                    className="px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
-                  >
-                    Reset
-                  </Button>
-                )}
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Mood Card Preview */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="space-y-6"
-          >
-            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                Mood Card
-              </h2>
-
-              {showMoodCard ? (
-                <MoodCardCanvas
-                  selectedEmojis={selectedEmojis}
-                  whisper={whisper}
-                  reminder={reminder}
-                  category={combinationCategory}
-                  onSave={handleMoodCardGenerated}
-                  onShare={handleShareMoodCard}
-                  onReady={handleMoodCardReady}
-                />
-              ) : (
-                <div className="h-96 flex items-center justify-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                  <div className="text-center text-gray-500">
-                    <div className="text-4xl mb-2">🎨</div>
-                    <p className="text-lg">Chọn 3 emoji để tạo mood card</p>
-                  </div>
-                </div>
-              )}
-
-              {showMoodCard && (
-                <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                  <Button
-                    onClick={handleSaveMoodCard}
-                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    Lưu Mood Card
-                  </Button>
-
-                  <Button
-                    onClick={handleReset}
-                    variant="outline"
-                    className="px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
-                  >
-                    Tạo Mới
-                  </Button>
-                </div>
-              )}
-            </div>
-
-            {/* Category Info */}
-            {combinationCategory && (
+        <div className="w-full">
+          <AnimatePresence mode="wait">
+            {/* Emoji Selection - chỉ hiển thị khi chưa tạo mood card */}
+            {!showMoodCard && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-                className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/50"
+                key="emoji-selection"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="space-y-6"
               >
-                <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-3 h-3 rounded-full ${
-                      combinationCategory === 'mindful'
-                        ? 'bg-green-500'
-                        : combinationCategory === 'tiger-linked'
-                          ? 'bg-orange-500'
-                          : 'bg-blue-500'
-                    }`}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                  {/* Emoji Grid */}
+                  <EmojiGrid
+                    emojis={EMOJI_OPTIONS.map(emojiOption => ({
+                      id: emojiOption.id,
+                      emoji: emojiOption.emoji,
+                      label: emojiOption.label,
+                    }))}
+                    selectedEmojis={selectedEmojis}
+                    onEmojiSelect={handleEmojiSelect}
+                    onEmojiRemove={handleEmojiRemove}
                   />
-                  <span className="text-sm font-medium text-gray-600">
-                    {combinationCategory === 'mindful'
-                      ? 'Mindful & Touching'
-                      : combinationCategory === 'tiger-linked'
-                        ? 'Tiger-linked'
-                        : 'Trendy & Playful'}
-                  </span>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-3 mt-6">
+                    <Button
+                      onClick={handleGenerateMoodCard}
+                      disabled={selectedEmojis.length !== 3}
+                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      {selectedEmojis.length === 3
+                        ? 'Tạo Mood Card'
+                        : `Chọn thêm ${3 - selectedEmojis.length} emoji`}
+                    </Button>
+
+                    {selectedEmojis.length > 0 && (
+                      <Button
+                        onClick={handleReset}
+                        variant="outline"
+                        className="px-6 py-3 rounded-xl border-2 border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                      >
+                        Reset
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             )}
-          </motion.div>
+
+            {/* Mood Card Preview - chỉ hiển thị khi đã tạo mood card */}
+            {showMoodCard && (
+              <motion.div
+                key="mood-card-preview"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="space-y-6 flex flex-col"
+              >
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50 flex flex-col">
+                  <MoodCardCanvas
+                    selectedEmojis={selectedEmojis}
+                    whisper={whisper}
+                    reminder={reminder}
+                    category={combinationCategory}
+                    onSave={handleMoodCardGenerated}
+                    onShare={handleShareMoodCard}
+                    onReady={handleMoodCardReady}
+                    onDownloadReady={handler => {
+                      downloadHandlerRef.current = handler;
+                    }}
+                    onShareReady={handler => {
+                      shareHandlerRef.current = handler;
+                    }}
+                    onGeneratingChange={setIsGenerating}
+                  />
+
+                  <div className="mt-auto grid grid-cols-2 gap-3 pt-6">
+                    <Button
+                      onClick={handleSaveMoodCard}
+                      className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      Lưu Mood Card
+                    </Button>
+
+                    <Button
+                      onClick={() => downloadHandlerRef.current?.()}
+                      disabled={isGenerating}
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      {isGenerating ? 'Đang tạo...' : 'Tải xuống'}
+                    </Button>
+
+                    <Button
+                      onClick={() => shareHandlerRef.current?.()}
+                      disabled={isGenerating}
+                      variant="outline"
+                      className="w-full py-3 rounded-xl border-2 border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                    >
+                      <Share2 className="w-4 h-4 mr-2" />
+                      Chia sẻ
+                    </Button>
+
+                    <Button
+                      onClick={handleReset}
+                      variant="outline"
+                      className="w-full py-3 rounded-xl border-2 border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                    >
+                      Tạo Mới
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Category Info */}
+                {combinationCategory && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 shadow-lg border border-white/50"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className={`w-3 h-3 rounded-full ${
+                          combinationCategory === 'mindful'
+                            ? 'bg-green-500'
+                            : combinationCategory === 'tiger-linked'
+                              ? 'bg-orange-500'
+                              : 'bg-blue-500'
+                        }`}
+                      />
+                      <span className="text-sm font-medium text-gray-600">
+                        {combinationCategory === 'mindful'
+                          ? 'Mindful & Touching'
+                          : combinationCategory === 'tiger-linked'
+                            ? 'Tiger-linked'
+                            : 'Trendy & Playful'}
+                      </span>
+                    </div>
+                  </motion.div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

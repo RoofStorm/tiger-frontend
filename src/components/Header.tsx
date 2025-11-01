@@ -44,11 +44,19 @@ export function Header() {
   }, []);
 
   const navigationItems = [
-    { href: '#corner-0', label: 'Trang chủ' },
-    // { href: '#corner-1', label: 'Mục lục' },
-    // { href: '#corner-2', label: 'Ưu đãi' },
-    // { href: '#corner-3', label: 'Cá nhân' },
+    { label: 'Dừng lại và cảm nhận', corner: 0 },
+    { label: 'Nhịp sống', corner: 1 },
+    { label: 'Thử thách', corner: 2 },
+    { label: 'Nhịp bếp', corner: 4 },
+    { label: 'Quà tặng', corner: 5 },
   ];
+
+  const scrollToCorner = (cornerIndex: number) => {
+    const el = document.querySelector(`[data-corner="${cornerIndex}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -85,35 +93,35 @@ export function Header() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -100, scale: 0.95 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="fixed top-0 left-0 right-0 z-40"
+            className="fixed top-0 left-0 right-0 z-40 bg-blue-800/95 backdrop-blur-sm shadow-md"
           >
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 px-6 py-4">
-                <div className="flex items-center w-full">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+              <div className="px-0 py-0">
+                <div className="flex items-center w-full text-white">
                   {/* Logo - Left 1/3 */}
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="w-1/3 flex justify-start"
+                    className="flex-none flex justify-start"
                   >
                     <Link
                       href="/"
                       className="flex items-center space-x-3 group"
                     >
                       <div className="relative">
-                        <div className="w-10 h-10 bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+                        <div className="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
                           <span className="text-white font-bold text-xl">
                             T
                           </span>
                         </div>
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full animate-pulse"></div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-white/30 rounded-full"></div>
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
+                        <span className="text-xl font-bold text-white">
                           Tiger
                         </span>
-                        <span className="text-xs text-gray-500 -mt-1">
+                        <span className="text-xs text-blue-100 -mt-1">
                           Mood Corner
                         </span>
                       </div>
@@ -121,12 +129,16 @@ export function Header() {
                   </motion.div>
 
                   {/* Navigation - Center 1/3 */}
-                  <nav className="hidden sm:flex items-center justify-center w-1/3 space-x-2">
+                  <nav className="hidden sm:flex items-center justify-center flex-1 space-x-4">
                     {navigationItems.map(item => (
                       <Link
-                        key={item.href}
-                        href={item.href}
-                        className="inline-block px-4 py-2 text-blue-700 hover:text-blue-900 font-medium transition-colors duration-300 whitespace-nowrap rounded-lg hover:bg-blue-50 w-fit"
+                        key={item.label}
+                        href={`#corner-${item.corner}`}
+                        onClick={e => {
+                          e.preventDefault();
+                          scrollToCorner(item.corner);
+                        }}
+                        className="inline-block px-3 py-2 text-white hover:text-blue-100 font-medium transition-colors duration-300 whitespace-nowrap rounded-lg"
                       >
                         {item.label}
                       </Link>
@@ -134,9 +146,9 @@ export function Header() {
                   </nav>
 
                   {/* Auth Buttons - Right 1/3 */}
-                  <div className="flex items-center justify-end w-1/3 space-x-3">
+                  <div className="flex items-center justify-end flex-none space-x-3">
                     {isAuthenticated ? (
-                      <div className="relative" ref={dropdownRef}>
+                      <div className="relative inline-block" ref={dropdownRef}>
                         <motion.div
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
@@ -146,9 +158,9 @@ export function Header() {
                             onClick={() =>
                               setIsUserDropdownOpen(!isUserDropdownOpen)
                             }
-                            className="text-blue-700 hover:text-blue-900 font-medium flex items-center space-x-2"
+                            className="text-white hover:text-blue-100 font-medium inline-flex items-center space-x-2 w-auto"
                           >
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
+                            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                               {user?.image ? (
                                 <Image
                                   src={user.image}
@@ -246,9 +258,8 @@ export function Header() {
                     ) : (
                       <>
                         <Button
-                          variant="ghost"
                           asChild
-                          className="text-blue-700 hover:text-blue-900 font-medium px-4 py-2"
+                          className="bg-white text-blue-800 hover:bg-white/90 font-medium px-4 py-2 rounded-full border border-white"
                         >
                           <Link href="/auth/register">Đăng ký</Link>
                         </Button>
@@ -258,7 +269,7 @@ export function Header() {
                         >
                           <Button
                             asChild
-                            className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium px-4 py-2 rounded-lg"
+                            className="bg-transparent border border-white text-white hover:bg-white/10 font-medium px-4 py-2 rounded-full"
                           >
                             <Link href="/auth/login">Đăng nhập</Link>
                           </Button>
@@ -274,13 +285,13 @@ export function Header() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="sm:hidden p-2 hover:bg-gray-100 transition-colors duration-300 rounded-full"
+                        className="sm:hidden p-2 hover:bg-white/10 transition-colors duration-300 rounded-full text-white"
                         onClick={() => setIsMenuOpen(!isMenuOpen)}
                       >
                         {isMenuOpen ? (
-                          <X className="w-5 h-5 text-gray-700" />
+                          <X className="w-5 h-5" />
                         ) : (
-                          <Menu className="w-5 h-5 text-gray-700" />
+                          <Menu className="w-5 h-5" />
                         )}
                       </Button>
                     </motion.div>
@@ -297,7 +308,7 @@ export function Header() {
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="sm:hidden bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg border border-gray-200/50 mx-4 mt-2 overflow-hidden"
+                  className="sm:hidden bg-white rounded-2xl shadow-lg border border-gray-200 mx-4 mt-2 overflow-hidden"
                 >
                   <div className="px-6 py-4 space-y-3">
                     {navigationItems.map(item => (
