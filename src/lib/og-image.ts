@@ -21,7 +21,8 @@ export function createOGImage(
 ): OGImageConfig {
   // URL ảnh mặc định nếu không có ảnh
   const defaultImage =
-    fallbackUrl || `${process.env.NEXTAUTH_URL}/default-post-image.jpg`;
+    fallbackUrl ||
+    'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
 
   // Sử dụng ảnh gốc nếu có, ngược lại dùng ảnh mặc định
   const finalImageUrl = imageUrl || defaultImage;
@@ -40,25 +41,27 @@ export function createOGImage(
  * @returns boolean
  */
 export function isValidOGImage(imageUrl: string): boolean {
+  if (!imageUrl) return false;
+
   // Kiểm tra URL hợp lệ
   try {
-    new URL(imageUrl);
+    const url = new URL(imageUrl);
+    // Kiểm tra HTTPS
+    if (url.protocol !== 'https:') {
+      return false;
+    }
+
+    // Kiểm tra định dạng ảnh được hỗ trợ (tìm trong pathname, không phải query params)
+    const pathname = url.pathname.toLowerCase();
+    const supportedFormats = ['.jpg', '.jpeg', '.png', '.webp'];
+    const hasValidFormat = supportedFormats.some(format =>
+      pathname.includes(format)
+    );
+
+    return hasValidFormat;
   } catch {
     return false;
   }
-
-  // Kiểm tra HTTPS
-  if (!imageUrl.startsWith('https://')) {
-    return false;
-  }
-
-  // Kiểm tra định dạng ảnh được hỗ trợ
-  const supportedFormats = ['.jpg', '.jpeg', '.png', '.webp'];
-  const hasValidFormat = supportedFormats.some(format =>
-    imageUrl.toLowerCase().includes(format)
-  );
-
-  return hasValidFormat;
 }
 
 /**
@@ -80,23 +83,27 @@ export function selectBestOGImage(
 /**
  * Tạo ảnh preview từ bài viết
  * @param post - Object bài viết
+ * @param fallbackUrl - URL ảnh mặc định nếu không có ảnh hợp lệ
  * @returns OGImageConfig object
  */
-export function generatePostOGImage(post: {
-  imageUrl?: string;
-  images?: string[];
-  title: string;
-}): OGImageConfig {
+export function generatePostOGImage(
+  post: {
+    imageUrl?: string;
+    images?: string[];
+    title: string;
+  },
+  fallbackUrl?: string
+): OGImageConfig {
   // Ưu tiên ảnh chính
   if (post.imageUrl && isValidOGImage(post.imageUrl)) {
-    return createOGImage(post.imageUrl);
+    return createOGImage(post.imageUrl, fallbackUrl);
   }
 
   // Nếu có nhiều ảnh, chọn ảnh đầu tiên
   if (post.images && post.images.length > 0) {
-    return selectBestOGImage(post.images);
+    return selectBestOGImage(post.images, fallbackUrl);
   }
 
   // Sử dụng ảnh mặc định
-  return createOGImage();
+  return createOGImage(undefined, fallbackUrl);
 }

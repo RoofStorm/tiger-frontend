@@ -53,6 +53,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'example.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'tiger-minio.fly.dev',
+      },
     ],
   },
   serverExternalPackages: ['html2canvas'],

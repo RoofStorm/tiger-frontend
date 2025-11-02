@@ -260,17 +260,20 @@ export function Corner2_2() {
       return;
     }
 
-    // Tạo URL preview cho bài viết
+    // Tạo URL preview cho bài viết - Ưu tiên production URL
+    // Facebook cần HTTPS và public URL để crawl meta tags
     const baseUrl =
       process.env.NEXT_PUBLIC_PUBLIC_URL ||
+      (typeof window !== 'undefined' ? window.location.origin : null) ||
       process.env.NEXTAUTH_URL ||
-      'http://localhost:3000';
+      'https://tiger-frontend-eta.vercel.app'; // Fallback to production URL
     const postUrl = `${baseUrl}/posts/${post.id}`;
     const postTitle = post.caption || 'Bài viết nổi bật từ Tiger Mood Corner';
     const postDescription = post.caption
       ? `${post.caption.substring(0, 160)}...`
       : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.';
-    const postImage = `${baseUrl}/default-post-image.jpg`;
+    const postImage =
+      'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
 
     // Console log để kiểm tra URL preview
     console.log('🔗 Share URL Preview:', {

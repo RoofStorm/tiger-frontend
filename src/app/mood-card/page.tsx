@@ -60,7 +60,8 @@ export async function generateMetadata({
     process.env.NEXT_PUBLIC_PUBLIC_URL ||
     process.env.NEXTAUTH_URL ||
     'http://localhost:3000';
-  const imageUrl = `${baseUrl}/default-post-image.jpg`;
+  const imageUrl =
+    'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
 
   return {
     title,
