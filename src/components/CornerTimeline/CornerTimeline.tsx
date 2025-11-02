@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
-import apiClient from '@/lib/api';
 
 interface Post {
   id: string;

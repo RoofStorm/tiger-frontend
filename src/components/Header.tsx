@@ -313,10 +313,14 @@ export function Header() {
                   <div className="px-6 py-4 space-y-3">
                     {navigationItems.map(item => (
                       <Link
-                        key={item.href}
-                        href={item.href}
+                        key={item.label}
+                        href={`#corner-${item.corner}`}
+                        onClick={e => {
+                          e.preventDefault();
+                          scrollToCorner(item.corner);
+                          setIsMenuOpen(false);
+                        }}
                         className="block px-4 py-2 text-blue-700 hover:text-blue-900 font-medium transition-colors duration-300 rounded-lg hover:bg-blue-50"
-                        onClick={() => setIsMenuOpen(false)}
                       >
                         {item.label}
                       </Link>
