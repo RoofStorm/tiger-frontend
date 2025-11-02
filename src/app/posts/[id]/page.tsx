@@ -8,7 +8,10 @@ import PostDetailClient from '@/components/PostDetailClient';
 async function getPost(postId: string): Promise<Post | null> {
   try {
     // Use direct fetch instead of apiClient to avoid authentication issues on server-side
-    const response = await fetch(`http://localhost:4000/api/posts/${postId}`, {
+    // Use environment variable for backend URL (works in both local and production)
+    const apiBaseUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+    const response = await fetch(`${apiBaseUrl}/posts/${postId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
