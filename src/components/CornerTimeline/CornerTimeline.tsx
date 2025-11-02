@@ -250,14 +250,6 @@ export function CornerTimeline() {
 
                   const pos = getPos(index);
 
-                  // Debug: log để kiểm tra
-                  const diff =
-                    (index - currentSlide + highlightedPosts.length) %
-                    highlightedPosts.length;
-                  console.log(
-                    `[DEBUG] Slide ${index + 1} (ID: ${post.id}): diff=${diff}, pos=${pos}, currentSlide=${currentSlide}, total=${highlightedPosts.length}`
-                  );
-
                   if (pos === 99) return null; // Chỉ hiển thị 5 slides gần center
 
                   const isCenter = pos === 0;
@@ -281,8 +273,8 @@ export function CornerTimeline() {
                     pos === 0 ? 1.12 : Math.abs(pos) === 1 ? 0.94 : 0.8; // ±2 tăng từ 0.75 lên 0.8 để thấy rõ hơn
                   const opacity =
                     pos === 0 ? 1 : Math.abs(pos) === 1 ? 0.6 : 0.5; // ±2 tăng từ 0.4 lên 0.5 để thấy rõ hơn
-                  // Z-index: center cao nhất, ±1 cao hơn ±2
-                  const zIndex = pos === 0 ? 40 : Math.abs(pos) === 1 ? 30 : 20;
+                  // Z-index: center cao nhất, ±1 cao hơn ±2 (thấp hơn header z-40)
+                  const zIndex = pos === 0 ? 30 : Math.abs(pos) === 1 ? 20 : 10;
 
                   // Kích thước responsive - slides ±2 nhỏ hơn ±1
                   const getHeight = (position: number) => {

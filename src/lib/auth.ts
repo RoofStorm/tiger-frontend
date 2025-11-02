@@ -8,26 +8,22 @@ import {
   checkDailyBonusAwarded,
   markDailyBonusAwarded,
   getTodayDateString,
-} from './redis';
+} from './cache';
 import { POINTS } from '@/constants/points';
 
-// Helper function to award daily login bonus with Redis cache
+// Helper function to award daily login bonus with in-memory cache
 async function awardDailyLoginBonus(userId: string, provider: string) {
   try {
     const today = getTodayDateString();
 
-    // Check Redis cache first
+    // Check in-memory cache first (fast)
     const alreadyAwarded = await checkDailyBonusAwarded(userId, today);
 
     if (alreadyAwarded) {
-      console.log(
-        `🎁 Daily login bonus already awarded today for ${provider} user:`,
-        userId
-      );
       return;
     }
 
-    // Double-check with database as fallback
+    // Double-check with database as fallback (source of truth)
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
     const tomorrow = new Date(todayDate);
@@ -45,11 +41,7 @@ async function awardDailyLoginBonus(userId: string, provider: string) {
     });
 
     if (todayLogs.length > 0) {
-      console.log(
-        `🎁 Daily login bonus already awarded today (DB check) for ${provider} user:`,
-        userId
-      );
-      // Mark in Redis cache for future requests
+      // Mark in cache for future requests
       await markDailyBonusAwarded(userId, today);
       return;
     }
@@ -73,12 +65,8 @@ async function awardDailyLoginBonus(userId: string, provider: string) {
       },
     });
 
-    // Mark as awarded in Redis cache
+    // Mark as awarded in cache
     await markDailyBonusAwarded(userId, today);
-
-    console.log(
-      `🎁 Daily login bonus awarded successfully to ${provider} user: ${POINTS.DAILY_LOGIN_BONUS} points`
-    );
   } catch (error) {
     console.error(
       `❌ Error awarding daily login bonus to ${provider} user:`,
@@ -115,7 +103,6 @@ export const authOptions: NextAuthOptions = {
           const apiBaseUrl =
             process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
 
-          console.log('🔐 Calling backend login API...');
           const response = await fetch(`${apiBaseUrl}/auth/login`, {
             method: 'POST',
             headers: {
@@ -154,8 +141,6 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          console.log('✅ Login successful for user:', responseData.user.email);
-
           // Store tokens for later use in JWT callback
           // We'll attach these to the user object so they're available in JWT callback
           return {
@@ -187,18 +172,21 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === 'google') {
         try {
-          console.log('🔍 Google sign in for user:', user.email);
+          if (!user.email) {
+            console.error('❌ No email provided by Google');
+            return false;
+          }
 
           // Check if user exists
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
+          let existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
           });
 
           if (!existingUser) {
             // Create new user for Google login
-            await prisma.user.create({
+            existingUser = await prisma.user.create({
               data: {
-                email: user.email!,
+                email: user.email,
                 name: user.name || 'Google User',
                 avatarUrl: user.image,
                 loginMethod: 'GOOGLE',
@@ -210,31 +198,42 @@ export const authOptions: NextAuthOptions = {
           } else {
             // Update existing user's login method if needed
             if (existingUser.loginMethod !== 'GOOGLE') {
-              await prisma.user.update({
+              existingUser = await prisma.user.update({
                 where: { id: existingUser.id },
                 data: {
                   loginMethod: 'GOOGLE',
                   avatarUrl: user.image,
                 },
               });
-              console.log('✅ Updated user login method to Google');
             }
           }
 
-          // Award daily login bonus for all users (new and existing)
-          // NOTE: This uses direct DB access. If user already logged in with credentials today,
-          // Redis/DB check will prevent duplicate. Should refactor to use backend API for consistency.
-          const userId =
-            existingUser?.id ||
-            (
-              await prisma.user.findUnique({
-                where: { email: user.email! },
-              })
-            )?.id;
-
-          if (userId) {
-            await awardDailyLoginBonus(userId, 'google');
+          // Award daily login bonus (non-blocking - don't fail sign in if this fails)
+          if (existingUser?.id) {
+            try {
+              // Use Promise with timeout to prevent hanging
+              await Promise.race([
+                awardDailyLoginBonus(existingUser.id, 'google'),
+                new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error('Timeout')), 5000)
+                ),
+              ]).catch(error => {
+                console.warn(
+                  '⚠️ Daily bonus award failed (non-critical):',
+                  error
+                );
+                // Don't throw - allow sign in to continue
+              });
+            } catch (error) {
+              console.warn(
+                '⚠️ Error awarding daily bonus (non-critical):',
+                error
+              );
+              // Continue with sign in even if bonus fails
+            }
           }
+
+          return true;
         } catch (error) {
           console.error('❌ Error in Google sign in:', error);
           return false;
@@ -243,16 +242,21 @@ export const authOptions: NextAuthOptions = {
 
       if (account?.provider === 'facebook') {
         try {
+          if (!user.email) {
+            console.error('❌ No email provided by Facebook');
+            return false;
+          }
+
           // Check if user exists
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
+          let existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
           });
 
           if (!existingUser) {
             // Create new user for Facebook login
-            const newUser = await prisma.user.create({
+            existingUser = await prisma.user.create({
               data: {
-                email: user.email!,
+                email: user.email,
                 name: user.name || 'Facebook User',
                 avatarUrl: user.image,
                 loginMethod: 'FACEBOOK',
@@ -261,35 +265,45 @@ export const authOptions: NextAuthOptions = {
                 points: 0, // Starting points
               },
             });
-            console.log('✅ New Facebook user created:', newUser.email);
           } else {
             // Update existing user's login method if needed
             if (existingUser.loginMethod !== 'FACEBOOK') {
-              await prisma.user.update({
+              existingUser = await prisma.user.update({
                 where: { id: existingUser.id },
                 data: {
                   loginMethod: 'FACEBOOK',
                   avatarUrl: user.image,
                 },
               });
-              console.log('✅ Updated user login method to Facebook');
             }
           }
 
-          // Award daily login bonus for all users (new and existing)
-          // NOTE: This uses direct DB access. If user already logged in with credentials today,
-          // Redis/DB check will prevent duplicate. Should refactor to use backend API for consistency.
-          const userId =
-            existingUser?.id ||
-            (
-              await prisma.user.findUnique({
-                where: { email: user.email! },
-              })
-            )?.id;
-
-          if (userId) {
-            await awardDailyLoginBonus(userId, 'facebook');
+          // Award daily login bonus (non-blocking - don't fail sign in if this fails)
+          if (existingUser?.id) {
+            try {
+              // Use Promise with timeout to prevent hanging
+              await Promise.race([
+                awardDailyLoginBonus(existingUser.id, 'facebook'),
+                new Promise((_, reject) =>
+                  setTimeout(() => reject(new Error('Timeout')), 5000)
+                ),
+              ]).catch(error => {
+                console.warn(
+                  '⚠️ Daily bonus award failed (non-critical):',
+                  error
+                );
+                // Don't throw - allow sign in to continue
+              });
+            } catch (error) {
+              console.warn(
+                '⚠️ Error awarding daily bonus (non-critical):',
+                error
+              );
+              // Continue with sign in even if bonus fails
+            }
           }
+
+          return true;
         } catch (error) {
           console.error('❌ Error in Facebook sign in:', error);
           return false;
