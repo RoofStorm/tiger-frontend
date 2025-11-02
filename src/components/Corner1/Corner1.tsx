@@ -120,11 +120,13 @@ export function Corner1() {
   };
 
   const openFacebookShareDialog = () => {
-    // Tạo URL preview cho mood card
+    // Tạo URL preview cho mood card - Ưu tiên HTTPS và public URL
+    // Facebook cần HTTPS và public URL để crawl meta tags
     const baseUrl =
       process.env.NEXT_PUBLIC_PUBLIC_URL ||
+      (typeof window !== 'undefined' ? window.location.origin : null) ||
       process.env.NEXTAUTH_URL ||
-      'http://localhost:3000';
+      'https://tiger-frontend-eta.vercel.app'; // Fallback to production URL
     const shareUrl = `${baseUrl}/mood-card?emojis=${selectedEmojis.map(e => e.id).join(',')}&whisper=${encodeURIComponent(whisper)}&reminder=${encodeURIComponent(reminder)}`;
 
     // Tạo title và description cho mood card
@@ -159,6 +161,24 @@ export function Corner1() {
     } else {
       moodCardDescription = `Khám phá cảm xúc của bạn qua emoji: ${emojiString}\n\n#TigerMoodCorner #MoodCard`;
     }
+
+    // Console log để debug imageUrl
+    console.log('🖼️ [MOOD CARD SHARE DEBUG] Image URL:', {
+      moodCardImage: moodCardImage,
+      shareUrl: shareUrl,
+      baseUrl: baseUrl,
+      moodCardTitle: moodCardTitle,
+      moodCardDescription: moodCardDescription,
+      emojis: selectedEmojis.map(e => e.emoji),
+      whisper: whisper,
+      reminder: reminder,
+      fullMoodCard: {
+        selectedEmojis,
+        whisper,
+        reminder,
+        combinationCategory,
+      },
+    });
 
     // Console log để kiểm tra
     console.log('🎨 Mood Card Share Preview:', {

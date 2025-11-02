@@ -295,15 +295,26 @@ export function Corner2_1() {
       return;
     }
 
-    // Tạo URL preview cho bài viết
+    // Tạo URL preview cho bài viết - Ưu tiên HTTPS và public URL
+    // Facebook cần HTTPS và public URL để crawl meta tags
     const baseUrl =
       process.env.NEXT_PUBLIC_PUBLIC_URL ||
+      (typeof window !== 'undefined' ? window.location.origin : null) ||
       process.env.NEXTAUTH_URL ||
-      'http://localhost:3000';
+      'https://tiger-frontend-eta.vercel.app'; // Fallback to production URL
     const postUrl = `${baseUrl}/posts/${post.id}`;
+
+    // Console log để debug imageUrl
+    console.log('🖼️ [SHARE DEBUG] Image URL:', {
+      postId: post.id,
+      imageUrl: post.imageUrl,
+      postUrl: postUrl,
+      fullPost: post,
+    });
 
     // Tạo Facebook Share URL
     const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+    console.log('📱 Facebook Share URL:', facebookShareUrl);
 
     // Mở popup Facebook Share Dialog
     const popup = window.open(

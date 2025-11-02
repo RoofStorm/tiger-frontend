@@ -56,10 +56,11 @@ export async function generateMetadata({
     description = `Khám phá cảm xúc của bạn qua emoji: ${emojiString}\n\n#TigerMoodCorner #MoodCard`;
   }
 
+  // Ưu tiên HTTPS production URL cho Facebook preview
   const baseUrl =
     process.env.NEXT_PUBLIC_PUBLIC_URL ||
     process.env.NEXTAUTH_URL ||
-    'http://localhost:3000';
+    'https://tiger-frontend-eta.vercel.app'; // Fallback to production HTTPS URL
   const imageUrl =
     'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
 

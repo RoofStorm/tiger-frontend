@@ -273,7 +273,20 @@ export function Corner2_2() {
       ? `${post.caption.substring(0, 160)}...`
       : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.';
     const postImage =
+      post.imageUrl ||
       'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
+
+    // Console log để debug imageUrl
+    console.log('🖼️ [SHARE DEBUG] Image URL:', {
+      postId: post.id,
+      imageUrl: post.imageUrl,
+      postImage: postImage,
+      postUrl: postUrl,
+      postTitle: postTitle,
+      postDescription: postDescription,
+      isHighlighted: post.isHighlighted,
+      fullPost: post,
+    });
 
     // Console log để kiểm tra URL preview
     console.log('🔗 Share URL Preview:', {
