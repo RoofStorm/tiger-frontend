@@ -2,25 +2,24 @@ export const EMOJI_OPTIONS: Array<{
   id: string;
   emoji: string;
   label: string;
+  imageUrl: string;
 }> = [
-  // 12 emoji từ hình
-  { id: 'excited', emoji: '🤩', label: 'Thú vị' },
-  { id: 'happy', emoji: '😊', label: 'Vui vẻ' },
-  { id: 'stressed', emoji: '😰', label: 'Căng thẳng' },
-  { id: 'sad', emoji: '😢', label: 'Buồn' },
-  { id: 'scared', emoji: '😨', label: 'Sợ' },
-  { id: 'ashamed', emoji: '😳', label: 'Xấu hổ' },
-  { id: 'unwell', emoji: '🤒', label: 'Không khỏe' },
-  { id: 'silly', emoji: '😜', label: 'Ngớ ngẩn' },
-  { id: 'worried', emoji: '😟', label: 'Lo lắng' },
-  { id: 'sleepy', emoji: '😴', label: 'Buồn ngủ' },
-  { id: 'angry', emoji: '😠', label: 'Giận dữ' },
-  { id: 'bored', emoji: '😑', label: 'Chán nản' },
-  // Thêm 4 emoji để đủ 16
-  { id: 'peaceful', emoji: '😌', label: 'Bình yên' },
-  { id: 'loved', emoji: '🥰', label: 'Được yêu thương' },
-  { id: 'confident', emoji: '😎', label: 'Tự tin' },
-  { id: 'grateful', emoji: '🙏', label: 'Biết ơn' },
+  // 12 emoji từ hình - thứ tự theo giao diện
+  // Row 1
+  { id: 'bored', emoji: '😑', label: 'Chán nản', imageUrl: '/emoji/EMO_channan.png' },
+  { id: 'happy', emoji: '😊', label: 'Vui vẻ', imageUrl: '/emoji/EMO_vuive.png' },
+  { id: 'scared', emoji: '😨', label: 'Sợ', imageUrl: '/emoji/EMO_so.png' },
+  { id: 'sleepy', emoji: '😴', label: 'Buồn ngủ', imageUrl: '/emoji/EMO_buonngu.png' },
+  // Row 2
+  { id: 'unwell', emoji: '🤒', label: 'Không khỏe', imageUrl: '/emoji/EMO_benh.png' },
+  { id: 'silly', emoji: '😜', label: 'Ngớ ngẩn', imageUrl: '/emoji/EMO_ngongan.png' },
+  { id: 'excited', emoji: '🤩', label: 'Thú vị', imageUrl: '/emoji/EMO_thuvi.png' },
+  { id: 'sad', emoji: '😢', label: 'Buồn', imageUrl: '/emoji/EMO_buon.png' },
+  // Row 3
+  { id: 'angry', emoji: '😠', label: 'Giận dữ', imageUrl: '/emoji/EMO_giandu.png' },
+  { id: 'worried', emoji: '😟', label: 'Lo lắng', imageUrl: '/emoji/EMO_lolang.png' },
+  { id: 'ashamed', emoji: '😳', label: 'Xấu hổ', imageUrl: '/emoji/EMO_xauho.png' },
+  { id: 'stressed', emoji: '😰', label: 'Căng thẳng', imageUrl: '/emoji/EMO_cangthang.png' },
 ];
 
 export const WHISPER_TEXTS = [

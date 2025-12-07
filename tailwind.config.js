@@ -7,6 +7,11 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        nunito: ['var(--font-nunito)', 'sans-serif'],
+        'noto-sans': ['var(--font-noto-sans)', 'sans-serif'],
+        prata: ['var(--font-prata)', 'serif'],
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -47,6 +52,11 @@ module.exports = {
           '3': 'hsl(var(--chart-3))',
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
+        },
+        tiger: {
+          blue: {
+            600: '#00579F',
+          },
         },
       },
       borderRadius: {

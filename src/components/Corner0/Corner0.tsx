@@ -9,9 +9,10 @@ import { useVideo } from '@/contexts/VideoContext';
 interface Corner0Props {
   onVideoEnded?: () => void;
   hideSkip?: boolean;
+  onSkip?: () => void;
 }
 
-export function Corner0({ onVideoEnded, hideSkip = false }: Corner0Props) {
+export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -181,6 +182,10 @@ export function Corner0({ onVideoEnded, hideSkip = false }: Corner0Props) {
 
   // Skip button: stop video and trigger intro modal immediately
   const handleSkipIntro = () => {
+    if (onSkip) {
+      onSkip();
+      return;
+    }
     const video = videoRef.current;
     if (!video || hasShownIntro) return;
     try {

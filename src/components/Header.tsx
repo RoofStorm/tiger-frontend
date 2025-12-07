@@ -42,19 +42,12 @@ export function Header() {
   }, []);
 
   const navigationItems = [
-    { label: 'Dừng lại và cảm nhận', corner: 0 },
-    { label: 'Nhịp sống', corner: 1 },
-    { label: 'Thử thách', corner: 2 },
-    { label: 'Nhịp bếp', corner: 4 },
-    { label: 'Quà tặng', corner: 5 },
+    { label: 'Trang chủ', href: '/' },
+    { label: 'Nhịp sống', href: '/nhip-song' },
+    { label: 'Thử thách giữ nhịp', href: '/thu-thach-giu-nhip' },
+    { label: 'Nhịp bếp', href: '/nhip-bep' },
+    { label: 'Ưu đãi', href: '/uu-dai' },
   ];
-
-  const scrollToCorner = (cornerIndex: number) => {
-    const el = document.querySelector(`[data-corner="${cornerIndex}"]`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
 
   return (
     <>
@@ -63,54 +56,97 @@ export function Header() {
         initial={{ opacity: 0, y: -100, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="fixed top-0 left-0 right-0 z-40 bg-blue-800/95 backdrop-blur-sm shadow-md"
+        className="relative top-0 left-0 right-0 z-40"
       >
+        {/* Logo - Absolute left */}
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 0.2 }}
+          className="absolute left-12 top-1/2 -translate-y-1/2 z-50"
+        >
+          <Link href="/" className="flex items-center group">
+            <Image
+              src="/icons/tiger_logo.png"
+              alt="Tiger Logo"
+              width={120}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </Link>
+        </motion.div>
+
+        {/* Auth Buttons - Absolute right */}
+        {!isAuthenticated && (
+          <div className="absolute right-12 top-1/2 -translate-y-1/2 z-50 flex items-center" style={{ gap: '8px' }}>
+            <Button
+              asChild
+              className="font-medium hover:opacity-90 min-w-[150px]"
+              style={{ 
+                backgroundColor: '#00579F', 
+                color: '#ffffff',
+                borderRadius: '8px',
+                paddingTop: '4px',
+                paddingRight: '8px',
+                paddingBottom: '4px',
+                paddingLeft: '8px',
+                gap: '8px',
+                opacity: 1,
+                fontSize: '16px'
+              }}
+            >
+              <Link href="/auth/register">Đăng ký</Link>
+            </Button>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button
+                asChild
+                className="bg-transparent font-medium hover:bg-gray-50 min-w-[150px]"
+                style={{ 
+                  color: '#333435', 
+                  border: '1px solid #333435',
+                  borderRadius: '8px',
+                  paddingTop: '4px',
+                  paddingRight: '8px',
+                  paddingBottom: '4px',
+                  paddingLeft: '8px',
+                  gap: '8px',
+                  opacity: 1,
+                  fontSize: '16px'
+                }}
+              >
+                <Link href="/auth/login">Đăng nhập</Link>
+              </Button>
+            </motion.div>
+          </div>
+        )}
+
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="px-0 py-0">
-            <div className="flex items-center w-full text-white">
-              {/* Logo - Left 1/3 */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="flex-none flex justify-start"
-              >
-                <Link href="/" className="flex items-center space-x-3 group">
-                  <div className="relative">
-                    <div className="w-10 h-10 bg-white/10 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-                      <span className="text-white font-bold text-xl">T</span>
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-white/30 rounded-full"></div>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-xl font-bold text-white">Tiger</span>
-                    <span className="text-xs text-blue-100 -mt-1">
-                      Mood Corner
-                    </span>
-                  </div>
-                </Link>
-              </motion.div>
-
+            <div className="flex items-center w-full" style={{ color: '#333435' }}>
               {/* Navigation - Center 1/3 */}
               <nav className="hidden sm:flex items-center justify-center flex-1 space-x-4">
                 {navigationItems.map(item => (
                   <Link
                     key={item.label}
-                    href={`#corner-${item.corner}`}
-                    onClick={e => {
-                      e.preventDefault();
-                      scrollToCorner(item.corner);
+                    href={item.href}
+                    onClick={() => {
+                      navigateWithLoading(item.href, `Đang chuyển đến ${item.label}...`);
                     }}
-                    className="inline-block px-3 py-2 text-white hover:text-blue-100 font-medium transition-colors duration-300 whitespace-nowrap rounded-lg"
+                    className="inline-block px-3 py-2 font-medium transition-colors duration-300 whitespace-nowrap rounded-lg hover:opacity-70"
+                    style={{ color: '#333435', fontSize: '16px' }}
                   >
                     {item.label}
                   </Link>
                 ))}
               </nav>
 
-              {/* Auth Buttons - Right 1/3 */}
-              <div className="flex items-center justify-end flex-none space-x-3">
-                {isAuthenticated ? (
+              {/* User Button - Right 1/3 */}
+              {isAuthenticated && (
+                <div className="flex items-center justify-end flex-none">
                   <div className="relative inline-block" ref={dropdownRef}>
                     <motion.div
                       whileHover={{ scale: 1.05 }}
@@ -121,9 +157,10 @@ export function Header() {
                         onClick={() =>
                           setIsUserDropdownOpen(!isUserDropdownOpen)
                         }
-                        className="text-white hover:text-blue-100 font-medium inline-flex items-center space-x-2 w-auto"
+                        className="font-medium inline-flex items-center space-x-2 w-auto hover:opacity-70"
+                        style={{ color: '#333435' }}
                       >
-                        <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
                           {user?.image ? (
                             <Image
                               src={user.image}
@@ -136,7 +173,7 @@ export function Header() {
                               )}
                             />
                           ) : (
-                            <span className="text-white font-bold text-sm">
+                            <span className="font-bold text-sm" style={{ color: '#333435' }}>
                               {user?.name?.charAt(0).toUpperCase()}
                             </span>
                           )}
@@ -218,47 +255,28 @@ export function Header() {
                       )}
                     </AnimatePresence>
                   </div>
-                ) : (
-                  <>
-                    <Button
-                      asChild
-                      className="bg-white text-blue-800 hover:bg-white/90 font-medium px-4 py-2 rounded-full border border-white"
-                    >
-                      <Link href="/auth/register">Đăng ký</Link>
-                    </Button>
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Button
-                        asChild
-                        className="bg-transparent border border-white text-white hover:bg-white/10 font-medium px-4 py-2 rounded-full"
-                      >
-                        <Link href="/auth/login">Đăng nhập</Link>
-                      </Button>
-                    </motion.div>
-                  </>
-                )}
+                </div>
+              )}
 
-                {/* Mobile Menu Button */}
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+              {/* Mobile Menu Button */}
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="sm:hidden p-2 hover:bg-gray-100 transition-colors duration-300 rounded-full"
+                  style={{ color: '#333435' }}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="sm:hidden p-2 hover:bg-white/10 transition-colors duration-300 rounded-full text-white"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  >
-                    {isMenuOpen ? (
-                      <X className="w-5 h-5" />
-                    ) : (
-                      <Menu className="w-5 h-5" />
-                    )}
-                  </Button>
-                </motion.div>
-              </div>
+                  {isMenuOpen ? (
+                    <X className="w-5 h-5" />
+                  ) : (
+                    <Menu className="w-5 h-5" />
+                  )}
+                </Button>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -277,11 +295,10 @@ export function Header() {
                 {navigationItems.map(item => (
                   <Link
                     key={item.label}
-                    href={`#corner-${item.corner}`}
-                    onClick={e => {
-                      e.preventDefault();
-                      scrollToCorner(item.corner);
+                    href={item.href}
+                    onClick={() => {
                       setIsMenuOpen(false);
+                      navigateWithLoading(item.href, `Đang chuyển đến ${item.label}...`);
                     }}
                     className="block px-4 py-2 text-blue-700 hover:text-blue-900 font-medium transition-colors duration-300 rounded-lg hover:bg-blue-50"
                   >
@@ -347,15 +364,16 @@ export function Header() {
                 ) : (
                   <div className="pt-3 border-t border-gray-200 space-y-2">
                     <Button
-                      variant="ghost"
                       asChild
-                      className="w-full text-blue-700 hover:text-blue-900 font-medium"
+                      className="w-full font-medium hover:opacity-90"
+                      style={{ backgroundColor: '#00579F', color: '#ffffff' }}
                     >
                       <Link href="/auth/register">Đăng ký</Link>
                     </Button>
                     <Button
                       asChild
-                      className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium"
+                      className="w-full bg-transparent font-medium hover:bg-gray-50"
+                      style={{ color: '#333435', border: '1px solid #333435' }}
                     >
                       <Link href="/auth/login">Đăng nhập</Link>
                     </Button>

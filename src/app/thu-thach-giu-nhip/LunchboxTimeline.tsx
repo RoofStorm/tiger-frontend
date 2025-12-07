@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Pause, Play } from 'lucide-react';
 
 interface Post {
   id: string;
@@ -15,7 +15,7 @@ interface Post {
   };
 }
 
-export function CornerTimeline() {
+export function LunchboxTimeline() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -143,31 +143,9 @@ export function CornerTimeline() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="mt-16 pt-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Title Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12 space-y-6"
-        >
-          <div className="space-y-2">
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-blue-900">
-              Cột mốc thời gian
-            </h2>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-blue-900">
-              giữ nhịp sống
-            </h2>
-          </div>
-          <p className="text-base sm:text-lg text-gray-700 leading-relaxed max-w-4xl mx-auto">
-            Đôi khi, nhịp sống nằm trong hơi nóng từ bữa cơm giản dị. Đôi khi,
-            nó gói gọn trong vài dòng chữ nhỏ. Tiger mời bạn tham gia Thử thách
-            Giữ Nhịp – nơi những điều nhỏ bé trở thành khoảnh khắc đáng nhớ – để
-            cùng nhau tạo nên một dòng chảy bình yên, đầy đủ sắc màu.
-          </p>
-        </motion.div>
-
+       
         {/* Carousel Section */}
         {isLoading ? (
           <div className="flex justify-center items-center h-96">
@@ -180,44 +158,21 @@ export function CornerTimeline() {
             </div>
           </div>
         ) : (
-          <div className="relative">
-            {/* Navigation Arrows */}
+          <div className="relative flex items-center">
+            {/* Left Arrow - Outside carousel */}
             <button
               onClick={prevSlide}
               disabled={isTransitioning || highlightedPosts.length <= 1}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-50 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed opacity-40 hover:opacity-100"
+              className="flex-shrink-0 z-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mr-4"
               aria-label="Previous slide"
             >
-              <ChevronLeft className="w-6 h-6 text-gray-700" />
-            </button>
-
-            <button
-              onClick={nextSlide}
-              disabled={isTransitioning || highlightedPosts.length <= 1}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-50 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed opacity-40 hover:opacity-100"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="w-6 h-6 text-gray-700" />
-            </button>
-
-            {/* Pause/Play Button */}
-            <button
-              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-              disabled={highlightedPosts.length <= 1}
-              className="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label={isAutoPlaying ? 'Pause' : 'Play'}
-            >
-              {isAutoPlaying ? (
-                <Pause className="w-5 h-5 text-gray-700" />
-              ) : (
-                <Play className="w-5 h-5 text-gray-700" />
-              )}
+              <ArrowLeft className="w-6 h-6 text-gray-700" />
             </button>
 
             {/* Carousel Container */}
             <div
               ref={carouselRef}
-              className="relative h-[500px] w-full overflow-visible"
+              className="relative h-[500px] flex-1 overflow-visible"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
@@ -256,10 +211,10 @@ export function CornerTimeline() {
 
                   // Tính toán: slides ±2 overlap với slides ±1
                   // translateBase cho slides ±1
-                  const translateBaseAdjacent = 290; // Khoảng cách từ center đến ±1
+                  const translateBaseAdjacent = 260; // Khoảng cách từ center đến ±1
                   // translateBase cho slides ±2 - điều chỉnh để hiển thị trong viewport
                   // Slides ±2 sẽ overlap với ±1 nên khoảng cách không quá xa
-                  const translateBaseOuter = 240; // Giảm từ 500 xuống 380 để slides ±2 hiển thị được
+                  const translateBaseOuter = 210; // Giảm từ 500 xuống 380 để slides ±2 hiển thị được
 
                   const xMove =
                     pos === 0
@@ -271,22 +226,22 @@ export function CornerTimeline() {
                   // Scale và opacity - slides ±2 nhỏ hơn và mờ hơn nhưng vẫn thấy được
                   const scale =
                     pos === 0 ? 1.12 : Math.abs(pos) === 1 ? 0.94 : 0.8; // ±2 tăng từ 0.75 lên 0.8 để thấy rõ hơn
-                  const opacity =
-                    pos === 0 ? 1 : Math.abs(pos) === 1 ? 0.6 : 0.5; // ±2 tăng từ 0.4 lên 0.5 để thấy rõ hơn
+                  const opacity =1;
+                    // pos === 0 ? 1 : Math.abs(pos) === 1 ? 0.6 : 0.5; // ±2 tăng từ 0.4 lên 0.5 để thấy rõ hơn
                   // Z-index: center cao nhất, ±1 cao hơn ±2 (thấp hơn header z-40)
                   const zIndex = pos === 0 ? 30 : Math.abs(pos) === 1 ? 20 : 10;
 
                   // Kích thước responsive - slides ±2 nhỏ hơn ±1
                   const getHeight = (position: number) => {
-                    if (position === 0) return 380;
-                    if (Math.abs(position) === 1) return 340;
-                    return 280; // ±2 nhỏ hơn
+                    if (position === 0) return 420; // Tăng từ 380 lên 420
+                    if (Math.abs(position) === 1) return 380; // Tăng từ 340 lên 380
+                    return 320; // Tăng từ 280 lên 320 - ±2 nhỏ hơn
                   };
 
                   const getWidth = (position: number) => {
-                    if (position === 0) return 'w-[28rem]'; // 448px
-                    if (Math.abs(position) === 1) return 'w-[24rem]'; // 384px
-                    return 'w-[18rem]'; // 288px - ±2 nhỏ hơn
+                    if (position === 0) return 'w-[20rem]'; // Giảm từ 24rem (384px) xuống 20rem (320px)
+                    if (Math.abs(position) === 1) return 'w-[18rem]'; // Giảm từ 20rem (320px) xuống 18rem (288px)
+                    return 'w-[14rem]'; // Giảm từ 16rem (256px) xuống 14rem (224px) - ±2 nhỏ hơn
                   };
 
                   return (
@@ -327,48 +282,129 @@ export function CornerTimeline() {
                           isCenter
                             ? 'border-white shadow-2xl'
                             : 'border-white shadow-xl'
-                        } overflow-hidden bg-white`}
+                        } overflow-hidden bg-white flex flex-col`}
                       >
-                        {post.imageUrl ? (
+                        {/* Image Section - Top */}
+                        <div className="relative flex-1 p-2">
+                          {post.imageUrl ? (
+                            <div className="relative w-full h-full rounded-lg overflow-hidden">
+                              <Image
+                                src={post.imageUrl}
+                                alt={post.caption || 'Post image'}
+                                fill
+                                className="object-cover"
+                                unoptimized={post.imageUrl?.includes(
+                                  'localhost:9000'
+                                )}
+                              />
+                              {/* Tiger Logo - Centered Top */}
+                              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
+                                <Image
+                                  src="/thuthachnhipsong/tiger_logo.png"
+                                  alt="Tiger Logo"
+                                  width={80}
+                                  height={80}
+                                  className="object-contain"
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="relative w-full h-full rounded-lg overflow-hidden">
+                              <Image
+                                src="/thuthachnhipsong/slide_example.png"
+                                alt="Slide example"
+                                fill
+                                className="object-cover"
+                              />
+                              {/* Tiger Logo - Centered Top */}
+                              <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
+                                <Image
+                                  src="/thuthachnhipsong/tiger_logo.png"
+                                  alt="Tiger Logo"
+                                  width={80}
+                                  height={80}
+                                  className="object-contain"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom Section - tramnamnhipsong image */}
+                        <div className="flex justify-center items-center pb-2 px-2">
                           <Image
-                            src={post.imageUrl}
-                            alt={post.caption || 'Post image'}
-                            fill
-                            className="object-cover"
-                            unoptimized={post.imageUrl?.includes(
-                              'localhost:9000'
-                            )}
+                            src="/thuthachnhipsong/tramnamnhipsong.png"
+                            alt="Trăm năm giữ nhịp sống"
+                            width={120}
+                            height={36}
+                            className="object-contain"
                           />
-                        ) : (
-                          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-400">No image</span>
-                          </div>
-                        )}
-                        <div
-                          className={`absolute inset-0 transition-colors duration-300 ${
-                            isCenter
-                              ? 'bg-black/0 hover:bg-black/10'
-                              : 'bg-black/20 hover:bg-black/30'
-                          }`}
-                        />
+                        </div>
                       </div>
                       {/* Đánh số slide để debug */}
-                      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-center">
+                      {/* <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-center">
                         <div className="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
                           Slide {index + 1} (pos: {pos})
                         </div>
                         <div className="text-xs text-gray-600 mt-1">
                           ID: {post.id}
                         </div>
-                      </div>
+                      </div> */}
                     </motion.div>
                   );
                 })}
               </div>
             </div>
+
+            {/* Right Arrow - Outside carousel */}
+            <button
+              onClick={nextSlide}
+              disabled={isTransitioning || highlightedPosts.length <= 1}
+              className="flex-shrink-0 z-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ml-4"
+              aria-label="Next slide"
+            >
+              <ArrowRight className="w-6 h-6 text-gray-700" />
+            </button>
+
+            {/* Pause/Play Button */}
+            <button
+              onClick={() => setIsAutoPlaying(!isAutoPlaying)}
+              disabled={highlightedPosts.length <= 1}
+              className="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label={isAutoPlaying ? 'Pause' : 'Play'}
+            >
+              {isAutoPlaying ? (
+                <Pause className="w-5 h-5 text-gray-700" />
+              ) : (
+                <Play className="w-5 h-5 text-gray-700" />
+              )}
+            </button>
           </div>
         )}
+        {/* Navigation Dots */}
+        <div className="flex justify-center items-center gap-2 mt-8">
+              {highlightedPosts.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    if (!isTransitioning && index !== currentSlide) {
+                      setIsTransitioning(true);
+                      setCurrentSlide(index);
+                      setTimeout(() => setIsTransitioning(false), 500);
+                    }
+                  }}
+                  disabled={isTransitioning}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === currentSlide
+                      ? 'w-4 h-4 bg-blue-600'
+                      : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
       </div>
     </div>
   );
 }
+

@@ -245,10 +245,12 @@ export function Corner1() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <p className="text-base sm:text-lg text-gray-700 mb-4">
-            Giữa muôn vàn hối hả, hãy giữ cho mình một nhịp riêng mà bạn muốn
+          <p className="font-nunito text-[18px] text-gray-700 mb-4 mt-4">
+            Giữa muôn vàn hối hả,
+            <br />
+            hãy giữ cho mình một nhịp riêng mà bạn muốn.
           </p>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent">
+          <h1 className="font-prata text-[28px] text-tiger-blue-600">
             Chọn nhịp sống của bạn hôm nay
           </h1>
         </motion.div>
@@ -272,6 +274,7 @@ export function Corner1() {
                       id: emojiOption.id,
                       emoji: emojiOption.emoji,
                       label: emojiOption.label,
+                      imageUrl: emojiOption.imageUrl,
                     }))}
                     selectedEmojis={selectedEmojis}
                     onEmojiSelect={handleEmojiSelect}

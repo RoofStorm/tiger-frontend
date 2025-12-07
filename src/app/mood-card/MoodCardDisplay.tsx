@@ -34,6 +34,7 @@ export default function MoodCardDisplay() {
               id: emojiOption.id,
               emoji: emojiOption.emoji,
               label: emojiOption.label,
+              imageUrl: emojiOption.imageUrl,
             }
           : {
               id: `unknown-${id}`,
@@ -77,9 +78,17 @@ export default function MoodCardDisplay() {
             {emojis.map((emoji, index) => (
               <span
                 key={index}
-                className="transform hover:scale-110 transition-transform duration-200"
+                className="transform hover:scale-110 transition-transform duration-200 flex items-center justify-center"
               >
-                {emoji.emoji}
+                {emoji.imageUrl ? (
+                  <img
+                    src={emoji.imageUrl}
+                    alt={emoji.label}
+                    className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
+                  />
+                ) : (
+                  emoji.emoji
+                )}
               </span>
             ))}
           </div>

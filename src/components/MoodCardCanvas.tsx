@@ -146,10 +146,18 @@ export function MoodCardCanvas({
           {selectedEmojis.map((emoji, index) => (
             <div
               key={emoji.id}
-              className="text-6xl animate-bounce"
+              className="animate-bounce flex items-center justify-center"
               style={{ animationDelay: `${index * 0.2}s` }}
             >
-              {emoji.emoji}
+              {emoji.imageUrl ? (
+                <img
+                  src={emoji.imageUrl}
+                  alt={emoji.label}
+                  className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+                />
+              ) : (
+                <div className="text-6xl">{emoji.emoji}</div>
+              )}
             </div>
           ))}
         </div>

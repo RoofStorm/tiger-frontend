@@ -54,6 +54,7 @@ export interface EmojiSelection {
   id: string;
   emoji: string;
   label: string;
+  imageUrl?: string;
 }
 
 // Mood Card Types

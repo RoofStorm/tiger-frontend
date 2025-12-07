@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Nunito, Noto_Sans, Prata } from 'next/font/google';
 import { Suspense } from 'react';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import { AuthSuccessHandler } from '@/components/AuthSuccessHandler';
 
 const inter = Inter({ subsets: ['latin'] });
+const nunito = Nunito({ subsets: ['latin', 'vietnamese'], variable: '--font-nunito' });
+const notoSans = Noto_Sans({ subsets: ['latin', 'vietnamese'], variable: '--font-noto-sans' });
+const prata = Prata({ subsets: ['latin'], weight: '400', variable: '--font-prata' });
 
 export const metadata: Metadata = {
   title: 'Tiger - Social Mood & Rewards',
@@ -35,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${nunito.variable} ${notoSans.variable} ${prata.variable}`}>
         <Providers>
           <Suspense fallback={null}>
             <AuthSuccessHandler />

@@ -85,6 +85,9 @@ export function useNextAuth(): UseNextAuthReturn {
           // Refresh router to ensure all components update
           router.refresh();
 
+          // Mark video as watched when user logs in
+          localStorage.setItem('hasWatchedVideo', 'true');
+
           // Redirect based on role - use the user from updated session
           const userRole = updatedSession?.user?.role;
           if (userRole === 'ADMIN') {
