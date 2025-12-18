@@ -43,24 +43,49 @@ export function UuDaiPageContent() {
     enabled: isAuthenticated,
   });
 
-  // Fetch rewards
-  const { data: rewardsData, isLoading: rewardsLoading } = useQuery({
-    queryKey: ['rewards'],
-    queryFn: () => apiClient.getRewards(),
-  });
-
-  const rewards = Array.isArray(rewardsData?.data?.data)
-    ? rewardsData.data.data.sort((a: Reward, b: Reward) => {
-        // Sort by points required (smallest to largest)
-        const aPoints = a.lifeRequired
-          ? a.lifeRequired * 1000
-          : a.pointsRequired;
-        const bPoints = b.lifeRequired
-          ? b.lifeRequired * 1000
-          : b.pointsRequired;
-        return aPoints - bPoints;
-      })
-    : [];
+  // Fixed reward cards data (no longer fetch from API)
+  const rewards: Reward[] = [
+    {
+      id: 'voucher-50k',
+      name: 'Voucher 50K',
+      description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
+      pointsRequired: 200,
+      imageUrl: '/uudai/card_voucher_background.png',
+      isActive: true,
+      maxPerUser: 3,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'voucher-100k',
+      name: 'Voucher 100K',
+      description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
+      pointsRequired: 200,
+      imageUrl: '/uudai/card_voucher_background.png',
+      isActive: true,
+      maxPerUser: 3,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'voucher-500k',
+      name: 'Voucher 500K',
+      description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
+      pointsRequired: 200,
+      imageUrl: '/uudai/card_voucher_background.png',
+      isActive: true,
+      maxPerUser: 3,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'voucher-700k',
+      name: 'Voucher 700K',
+      description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
+      pointsRequired: 200,
+      imageUrl: '/uudai/card_voucher_background.png',
+      isActive: true,
+      maxPerUser: 3,
+      createdAt: new Date().toISOString(),
+    },
+  ];
 
   // Fetch user's redeem history
   const { data: redeemHistory } = useQuery({
@@ -337,26 +362,8 @@ export function UuDaiPageContent() {
             {/* Tab Content */}
             {activeTab === 'doi-qua' && (
               <div className="mb-16">
-                {rewardsLoading ? (
-                <div className="text-center py-16">
-                  <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-500 mx-auto"></div>
-                  <p className="mt-6 text-gray-600 text-lg">Đang tải...</p>
-                </div>
-              ) : rewards.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="w-32 h-32 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Gift className="w-16 h-16 text-green-400" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-700 mb-4">
-                    Chưa có phần thưởng nào
-                  </h3>
-                  <p className="text-gray-500 text-lg">
-                    Admin sẽ thêm phần thưởng mới sớm!
-                  </p>
-                </div>
-              ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-                  {rewards.slice(0, 4).map((reward: Reward, index: number) => {
+                  {rewards.map((reward: Reward, index: number) => {
                     // Extract voucher value from reward name (e.g., "50K", "100K")
                     const voucherMatch = reward.name.match(/(\d+K|\d+k)/i);
                     const voucherValue = voucherMatch ? voucherMatch[1].toUpperCase() : 'VOUCHER';
@@ -460,7 +467,6 @@ export function UuDaiPageContent() {
                     );
                   })}
                 </div>
-              )}
               </div>
             )}
 
