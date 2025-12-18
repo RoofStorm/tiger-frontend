@@ -276,14 +276,16 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
         )}
       </AnimatePresence>
 
-      {/* Skip Intro Button - bottom-right over video */}
-      {!hideSkip && !isLoading && (
+      {/* Skip Intro Button - bottom-right over video - luôn hiển thị khi không hideSkip */}
+      {!hideSkip && (
         <div className="absolute bottom-6 right-6 z-40">
           <button
             onClick={handleSkipIntro}
             className="px-3 py-1.5 text-xs md:text-sm rounded-full bg-black/60 hover:bg-black/75 text-white border border-white/20 transition-colors"
+            disabled={isLoading}
+            style={{ opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'wait' : 'pointer' }}
           >
-            Bỏ qua
+            {isLoading ? 'Đang tải...' : 'Bỏ qua'}
           </button>
         </div>
       )}

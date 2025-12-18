@@ -13,15 +13,15 @@ export function HomePageContent() {
   const router = useRouter();
   const { navigateWithLoading } = useGlobalNavigationLoading();
 
-  // Nếu chưa đăng nhập và chưa xem video, điều hướng đến trang video
-  useEffect(() => {
-    if (!isAuthenticated) {
-      const hasWatchedVideo = localStorage.getItem('hasWatchedVideo');
-      if (!hasWatchedVideo) {
-        router.push('/video');
-      }
-    }
-  }, [isAuthenticated, router]);
+  // Tạm thời tắt auto redirect đến /video
+  // useEffect(() => {
+  //   if (!isAuthenticated) {
+  //     const hasWatchedVideo = localStorage.getItem('hasWatchedVideo');
+  //     if (!hasWatchedVideo) {
+  //       router.push('/video');
+  //     }
+  //   }
+  // }, [isAuthenticated, router]);
 
   return (
     <div className="min-h-screen">
