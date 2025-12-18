@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,9 @@ export function LunchboxUploadSection() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [showCaptionModal, setShowCaptionModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
+  const [uploadedCaption, setUploadedCaption] = useState<string>('');
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -64,8 +67,6 @@ export function LunchboxUploadSection() {
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     setUploadProgress(0);
-    // Show caption modal when file is selected
-    setShowCaptionModal(true);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -151,7 +152,7 @@ export function LunchboxUploadSection() {
         caption: caption || '',
       };
 
-      const result = await apiClient.createPost(postData);
+      await apiClient.createPost(postData);
 
       // Invalidate queries
       queryClient.invalidateQueries({
@@ -160,6 +161,10 @@ export function LunchboxUploadSection() {
       queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
+      // Save uploaded image URL and caption for modal
+      setUploadedImageUrl(uploadResult.data.url);
+      setUploadedCaption(caption || '');
+      
       // Reset form
       setCaption('');
       setSelectedFile(null);
@@ -169,14 +174,8 @@ export function LunchboxUploadSection() {
         fileInputRef.current.value = '';
       }
 
-      // Show success message
-      toast({
-        title: 'Đăng bài thành công!',
-        description:
-          result.pointsMessage || 'Bài viết của bạn đã được chia sẻ.',
-        variant: 'success',
-        duration: 4000,
-      });
+      // Show success modal
+      setShowSuccessModal(true);
     } catch (error) {
       console.error('Upload failed:', error);
       toast({
@@ -191,17 +190,20 @@ export function LunchboxUploadSection() {
   };
 
   const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCaption(e.target.value);
+    if (e.target.value.length <= 200) {
+      setCaption(e.target.value);
+    }
   };
 
   return (
     <>
       {/* Bottom Section - Upload Section */}
       <motion.div
+        id="lunchbox-upload-section"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
-        className="mt-20 rounded-lg"
+        className="mt-5 rounded-lg mx-12"
         style={{ backgroundColor: '#004EA3' }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
@@ -365,14 +367,44 @@ export function LunchboxUploadSection() {
             </div>
           )}
 
-          {/* Text Input - Hidden, will show in modal */}
+          {/* Text Input */}
+          <textarea
+            ref={captionTextareaRef}
+            value={caption}
+            onChange={(e) => {
+              if (e.target.value.length <= 200) {
+                setCaption(e.target.value);
+              }
+            }}
+            onKeyDown={handleInputKeyDown}
+            placeholder="Câu chuyện của bạn...(không quá 200 ký tự)"
+            rows={4}
+            className="w-full px-4 py-3 border border-white/30 rounded-lg resize-none focus:outline-none focus:border-blue-300 placeholder-gray-300 font-nunito backdrop-blur-sm mb-4"
+            style={{ 
+              backgroundColor: '#FFFFFF1A',
+              color: '#DCDCDC'
+            }}
+          />
 
           {/* Upload Post Button */}
           <Button
             onClick={handleUploadPost}
-            disabled={!selectedFile || uploading || !isAuthenticated}
-            className="w-full font-medium py-3 rounded-lg transition-all duration-300"
-            style={{ backgroundColor: '#ffffff', color: '#00579F' }}
+            disabled={!selectedFile || !caption.trim() || uploading || !isAuthenticated}
+            className="w-full font-medium transition-all duration-300"
+            style={{ 
+              height: '48px',
+              borderRadius: '8px',
+              gap: '8px',
+              opacity: (!selectedFile || !caption.trim() || uploading || !isAuthenticated) ? 0.5 : 1,
+              paddingTop: '12px',
+              paddingRight: '28px',
+              paddingBottom: '12px',
+              paddingLeft: '28px',
+              borderWidth: '1px',
+              backgroundColor: '#ffffff',
+              color: '#00579F',
+              cursor: (!selectedFile || !caption.trim() || uploading || !isAuthenticated) ? 'not-allowed' : 'pointer'
+            }}
           >
             {uploading ? 'Đang chia sẻ...' : 'Chia sẻ ngay!'}
           </Button>
@@ -421,6 +453,205 @@ export function LunchboxUploadSection() {
             </div>
           </div>
         </Modal>
+
+        {/* Success Modal */}
+        <AnimatePresence>
+          {showSuccessModal && (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
+                onClick={() => setShowSuccessModal(false)}
+              />
+              
+              {/* Modal Content */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className="rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-white"
+                >
+                  <div className="p-8">
+                    {/* Tiger Logo - Centered Top */}
+                    <div className="flex justify-center mb-6">
+                      <Image
+                        src="/icons/tiger_logo.png"
+                        alt="Tiger Logo"
+                        width={120}
+                        height={40}
+                        className="object-contain"
+                      />
+                    </div>
+
+                    {/* Thank You Message */}
+                    <h2 
+                      className="text-center mb-8 font-prata"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontStyle: 'normal',
+                        fontSize: '16px',
+                        lineHeight: '20px',
+                        letterSpacing: '0.03em',
+                        textAlign: 'center',
+                        color: '#00579F'
+                      }}
+                    >
+                      Cảm ơn bạn đã chia sẻ khoảnh khắc đáng nhớ này!
+                    </h2>
+
+                    {/* Main Content - Image and Caption with Buttons */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                      {/* Left - User Uploaded Image */}
+                      <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+                        {uploadedImageUrl && (
+                          <>
+                            <Image
+                              src={uploadedImageUrl}
+                              alt="Uploaded image"
+                              fill
+                              className="object-cover"
+                            />
+                            {/* Tramnamgiutronnhipsong overlay - Bottom Right */}
+                            <div 
+                              className="absolute z-10"
+                              style={{ 
+                                bottom: '0px',
+                                right: '0px',
+                                transform: 'translate(10px, 10px)'
+                              }}
+                            >
+                              <Image
+                                src="/thuthachnhipsong/tramnamgiunhipsong.png"
+                                alt="Trăm năm giữ trọn nhịp sống"
+                                width={180}
+                                height={54}
+                                className="object-contain"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Right - Caption and Buttons */}
+                      <div className="flex flex-col h-full">
+                        {/* Caption Text */}
+                        <div className="relative w-full p-6 flex-1">
+                          {/* Quote Mark - Top Left */}
+                          <div className="absolute -top-2 -left-2">
+                            <Image
+                              src="/icons/blueQuoteMark.png"
+                              alt="Quote mark"
+                              width={40}
+                              height={40}
+                              className="object-contain"
+                            />
+                          </div>
+                          <p 
+                            className="font-nunito"
+                            style={{
+                              fontFamily: 'Nunito',
+                              fontWeight: 700,
+                              fontStyle: 'italic',
+                              fontSize: '16px',
+                              lineHeight: '24px',
+                              letterSpacing: '0%',
+                              textAlign: 'center',
+                              color: '#00579F'
+                            }}
+                          >
+                            {uploadedCaption}
+                          </p>
+                        </div>
+
+                        {/* Buttons - Bottom */}
+                        <div className="flex gap-4 mt-auto">
+                          <Button
+                            onClick={() => {
+                              setShowSuccessModal(false);
+                              // Scroll và focus vào textarea trong ShareNoteSection
+                              setTimeout(() => {
+                                const textarea = document.getElementById('share-note-textarea');
+                                if (textarea) {
+                                  textarea.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'center' 
+                                  });
+                                  setTimeout(() => {
+                                    textarea.focus();
+                                  }, 300);
+                                }
+                              }, 100);
+                            }}
+                            className="flex-1 font-nunito transition-all duration-300"
+                            style={{ 
+                              height: '40px',
+                              borderRadius: '8px',
+                              gap: '8px',
+                              opacity: 1,
+                              paddingTop: '8px',
+                              paddingRight: '16px',
+                              paddingBottom: '8px',
+                              paddingLeft: '16px',
+                              backgroundColor: '#00579F',
+                              color: '#ffffff',
+                              fontFamily: 'Nunito',
+                              fontWeight: 700,
+                              fontStyle: 'normal',
+                              fontSize: '16px',
+                              lineHeight: '24px',
+                              letterSpacing: '0%',
+                              textAlign: 'center'
+                            }}
+                          >
+                            Để lại lời nhắn
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              // TODO: Handle Facebook share
+                              setShowSuccessModal(false);
+                            }}
+                            className="flex-1 font-nunito transition-all duration-300 flex items-center justify-center gap-2"
+                            style={{ 
+                              backgroundColor: '#ffffff',
+                              color: '#00579F',
+                              border: '1px solid #00579F',
+                              fontFamily: 'Nunito',
+                              fontWeight: 700,
+                              fontStyle: 'normal',
+                              fontSize: '16px',
+                              lineHeight: '24px',
+                              letterSpacing: '0%',
+                              textAlign: 'center'
+                            }}
+                          >
+                            Chia sẻ
+                            <Image
+                              src="/icons/facebook.png"
+                              alt="Facebook"
+                              width={20}
+                              height={20}
+                              className="object-contain"
+                            />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </motion.div>
     </>
   );

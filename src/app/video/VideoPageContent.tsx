@@ -19,9 +19,9 @@ export function VideoPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100">
+    <div className="min-h-screen">
       <Header />
-      <main className="relative">
+      <main className="relative min-h-[calc(100vh-80px)] bg-gradient-to-b from-blue-50 to-indigo-100">
         <Corner0
           onVideoEnded={() => setShowIntroModal(true)}
           hideSkip={false}

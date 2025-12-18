@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { Button } from '@/components/ui/button';
@@ -17,14 +18,20 @@ import {
   Shield,
 } from 'lucide-react';
 
-export function Header() {
+interface HeaderProps {
+  isDarkMode?: boolean;
+}
+
+export function Header({ isDarkMode = false }: HeaderProps = {}) {
   const { user, isAuthenticated, logout, isAdmin } = useNextAuth();
   const { navigateWithLoading } = useGlobalNavigationLoading();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -33,11 +40,19 @@ export function Header() {
       ) {
         setIsUserDropdownOpen(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsMenuOpen(false);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, []);
 
@@ -56,209 +71,336 @@ export function Header() {
         initial={{ opacity: 0, y: -100, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="relative top-0 left-0 right-0 z-40"
+        className="relative top-0 left-0 right-0 z-[60]"
+        style={{
+          backgroundColor: isDarkMode ? '#333435' : '#FBF9F380',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+        }}
       >
-        {/* Logo - Absolute left */}
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ duration: 0.2 }}
-          className="absolute left-12 top-1/2 -translate-y-1/2 z-50"
-        >
-          <Link href="/" className="flex items-center group">
-            <Image
-              src="/icons/tiger_logo.png"
-              alt="Tiger Logo"
-              width={120}
-              height={40}
-              className="h-10 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </motion.div>
-
-        {/* Auth Buttons - Absolute right */}
-        {!isAuthenticated && (
-          <div className="absolute right-12 top-1/2 -translate-y-1/2 z-50 flex items-center" style={{ gap: '8px' }}>
-            <Button
-              asChild
-              className="font-medium hover:opacity-90 min-w-[150px]"
-              style={{ 
-                backgroundColor: '#00579F', 
-                color: '#ffffff',
-                borderRadius: '8px',
-                paddingTop: '4px',
-                paddingRight: '8px',
-                paddingBottom: '4px',
-                paddingLeft: '8px',
-                gap: '8px',
-                opacity: 1,
-                fontSize: '16px'
-              }}
-            >
-              <Link href="/auth/register">Đăng ký</Link>
-            </Button>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-20">
+            {/* Logo - Left side */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="flex-shrink-0 z-50"
             >
-              <Button
-                asChild
-                className="bg-transparent font-medium hover:bg-gray-50 min-w-[150px]"
-                style={{ 
-                  color: '#333435', 
-                  border: '1px solid #333435',
-                  borderRadius: '8px',
-                  paddingTop: '4px',
-                  paddingRight: '8px',
-                  paddingBottom: '4px',
-                  paddingLeft: '8px',
-                  gap: '8px',
-                  opacity: 1,
-                  fontSize: '16px'
-                }}
-              >
-                <Link href="/auth/login">Đăng nhập</Link>
-              </Button>
+              <Link href="/" className="flex items-center group">
+                <Image
+                  src={isDarkMode ? "/icons/tiger_logo_darkmode.png" : "/icons/tiger_logo.png"}
+                  alt="Tiger Logo"
+                  width={120}
+                  height={40}
+                  className="h-8 sm:h-10 w-auto object-contain"
+                  priority
+                />
+              </Link>
             </motion.div>
-          </div>
-        )}
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="px-0 py-0">
-            <div className="flex items-center w-full" style={{ color: '#333435' }}>
-              {/* Navigation - Center 1/3 */}
-              <nav className="hidden sm:flex items-center justify-center flex-1 space-x-4">
-                {navigationItems.map(item => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    onClick={() => {
-                      navigateWithLoading(item.href, `Đang chuyển đến ${item.label}...`);
-                    }}
-                    className="inline-block px-3 py-2 font-medium transition-colors duration-300 whitespace-nowrap rounded-lg hover:opacity-70"
-                    style={{ color: '#333435', fontSize: '16px' }}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
+            {/* Desktop Navigation - Center */}
+            <nav className="hidden md:flex items-center justify-center flex-1 px-4 lg:px-8">
+              <div className="flex items-center space-x-4 lg:space-x-8">
+                {navigationItems.map(item => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => {
+                        navigateWithLoading(item.href, `Đang chuyển đến ${item.label}...`);
+                      }}
+                      className="inline-block px-2 lg:px-3 py-2 font-medium transition-colors duration-300 whitespace-nowrap rounded-lg hover:opacity-70"
+                      style={{ 
+                        color: isDarkMode && isActive ? '#0479D9' : (isDarkMode ? '#FFFFFF' : '#333435'), 
+                        fontSize: '14px',
+                      }}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </nav>
 
-              {/* User Button - Right 1/3 */}
-              {isAuthenticated && (
-                <div className="flex items-center justify-end flex-none">
-                  <div className="relative inline-block" ref={dropdownRef}>
+            {/* Desktop Auth/User Section - Right side */}
+            <div className="flex items-center flex-shrink-0 gap-2 z-50">
+              {!isAuthenticated ? (
+                <>
+                  {/* Desktop Auth Buttons */}
+                  <div className="hidden md:flex items-center gap-2">
+                    <Button
+                      asChild
+                      className={`font-medium ${isDarkMode ? '' : 'hover:opacity-90'}`}
+                      style={{ 
+                        width: isDarkMode ? '134px' : 'auto',
+                        height: isDarkMode ? '28px' : 'auto',
+                        minWidth: isDarkMode ? '134px' : '120px',
+                        backgroundColor: isDarkMode ? '#FBF9F3' : '#00579F', 
+                        color: isDarkMode ? '#333435' : '#ffffff',
+                        border: isDarkMode ? '1px solid #FBF9F3' : 'none',
+                        borderWidth: isDarkMode ? '1px' : '0',
+                        borderRadius: '8px',
+                        paddingTop: '4px',
+                        paddingRight: '8px',
+                        paddingBottom: '4px',
+                        paddingLeft: '8px',
+                        gap: '8px',
+                        opacity: 1,
+                        fontSize: '14px'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (isDarkMode) {
+                          e.currentTarget.style.opacity = '0.8';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (isDarkMode) {
+                          e.currentTarget.style.opacity = '1';
+                        }
+                      }}
+                    >
+                      <Link href="/auth/register" style={{ color: isDarkMode ? '#333435' : '#ffffff' }}>Đăng ký</Link>
+                    </Button>
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
                       <Button
-                        variant="ghost"
-                        onClick={() =>
-                          setIsUserDropdownOpen(!isUserDropdownOpen)
-                        }
-                        className="font-medium inline-flex items-center space-x-2 w-auto hover:opacity-70"
-                        style={{ color: '#333435' }}
+                        asChild
+                        className={`bg-transparent font-medium ${isDarkMode ? '' : 'hover:bg-gray-50'}`}
+                        style={{ 
+                          width: isDarkMode ? '136px' : 'auto',
+                          height: isDarkMode ? '28px' : 'auto',
+                          minWidth: isDarkMode ? '136px' : '120px',
+                          color: isDarkMode ? '#FFFFFF' : '#333435', 
+                          border: isDarkMode ? '1px solid #FFFFFF' : '1px solid #333435',
+                          borderWidth: '1px',
+                          borderRadius: '8px',
+                          gap: '8px',
+                          opacity: 1,
+                          paddingTop: '4px',
+                          paddingRight: '8px',
+                          paddingBottom: '4px',
+                          paddingLeft: '8px',
+                          fontSize: '14px'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (isDarkMode) {
+                            e.currentTarget.style.opacity = '0.8';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (isDarkMode) {
+                            e.currentTarget.style.opacity = '1';
+                          }
+                        }}
                       >
-                        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                          {user?.image ? (
-                            <Image
-                              src={user.image}
-                              alt={user.name || 'User avatar'}
-                              width={32}
-                              height={32}
-                              className="w-8 h-8 rounded-full object-cover"
-                              unoptimized={user.image.includes(
-                                'platform-lookaside.fbsbx.com'
-                              )}
-                            />
-                          ) : (
-                            <span className="font-bold text-sm" style={{ color: '#333435' }}>
-                              {user?.name?.charAt(0).toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <span>{user?.name || 'User'}</span>
-                        <ChevronDown
-                          className={`w-4 h-4 transition-transform duration-200 ${isUserDropdownOpen ? 'rotate-180' : ''}`}
-                        />
+                        <Link href="/auth/login" style={{ color: isDarkMode ? '#FFFFFF' : '#333435' }}>Đăng nhập</Link>
                       </Button>
                     </motion.div>
+                  </div>
+                </>
+              ) : (
+                <div className="relative inline-block" ref={dropdownRef}>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button
+                      variant="ghost"
+                      onClick={() => {
+                        setIsUserDropdownOpen(!isUserDropdownOpen);
+                        // Đóng mobile menu nếu đang mở
+                        if (isMenuOpen) {
+                          setIsMenuOpen(false);
+                        }
+                      }}
+                      className="font-medium inline-flex items-center space-x-2 w-auto hover:opacity-70"
+                      style={{ color: isDarkMode ? '#FFFFFF' : '#333435' }}
+                    >
+                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                        {user?.image ? (
+                          <Image
+                            src={user.image}
+                            alt={user.name || 'User avatar'}
+                            width={32}
+                            height={32}
+                            className="w-8 h-8 rounded-full object-cover"
+                            unoptimized={user.image.includes(
+                              'platform-lookaside.fbsbx.com'
+                            )}
+                          />
+                        ) : (
+                          <span className="font-bold text-sm" style={{ color: isDarkMode ? '#333435' : '#333435' }}>
+                            {user?.name?.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                      </div>
+                      <span className="hidden lg:inline">{user?.name || 'User'}</span>
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform duration-200 ${isUserDropdownOpen ? 'rotate-180' : ''}`}
+                      />
+                    </Button>
+                  </motion.div>
 
-                    {/* User Dropdown */}
-                    <AnimatePresence>
-                      {isUserDropdownOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
-                        >
-                          <div className="px-4 py-2 border-b border-gray-100">
-                            <p className="text-sm font-semibold text-gray-900">
-                              {user?.name}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {user?.email}
-                            </p>
-                          </div>
-                          <div className="py-1">
+                  {/* User Dropdown */}
+                  <AnimatePresence>
+                    {isUserDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[70]"
+                        style={{
+                          backgroundColor: isDarkMode ? '#333435' : '#ffffff',
+                          borderColor: isDarkMode ? '#555' : '#e5e7eb',
+                        }}
+                      >
+                        <div className="px-4 py-2 border-b" style={{ borderColor: isDarkMode ? '#555' : '#e5e7eb' }}>
+                          <p className="text-sm font-semibold" style={{ color: isDarkMode ? '#FFFFFF' : '#111827' }}>
+                            {user?.name}
+                          </p>
+                          <p className="text-xs" style={{ color: isDarkMode ? '#999' : '#6b7280' }}>
+                            {user?.email}
+                          </p>
+                        </div>
+                        <div className="py-1">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setIsUserDropdownOpen(false);
+                              navigateWithLoading(
+                                '/profile',
+                                'Đang chuyển đến hồ sơ cá nhân...'
+                              );
+                            }}
+                            onTouchStart={(e) => {
+                              e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                            }}
+                            onTouchEnd={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                            className="flex items-center px-4 py-2 text-sm transition-colors duration-200 w-full text-left cursor-pointer touch-manipulation"
+                            style={{ 
+                              color: isDarkMode ? '#FFFFFF' : '#374151',
+                              backgroundColor: 'transparent',
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            <User className="w-4 h-4 mr-3" />
+                            Hồ sơ cá nhân
+                          </button>
+                          <Link
+                            href="/settings"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsUserDropdownOpen(false);
+                            }}
+                            onTouchStart={(e) => {
+                              e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                            }}
+                            onTouchEnd={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                            className="flex items-center px-4 py-2 text-sm transition-colors duration-200 cursor-pointer touch-manipulation"
+                            style={{ 
+                              color: isDarkMode ? '#FFFFFF' : '#374151',
+                              backgroundColor: 'transparent',
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            <Settings className="w-4 h-4 mr-3" />
+                            Cài đặt
+                          </Link>
+                          {isAdmin && (
                             <button
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 setIsUserDropdownOpen(false);
                                 navigateWithLoading(
-                                  '/profile',
-                                  'Đang chuyển đến hồ sơ cá nhân...'
+                                  '/admin',
+                                  'Đang chuyển đến CMS...'
                                 );
                               }}
-                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 w-full text-left"
-                            >
-                              <User className="w-4 h-4 mr-3" />
-                              Hồ sơ cá nhân
-                            </button>
-                            <Link
-                              href="/settings"
-                              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                              onClick={() => setIsUserDropdownOpen(false)}
-                            >
-                              <Settings className="w-4 h-4 mr-3" />
-                              Cài đặt
-                            </Link>
-                            {isAdmin && (
-                              <button
-                                onClick={() => {
-                                  setIsUserDropdownOpen(false);
-                                  navigateWithLoading(
-                                    '/admin',
-                                    'Đang chuyển đến CMS...'
-                                  );
-                                }}
-                                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 w-full text-left"
-                              >
-                                <Shield className="w-4 h-4 mr-3" />
-                                Quản lý CMS
-                              </button>
-                            )}
-                            <button
-                              onClick={() => {
-                                logout();
-                                setIsUserDropdownOpen(false);
+                              onTouchStart={(e) => {
+                                e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
                               }}
-                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                              onTouchEnd={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
+                              className="flex items-center px-4 py-2 text-sm transition-colors duration-200 w-full text-left cursor-pointer touch-manipulation"
+                              style={{ 
+                                color: isDarkMode ? '#FFFFFF' : '#374151',
+                                backgroundColor: 'transparent',
+                                WebkitTapHighlightColor: 'transparent',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                              }}
                             >
-                              <LogOut className="w-4 h-4 mr-3" />
-                              Đăng xuất
+                              <Shield className="w-4 h-4 mr-3" />
+                              Quản lý CMS
                             </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              logout();
+                              setIsUserDropdownOpen(false);
+                            }}
+                            onTouchStart={(e) => {
+                              e.currentTarget.style.backgroundColor = '#fef2f2';
+                            }}
+                            onTouchEnd={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                            className="flex items-center w-full px-4 py-2 text-sm transition-colors duration-200 cursor-pointer touch-manipulation"
+                            style={{ 
+                              color: '#dc2626',
+                              backgroundColor: 'transparent',
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#fef2f2';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            <LogOut className="w-4 h-4 mr-3" />
+                            Đăng xuất
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
+            </div>
 
-              {/* Mobile Menu Button */}
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex-shrink-0 z-50 relative">
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -266,123 +408,97 @@ export function Header() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="sm:hidden p-2 hover:bg-gray-100 transition-colors duration-300 rounded-full"
-                  style={{ color: '#333435' }}
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="p-2 transition-colors duration-300 rounded-lg"
+                  style={{ 
+                    color: isDarkMode ? '#FFFFFF' : '#333435',
+                  }}
+                  onClick={() => {
+                    setIsMenuOpen(!isMenuOpen);
+                    // Đóng dropdown nếu đang mở
+                    if (isUserDropdownOpen) {
+                      setIsUserDropdownOpen(false);
+                    }
+                  }}
                 >
                   {isMenuOpen ? (
-                    <X className="w-5 h-5" />
+                    <X className="w-6 h-6" />
                   ) : (
-                    <Menu className="w-5 h-5" />
+                    <Menu className="w-6 h-6" />
                   )}
                 </Button>
               </motion.div>
-            </div>
-          </div>
-        </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-              className="sm:hidden bg-white rounded-2xl shadow-lg border border-gray-200 mx-4 mt-2 overflow-hidden"
-            >
-              <div className="px-6 py-4 space-y-3">
-                {navigationItems.map(item => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      navigateWithLoading(item.href, `Đang chuyển đến ${item.label}...`);
+              {/* Mobile Menu Dropdown */}
+              <AnimatePresence>
+                {isMenuOpen && (
+                  <motion.div
+                    ref={mobileMenuRef}
+                    initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 top-full mt-2 w-56 rounded-lg shadow-lg border z-[70]"
+                    style={{
+                      backgroundColor: isDarkMode ? '#333435' : '#ffffff',
+                      borderColor: isDarkMode ? '#555' : '#e5e7eb',
+                      boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
                     }}
-                    className="block px-4 py-2 text-blue-700 hover:text-blue-900 font-medium transition-colors duration-300 rounded-lg hover:bg-blue-50"
                   >
-                    {item.label}
-                  </Link>
-                ))}
-
-                {isAuthenticated ? (
-                  <div className="pt-3 border-t border-gray-200 space-y-2">
-                    <div className="px-4 py-2 text-sm text-gray-600">
-                      Xin chào,{' '}
-                      <span className="font-semibold text-gray-900">
-                        {user?.name || 'User'}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        navigateWithLoading(
-                          '/profile',
-                          'Đang chuyển đến hồ sơ cá nhân...'
-                        );
-                      }}
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg w-full text-left"
-                    >
-                      <User className="w-4 h-4 mr-3" />
-                      Hồ sơ cá nhân
-                    </button>
+              <div className="py-2">
+                {/* Navigation Items */}
+                {navigationItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
                     <Link
-                      href="/settings"
-                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Settings className="w-4 h-4 mr-3" />
-                      Cài đặt
-                    </Link>
-                    {isAdmin && (
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          navigateWithLoading(
-                            '/admin',
-                            'Đang chuyển đến CMS...'
-                          );
-                        }}
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200 rounded-lg w-full text-left"
-                      >
-                        <Shield className="w-4 h-4 mr-3" />
-                        Quản lý CMS
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        logout();
+                      key={item.label}
+                      href={item.href}
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setIsMenuOpen(false);
+                        navigateWithLoading(item.href, `Đang chuyển đến ${item.label}...`);
                       }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200 rounded-lg"
+                      onTouchStart={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                        }
+                      }}
+                      onTouchEnd={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
+                      className="block px-4 py-3 text-sm font-medium transition-colors duration-200 cursor-pointer touch-manipulation"
+                      style={{
+                        color: isActive 
+                          ? (isDarkMode ? '#0479D9' : '#00579F')
+                          : (isDarkMode ? '#FFFFFF' : '#333435'),
+                        backgroundColor: isActive 
+                          ? (isDarkMode ? 'rgba(4, 121, 217, 0.1)' : 'rgba(0, 87, 159, 0.1)')
+                          : 'transparent',
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                      }}
                     >
-                      <LogOut className="w-4 h-4 mr-3" />
-                      Đăng xuất
-                    </button>
-                  </div>
-                ) : (
-                  <div className="pt-3 border-t border-gray-200 space-y-2">
-                    <Button
-                      asChild
-                      className="w-full font-medium hover:opacity-90"
-                      style={{ backgroundColor: '#00579F', color: '#ffffff' }}
-                    >
-                      <Link href="/auth/register">Đăng ký</Link>
-                    </Button>
-                    <Button
-                      asChild
-                      className="w-full bg-transparent font-medium hover:bg-gray-50"
-                      style={{ color: '#333435', border: '1px solid #333435' }}
-                    >
-                      <Link href="/auth/login">Đăng nhập</Link>
-                    </Button>
-                  </div>
-                )}
+                      {item.label}
+                    </Link>
+                  );
+                  })}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
+            </div>
+          </div>
+        </div>
       </motion.header>
     </>
   );

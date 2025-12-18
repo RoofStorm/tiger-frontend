@@ -1,6 +1,7 @@
 'use client';
 
 import { EmojiSelection } from '@/types';
+import { motion } from 'framer-motion';
 
 interface EmojiGridProps {
   emojis: EmojiSelection[];
@@ -24,7 +25,7 @@ export function EmojiGrid({
     <div>
       {/* Emoji Grid - 4 columns for 12 emojis */}
       <div className="grid grid-cols-4 max-w-2xl mx-auto items-stretch">
-        {emojis.map(emoji => {
+        {emojis.map((emoji, index) => {
           const selected = isSelected(emoji.id);
           const disabled = !canSelect && !selected;
 
@@ -42,13 +43,41 @@ export function EmojiGrid({
             >
               <div className="flex items-center justify-center mb-1 h-[4.5rem] sm:h-[5rem]">
                 {emoji.imageUrl ? (
-                  <img
+                  <motion.img
                     src={emoji.imageUrl}
                     alt={emoji.label}
                     className="w-[70px] h-[70px] object-contain"
+                    animate={{
+                      rotate: [
+                        0, -6, 6, -6, 6, -4, 4, -3, 3, -2, 0
+                      ],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                      delay: index * 0.2,
+                      ease: "easeInOut",
+                    }}
                   />
                 ) : (
-                  <div className="text-2xl sm:text-3xl">{emoji.emoji}</div>
+                  <motion.div
+                    className="text-2xl sm:text-3xl"
+                    animate={{
+                      rotate: [
+                        0, -6, 6, -6, 6, -4, 4, -3, 3, -2, 0
+                      ],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      repeatDelay: 2,
+                      delay: index * 0.2,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    {emoji.emoji}
+                  </motion.div>
                 )}
               </div>
               <div className="flex items-center justify-center gap-1.5 h-[2rem]">

@@ -18,11 +18,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useInputFix } from '@/hooks/useInputFix';
 import { PhoneInput } from '@/components/ui/phone-input';
 
+type TabType = 'doi-qua' | 'the-le' | 'nhip-song' | 'thu-thach';
+
 export function Corner4() {
   const { user, isAuthenticated } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { onKeyDown: handleInputKeyDown } = useInputFix();
+  const [activeTab, setActiveTab] = useState<TabType>('doi-qua');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
   const [redeemForm, setRedeemForm] = useState({
@@ -200,9 +203,10 @@ export function Corner4() {
     <div
       data-corner="4"
       id="corner-4"
-      className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-12 lg:py-20"
+      className="min-h-screen py-12 lg:py-20"
+      style={{ backgroundColor: '#FFFDF5' }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[90%] mx-auto px-0.5 sm:px-1 lg:px-2">
         {/* Header Section */}
         <div className="text-center mb-16">
           <motion.div
@@ -211,42 +215,15 @@ export function Corner4() {
             transition={{ duration: 0.6 }}
             className="space-y-6"
           >
-            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              Góc Phần Thưởng
+            <h2 className="font-prata text-4xl md:text-5xl mb-6" style={{ color: '#00579F' }}>
+              Trao đổi nhịp sống
             </h2>
-            <p className="text-xl sm:text-2xl lg:text-3xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              Đổi điểm của bạn lấy những phần quà ý nghĩa
+            <p className="text-gray-700 max-w-3xl mx-auto text-center leading-relaxed font-noto-sans" style={{ fontSize: '16px' }}>
+              Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. Đổi điểm để nhận về những món quà từ Tiger – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
             </p>
 
-            {/* Hint công thức đổi */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 max-w-4xl mx-auto border border-blue-200"
-            >
-              <h3 className="text-lg font-bold text-blue-800 mb-3 text-center">
-                💡 Công thức đổi điểm
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-                <div className="bg-white rounded-xl p-4 shadow-sm">
-                  <div className="text-2xl font-bold text-blue-600 mb-1">
-                    1.000 điểm
-                  </div>
-                  <div className="text-sm text-gray-600">= 1 Nhịp sống</div>
-                </div>
-                <div className="bg-white rounded-xl p-4 shadow-sm">
-                  <div className="text-2xl font-bold text-green-600 mb-1">
-                    1 Nhịp sống
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    = 1.000 điểm năng lượng
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {isAuthenticated && (
+            {/* Temporarily hidden */}
+            {false && isAuthenticated && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -270,9 +247,65 @@ export function Corner4() {
           </motion.div>
         </div>
 
-        {/* Rewards Grid */}
-        <div className="mb-16">
-          {rewardsLoading ? (
+        {/* Tab Navigation */}
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center">
+            {[
+              { id: 'doi-qua' as TabType, label: 'Đổi quà' },
+              { id: 'the-le' as TabType, label: 'Thể lệ' },
+              { id: 'nhip-song' as TabType, label: 'Nhịp sống' },
+              { id: 'thu-thach' as TabType, label: 'Thử thách' },
+            ].map((tab, index, array) => (
+              <div key={tab.id} className="flex items-center">
+                <button
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-6 py-3 font-medium transition-all duration-300 rounded-full ${
+                    activeTab === tab.id
+                      ? 'bg-[#284A8F] text-white'
+                      : 'bg-white text-gray-800 border border-gray-800'
+                  }`}
+                  style={{
+                    fontFamily: 'var(--font-nunito)',
+                    fontSize: '16px',
+                    fontWeight: activeTab === tab.id ? 600 : 500,
+                  }}
+                >
+                  {tab.label}
+                </button>
+                {index < array.length - 1 && (
+                  <div 
+                    className="h-[1px] w-8 mx-1"
+                    style={{ backgroundColor: '#333435' }}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Centered Title */}
+        <div className="text-center mb-12">
+          <h2 
+            className="font-prata"
+            style={{ 
+              color: '#00579F',
+              fontFamily: 'Prata',
+              fontWeight: 400,
+              fontStyle: 'normal',
+              fontSize: '36px',
+              lineHeight: '40px',
+              letterSpacing: '0.03em',
+              textAlign: 'center',
+            }}
+          >
+            Đổi quà
+          </h2>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'doi-qua' && (
+          <div className="mb-16">
+            {rewardsLoading ? (
             <div className="text-center py-16">
               <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-500 mx-auto"></div>
               <p className="mt-6 text-gray-600 text-lg">Đang tải...</p>
@@ -290,113 +323,126 @@ export function Corner4() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8">
-              {rewards.map((reward: Reward, index: number) => (
-                <motion.div
-                  key={reward.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className={`bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 group flex flex-col h-full ${
-                    !canRedeem(reward) ? 'opacity-60' : ''
-                  }`}
-                >
-                  {/* Reward Image */}
-                  <div className="aspect-square bg-gray-100 relative overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={reward.imageUrl}
-                      alt={reward.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+              {rewards.map((reward: Reward, index: number) => {
+                // Extract voucher value from reward name (e.g., "50K", "100K")
+                const voucherMatch = reward.name.match(/(\d+K|\d+k)/i);
+                const voucherValue = voucherMatch ? voucherMatch[1].toUpperCase() : 'VOUCHER';
+                const pointsRequired = reward.lifeRequired 
+                  ? reward.lifeRequired * 1000 
+                  : reward.pointsRequired;
 
-                    {/* Points Badge */}
-                    <div className="absolute top-4 right-4">
-                      <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white px-3 py-2 rounded-full shadow-lg flex items-center space-x-1">
-                        <Star className="w-4 h-4 fill-current" />
-                        <span className="font-bold">
-                          {reward.lifeRequired
-                            ? `${reward.lifeRequired} Nhịp sống`
-                            : `${reward.pointsRequired} điểm`}
-                        </span>
+                return (
+                  <motion.div
+                    key={reward.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    className={`rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 flex flex-col h-full ${
+                      !canRedeem(reward) ? 'opacity-60' : ''
+                    }`}
+                    style={{ backgroundColor: '#284A8F', minHeight: '500px' }}
+                  >
+                    {/* Voucher Card Content */}
+                    <div className="p-6 flex flex-col h-full">
+                      {/* Points Requirement */}
+                      <div className="text-center mb-4">
+                        <p className="text-white font-nunito font-medium" style={{ fontSize: '14px' }}>
+                          {pointsRequired} Điểm năng lượng
+                        </p>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Reward Content */}
-                  <div className="p-6 flex flex-col h-full">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                        {reward.name}
-                      </h3>
+                      {/* Dashed Border Section */}
+                      <div 
+                        className="border-2 border-dashed rounded-lg p-6 mb-4 flex-1 flex flex-col justify-center"
+                        style={{ borderColor: '#3B65AD' }}
+                      >
+                        <div className="text-center">
+                          {/* VOUCHER Label */}
+                          <p 
+                            className="font-prata text-white mb-3"
+                            style={{
+                              fontFamily: 'Prata',
+                              fontWeight: 400,
+                              fontSize: '24px',
+                              letterSpacing: '0.03em',
+                              color: '#FFFFFF',
+                            }}
+                          >
+                            VOUCHER
+                          </p>
 
-                      <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed">
-                        {reward.description}
-                      </p>
-                    </div>
+                          {/* Voucher Value */}
+                          <p 
+                            className="font-nunito font-bold mb-3"
+                            style={{
+                              fontFamily: 'Nunito',
+                              fontWeight: 700,
+                              fontSize: '64px',
+                              lineHeight: '64px',
+                              color: '#ADD1EE',
+                            }}
+                          >
+                            {voucherValue}
+                          </p>
 
-                    <div className="mt-auto">
-                      {/* Remaining Redeems Counter */}
-                      {(() => {
-                        const remainingRedeems = getRemainingRedeems(reward);
-                        if (remainingRedeems) {
-                          return (
-                            <div className="mb-3 text-center">
-                              <div className="inline-flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-full">
-                                <span className="text-sm font-medium text-blue-800">
-                                  Còn lại: {remainingRedeems.remaining}/
-                                  {remainingRedeems.max} lần
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      })()}
+                          {/* Description */}
+                          <p 
+                            className="font-nunito text-center"
+                            style={{
+                              fontFamily: 'Nunito',
+                              fontWeight: 400,
+                              fontSize: '14px',
+                              lineHeight: '20px',
+                              color: '#FFFFFF',
+                            }}
+                          >
+                            Cho sản phẩm Tiger (giới hạn 3 lần/user)
+                          </p>
+                        </div>
+                      </div>
 
-                      <Button
+                      {/* Button */}
+                      <button
                         onClick={() => handleRedeem(reward)}
                         disabled={!canRedeem(reward)}
-                        className={`w-full py-3 text-lg font-semibold rounded-xl transition-all duration-300 ${
+                        className={`w-full py-3 rounded-lg font-nunito font-semibold transition-all duration-300 ${
                           canRedeem(reward)
-                            ? 'bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg hover:shadow-green-500/25 hover:scale-105'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            ? 'bg-white hover:bg-gray-100'
+                            : 'bg-gray-300 cursor-not-allowed'
                         }`}
+                        style={{ 
+                          color: canRedeem(reward) ? '#284A8F' : '#666666'
+                        }}
                       >
-                        {(() => {
-                          if (!isAuthenticated) return '🔒 Cần đăng nhập';
-
-                          const remainingRedeems = getRemainingRedeems(reward);
-                          if (
-                            remainingRedeems &&
-                            remainingRedeems.remaining <= 0
-                          ) {
-                            return '🚫 Hết lượt đổi';
-                          }
-
-                          const userPoints = userDetails?.points || 0;
-                          if (reward.lifeRequired && reward.lifeRequired > 0) {
-                            const userLife = Math.floor(userPoints / 1000);
-                            if (userLife < reward.lifeRequired) {
-                              return '❌ Không đủ Nhịp sống';
-                            }
-                          } else if (reward.pointsRequired > 0) {
-                            if (userPoints < reward.pointsRequired) {
-                              return '❌ Không đủ điểm';
-                            }
-                          }
-
-                          return '🎁 Đổi quà';
-                        })()}
-                      </Button>
+                        Đổi quà ngay
+                      </button>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           )}
-        </div>
+          </div>
+        )}
+
+        {activeTab === 'the-le' && (
+          <div className="mb-16 text-center py-16">
+            <p className="text-gray-600 text-lg">Nội dung thể lệ sẽ được cập nhật...</p>
+          </div>
+        )}
+
+        {activeTab === 'nhip-song' && (
+          <div className="mb-16 text-center py-16">
+            <p className="text-gray-600 text-lg">Nội dung nhịp sống sẽ được cập nhật...</p>
+          </div>
+        )}
+
+        {activeTab === 'thu-thach' && (
+          <div className="mb-16 text-center py-16">
+            <p className="text-gray-600 text-lg">Nội dung thử thách sẽ được cập nhật...</p>
+          </div>
+        )}
 
         {/* Redeem Modal */}
         {showRedeemModal && selectedReward && (
