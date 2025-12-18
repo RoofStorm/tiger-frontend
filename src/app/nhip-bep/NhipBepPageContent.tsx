@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
 import Image from 'next/image';
 import { TimelineInteractive } from '@/components/TimelineInteractive/TimelineInteractive';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 interface SlideContent {
   dates: string;
@@ -48,24 +48,50 @@ const slides: SlideContent[] = [
 interface Product {
   image: string;
   label: string;
+  fullName: string;
+  benefits: string[];
 }
 
 const baseProducts: Product[] = [
   {
     image: '/nhipbep/noicom.png',
-    label: 'Nồi cơm điện'
+    label: 'Nồi cơm điện',
+    fullName: 'Nồi cơm điện Tiger',
+    benefits: [
+      '"Xới cơm ngay khi cơm vừa chín – hạt tơi, không khô cả ngày. Với nồi Tiger, hạt cơm được giữ ấm đều, thơm như mới nấu."',
+      '"Cho vài giọt dầu ăn vào gạo – cơm bóng và tơi hơn. Nồi Tiger giữ trọn hương thơm và độ dẻo."',
+      '"Nấu cháo nhanh bằng nước sôi – chỉ 30 phút đã nhừ. Công nghệ kiểm soát nhiệt Tiger giúp hạt gạo bung đều, không khê."'
+    ]
   },
   {
     image: '/nhipbep/binhgiunhiet.png',
-    label: 'Bình giữ nhiệt'
+    label: 'Bình giữ nhiệt',
+    fullName: 'Bình giữ nhiệt Tiger',
+    benefits: [
+      '"Giữ nhiệt độ lâu dài – đồ uống nóng vẫn nóng, đồ lạnh vẫn lạnh suốt nhiều giờ. Công nghệ chân không của Tiger đảm bảo nhiệt độ được bảo toàn tối đa."',
+      '"Thiết kế tiện lợi – dễ dàng mang theo mọi nơi, phù hợp cho công việc, du lịch hay hoạt động ngoài trời."',
+      '"An toàn và bền bỉ – chất liệu cao cấp, không chứa chất độc hại, đảm bảo sức khỏe cho người sử dụng."'
+    ]
   },
   {
     image: '/nhipbep/hopcom.png',
-    label: 'Hộp cơm'
+    label: 'Hộp cơm',
+    fullName: 'Hộp cơm Tiger',
+    benefits: [
+      '"Giữ thức ăn nóng lâu – công nghệ cách nhiệt hiện đại giúp thức ăn giữ được độ nóng và hương vị như mới nấu."',
+      '"Thiết kế gọn nhẹ – dễ dàng mang theo, phù hợp cho bữa trưa tại văn phòng hay các chuyến đi chơi."',
+      '"Dễ dàng vệ sinh – chất liệu chống dính, không bám mùi, dễ dàng làm sạch sau khi sử dụng."'
+    ]
   },
   {
     image: '/nhipbep/mayxay.png',
-    label: 'Máy xay'
+    label: 'Máy xay',
+    fullName: 'Máy xay Tiger',
+    benefits: [
+      '"Xay nhuyễn mịn – công suất mạnh mẽ, xay được nhiều loại thực phẩm từ rau củ đến đá viên một cách dễ dàng."',
+      '"An toàn và tiện lợi – thiết kế chống trượt, dễ sử dụng và vệ sinh, phù hợp cho mọi gia đình."',
+      '"Bền bỉ và hiệu quả – động cơ mạnh mẽ, lưỡi dao sắc bén, đảm bảo hiệu suất làm việc lâu dài."'
+    ]
   }
 ];
 
@@ -76,10 +102,37 @@ const products: Product[] = [
   baseProducts[0] // Add one more to make 9 total
 ];
 
+// Helper function to get background image for product card based on index
+const getProductBackgroundImage = (index: number): string => {
+  const backgroundIndex = (index % 4) + 1; // Cycle through 1, 2, 3, 4
+  return `/nhipbep/card_product_background${backgroundIndex}.png`;
+};
+
 export function NhipBepPageContent() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentProductSlide, setCurrentProductSlide] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
   const currentContent = slides[currentSlide];
+
+  const handleProductHover = (product: Product) => {
+    // Clear any existing timeout
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+    }
+    // Set new timeout to open modal after 500ms
+    const timeout = setTimeout(() => {
+      setSelectedProduct(product);
+    }, 500);
+    setHoverTimeout(timeout);
+  };
+
+  const handleProductLeave = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+  };
 
   const nextProductSlide = () => {
     setCurrentProductSlide((prev) => (prev + 1) % products.length);
@@ -101,6 +154,15 @@ export function NhipBepPageContent() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Cleanup hover timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
 
   return (
     <div className="min-h-screen">
@@ -192,7 +254,16 @@ export function NhipBepPageContent() {
         </div>
 
         {/* Products Carousel Section */}
-        <div className="relative w-full py-16" style={{ backgroundColor: '#00579F' }}>
+        <div 
+          className="relative w-full py-16"
+          style={{
+            backgroundColor: '#00579F',
+            backgroundImage: 'url(/nhipbep/nhipbep_products_background.png)',
+            backgroundSize: '100% 100%',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
           <div className="max-w-7xl mx-auto px-4">
             {/* Header Section */}
             <div className="text-center mb-12 space-y-6">
@@ -220,33 +291,64 @@ export function NhipBepPageContent() {
               <div className="relative overflow-hidden">
                 <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentProductSlide * (100 / 4)}%)` }}>
                   {/* Duplicate products for seamless infinite scroll */}
-                  {[...products, ...products.slice(0, 4)].map((product, index) => (
-                    <div
-                      key={index}
-                      className="min-w-[25%] flex-shrink-0 px-4"
-                    >
-                      <div className="flex justify-center">
-                        <div className="bg-[#FFFDF5] rounded-lg p-8 w-full transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-2xl hover:bg-white group">
-                          <div className="flex flex-col items-center space-y-4">
-                            {/* Product Image */}
-                            <div className="relative w-full aspect-square max-w-xs transition-transform duration-300 group-hover:scale-110">
-                              <Image
-                                src={product.image}
-                                alt={product.label}
-                                fill
-                                className="object-contain"
-                              />
-                            </div>
+                  {[...products, ...products.slice(0, 4)].map((product, index) => {
+                    // Calculate the actual product index (for background selection)
+                    const actualIndex = index % products.length;
+                    const backgroundImage = getProductBackgroundImage(actualIndex);
+                    
+                    return (
+                      <div
+                        key={index}
+                        className="min-w-[25%] flex-shrink-0 px-4"
+                      >
+                        <div className="flex justify-center">
+                          <div 
+                            className="rounded-lg p-8 w-full transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-2xl group relative overflow-hidden"
+                            style={{
+                              backgroundImage: `url(${backgroundImage})`,
+                              backgroundSize: '100% 100%',
+                              backgroundPosition: 'center',
+                              backgroundRepeat: 'no-repeat',
+                            }}
+                            onClick={() => setSelectedProduct(product)}
+                            onMouseEnter={() => handleProductHover(product)}
+                            onMouseLeave={handleProductLeave}
+                          >
+                            <div className="flex flex-col items-center space-y-4 relative z-10">
+                              {/* Product Image */}
+                              <div className="relative w-full aspect-square max-w-xs transition-transform duration-300 group-hover:scale-110">
+                                <Image
+                                  src={product.image}
+                                  alt={product.label}
+                                  fill
+                                  className="object-contain"
+                                />
+                              </div>
 
-                            {/* Product Label */}
-                            <h3 className="text-xl font-nunito font-medium text-gray-800 transition-colors duration-300 group-hover:text-[#00579F]">
-                              {product.label}
-                            </h3>
+                              {/* Product Label */}
+                              <h3 className="text-xl font-nunito font-medium text-gray-800 transition-colors duration-300 group-hover:text-[#00579F]">
+                                {product.label}
+                              </h3>
+                            </div>
                           </div>
                         </div>
+                        
+                        {/* Mua ngay Button - Outside card, below card */}
+                        <div className="flex justify-center mt-4 w-full">
+                          <button
+                            className="w-full px-6 py-2 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90"
+                            style={{
+                              backgroundColor: 'transparent',
+                              border: '1px solid white',
+                              fontSize: '16px',
+                            }}
+                          >
+                            Mua ngay
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -290,6 +392,110 @@ export function NhipBepPageContent() {
           </div>
         </div>
       </main>
+
+      {/* Product Modal */}
+      <AnimatePresence>
+        {selectedProduct && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-[#00579F]/80 backdrop-blur-sm z-50"
+              onClick={() => setSelectedProduct(null)}
+            />
+            
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 z-[51] flex items-center justify-center p-4 pointer-events-none"
+            >
+              <div 
+                className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto relative pointer-events-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedProduct(null)}
+                  className="absolute top-3 right-3 p-2 rounded-full transition-colors hover:bg-gray-100 z-10"
+                  aria-label="Đóng"
+                >
+                  <X className="w-5 h-5 text-[#00579F]" />
+                </button>
+
+                {/* Product Image Section */}
+                <div className="relative px-6 pt-8 pb-4 flex justify-center items-center">
+                  <div className="relative w-full max-w-[180px] aspect-square">
+                    <Image
+                      src={selectedProduct.image}
+                      alt={selectedProduct.label}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+
+                {/* Product Title */}
+                <div className="px-6 pb-4">
+                  <h2 
+                    className="text-center font-prata text-2xl md:text-3xl"
+                    style={{ color: '#00579F' }}
+                  >
+                    {selectedProduct.fullName}
+                  </h2>
+                </div>
+
+                {/* Product Benefits */}
+                <div className="px-6 pb-6 space-y-3">
+                  {selectedProduct.benefits.map((benefit, index) => (
+                    <div key={index} className="flex items-start gap-4">
+                      {/* Check Circle Icon */}
+                      <div className="flex-shrink-0 mt-0.5">
+                        <Image
+                          src="/icons/check_circle.png"
+                          alt="Check"
+                          width={20}
+                          height={20}
+                          className="object-contain"
+                        />
+                      </div>
+                      {/* Benefit Text */}
+                      <p 
+                        className="flex-1 font-nunito text-sm leading-relaxed"
+                        style={{ color: '#00579F' }}
+                      >
+                        {benefit}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Mua ngay Button */}
+                <div className="px-6 pb-6">
+                  <button
+                    className="w-full py-2.5 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90"
+                    style={{
+                      backgroundColor: '#00579F',
+                      fontSize: '15px',
+                    }}
+                    onClick={() => {
+                      // Handle buy now action
+                      console.log('Mua ngay:', selectedProduct.label);
+                    }}
+                  >
+                    Mua ngay
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

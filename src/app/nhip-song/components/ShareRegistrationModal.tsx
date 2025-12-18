@@ -1,7 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
 
 interface ShareRegistrationModalProps {
   isOpen: boolean;
@@ -16,6 +17,45 @@ export function ShareRegistrationModal({
   onRegister,
   onLogin,
 }: ShareRegistrationModalProps) {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoginMode, setIsLoginMode] = useState(false); // false = registration, true = login
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Reset to registration mode when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setIsLoginMode(false);
+      setUsername('');
+      setPassword('');
+      setAgeConfirmed(false);
+      setTermsAccepted(false);
+    }
+  }, [isOpen]);
+
+  const handleFacebookLogin = () => {
+    // Handle Facebook login
+    console.log('Facebook login');
+  };
+
+  const handleGoogleLogin = () => {
+    // Handle Google login
+    console.log('Google login');
+  };
+
+  const handleFormLogin = () => {
+    // Handle form login
+    onLogin();
+  };
+
+  const handleFormRegister = () => {
+    // Handle form registration
+    if (ageConfirmed && termsAccepted) {
+      onRegister();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -37,220 +77,378 @@ export function ShareRegistrationModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          onClick={(e) => e.stopPropagation()}
+          className="fixed inset-0 z-[51] flex items-center justify-center p-4 pointer-events-none"
         >
-          <div className="rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" style={{ backgroundColor: '#FBF9F3' }}>
-            <div className="px-12 py-8">
+          <div 
+            className="rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto pointer-events-auto" 
+            style={{ backgroundColor: '#FBF9F3' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-8 py-8">
+              {/* Header Text */}
+              <p 
+                className="font-noto-sans text-center mb-2"
+                style={{
+                  fontFamily: 'Noto Sans',
+                  fontWeight: 400,
+                  fontSize: '14px',
+                  lineHeight: '20px',
+                  color: '#999999',
+                }}
+              >
+                Giữa muôn vàn hối hả, hãy giữ cho mình một nhìn riêng
+              </p>
+
+              {/* Title */}
               <h2 
                 className="font-prata text-center mb-2"
                 style={{
                   fontFamily: 'Prata',
                   fontWeight: 400,
-                  fontSize: '44px',
-                  lineHeight: '52px',
+                  fontSize: '36px',
+                  lineHeight: '44px',
                   letterSpacing: '0.03em',
                   textAlign: 'center',
-                  verticalAlign: 'bottom',
                   color: '#00579F',
                 }}
               >
                 Khám phá và tận hưởng
               </h2>
+
+              {/* Subtitle */}
               <p 
-                className="font-noto-sans text-center mb-6"
+                className="font-noto-sans text-center mb-8"
                 style={{
                   fontFamily: 'Noto Sans',
-                  fontWeight: 500,
+                  fontWeight: 400,
                   fontSize: '14px',
-                  lineHeight: '16px',
-                  letterSpacing: '-0.02em',
-                  textAlign: 'center',
+                  lineHeight: '20px',
                   color: '#333435',
                 }}
               >
                 Để nhận ngay 200 điểm và đổi quà độc quyền
               </p>
 
-              {/* Form fields */}
-              <div className="space-y-4">
-                <div>
-                  <label 
-                    className="block font-nunito mb-2"
-                    style={{
-                      fontFamily: 'Nunito',
-                      fontWeight: 500,
-                      fontSize: '18px',
-                      lineHeight: '24px',
-                      letterSpacing: '-0.02em',
-                      color: '#333435',
-                    }}
-                  >
-                    Họ và tên
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Nhập họ tên bạn"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    style={{ backgroundColor: '#FBF9F3' }}
+              {/* Social Login Buttons */}
+              <div className="flex gap-3 mb-6">
+                {/* Facebook Button */}
+                <button
+                  onClick={handleFacebookLogin}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg text-white font-nunito font-medium transition-all duration-300 hover:opacity-90"
+                  style={{
+                    backgroundColor: '#1877F2',
+                    fontSize: '14px',
+                  }}
+                >
+                  <Image
+                    src="/icons/white_facebook_logo.png"
+                    alt="Facebook"
+                    width={20}
+                    height={20}
+                    className="object-contain"
                   />
-                </div>
+                  <span>Tiếp tục bằng Facebook</span>
+                </button>
 
-                <div>
-                  <label 
-                    className="block font-nunito mb-2"
-                    style={{
-                      fontFamily: 'Nunito',
-                      fontWeight: 500,
-                      fontSize: '18px',
-                      lineHeight: '24px',
-                      letterSpacing: '-0.02em',
-                      color: '#333435',
-                    }}
-                  >
-                    Số điện thoại
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="Nhập số điện thoại"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    style={{ backgroundColor: '#FBF9F3' }}
+                {/* Google Button */}
+                <button
+                  onClick={handleGoogleLogin}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-nunito font-medium transition-all duration-300 hover:bg-gray-50 border"
+                  style={{
+                    backgroundColor: '#FFFFFF',
+                    borderColor: '#E0E0E0',
+                    color: '#333435',
+                    fontSize: '14px',
+                  }}
+                >
+                  <Image
+                    src="/icons/google_logo.png"
+                    alt="Google"
+                    width={20}
+                    height={20}
+                    className="object-contain"
                   />
-                </div>
+                  <span>Tiếp tục bằng Google</span>
+                </button>
+              </div>
 
-                <div>
-                  <button 
-                    className="font-nunito underline text-center"
-                    style={{
-                      fontFamily: 'Nunito',
-                      fontWeight: 600,
-                      fontSize: '14px',
-                      lineHeight: '20px',
-                      letterSpacing: '0%',
-                      textAlign: 'center',
-                      verticalAlign: 'middle',
-                      textDecoration: 'underline',
-                      textDecorationStyle: 'solid',
-                      color: '#333435',
-                    }}
-                  >
-                    Nhận mã OTP từ Zalo
-                  </button>
+              {/* Separator */}
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t" style={{ borderColor: '#E0E0E0' }} />
                 </div>
-
-                <div>
-                  <label 
-                    className="block font-nunito mb-2"
-                    style={{
-                      fontFamily: 'Nunito',
-                      fontWeight: 500,
-                      fontSize: '18px',
-                      lineHeight: '24px',
-                      letterSpacing: '-0.02em',
-                      color: '#333435',
-                    }}
-                  >
-                    Mã OTP<span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Mã OTP***"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    style={{ backgroundColor: '#FBF9F3' }}
-                  />
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-[#FBF9F3]" style={{ color: '#666666' }}>
+                    Hoặc
+                  </span>
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="mr-2" />
-                    <span className="text-sm text-gray-700">
-                      Tôi xác nhận đủ 18 tuổi trở lên
-                    </span>
-                  </label>
-                  <label className="flex items-start">
-                    <input type="checkbox" className="mr-2 mt-1" />
-                    <span className="text-sm text-gray-700">
-                      Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies của La Vie, Thể lệ chương trình Yên một chút cùng La Vie như được đăng tải tại website
-                    </span>
-                  </label>
-                </div>
+              {!isLoginMode ? (
+                /* Registration Form */
+                <div className="space-y-4">
+                  {/* Username Field */}
+                  <div>
+                    <label 
+                      className="block font-nunito mb-2"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#333435',
+                      }}
+                    >
+                      Tên đăng nhập
+                    </label>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Nhập tên đăng nhập"
+                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: '#E0E0E0',
+                        fontSize: '14px',
+                      }}
+                    />
+                  </div>
 
-                <div className="flex justify-center gap-3 pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={onLogin}
+                  {/* Password Field */}
+                  <div>
+                    <label 
+                      className="block font-nunito mb-2"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#333435',
+                      }}
+                    >
+                      Mật khẩu
+                    </label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Nhập mật khẩu"
+                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: '#E0E0E0',
+                        fontSize: '14px',
+                      }}
+                    />
+                  </div>
+
+                  {/* Checkboxes */}
+                  <div className="space-y-3">
+                    {/* Age Confirmation Checkbox */}
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={ageConfirmed}
+                        onChange={(e) => setAgeConfirmed(e.target.checked)}
+                        className="mt-1 w-4 h-4 rounded border-gray-300 text-[#00579F] focus:ring-[#00579F]"
+                      />
+                      <span 
+                        className="font-nunito flex-1"
+                        style={{
+                          fontFamily: 'Nunito',
+                          fontWeight: 400,
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          color: '#333435',
+                        }}
+                      >
+                        Tôi xác nhận đủ 18 tuổi trở lên
+                      </span>
+                    </label>
+
+                    {/* Terms and Conditions Checkbox */}
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={termsAccepted}
+                        onChange={(e) => setTermsAccepted(e.target.checked)}
+                        className="mt-1 w-4 h-4 rounded border-gray-300 text-[#00579F] focus:ring-[#00579F]"
+                      />
+                      <span 
+                        className="font-nunito flex-1"
+                        style={{
+                          fontFamily: 'Nunito',
+                          fontWeight: 400,
+                          fontSize: '14px',
+                          lineHeight: '20px',
+                          color: '#333435',
+                        }}
+                      >
+                        Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies của La Vie, Thể lệ chương trình Yên một chút cùng La Vie như được đăng tải tại website
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Register Button */}
+                  <button
+                    onClick={handleFormRegister}
+                    disabled={!ageConfirmed || !termsAccepted}
+                    className="w-full py-3 px-4 rounded-lg text-white font-nunito font-semibold transition-all duration-300 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      width: '266px',
-                      height: '48px',
-                      borderRadius: '8px',
-                      gap: '8px',
-                      opacity: 1,
-                      paddingTop: '12px',
-                      paddingRight: '28px',
-                      paddingBottom: '12px',
-                      paddingLeft: '28px',
-                      borderWidth: '1px',
-                      border: '1px solid #333435',
+                      backgroundColor: '#00579F',
+                      fontSize: '16px',
                     }}
-                  >
-                    Đăng nhập
-                  </Button>
-                  <Button
-                    className="text-white"
-                    style={{
-                      width: '266px',
-                      height: '48px',
-                      borderRadius: '8px',
-                      gap: '8px',
-                      opacity: 1,
-                      paddingTop: '12px',
-                      paddingRight: '28px',
-                      paddingBottom: '12px',
-                      paddingLeft: '28px',
-                      background: '#00579F',
-                    }}
-                    onClick={onRegister}
                   >
                     Đăng ký ngay
-                  </Button>
-                </div>
+                  </button>
 
-                <p className="text-xs text-gray-600 text-center pt-2">
-                  *Đăng kí để chia sẻ cảm xúc ngày hôm nay và nhận được quà từ chương trình nhé!
-                </p>
-
-                <div className="text-center pt-2">
-                  <span 
-                    className="font-nunito"
+                  {/* Disclaimer */}
+                  <p 
+                    className="font-nunito text-center"
                     style={{
                       fontFamily: 'Nunito',
                       fontWeight: 400,
-                      fontSize: '16px',
-                      lineHeight: '24px',
-                      letterSpacing: '0%',
-                      color: '#333435',
+                      fontSize: '12px',
+                      lineHeight: '18px',
+                      color: '#666666',
                     }}
                   >
-                    Bạn đã có tài khoản?{' '}
-                  </span>
-                  <button 
-                    className="font-nunito underline"
-                    onClick={onLogin}
+                    *Đăng kí để chia sẻ cảm xúc ngày hôm nay và nhận được quà từ chương trình nhé!
+                  </p>
+
+                  {/* Login Link */}
+                  <div className="text-center pt-2">
+                    <span 
+                      className="font-nunito"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 400,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#333435',
+                      }}
+                    >
+                      Bạn đã có tài khoản?{' '}
+                    </span>
+                    <button 
+                      className="font-nunito underline"
+                      onClick={() => setIsLoginMode(true)}
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        textDecoration: 'underline',
+                        color: '#00579F',
+                      }}
+                    >
+                      Đăng nhập ngay
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Login Form */
+                <div className="space-y-4">
+                  {/* Username Field */}
+                  <div>
+                    <label 
+                      className="block font-nunito mb-2"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#333435',
+                      }}
+                    >
+                      Tên đăng nhập
+                    </label>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Nhập tên đăng nhập"
+                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: '#E0E0E0',
+                        fontSize: '14px',
+                      }}
+                    />
+                  </div>
+
+                  {/* Password Field */}
+                  <div>
+                    <label 
+                      className="block font-nunito mb-2"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#333435',
+                      }}
+                    >
+                      Mật khẩu
+                    </label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Nhập mật khẩu"
+                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: '#E0E0E0',
+                        fontSize: '14px',
+                      }}
+                    />
+                  </div>
+
+                  {/* Login Button */}
+                  <button
+                    onClick={handleFormLogin}
+                    className="w-full py-3 px-4 rounded-lg text-white font-nunito font-semibold transition-all duration-300 hover:opacity-90"
                     style={{
-                      fontFamily: 'Nunito',
-                      fontWeight: 600,
+                      backgroundColor: '#00579F',
                       fontSize: '16px',
-                      lineHeight: '24px',
-                      letterSpacing: '0%',
-                      textDecoration: 'underline',
-                      textDecorationStyle: 'solid',
-                      color: '#333435',
                     }}
                   >
                     Đăng nhập ngay
                   </button>
+
+                  {/* Registration Link */}
+                  <div className="text-center pt-2">
+                    <span 
+                      className="font-nunito"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 400,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#333435',
+                      }}
+                    >
+                      Bạn đã chưa có tài khoản?{' '}
+                    </span>
+                    <button 
+                      className="font-nunito underline"
+                      onClick={() => setIsLoginMode(false)}
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 600,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        textDecoration: 'underline',
+                        color: '#00579F',
+                      }}
+                    >
+                      Đăng ký ngay
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </motion.div>

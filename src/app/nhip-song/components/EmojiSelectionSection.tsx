@@ -11,6 +11,7 @@ interface EmojiSelectionSectionProps {
   onEmojiSelect: (emoji: EmojiSelection) => void;
   onEmojiRemove: (emojiId: string) => void;
   onGenerateMoodCard: () => void;
+  isDarkMode?: boolean;
 }
 
 export function EmojiSelectionSection({
@@ -18,6 +19,7 @@ export function EmojiSelectionSection({
   onEmojiSelect,
   onEmojiRemove,
   onGenerateMoodCard,
+  isDarkMode = false,
 }: EmojiSelectionSectionProps) {
   const requiredEmojiCount = 3;
   const remainingCount = requiredEmojiCount - selectedEmojis.length;
@@ -30,14 +32,14 @@ export function EmojiSelectionSection({
       className="space-y-2 sm:space-y-4 text-center"
     >
       {/* Intro Text */}
-      <p className="font-nunito text-[18px] text-gray-700 leading-relaxed px-4 mt-4">
+      <p className={`font-nunito text-[18px] leading-relaxed px-4 mt-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
         Giữa muôn vàn hối hả,
         <br />
         hãy giữ cho mình một nhịp riêng mà bạn muốn.
       </p>
 
       {/* Main Title */}
-      <h2 className="font-prata text-[28px] text-tiger-blue-600 px-4">
+      <h2 className={`font-prata text-[28px] px-4 ${isDarkMode ? 'text-white' : 'text-tiger-blue-600'}`}>
         Chọn nhịp sống của bạn hôm nay.
       </h2>
 
@@ -70,7 +72,7 @@ export function EmojiSelectionSection({
       </div>
 
       {/* Instruction Text */}
-      <p className="font-noto-sans text-[12px] text-gray-600 pt-2">
+      <p className={`font-noto-sans text-[12px] pt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
         *Bạn chọn ít nhất 3 trạng thái đúng nhất với mình hiện tại nhé!
       </p>
     </motion.div>

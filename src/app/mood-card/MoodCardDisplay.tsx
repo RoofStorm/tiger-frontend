@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { EmojiSelection } from '@/types';
 import {
   EmojiCombination,
@@ -81,9 +82,11 @@ export default function MoodCardDisplay() {
                 className="transform hover:scale-110 transition-transform duration-200 flex items-center justify-center"
               >
                 {emoji.imageUrl ? (
-                  <img
+                  <Image
                     src={emoji.imageUrl}
                     alt={emoji.label}
+                    width={64}
+                    height={64}
                     className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
                   />
                 ) : (

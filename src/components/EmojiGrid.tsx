@@ -14,7 +14,7 @@ export function EmojiGrid({
   emojis,
   selectedEmojis,
   onEmojiSelect,
-  onEmojiRemove,
+  // onEmojiRemove,
 }: EmojiGridProps) {
   const isSelected = (emojiId: string) =>
     selectedEmojis.some(emoji => emoji.id === emojiId);

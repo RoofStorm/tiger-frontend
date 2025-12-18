@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { EmojiSelectionSection } from './components/EmojiSelectionSection';
 import { MoodCardFlipCard } from './components/MoodCardFlipCard';
@@ -9,11 +9,46 @@ import { RewardModal } from './components/RewardModal';
 import { useMoodCard } from '@/hooks/useMoodCard';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
+const getBackgroundImage = (): string => {
+  const now = new Date();
+  const hour = now.getHours();
+  // Từ 18:00 (6 giờ chiều) đến 05:59 (gần 6 giờ sáng) dùng dark background
+  // Từ 06:00 (6 giờ sáng) đến 17:59 (gần 6 giờ chiều) dùng light background
+  if (hour >= 18 || hour < 6) {
+    return 'url(/nhipsong/nhipsong_dark_background.jpg)';
+  }
+  return 'url(/nhipsong/nhipsong_light_background.jpg)';
+};
+
+const isDarkMode = (): boolean => {
+  const now = new Date();
+  const hour = now.getHours();
+  return hour >= 18 || hour < 6;
+};
+
 export function NhipSongPageContent() {
   const [showMoodCard, setShowMoodCard] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
+  const [backgroundImage, setBackgroundImage] = useState<string>(getBackgroundImage());
+  const [isDark, setIsDark] = useState<boolean>(isDarkMode());
   const { navigateWithLoading } = useGlobalNavigationLoading();
+
+  // Cập nhật background image và dark mode dựa trên thời gian
+  useEffect(() => {
+    const updateBackground = () => {
+      setBackgroundImage(getBackgroundImage());
+      setIsDark(isDarkMode());
+    };
+
+    // Cập nhật ngay khi component mount
+    updateBackground();
+
+    // Kiểm tra lại mỗi phút để đảm bảo background được cập nhật khi thời gian thay đổi
+    const interval = setInterval(updateBackground, 60000); // 60000ms = 1 phút
+
+    return () => clearInterval(interval);
+  }, []);
 
   const {
     selectedEmojis,
@@ -73,7 +108,7 @@ export function NhipSongPageContent() {
       <main 
         className="pt-5 min-h-[calc(100vh-80px)]"
         style={{
-          backgroundImage: 'url(/nhipsong/nhipsong_light_background.jpg)',
+          backgroundImage: backgroundImage,
           backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -86,6 +121,7 @@ export function NhipSongPageContent() {
               onEmojiSelect={handleEmojiSelect}
               onEmojiRemove={handleEmojiRemove}
               onGenerateMoodCard={handleGenerateMoodCard}
+              isDarkMode={isDark}
             />
           ) : (
             moodCardData && (

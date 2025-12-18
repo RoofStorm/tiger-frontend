@@ -6,7 +6,7 @@ import { X, Share2, RotateCcw } from 'lucide-react';
 import Image from 'next/image';
 import { EmojiGrid } from '@/components/EmojiGrid';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+// import { useToast } from '@/hooks/use-toast';
 import { EmojiSelection } from '@/types';
 import { findCombinationByEmojis } from '@/constants/emojiCombinations';
 import { EMOJI_OPTIONS } from '@/constants/emojis';
@@ -28,15 +28,15 @@ export function MoodCardModal({
   const [showMoodCard, setShowMoodCard] = useState(false);
   const [whisper, setWhisper] = useState('');
   const [reminder, setReminder] = useState('');
-  const [combinationCategory, setCombinationCategory] = useState<
+  const [, setCombinationCategory] = useState<
     'mindful' | 'tiger-linked' | 'trendy' | null
   >(null);
-  const [moodCardImage, setMoodCardImage] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [, setMoodCardImage] = useState<string>('');
+  const [isGenerating, ] = useState(false);
   const [isCardFlipped, setIsCardFlipped] = useState(false);
-  const downloadHandlerRef = useRef<(() => Promise<void>) | null>(null);
+  // const downloadHandlerRef = useRef<(() => Promise<void>) | null>(null);
   const shareHandlerRef = useRef<(() => Promise<void>) | null>(null);
-  const { toast } = useToast();
+  // const { toast } = useToast();
 
   const handleEmojiSelect = (emoji: EmojiSelection) => {
     const isAlreadySelected = selectedEmojis.some(
@@ -94,94 +94,94 @@ export function MoodCardModal({
     }
   };
 
-  const handleMoodCardGenerated = (imageData: string) => {
-    setMoodCardImage(imageData);
-  };
+  // const handleMoodCardGenerated = (imageData: string) => {
+  //   setMoodCardImage(imageData);
+  // };
 
-  const handleMoodCardReady = () => {
-    setMoodCardImage('ready');
-  };
+  // const handleMoodCardReady = () => {
+  //   setMoodCardImage('ready');
+  // };
 
-  const handleShareMoodCard = (imageData?: string) => {
-    if (!moodCardImage && !showMoodCard && !imageData) {
-      toast({
-        title: 'Lỗi',
-        description: 'Vui lòng tạo mood card trước khi chia sẻ.',
-        variant: 'destructive',
-        duration: 4000,
-      });
-      return;
-    }
+  // const handleShareMoodCard = (imageData?: string) => {
+  //   if (!moodCardImage && !showMoodCard && !imageData) {
+  //     toast({
+  //       title: 'Lỗi',
+  //       description: 'Vui lòng tạo mood card trước khi chia sẻ.',
+  //       variant: 'destructive',
+  //       duration: 4000,
+  //     });
+  //     return;
+  //   }
 
-    if (imageData) {
-      openFacebookShareDialog();
-      return;
-    }
+  //   if (imageData) {
+  //     openFacebookShareDialog();
+  //     return;
+  //   }
 
-    openFacebookShareDialog();
-  };
+  //   openFacebookShareDialog();
+  // };
 
-  const openFacebookShareDialog = () => {
-    const baseUrl =
-      process.env.NEXT_PUBLIC_PUBLIC_URL ||
-      (typeof window !== 'undefined' ? window.location.origin : null) ||
-      process.env.NEXTAUTH_URL ||
-      'https://tiger-frontend-eta.vercel.app';
-    const shareUrl = `${baseUrl}/mood-card?emojis=${selectedEmojis.map(e => e.id).join(',')}&whisper=${encodeURIComponent(whisper)}&reminder=${encodeURIComponent(reminder)}`;
+  // const openFacebookShareDialog = () => {
+  //   const baseUrl =
+  //     process.env.NEXT_PUBLIC_PUBLIC_URL ||
+  //     (typeof window !== 'undefined' ? window.location.origin : null) ||
+  //     process.env.NEXTAUTH_URL ||
+  //     'https://tiger-frontend-eta.vercel.app';
+  //   const shareUrl = `${baseUrl}/mood-card?emojis=${selectedEmojis.map(e => e.id).join(',')}&whisper=${encodeURIComponent(whisper)}&reminder=${encodeURIComponent(reminder)}`;
 
-    const emojiLabels = selectedEmojis.map(e => e.label).join(', ');
-    const emojiString = selectedEmojis.map(e => e.emoji).join(' ');
+  //   const emojiLabels = selectedEmojis.map(e => e.label).join(', ');
+  //   const emojiString = selectedEmojis.map(e => e.emoji).join(' ');
 
-    let moodCardTitle = '';
-    if (reminder) {
-      const shortReminder =
-        reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
-      moodCardTitle = `${shortReminder} - Tiger Mood Corner`;
-    } else if (whisper) {
-      const shortWhisper =
-        whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
-      moodCardTitle = `"${shortWhisper}" - Tiger Mood Corner`;
-    } else {
-      moodCardTitle = `Mood Card: ${emojiLabels} - Tiger Mood Corner`;
-    }
+  //   let moodCardTitle = '';
+  //   if (reminder) {
+  //     const shortReminder =
+  //       reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
+  //     moodCardTitle = `${shortReminder} - Tiger Mood Corner`;
+  //   } else if (whisper) {
+  //     const shortWhisper =
+  //       whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
+  //     moodCardTitle = `"${shortWhisper}" - Tiger Mood Corner`;
+  //   } else {
+  //     moodCardTitle = `Mood Card: ${emojiLabels} - Tiger Mood Corner`;
+  //   }
 
-    let moodCardDescription = '';
-    if (whisper && reminder) {
-      moodCardDescription = `"${whisper}"\n\n${reminder}\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
-    } else if (whisper) {
-      moodCardDescription = `"${whisper}"\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
-    } else if (reminder) {
-      moodCardDescription = `${reminder}\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
-    } else {
-      moodCardDescription = `Khám phá cảm xúc của bạn qua emoji: ${emojiString}\n\n#TigerMoodCorner #MoodCard`;
-    }
+  //   let moodCardDescription = '';
+  //   if (whisper && reminder) {
+  //     moodCardDescription = `"${whisper}"\n\n${reminder}\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
+  //   } else if (whisper) {
+  //     moodCardDescription = `"${whisper}"\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
+  //   } else if (reminder) {
+  //     moodCardDescription = `${reminder}\n\n#TigerMoodCorner #MoodCard ${emojiString}`;
+  //   } else {
+  //     moodCardDescription = `Khám phá cảm xúc của bạn qua emoji: ${emojiString}\n\n#TigerMoodCorner #MoodCard`;
+  //   }
 
-    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  //   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
 
-    const popup = window.open(
-      facebookShareUrl,
-      'facebook-share-dialog',
-      'width=800,height=600,scrollbars=yes,resizable=yes'
-    );
+  //   const popup = window.open(
+  //     facebookShareUrl,
+  //     'facebook-share-dialog',
+  //     'width=800,height=600,scrollbars=yes,resizable=yes'
+  //   );
 
-    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-      toast({
-        title: 'Popup bị chặn',
-        description: 'Vui lòng cho phép popup để chia sẻ mood card.',
-        variant: 'destructive',
-        duration: 4000,
-      });
-      return;
-    }
+  //   if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+  //     toast({
+  //       title: 'Popup bị chặn',
+  //       description: 'Vui lòng cho phép popup để chia sẻ mood card.',
+  //       variant: 'destructive',
+  //       duration: 4000,
+  //     });
+  //     return;
+  //   }
 
-    popup.focus();
+  //   popup.focus();
 
-    toast({
-      title: 'Chia sẻ mood card',
-      description: 'Đang mở Facebook để chia sẻ mood card của bạn.',
-      duration: 3000,
-    });
-  };
+  //   toast({
+  //     title: 'Chia sẻ mood card',
+  //     description: 'Đang mở Facebook để chia sẻ mood card của bạn.',
+  //     duration: 3000,
+  //   });
+  // };
 
   const handleReset = () => {
     setSelectedEmojis([]);

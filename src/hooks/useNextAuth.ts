@@ -27,7 +27,7 @@ interface UseNextAuthReturn {
 
 export function useNextAuth(): UseNextAuthReturn {
   const { user, loading, isAuthenticated } = useOptimizedSession();
-  const { data: session, update } = useSession();
+  const { update } = useSession();
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -166,7 +166,7 @@ export function useNextAuth(): UseNextAuthReturn {
         throw error;
       }
     },
-    [router, queryClient]
+    [router, queryClient, update]
   );
 
   const logout = useCallback(async () => {

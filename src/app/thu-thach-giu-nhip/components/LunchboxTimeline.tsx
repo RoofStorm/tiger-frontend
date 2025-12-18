@@ -307,6 +307,16 @@ export function LunchboxTimeline() {
                                   className="object-contain"
                                 />
                               </div>
+                              {/* White Heart Logo - Bottom Right */}
+                              <div className="absolute bottom-2 right-2 z-10">
+                                <Image
+                                  src="/icons/white_heart.png"
+                                  alt="White Heart"
+                                  width={32}
+                                  height={32}
+                                  className="object-contain"
+                                />
+                              </div>
                             </div>
                           ) : (
                             <div className="relative w-full h-full rounded-lg overflow-hidden">
@@ -323,6 +333,16 @@ export function LunchboxTimeline() {
                                   alt="Tiger Logo"
                                   width={80}
                                   height={80}
+                                  className="object-contain"
+                                />
+                              </div>
+                              {/* White Heart Logo - Bottom Right */}
+                              <div className="absolute bottom-2 right-2 z-10">
+                                <Image
+                                  src="/icons/white_heart.png"
+                                  alt="White Heart"
+                                  width={32}
+                                  height={32}
                                   className="object-contain"
                                 />
                               </div>

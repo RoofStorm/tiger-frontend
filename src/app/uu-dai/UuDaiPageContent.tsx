@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Gift, Star } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Reward, CreateRedeemData } from '@/types';
 import { Header } from '@/components/Header';
@@ -203,12 +204,19 @@ export function UuDaiPageContent() {
   return (
     <div className="min-h-screen">
       <Header />
-      <main style={{ backgroundColor: '#FFFDF5', minHeight: 'calc(100vh - 80px)' }}>
+      <main 
+        style={{ 
+          backgroundImage: 'url(/uudai/traodoinhipsong_background.png)',
+          backgroundSize: '100% 100%',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          minHeight: 'calc(100vh - 80px)' 
+        }}
+      >
         <div
           data-corner="4"
           id="corner-4"
           className="min-h-screen py-12 lg:py-20"
-          style={{ backgroundColor: '#FFFDF5' }}
         >
           <div className="max-w-[90%] mx-auto px-0.5 sm:px-1 lg:px-2">
             {/* Header Section */}
@@ -225,6 +233,26 @@ export function UuDaiPageContent() {
                 <p className="text-gray-700 max-w-3xl mx-auto text-center leading-relaxed font-noto-sans" style={{ fontSize: '16px' }}>
                   Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. Đổi điểm để nhận về những món quà từ Tiger – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
                 </p>
+
+                {/* Tips Image */}
+                <div className="flex justify-center"
+                style={{ marginTop: '100px', marginBottom: '100px' }}
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                  >
+                    <Image
+                      src="/uudai/traodoinhipsong_tips.png"
+                      alt="Trao đổi nhịp sống tips"
+                      width={1600}
+                      height={800}
+                      className="w-full h-auto object-contain max-w-[90vw]"
+                      style={{ transform: 'scale(3)' }}
+                    />
+                  </motion.div>
+                </div>
 
                 {/* Temporarily hidden */}
                 {false && isAuthenticated && (
@@ -328,7 +356,7 @@ export function UuDaiPageContent() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-                  {rewards.map((reward: Reward, index: number) => {
+                  {rewards.slice(0, 4).map((reward: Reward, index: number) => {
                     // Extract voucher value from reward name (e.g., "50K", "100K")
                     const voucherMatch = reward.name.match(/(\d+K|\d+k)/i);
                     const voucherValue = voucherMatch ? voucherMatch[1].toUpperCase() : 'VOUCHER';
@@ -345,7 +373,13 @@ export function UuDaiPageContent() {
                         className={`rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 flex flex-col h-full ${
                           !canRedeem(reward) ? 'opacity-60' : ''
                         }`}
-                        style={{ backgroundColor: '#284A8F', minHeight: '500px' }}
+                        style={{ 
+                          backgroundImage: 'url(/uudai/card_voucher_background.png)',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                          minHeight: '500px' 
+                        }}
                       >
                         {/* Voucher Card Content */}
                         <div className="p-6 flex flex-col h-full">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
+import Image from 'next/image';
 import html2canvas from 'html2canvas';
 import { EmojiSelection } from '@/types';
 
@@ -150,9 +151,11 @@ export function MoodCardCanvas({
               style={{ animationDelay: `${index * 0.2}s` }}
             >
               {emoji.imageUrl ? (
-                <img
+                <Image
                   src={emoji.imageUrl}
                   alt={emoji.label}
+                  width={80}
+                  height={80}
                   className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
                 />
               ) : (
