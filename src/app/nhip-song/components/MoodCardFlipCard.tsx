@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { RotateCcw, Share2 } from 'lucide-react';
+import { RotateCcw, Share2, ArrowRight } from 'lucide-react';
 
 interface MoodCardFlipCardProps {
   whisper: string;
@@ -13,6 +13,7 @@ interface MoodCardFlipCardProps {
   onSave: () => void;
   onShare: () => void;
   onReset: () => void;
+  onExploreMore: () => void;
 }
 
 export function MoodCardFlipCard({
@@ -23,6 +24,7 @@ export function MoodCardFlipCard({
   onSave,
   onShare,
   onReset,
+  onExploreMore,
 }: MoodCardFlipCardProps) {
   return (
     <>
@@ -148,7 +150,7 @@ export function MoodCardFlipCard({
                   </div>
 
                   {/* Try Again Link */}
-                  <div className="text-center">
+                  <div className="text-center mb-4">
                     <span className="text-white" style={{ fontSize: '14px' }}>Chọn lại nhịp sống? </span>
                     <button
                       onClick={(e) => {
@@ -161,6 +163,27 @@ export function MoodCardFlipCard({
                       <span>Thử lại ngay</span>
                       <RotateCcw className="w-4 h-4" />
                     </button>
+                  </div>
+
+                  {/* Explore More Button */}
+                  <div className="text-center w-full">
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onExploreMore();
+                      }}
+                      className="w-full max-w-xs py-3 rounded-lg border border-white text-white bg-transparent hover:text-white hover:opacity-80 hover:scale-105 active:scale-95 transition-all duration-200 inline-flex items-center justify-center gap-2"
+                      style={{ fontSize: '14px', backgroundColor: 'transparent', color: '#ffffff' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                    >
+                      <span>Khám phá thêm</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               </div>

@@ -29,7 +29,7 @@ export function ChallengeCardsSection() {
       >
         <div className="relative w-full h-full" style={{ transform: 'scale(0.85)' }}>
           <Image
-            src="/thuthachnhipsong/lunchBox_challenge.png"
+            src="/thuthachnhipsong/lunchbox_challenge.png"
             alt="LunchBox Challenge"
             fill
             className="object-cover"

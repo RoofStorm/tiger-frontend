@@ -9,6 +9,7 @@ interface ShareRegistrationModalProps {
   onClose: () => void;
   onRegister: () => void;
   onLogin: () => void;
+  initialMode?: 'login' | 'register'; // 'register' = registration, 'login' = login
 }
 
 export function ShareRegistrationModal({
@@ -16,14 +17,15 @@ export function ShareRegistrationModal({
   onClose,
   onRegister,
   onLogin,
+  initialMode = 'register',
 }: ShareRegistrationModalProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoginMode, setIsLoginMode] = useState(false); // false = registration, true = login
+  const [isLoginMode, setIsLoginMode] = useState(initialMode === 'login'); // false = registration, true = login
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
-  // Reset to registration mode when modal closes
+  // Reset to initial mode when modal closes or opens
   useEffect(() => {
     if (!isOpen) {
       setIsLoginMode(false);
@@ -31,8 +33,11 @@ export function ShareRegistrationModal({
       setPassword('');
       setAgeConfirmed(false);
       setTermsAccepted(false);
+    } else {
+      // Set mode when modal opens
+      setIsLoginMode(initialMode === 'login');
     }
-  }, [isOpen]);
+  }, [isOpen, initialMode]);
 
   const handleFacebookLogin = () => {
     // Handle Facebook login

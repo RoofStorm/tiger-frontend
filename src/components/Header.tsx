@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { Button } from '@/components/ui/button';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
+import { ShareRegistrationModal } from '@/app/nhip-song/components/ShareRegistrationModal';
 import {
   User,
   Menu,
@@ -28,6 +29,8 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('register');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -63,6 +66,25 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
     { label: 'Nhịp bếp', href: '/nhip-bep' },
     { label: 'Ưu đãi', href: '/uu-dai' },
   ];
+
+  const handleOpenAuthModal = (mode: 'login' | 'register') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleCloseAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
+
+  const handleRegister = () => {
+    setIsAuthModalOpen(false);
+    navigateWithLoading('/auth/register', 'Đang chuyển đến trang đăng ký...');
+  };
+
+  const handleLogin = () => {
+    setIsAuthModalOpen(false);
+    navigateWithLoading('/auth/login', 'Đang chuyển đến trang đăng nhập...');
+  };
 
   return (
     <>
@@ -131,7 +153,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                   {/* Desktop Auth Buttons */}
                   <div className="hidden md:flex items-center gap-2">
                     <Button
-                      asChild
+                      onClick={() => handleOpenAuthModal('register')}
                       className={`font-medium ${isDarkMode ? '' : 'hover:opacity-90'}`}
                       style={{ 
                         width: isDarkMode ? '134px' : 'auto',
@@ -161,14 +183,14 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                         }
                       }}
                     >
-                      <Link href="/auth/register" style={{ color: isDarkMode ? '#333435' : '#ffffff' }}>Đăng ký</Link>
+                      Đăng ký
                     </Button>
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
                       <Button
-                        asChild
+                        onClick={() => handleOpenAuthModal('login')}
                         className={`bg-transparent font-medium ${isDarkMode ? '' : 'hover:bg-gray-50'}`}
                         style={{ 
                           width: isDarkMode ? '136px' : 'auto',
@@ -197,7 +219,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                           }
                         }}
                       >
-                        <Link href="/auth/login" style={{ color: isDarkMode ? '#FFFFFF' : '#333435' }}>Đăng nhập</Link>
+                        Đăng nhập
                       </Button>
                     </motion.div>
                   </div>
@@ -492,6 +514,55 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                     </Link>
                   );
                   })}
+                
+                {/* Mobile Auth Buttons */}
+                {!isAuthenticated && (
+                  <>
+                    <div className="border-t my-2" style={{ borderColor: isDarkMode ? '#555' : '#e5e7eb' }} />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsMenuOpen(false);
+                        handleOpenAuthModal('register');
+                      }}
+                      className="block w-full px-4 py-3 text-sm font-medium transition-colors duration-200 cursor-pointer touch-manipulation text-left"
+                      style={{
+                        color: isDarkMode ? '#FFFFFF' : '#333435',
+                        backgroundColor: 'transparent',
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      Đăng ký
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsMenuOpen(false);
+                        handleOpenAuthModal('login');
+                      }}
+                      className="block w-full px-4 py-3 text-sm font-medium transition-colors duration-200 cursor-pointer touch-manipulation text-left"
+                      style={{
+                        color: isDarkMode ? '#FFFFFF' : '#333435',
+                        backgroundColor: 'transparent',
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = isDarkMode ? '#444' : '#f3f4f6';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }}
+                    >
+                      Đăng nhập
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
           )}
@@ -500,6 +571,15 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
           </div>
         </div>
       </motion.header>
+
+      {/* Auth Modal */}
+      <ShareRegistrationModal
+        isOpen={isAuthModalOpen}
+        onClose={handleCloseAuthModal}
+        onRegister={handleRegister}
+        onLogin={handleLogin}
+        initialMode={authModalMode}
+      />
     </>
   );
 }
