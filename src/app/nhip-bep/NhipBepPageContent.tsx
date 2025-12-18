@@ -113,7 +113,18 @@ export function NhipBepPageContent() {
   const [currentProductSlide, setCurrentProductSlide] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const currentContent = slides[currentSlide];
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleProductHover = (product: Product) => {
     // Clear any existing timeout
@@ -169,31 +180,31 @@ export function NhipBepPageContent() {
       <Header />
       <main className="min-h-[calc(100vh-80px)] bg-white">
         {/* Image Container - Relative for absolute text positioning */}
-        <div className="relative w-full">
+        <div className="relative w-full min-h-[500px] md:min-h-0">
           <Image
             src={currentContent.image}
             alt="History Background"
             width={1920}
             height={1080}
-            className="w-full h-auto object-cover"
+            className="w-full h-[500px] md:h-auto object-cover md:object-cover"
             priority
           />
 
           {/* Text Content - Absolute, center bottom overlay */}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-6xl px-4 pb-12">
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-6xl px-4 pb-8 md:pb-12">
             <div className="text-center">
               {/* Dates */}
-              <h2 className="text-5xl md:text-6xl font-serif text-white mb-4">
+              <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white mb-3 md:mb-4">
                 {currentContent.dates}
               </h2>
 
               {/* Subtitle */}
-              <h3 className="text-xl md:text-2xl font-serif text-white mb-2">
+              <h3 className="text-lg md:text-xl lg:text-2xl font-serif text-white mb-2">
                 {currentContent.subtitle}
               </h3>
 
               {/* Body Text */}
-              <div className="text-white space-y-1 font-nunito leading-relaxed" style={{ fontSize: '18px' }}>
+              <div className="text-white space-y-1 font-nunito leading-relaxed text-sm md:text-base lg:text-lg px-2">
                 {currentContent.paragraphs.map((paragraph, index) => (
                   <p key={index}>
                     {paragraph}
@@ -202,15 +213,15 @@ export function NhipBepPageContent() {
               </div>
 
               {/* Navigation Dots */}
-              <div className="flex justify-center items-center gap-3 mt-8">
+              <div className="flex justify-center items-center gap-2 md:gap-3 mt-6 md:mt-8">
                 {slides.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
                     className={`transition-all duration-300 rounded-full ${
                       index === currentSlide
-                        ? 'w-3 h-3 bg-white'
-                        : 'w-2 h-2 bg-white/50 hover:bg-white/75'
+                        ? 'w-2.5 h-2.5 md:w-3 md:h-3 bg-white'
+                        : 'w-2 h-2 md:w-2 md:h-2 bg-white/50 hover:bg-white/75'
                     }`}
                     aria-label={`Go to slide ${index + 1}`}
                   />
@@ -221,13 +232,13 @@ export function NhipBepPageContent() {
         </div>
 
         {/* Background Section */}
-        <div className="relative w-full">
+        <div className="relative w-full min-h-[600px] md:min-h-[800px]">
           <Image
             src="/nhipbep/nhipbep_background.png"
             alt="Nhip Bep Background"
             width={1920}
             height={1080}
-            className="w-full h-auto object-cover"
+            className="w-full h-auto object-cover min-h-[600px] md:min-h-[800px]"
           />
 
           {/* Text Content - Absolute, centered overlay */}
@@ -248,7 +259,7 @@ export function NhipBepPageContent() {
           </div>
 
           {/* Timeline Image - Absolute, bottom */}
-          <div className="absolute bottom-0 left-0 w-full">
+          <div className="absolute bottom-0 left-0 w-full z-10">
             <TimelineInteractive />
           </div>
         </div>
@@ -289,7 +300,7 @@ export function NhipBepPageContent() {
             <div className="relative">
               {/* Carousel Container */}
               <div className="relative overflow-hidden">
-                <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentProductSlide * (100 / 4)}%)` }}>
+                <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentProductSlide * (100 / (isMobile ? 1 : 4))}%)` }}>
                   {/* Duplicate products for seamless infinite scroll */}
                   {[...products, ...products.slice(0, 4)].map((product, index) => {
                     // Calculate the actual product index (for background selection)
@@ -299,11 +310,11 @@ export function NhipBepPageContent() {
                     return (
                       <div
                         key={index}
-                        className="min-w-[25%] flex-shrink-0 px-4"
+                        className="min-w-full md:min-w-[25%] flex-shrink-0 px-4 flex flex-col"
                       >
-                        <div className="flex justify-center">
+                        <div className="flex justify-center flex-1">
                           <div 
-                            className="rounded-lg p-8 w-full transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-2xl group relative overflow-hidden"
+                            className="rounded-lg p-4 md:p-8 w-full h-full min-h-[280px] md:min-h-0 transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-2xl group relative overflow-hidden flex flex-col"
                             style={{
                               backgroundImage: `url(${backgroundImage})`,
                               backgroundSize: '100% 100%',
@@ -314,9 +325,9 @@ export function NhipBepPageContent() {
                             onMouseEnter={() => handleProductHover(product)}
                             onMouseLeave={handleProductLeave}
                           >
-                            <div className="flex flex-col items-center space-y-4 relative z-10">
+                            <div className="flex flex-col items-center justify-center space-y-2 md:space-y-4 relative z-10 flex-1">
                               {/* Product Image */}
-                              <div className="relative w-full aspect-square max-w-xs transition-transform duration-300 group-hover:scale-110">
+                              <div className="relative w-full aspect-square max-w-[180px] md:max-w-xs transition-transform duration-300 group-hover:scale-110 flex-shrink-0">
                                 <Image
                                   src={product.image}
                                   alt={product.label}
@@ -326,7 +337,7 @@ export function NhipBepPageContent() {
                               </div>
 
                               {/* Product Label */}
-                              <h3 className="text-xl font-nunito font-medium text-gray-800 transition-colors duration-300 group-hover:text-[#00579F]">
+                              <h3 className="text-base md:text-xl font-nunito font-medium text-gray-800 transition-colors duration-300 group-hover:text-[#00579F] text-center flex-shrink-0">
                                 {product.label}
                               </h3>
                             </div>
@@ -334,13 +345,12 @@ export function NhipBepPageContent() {
                         </div>
                         
                         {/* Mua ngay Button - Outside card, below card */}
-                        <div className="flex justify-center mt-4 w-full">
+                        <div className="flex justify-center mt-3 md:mt-4 w-full flex-shrink-0">
                           <button
-                            className="w-full px-6 py-2 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90"
+                            className="w-full px-4 md:px-6 py-1.5 md:py-2 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90 text-sm md:text-base"
                             style={{
                               backgroundColor: 'transparent',
                               border: '1px solid white',
-                              fontSize: '16px',
                             }}
                           >
                             Mua ngay

@@ -523,29 +523,28 @@ export function LunchboxUploadSection() {
                 className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
               >
                 <div 
-                  className="rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-white pointer-events-auto"
+                  className="rounded-2xl shadow-xl max-w-[95%] md:max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-white pointer-events-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="p-8">
+                  <div className="p-4 md:p-8">
                     {/* Tiger Logo - Centered Top */}
-                    <div className="flex justify-center mb-6">
+                    <div className="flex justify-center mb-4 md:mb-6">
                       <Image
                         src="/icons/tiger_logo.png"
                         alt="Tiger Logo"
                         width={120}
                         height={40}
-                        className="object-contain"
+                        className="object-contain w-20 md:w-30 h-auto"
                       />
                     </div>
 
                     {/* Thank You Message */}
                     <h2 
-                      className="text-center mb-8 font-prata"
+                      className="text-center mb-4 md:mb-8 font-prata text-sm md:text-base"
                       style={{
                         fontFamily: 'Prata',
                         fontWeight: 400,
                         fontStyle: 'normal',
-                        fontSize: '16px',
                         lineHeight: '20px',
                         letterSpacing: '0.03em',
                         textAlign: 'center',
@@ -556,9 +555,9 @@ export function LunchboxUploadSection() {
                     </h2>
 
                     {/* Main Content - Image and Caption with Buttons */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10">
                       {/* Left - User Uploaded Image */}
-                      <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+                      <div className="relative w-full max-w-[200px] mx-auto md:max-w-none md:mx-0 aspect-square rounded-lg overflow-hidden">
                         {uploadedImageUrl && (
                           <>
                             <Image
@@ -573,9 +572,9 @@ export function LunchboxUploadSection() {
                               style={{ 
                                 bottom: '0px',
                                 right: '0px',
-                                transform: 'translate(10px, 10px)',
+                                transform: 'translate(5px, 5px)',
                                 backgroundColor: '#ffffff',
-                                padding: '8px',
+                                padding: '4px',
                                 borderRadius: '4px'
                               }}
                             >
@@ -584,7 +583,7 @@ export function LunchboxUploadSection() {
                                 alt="Trăm năm giữ trọn nhịp sống"
                                 width={180}
                                 height={54}
-                                className="object-contain"
+                                className="object-contain w-24 md:w-44 h-auto"
                               />
                             </div>
                           </>
@@ -594,25 +593,24 @@ export function LunchboxUploadSection() {
                       {/* Right - Caption and Buttons */}
                       <div className="flex flex-col h-full">
                         {/* Caption Text */}
-                        <div className="relative w-full p-6 flex-1">
+                        <div className="relative w-full p-4 md:p-6 flex-1">
                           {/* Quote Mark - Top Left */}
-                          <div className="absolute -top-2 -left-2">
+                          <div className="absolute -top-1 -left-1 md:-top-2 md:-left-2">
                             <Image
                               src="/icons/blueQuoteMark.png"
                               alt="Quote mark"
                               width={40}
                               height={40}
-                              className="object-contain"
+                              className="object-contain w-8 h-8 md:w-10 md:h-10"
                             />
                           </div>
                           <p 
-                            className="font-nunito"
+                            className="font-nunito text-sm md:text-base"
                             style={{
                               fontFamily: 'Nunito',
                               fontWeight: 700,
                               fontStyle: 'italic',
-                              fontSize: '16px',
-                              lineHeight: '24px',
+                              lineHeight: '20px',
                               letterSpacing: '0%',
                               textAlign: 'center',
                               color: '#00579F'
@@ -623,7 +621,7 @@ export function LunchboxUploadSection() {
                         </div>
 
                         {/* Buttons - Bottom */}
-                        <div className="flex gap-4 mt-auto">
+                        <div className="flex flex-col md:flex-row gap-2 md:gap-4 mt-auto">
                           <Button
                             onClick={() => {
                               setShowSuccessModal(false);
@@ -641,23 +639,23 @@ export function LunchboxUploadSection() {
                                 }
                               }, 100);
                             }}
-                            className="flex-1 font-nunito transition-all duration-300"
+                            className="w-full md:flex-1 font-nunito transition-all duration-300"
                             style={{ 
-                              height: '40px',
+                              height: '36px',
                               borderRadius: '8px',
                               gap: '8px',
                               opacity: 1,
-                              paddingTop: '8px',
-                              paddingRight: '16px',
-                              paddingBottom: '8px',
-                              paddingLeft: '16px',
+                              paddingTop: '6px',
+                              paddingRight: '12px',
+                              paddingBottom: '6px',
+                              paddingLeft: '12px',
                               backgroundColor: '#00579F',
                               color: '#ffffff',
                               fontFamily: 'Nunito',
                               fontWeight: 700,
                               fontStyle: 'normal',
-                              fontSize: '16px',
-                              lineHeight: '24px',
+                              fontSize: '14px',
+                              lineHeight: '20px',
                               letterSpacing: '0%',
                               textAlign: 'center'
                             }}
@@ -669,16 +667,22 @@ export function LunchboxUploadSection() {
                               // TODO: Handle Facebook share
                               setShowSuccessModal(false);
                             }}
-                            className="flex-1 font-nunito transition-all duration-300 flex items-center justify-center gap-2"
+                            className="w-full md:flex-1 font-nunito transition-all duration-300 flex items-center justify-center gap-2"
                             style={{ 
+                              height: '36px',
                               backgroundColor: '#ffffff',
                               color: '#00579F',
                               border: '1px solid #00579F',
+                              borderRadius: '8px',
+                              paddingTop: '6px',
+                              paddingRight: '12px',
+                              paddingBottom: '6px',
+                              paddingLeft: '12px',
                               fontFamily: 'Nunito',
                               fontWeight: 700,
                               fontStyle: 'normal',
-                              fontSize: '16px',
-                              lineHeight: '24px',
+                              fontSize: '14px',
+                              lineHeight: '20px',
                               letterSpacing: '0%',
                               textAlign: 'center'
                             }}
@@ -687,8 +691,8 @@ export function LunchboxUploadSection() {
                             <Image
                               src="/icons/facebook.png"
                               alt="Facebook"
-                              width={20}
-                              height={20}
+                              width={18}
+                              height={18}
                               className="object-contain"
                             />
                           </Button>

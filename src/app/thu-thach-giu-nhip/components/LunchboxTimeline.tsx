@@ -21,7 +21,18 @@ export function LunchboxTimeline() {
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Fetch highlighted posts for carousel
   // Tạm thời disable để dùng mock data
@@ -143,7 +154,7 @@ export function LunchboxTimeline() {
   };
 
   return (
-    <div className="mt-16 pt-12 px-4 sm:px-6 lg:px-8">
+    <div className="mt-16 pt-12 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
        
         {/* Carousel Section */}
@@ -158,63 +169,61 @@ export function LunchboxTimeline() {
             </div>
           </div>
         ) : (
-          <div className="relative flex items-center">
+          <div className="relative flex items-center w-full max-w-full overflow-x-hidden">
             {/* Left Arrow - Outside carousel */}
             <button
               onClick={prevSlide}
               disabled={isTransitioning || highlightedPosts.length <= 1}
-              className="flex-shrink-0 z-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mr-4"
+              className="flex-shrink-0 z-40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mr-2 md:mr-4"
               aria-label="Previous slide"
             >
-              <ArrowLeft className="w-6 h-6 text-gray-700" />
+              <ArrowLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
             </button>
 
             {/* Carousel Container */}
             <div
               ref={carouselRef}
-              className="relative h-[500px] flex-1 overflow-visible"
+              className="relative h-[350px] md:h-[500px] flex-1 overflow-hidden"
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              <div className="relative h-full w-full flex items-center justify-center">
+              <div className="relative h-full w-full flex items-center justify-center overflow-hidden">
                 {highlightedPosts.map((post: Post, index: number) => {
                   // Tính relative position so với currentSlide
-                  const getPos = (idx: number) => {
+                  const getPos = (idx: number, isMobile: boolean) => {
                     const diff =
                       (idx - currentSlide + highlightedPosts.length) %
                       highlightedPosts.length;
 
-                    // Chuyển đổi diff thành relative position (-2, -1, 0, 1, 2)
-                    // Với wrap-around: nếu diff > 2, tính từ phía bên kia
+                    // Trên mobile: chỉ hiển thị 3 slides (-1, 0, 1)
+                    // Trên desktop: hiển thị 5 slides (-2, -1, 0, 1, 2)
+                    const maxPos = isMobile ? 1 : 2;
                     let pos = diff;
                     const total = highlightedPosts.length;
 
-                    // Với 5 items: diff = 0,1,2 là right (0,1,2), diff = 3,4 là left (-2,-1)
-                    if (diff > 2) {
-                      pos = diff - total; // Negative position: 3 -> -2, 4 -> -1
+                    // Wrap-around logic
+                    if (diff > maxPos) {
+                      pos = diff - total; // Negative position
                     }
 
-                    // Chỉ hiển thị 5 slides gần center: -2, -1, 0, 1, 2
-                    if (Math.abs(pos) > 2) {
+                    // Chỉ hiển thị slides trong range
+                    if (Math.abs(pos) > maxPos) {
                       return 99; // Không hiển thị
                     }
 
                     return pos;
                   };
 
-                  const pos = getPos(index);
+                  const pos = getPos(index, isMobile);
 
-                  if (pos === 99) return null; // Chỉ hiển thị 5 slides gần center
+                  if (pos === 99) return null;
 
                   const isCenter = pos === 0;
 
-                  // Tính toán: slides ±2 overlap với slides ±1
-                  // translateBase cho slides ±1
-                  const translateBaseAdjacent = 260; // Khoảng cách từ center đến ±1
-                  // translateBase cho slides ±2 - điều chỉnh để hiển thị trong viewport
-                  // Slides ±2 sẽ overlap với ±1 nên khoảng cách không quá xa
-                  const translateBaseOuter = 210; // Giảm từ 500 xuống 380 để slides ±2 hiển thị được
+                  // Tính toán khoảng cách - mobile gần hơn và đảm bảo không overflow
+                  const translateBaseAdjacent = isMobile ? 140 : 260; // Mobile: gần hơn để tránh overflow
+                  const translateBaseOuter = isMobile ? 0 : 210; // Mobile không có ±2
 
                   const xMove =
                     pos === 0
@@ -223,33 +232,41 @@ export function LunchboxTimeline() {
                         ? pos * translateBaseAdjacent
                         : pos * translateBaseOuter;
 
-                  // Scale và opacity - slides ±2 nhỏ hơn và mờ hơn nhưng vẫn thấy được
-                  const scale =
-                    pos === 0 ? 1.12 : Math.abs(pos) === 1 ? 0.94 : 0.8; // ±2 tăng từ 0.75 lên 0.8 để thấy rõ hơn
-                  const opacity =1;
-                    // pos === 0 ? 1 : Math.abs(pos) === 1 ? 0.6 : 0.5; // ±2 tăng từ 0.4 lên 0.5 để thấy rõ hơn
-                  // Z-index: center cao nhất, ±1 cao hơn ±2 (thấp hơn header z-40)
+                  // Scale và opacity
+                  const scale = isMobile
+                    ? pos === 0 ? 1.0 : 0.85 // Mobile: scale nhỏ hơn
+                    : pos === 0 ? 1.12 : Math.abs(pos) === 1 ? 0.94 : 0.8;
+                  const opacity = 1;
+                  // Z-index: center cao nhất, ±1 cao hơn ±2
                   const zIndex = pos === 0 ? 30 : Math.abs(pos) === 1 ? 20 : 10;
 
-                  // Kích thước responsive - slides ±2 nhỏ hơn ±1
-                  const getHeight = (position: number) => {
-                    if (position === 0) return 420; // Tăng từ 380 lên 420
-                    if (Math.abs(position) === 1) return 380; // Tăng từ 340 lên 380
-                    return 320; // Tăng từ 280 lên 320 - ±2 nhỏ hơn
+                  // Kích thước responsive
+                  const getHeight = (position: number, isMobile: boolean) => {
+                    if (isMobile) {
+                      if (position === 0) return 300;
+                      return 260; // ±1 nhỏ hơn
+                    }
+                    if (position === 0) return 420;
+                    if (Math.abs(position) === 1) return 380;
+                    return 320;
                   };
 
-                  const getWidth = (position: number) => {
-                    if (position === 0) return 'w-[20rem]'; // Giảm từ 24rem (384px) xuống 20rem (320px)
-                    if (Math.abs(position) === 1) return 'w-[18rem]'; // Giảm từ 20rem (320px) xuống 18rem (288px)
-                    return 'w-[14rem]'; // Giảm từ 16rem (256px) xuống 14rem (224px) - ±2 nhỏ hơn
+                  const getWidth = (position: number, isMobile: boolean) => {
+                    if (isMobile) {
+                      if (position === 0) return 'w-[16rem]'; // 256px
+                      return 'w-[14rem]'; // 224px
+                    }
+                    if (position === 0) return 'w-[20rem]';
+                    if (Math.abs(position) === 1) return 'w-[18rem]';
+                    return 'w-[14rem]';
                   };
 
                   return (
                     <motion.div
                       key={post.id}
-                      className={`absolute ${getWidth(pos)} cursor-pointer`}
+                      className={`absolute ${getWidth(pos, isMobile)} cursor-pointer`}
                       style={{
-                        height: `${getHeight(pos)}px`,
+                        height: `${getHeight(pos, isMobile)}px`,
                         left: '50%',
                       }}
                       animate={{
@@ -380,29 +397,29 @@ export function LunchboxTimeline() {
             <button
               onClick={nextSlide}
               disabled={isTransitioning || highlightedPosts.length <= 1}
-              className="flex-shrink-0 z-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ml-4"
+              className="flex-shrink-0 z-40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ml-2 md:ml-4"
               aria-label="Next slide"
             >
-              <ArrowRight className="w-6 h-6 text-gray-700" />
+              <ArrowRight className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
             </button>
 
             {/* Pause/Play Button */}
             <button
               onClick={() => setIsAutoPlaying(!isAutoPlaying)}
               disabled={highlightedPosts.length <= 1}
-              className="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute top-2 right-2 md:top-4 md:right-4 z-40 bg-white/80 backdrop-blur-sm rounded-full p-2 md:p-3 shadow-lg hover:bg-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={isAutoPlaying ? 'Pause' : 'Play'}
             >
               {isAutoPlaying ? (
-                <Pause className="w-5 h-5 text-gray-700" />
+                <Pause className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
               ) : (
-                <Play className="w-5 h-5 text-gray-700" />
+                <Play className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
               )}
             </button>
           </div>
         )}
         {/* Navigation Dots */}
-        <div className="flex justify-center items-center gap-2 mt-8">
+        <div className="flex justify-center items-center gap-1.5 md:gap-2 mt-4 md:mt-8">
               {highlightedPosts.map((_, index) => (
                 <button
                   key={index}
@@ -416,8 +433,8 @@ export function LunchboxTimeline() {
                   disabled={isTransitioning}
                   className={`transition-all duration-300 rounded-full ${
                     index === currentSlide
-                      ? 'w-4 h-4 bg-blue-600'
-                      : 'w-3 h-3 bg-gray-300 hover:bg-gray-400'
+                      ? 'w-3 h-3 md:w-4 md:h-4 bg-blue-600'
+                      : 'w-2 h-2 md:w-3 md:h-3 bg-gray-300 hover:bg-gray-400'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                   aria-label={`Go to slide ${index + 1}`}
                 />

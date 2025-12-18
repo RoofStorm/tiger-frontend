@@ -293,11 +293,11 @@ export function ShareNoteSection() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
-              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
             >
               <div 
-                className="rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white"
+                className="rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white pointer-events-auto"
+                onClick={(e) => e.stopPropagation()}
               >
                 <div className="p-8">
                   {/* Tiger Logo - Centered Top */}
