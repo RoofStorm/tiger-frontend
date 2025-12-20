@@ -50,7 +50,7 @@ export function UuDaiPageContent() {
       name: 'Voucher 50K',
       description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
       pointsRequired: 200,
-      imageUrl: '/uudai/card_voucher_background.png',
+      imageUrl: '/uudai/card_voucher_background.svg',
       isActive: true,
       maxPerUser: 3,
       createdAt: new Date().toISOString(),
@@ -60,7 +60,7 @@ export function UuDaiPageContent() {
       name: 'Voucher 100K',
       description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
       pointsRequired: 200,
-      imageUrl: '/uudai/card_voucher_background.png',
+      imageUrl: '/uudai/card_voucher_background.svg',
       isActive: true,
       maxPerUser: 3,
       createdAt: new Date().toISOString(),
@@ -70,7 +70,7 @@ export function UuDaiPageContent() {
       name: 'Voucher 500K',
       description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
       pointsRequired: 200,
-      imageUrl: '/uudai/card_voucher_background.png',
+      imageUrl: '/uudai/card_voucher_background.svg',
       isActive: true,
       maxPerUser: 3,
       createdAt: new Date().toISOString(),
@@ -80,7 +80,7 @@ export function UuDaiPageContent() {
       name: 'Voucher 700K',
       description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
       pointsRequired: 200,
-      imageUrl: '/uudai/card_voucher_background.png',
+      imageUrl: '/uudai/card_voucher_background.svg',
       isActive: true,
       maxPerUser: 3,
       createdAt: new Date().toISOString(),
@@ -231,11 +231,12 @@ export function UuDaiPageContent() {
       <Header />
       <main 
         style={{ 
-          backgroundImage: 'url(/uudai/traodoinhipsong_background.png)',
-          backgroundSize: '100% 100%',
-          backgroundPosition: 'center',
+          backgroundImage: 'url(/uudai/traodoinhipsong_background.svg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 0px',
           backgroundRepeat: 'no-repeat',
-          minHeight: 'calc(100vh - 80px)' 
+          minHeight: 'calc(100vh - 80px)',
+          width: '100%'
         }}
       >
         <div
@@ -261,7 +262,7 @@ export function UuDaiPageContent() {
 
                 {/* Tips Image */}
                 <div className="flex justify-center"
-                style={{ marginTop: '100px', marginBottom: '100px' }}
+                // style={{ marginTop: '100px', marginBottom: '100px' }}
                 >
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -269,12 +270,12 @@ export function UuDaiPageContent() {
                     transition={{ duration: 0.6, delay: 0.3 }}
                   >
                     <Image
-                      src="/uudai/traodoinhipsong_tips.png"
+                      src="/uudai/traodoinhipsong_tips.svg"
                       alt="Trao đổi nhịp sống tips"
-                      width={1600}
-                      height={800}
+                      width={1200}
+                      height={600}
                       className="w-full h-auto object-contain max-w-[90vw]"
-                      style={{ transform: 'scale(3)' }}
+                      // style={{ transform: 'scale(1)' }}
                     />
                   </motion.div>
                 </div>
@@ -305,38 +306,47 @@ export function UuDaiPageContent() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex justify-center mb-8">
-              <div className="flex items-center">
-                {[
-                  { id: 'doi-qua' as TabType, label: 'Đổi quà' },
-                  { id: 'the-le' as TabType, label: 'Thể lệ' },
-                  { id: 'nhip-song' as TabType, label: 'Nhịp sống' },
-                  { id: 'thu-thach' as TabType, label: 'Thử thách' },
-                ].map((tab, index, array) => (
-                  <div key={tab.id} className="flex items-center">
-                    <button
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`px-6 py-3 font-medium transition-all duration-300 rounded-full ${
-                        activeTab === tab.id
-                          ? 'bg-[#284A8F] text-white'
-                          : 'bg-white text-gray-800 border border-gray-800'
-                      }`}
-                      style={{
-                        fontFamily: 'var(--font-nunito)',
-                        fontSize: '16px',
-                        fontWeight: activeTab === tab.id ? 600 : 500,
-                      }}
-                    >
-                      {tab.label}
-                    </button>
-                    {index < array.length - 1 && (
-                      <div 
-                        className="h-[1px] w-8 mx-1"
-                        style={{ backgroundColor: '#333435' }}
-                      />
-                    )}
-                  </div>
-                ))}
+            <div className="flex justify-center mb-8 px-4">
+              <div 
+                className="flex items-center justify-center overflow-x-auto w-full max-w-full [&::-webkit-scrollbar]:hidden"
+                style={{
+                  scrollbarWidth: 'none', /* Firefox */
+                  msOverflowStyle: 'none', /* IE and Edge */
+                  WebkitOverflowScrolling: 'touch', /* iOS smooth scrolling */
+                }}
+              >
+                <div className="flex items-center justify-center gap-1 md:gap-0">
+                  {[
+                    { id: 'doi-qua' as TabType, label: 'Đổi quà' },
+                    { id: 'the-le' as TabType, label: 'Thể lệ' },
+                    { id: 'nhip-song' as TabType, label: 'Nhịp sống' },
+                    { id: 'thu-thach' as TabType, label: 'Thử thách' },
+                  ].map((tab, index, array) => (
+                    <div key={tab.id} className="flex items-center flex-shrink-0">
+                      <button
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`px-3 py-2 md:px-6 md:py-3 font-medium transition-all duration-300 rounded-full whitespace-nowrap ${
+                          activeTab === tab.id
+                            ? 'bg-[#284A8F] text-white'
+                            : 'bg-white text-gray-800 border border-gray-800'
+                        }`}
+                        style={{
+                          fontFamily: 'var(--font-nunito)',
+                          fontSize: 'clamp(12px, 3vw, 16px)',
+                          fontWeight: activeTab === tab.id ? 600 : 500,
+                        }}
+                      >
+                        {tab.label}
+                      </button>
+                      {index < array.length - 1 && (
+                        <div 
+                          className="h-[1px] w-4 md:w-8 mx-0.5 md:mx-1 flex-shrink-0 hidden sm:block"
+                          style={{ backgroundColor: '#333435' }}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -381,7 +391,7 @@ export function UuDaiPageContent() {
                           !canRedeem(reward) ? 'opacity-60' : ''
                         }`}
                         style={{ 
-                          backgroundImage: 'url(/uudai/card_voucher_background.png)',
+                          backgroundImage: 'url(/uudai/card_voucher_background.svg)',
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat',

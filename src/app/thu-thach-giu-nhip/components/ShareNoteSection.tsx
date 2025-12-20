@@ -145,11 +145,11 @@ export function ShareNoteSection() {
             <div className="flex items-end justify-end pr-0 pb-0 min-h-[200px] md:min-h-[250px]">
               <div className="relative rounded-lg overflow-hidden w-full h-full">
                 <Image
-                  src="/thuthachnhipsong/buaangiadinh.png"
+                  src="/thuthachnhipsong/buaangiadinh.svg"
                   alt="Bữa ăn gia đình"
-                  width={400}
+                  width={500}
                   height={200}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full"
                 />
               </div>
             </div>
@@ -174,9 +174,9 @@ export function ShareNoteSection() {
         id="highlighted-notes-section"
         className="mt-16 rounded-lg overflow-hidden min-h-[700px]"
         style={{
-          backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.png)',
+          backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.svg)',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'top right',
           backgroundRepeat: 'no-repeat',
         }}
       >
@@ -303,7 +303,7 @@ export function ShareNoteSection() {
                   {/* Tiger Logo - Centered Top */}
                   <div className="flex justify-center mb-6">
                     <Image
-                      src="/icons/tiger_logo.png"
+                      src="/icons/tiger_logo.svg"
                       alt="Tiger Logo"
                       width={120}
                       height={40}

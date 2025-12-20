@@ -104,7 +104,7 @@ export function TimelineInteractive() {
   return (
     <div className="relative w-full">
       <Image
-        src="/nhipbep/timeline.png"
+        src="/nhipbep/timeline.svg"
         alt="Timeline"
         width={1920}
         height={400}

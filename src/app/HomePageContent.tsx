@@ -29,9 +29,9 @@ export function HomePageContent() {
       <main 
         className="min-h-[calc(100vh-80px)] relative flex flex-col md:block"
         style={{
-          backgroundImage: 'url(/trangchu/trangchu_background.jpg)',
-          backgroundSize: '100% 100%',
-          backgroundPosition: 'center',
+          backgroundImage: 'url(/trangchu/trangchu_background.svg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 0px',
           backgroundRepeat: 'no-repeat',
         }}
       >

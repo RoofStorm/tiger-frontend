@@ -254,9 +254,9 @@ export function LunchboxUploadSection() {
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Column - Image */}
-          <div className="relative w-full h-full min-h-[400px] lg:min-h-[600px]">
+          <div className="relative w-full h-full">
             <Image
-              src="/thuthachnhipsong/upload_section.png"
+              src="/thuthachnhipsong/upload_section.svg"
               alt="Upload section"
               fill
               className="object-cover rounded-lg"
@@ -530,7 +530,7 @@ export function LunchboxUploadSection() {
                     {/* Tiger Logo - Centered Top */}
                     <div className="flex justify-center mb-4 md:mb-6">
                       <Image
-                        src="/icons/tiger_logo.png"
+                        src="/icons/tiger_logo.svg"
                         alt="Tiger Logo"
                         width={120}
                         height={40}

@@ -111,7 +111,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
             >
               <Link href="/" className="flex items-center group">
                 <Image
-                  src={isDarkMode ? "/icons/tiger_logo_darkmode.png" : "/icons/tiger_logo.png"}
+                  src={isDarkMode ? "/icons/tiger_logo_darkmode.png" : "/icons/tiger_logo.svg"}
                   alt="Tiger Logo"
                   width={120}
                   height={40}

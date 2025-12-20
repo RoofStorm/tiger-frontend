@@ -15,9 +15,9 @@ const getBackgroundImage = (): string => {
   // Từ 18:00 (6 giờ chiều) đến 05:59 (gần 6 giờ sáng) dùng dark background
   // Từ 06:00 (6 giờ sáng) đến 17:59 (gần 6 giờ chiều) dùng light background
   if (hour >= 18 || hour < 6) {
-    return 'url(/nhipsong/nhipsong_dark_background.jpg)';
+    return 'url(/nhipsong/nhipsong_dark_background.svg)';
   }
-  return 'url(/nhipsong/nhipsong_light_background.jpg)';
+  return 'url(/nhipsong/nhipsong_light_background.svg)';
 };
 
 const isDarkMode = (): boolean => {
@@ -107,18 +107,18 @@ export function NhipSongPageContent() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div>
       <Header isDarkMode={showShareModal} />
       <main 
-        className="pt-5 min-h-[calc(100vh-80px)]"
         style={{
           backgroundImage: backgroundImage,
-          backgroundSize: '100% 100%',
-          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          backgroundPosition: isDark ? 'center' : 'bottom',
           backgroundRepeat: 'no-repeat',
+          height: 'calc(100vh)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           {!showMoodCard ? (
             <EmojiSelectionSection
               selectedEmojis={selectedEmojis}

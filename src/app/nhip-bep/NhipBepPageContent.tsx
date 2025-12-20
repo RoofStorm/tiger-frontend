@@ -22,7 +22,7 @@ const slides: SlideContent[] = [
       "The 'Five-fold Power Vacuum Bottle' was launched in the early days of the company and went on to become a popular product further down the road, but at the time of its initial release it was still only useful for hiking or traveling, and domestic demand was low.",
       "However, the company continued to develop new products. These included a baby bottle with a teat over the opening (thermal baby bottle), and a vacuum bottle for sake that kept the sake inside warm. Many other amazing products went on to be developed, such as a container for ice cream, and a vacuum bottle for ayu fishing to refrigerate and transport freshly caught fish."
     ],
-    image: '/nhipbep/history1_background.png'
+    image: '/nhipbep/history1_background.svg'
   },
   // Add more slides as needed
   {
@@ -32,7 +32,7 @@ const slides: SlideContent[] = [
       "During this period, the company expanded its product line and continued to innovate in vacuum bottle technology.",
       "New manufacturing processes were developed, and the company began to establish itself as a leader in thermal insulation products."
     ],
-    image: '/nhipbep/history1_background.png'
+    image: '/nhipbep/history1_background.svg'
   },
   {
     dates: '1981 - 2000',
@@ -41,7 +41,7 @@ const slides: SlideContent[] = [
       "The company expanded globally, bringing its innovative vacuum bottle technology to markets around the world.",
       "This era marked significant growth in both product diversity and international presence."
     ],
-    image: '/nhipbep/history1_background.png'
+    image: '/nhipbep/history1_background.svg'
   }
 ];
 
@@ -54,7 +54,7 @@ interface Product {
 
 const baseProducts: Product[] = [
   {
-    image: '/nhipbep/noicom.png',
+    image: '/nhipbep/noicom.svg',
     label: 'Nồi cơm điện',
     fullName: 'Nồi cơm điện Tiger',
     benefits: [
@@ -64,7 +64,7 @@ const baseProducts: Product[] = [
     ]
   },
   {
-    image: '/nhipbep/binhgiunhiet.png',
+    image: '/nhipbep/binhgiunhiet.svg',
     label: 'Bình giữ nhiệt',
     fullName: 'Bình giữ nhiệt Tiger',
     benefits: [
@@ -74,7 +74,7 @@ const baseProducts: Product[] = [
     ]
   },
   {
-    image: '/nhipbep/hopcom.png',
+    image: '/nhipbep/hopcom.svg',
     label: 'Hộp cơm',
     fullName: 'Hộp cơm Tiger',
     benefits: [
@@ -84,7 +84,7 @@ const baseProducts: Product[] = [
     ]
   },
   {
-    image: '/nhipbep/mayxay.png',
+    image: '/nhipbep/mayxay.svg',
     label: 'Máy xay',
     fullName: 'Máy xay Tiger',
     benefits: [
@@ -105,7 +105,7 @@ const products: Product[] = [
 // Helper function to get background image for product card based on index
 const getProductBackgroundImage = (index: number): string => {
   const backgroundIndex = (index % 4) + 1; // Cycle through 1, 2, 3, 4
-  return `/nhipbep/card_product_background${backgroundIndex}.png`;
+  return `/nhipbep/card_product_background${backgroundIndex}.svg`;
 };
 
 export function NhipBepPageContent() {
@@ -234,7 +234,7 @@ export function NhipBepPageContent() {
         {/* Background Section */}
         <div className="relative w-full min-h-[600px] md:min-h-[800px]">
           <Image
-            src="/nhipbep/nhipbep_background.png"
+            src="/nhipbep/nhipbep_background.svg"
             alt="Nhip Bep Background"
             width={1920}
             height={1080}
@@ -269,8 +269,8 @@ export function NhipBepPageContent() {
           className="relative w-full py-16"
           style={{
             backgroundColor: '#00579F',
-            backgroundImage: 'url(/nhipbep/nhipbep_products_background.png)',
-            backgroundSize: '100% 100%',
+            backgroundImage: 'url(/nhipbep/nhipbep_products_background.svg)',
+            backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
           }}

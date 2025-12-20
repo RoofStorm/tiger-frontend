@@ -63,14 +63,14 @@ export function MoodCardFlipCard({
                 transform: isCardFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
               }}
             >
-              {/* Back of Card (tarot.jpg) */}
+              {/* Back of Card (front_card_1.svg) */}
               <div
                 className="absolute inset-0 w-full h-full"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <div className="relative w-full h-full min-h-[550px]">
                   <Image
-                    src="/tarot.jpg"
+                    src="/nhipsong/front_card_1.svg"
                     alt="Mood Card Back"
                     fill
                     className="object-contain"
