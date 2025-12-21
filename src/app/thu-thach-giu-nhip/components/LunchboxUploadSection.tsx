@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -22,6 +22,7 @@ export function LunchboxUploadSection() {
   const { onKeyDown: handleInputKeyDown } = useInputFix();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const captionTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const backgroundRef = useRef<HTMLDivElement>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [caption, setCaption] = useState('');
@@ -241,6 +242,20 @@ export function LunchboxUploadSection() {
     }
   };
 
+  useEffect(() => {
+    const updateBackgroundStyle = () => {
+      if (backgroundRef.current) {
+        const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
+        backgroundRef.current.style.backgroundSize = isDesktop ? 'cover' : '200%';
+        backgroundRef.current.style.backgroundPosition = isDesktop ? 'top right' : 'center right';
+      }
+    };
+
+    updateBackgroundStyle();
+    window.addEventListener('resize', updateBackgroundStyle);
+    return () => window.removeEventListener('resize', updateBackgroundStyle);
+  }, []);
+
   return (
     <>
       {/* Bottom Section - Upload Section */}
@@ -254,22 +269,23 @@ export function LunchboxUploadSection() {
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Left Column - Image */}
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-[250px] md:h-[300px] lg:h-full">
             <Image
               src="/thuthachnhipsong/upload_section.svg"
               alt="Upload section"
               fill
-              className="object-cover rounded-lg"
+              className="object-contain object-top lg:object-cover lg:object-center rounded-lg"
             />
           </div>
 
           {/* Right Column - Upload và Input */}
           <div 
+            ref={backgroundRef}
             className="space-y-6 p-8 lg:p-12"
             style={{ 
-              backgroundImage: 'url(/thuthachnhipsong/upload_background.png)',
-              backgroundSize: '90%',
-              backgroundPosition: 'center top',
+              backgroundImage: 'url(/thuthachnhipsong/upload_background.svg)',
+              backgroundSize: '200%',
+              backgroundPosition: 'center right',
               backgroundRepeat: 'no-repeat',
             }}
           >
@@ -300,7 +316,7 @@ export function LunchboxUploadSection() {
                 <div className="flex justify-center mb-4">
                   <div className="w-20 h-20 flex items-center justify-center">
                     <Image
-                      src="/icons/upload.png"
+                      src="/icons/upload.svg"
                       alt="Upload"
                       width={48}
                       height={48}
@@ -317,9 +333,9 @@ export function LunchboxUploadSection() {
 
           {/* File Info Display - Shown when file is selected but not uploading */}
           {selectedFile && !uploading && (
-            <div className="rounded-lg p-4 mb-4" style={{ backgroundColor: '#FFFFFF1A', border: '0.5px solid #DCDCDC' }}>
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 flex-1">
+            <div className="rounded-lg p-4 mb-4 overflow-hidden" style={{ backgroundColor: '#FFFFFF1A', border: '0.5px solid #DCDCDC' }}>
+              <div className="flex items-center justify-between gap-4 min-w-0">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                     <Image
                     src="/icons/jpg_file.png"
                     alt="File icon"
@@ -327,11 +343,11 @@ export function LunchboxUploadSection() {
                     height={40}
                     className="flex-shrink-0"
                   />
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 overflow-hidden">
                     <p className="text-sm font-medium text-white truncate">
                       {selectedFile.name}
                     </p>
-                    <p className="text-xs text-gray-300 mt-1">
+                    <p className="text-xs text-gray-300 mt-1 truncate">
                       {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
                     </p>
                   </div>
@@ -354,9 +370,9 @@ export function LunchboxUploadSection() {
 
           {/* Upload Progress */}
           {uploading && selectedFile && (
-            <div className="rounded-lg p-4 mb-4" style={{ backgroundColor: '#FFFFFF1A', border: '0.5px solid #DCDCDC' }}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
+            <div className="rounded-lg p-4 mb-4 overflow-hidden" style={{ backgroundColor: '#FFFFFF1A', border: '0.5px solid #DCDCDC' }}>
+              <div className="flex items-center justify-between gap-4 mb-2 min-w-0">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   <Image
                     src="/icons/jpg_file.png"
                     alt="File icon"
@@ -364,11 +380,11 @@ export function LunchboxUploadSection() {
                     height={40}
                     className="flex-shrink-0"
                   />
-                  <div>
-                    <p className="text-sm font-medium text-white">
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <p className="text-sm font-medium text-white truncate">
                       {selectedFile.name}
                     </p>
-                    <p className="text-xs text-gray-300 mt-1">
+                    <p className="text-xs text-gray-300 mt-1 truncate">
                       {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
                     </p>
                   </div>
@@ -441,7 +457,6 @@ export function LunchboxUploadSection() {
               height: '48px',
               borderRadius: '8px',
               gap: '8px',
-              opacity: (!selectedFile || !caption.trim() || uploading || (!isByPass && !isAuthenticated)) ? 0.5 : 1,
               paddingTop: '12px',
               paddingRight: '28px',
               paddingBottom: '12px',
@@ -534,7 +549,7 @@ export function LunchboxUploadSection() {
                         alt="Tiger Logo"
                         width={120}
                         height={40}
-                        className="object-contain w-20 md:w-30 h-auto"
+                        className="object-contain"
                       />
                     </div>
 
@@ -557,7 +572,7 @@ export function LunchboxUploadSection() {
                     {/* Main Content - Image and Caption with Buttons */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-10">
                       {/* Left - User Uploaded Image */}
-                      <div className="relative w-full max-w-[200px] mx-auto md:max-w-none md:mx-0 aspect-square rounded-lg overflow-hidden">
+                      <div className="relative w-full max-w-[180px] mx-auto md:max-w-none md:mx-0 aspect-square rounded-lg overflow-hidden">
                         {uploadedImageUrl && (
                           <>
                             <Image
@@ -579,7 +594,7 @@ export function LunchboxUploadSection() {
                               }}
                             >
                               <Image
-                                src="/thuthachnhipsong/tramnamgiunhipsong.png"
+                                src="/thuthachnhipsong/tramnamgiunhipsong.svg"
                                 alt="Trăm năm giữ trọn nhịp sống"
                                 width={180}
                                 height={54}
@@ -597,11 +612,11 @@ export function LunchboxUploadSection() {
                           {/* Quote Mark - Top Left */}
                           <div className="absolute -top-1 -left-1 md:-top-2 md:-left-2">
                             <Image
-                              src="/icons/blueQuoteMark.png"
+                              src="/icons/blueQuoteMark.svg"
                               alt="Quote mark"
-                              width={40}
-                              height={40}
-                              className="object-contain w-8 h-8 md:w-10 md:h-10"
+                              width={30}
+                              height={30}
+                              className="object-contain w-3 h-3 md:w-7 md:h-7"
                             />
                           </div>
                           <p 
@@ -614,6 +629,7 @@ export function LunchboxUploadSection() {
                               letterSpacing: '0%',
                               textAlign: 'center',
                               color: '#00579F'
+                              
                             }}
                           >
                             {uploadedCaption}
@@ -699,6 +715,23 @@ export function LunchboxUploadSection() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Footer Text */}
+                    <p 
+                      className="text-center mt-4 md:mt-6 font-nunito"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 400,
+                        fontStyle: 'normal',
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        letterSpacing: '0%',
+                        textAlign: 'center',
+                        color: '#00579F'
+                      }}
+                    >
+                      Hãy để lại thêm một lời nhắn cho chính mình hoặc gửi đến mọi người nhé
+                    </p>
                   </div>
                 </div>
               </motion.div>

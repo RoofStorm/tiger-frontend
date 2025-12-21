@@ -96,12 +96,12 @@ export function ShareNoteSection() {
   return (
     <>
       {/* Share Section */}
-      <div className="mt-16 rounded-lg border-2 border-gray-200 overflow-hidden bg-white mx-4 md:mx-8 lg:mx-32 max-w-full md:max-w-none min-h-[300px] md:min-h-[250px]">
+      <div className="mt-16 rounded-[30px] border-2 border-gray-200 overflow-hidden bg-white mx-4 md:mx-8 lg:mx-32 max-w-full md:max-w-none min-h-[300px] md:min-h-[250px]">
         <div className="grid grid-cols-1 md:grid-cols-5 h-full">
           {/* Left Part: Text - 20% width */}
           <div 
             onClick={scrollToTextarea}
-            className="p-4 md:p-6 flex items-center justify-center bg-[#2A4A8C] md:col-span-1 relative cursor-pointer transition-all duration-300 hover:opacity-90 hover:bg-[#1f3a6b] min-h-[120px] md:min-h-[200px]"
+            className="p-4 md:p-6 flex items-center justify-center bg-[#00579F] md:col-span-1 relative cursor-pointer transition-all duration-300 hover:opacity-90 hover:bg-[#1f3a6b]"
             style={{
               backgroundImage: 'url(/thuthachnhipsong/bonghoa.png)',
               backgroundPosition: 'top left',
@@ -115,7 +115,7 @@ export function ShareNoteSection() {
           </div>
 
           {/* Right Part: Content - 80% width */}
-          <div className="bg-[#FFFDF5] md:col-span-4 grid grid-cols-1 md:grid-cols-2 min-h-[200px] md:min-h-[250px]">
+          <div className="bg-[#FFFDF5] md:col-span-4 grid grid-cols-1 md:grid-cols-2 md:min-h-[250px]">
             {/* Left: Avatar, Name, Content */}
             <div className="p-4 md:p-6 space-y-3 flex flex-col justify-center">
               {/* Avatar + Name */}
@@ -136,20 +136,22 @@ export function ShareNoteSection() {
               {/* Note */}
               <div>
                 <p className="text-gray-700 leading-relaxed text-base">
-                  Một hộp cơm giản dị, một bình nước bên bàn làm việc, hay nụ cười bên đồng nghiệp cũng đủ trở thành &quot;nhịp giữ&quot; trong ngày bận rộn.
+                Trong bối cảnh thị trường biến động nhanh, việc cập nhật kiến thức, tối ưu quy trình và ra quyết định dựa trên dữ liệu là yếu tố then chốt giúp tổ chức duy trì hiệu quả và phát triển bền vững lâu dài.
                 </p>
               </div>
             </div>
 
             {/* Right: Image */}
-            <div className="flex items-end justify-end pr-0 pb-0 min-h-[200px] md:min-h-[250px]">
-              <div className="relative rounded-lg overflow-hidden w-full h-full">
+            <div className="flex items-end justify-end pr-0 pb-0">
+              <div 
+                className="relative overflow-hidden w-full"
+              >
                 <Image
                   src="/thuthachnhipsong/buaangiadinh.svg"
                   alt="Bữa ăn gia đình"
                   width={500}
                   height={200}
-                  className="w-full h-full"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
@@ -180,21 +182,19 @@ export function ShareNoteSection() {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-12 min-h-[700px] max-h-[900px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-12 min-h-[700px]">
           {/* Left: Image, TextArea, Button */}
           <div className="space-y-4 flex flex-col items-center">
-            <div className="w-[70%] space-y-4 flex flex-col">
+            <div className="space-y-4 flex flex-col">
               {/* Image */}
-              <div className="relative w-full overflow-hidden rounded-t-[30px]">
-                <div className="relative w-full" style={{ paddingTop: '110%' }}>
-                  <Image
-                    src="/thuthachnhipsong/giadinhancom.png"
-                    alt="Giadinhancom"
-                    fill
-                    className="object-cover rounded-t-[30px]"
-                    style={{ borderRadius: '30px 30px 0 0' }}
-                  />
-                </div>
+              <div className="relative w-full mt-6">
+                <Image
+                  src="/thuthachnhipsong/giadinhancom.svg"
+                  alt="Giadinhancom"
+                  width={800}
+                  height={600}
+                  className="w-full h-auto object-contain"
+                />
               </div>
 
               {/* TextArea */}
@@ -244,13 +244,13 @@ export function ShareNoteSection() {
                 style={{ backgroundColor: '#FFFFFF1A' }}
               >
                 {/* Quote Mark - Top Left */}
-                <div className="absolute top-[-15px] left-3">
+                <div className="absolute top-[-10px] md:top-[-20px] left-3">
                   <Image
-                    src="/icons/quotemark.png"
+                    src="/icons/quotemark_white.svg"
                     alt="Quote mark"
                     width={40}
                     height={40}
-                    className="object-contain"
+                    className="object-contain w-6 h-6 md:w-10 md:h-10"
                   />
                 </div>
                 <div className="flex items-center gap-3 mb-3 pt-4">
@@ -364,11 +364,11 @@ export function ShareNoteSection() {
                     {/* TRĂM NĂM GIỮ TRỌN nhịp sống */}
                     <div className="flex justify-center">
                       <Image
-                        src="/thuthachnhipsong/tramnamgiunhipsong.png"
+                        src="/thuthachnhipsong/tramnamgiunhipsong.svg"
                         alt="Trăm năm giữ trọn nhịp sống"
                         width={240}
                         height={72}
-                        className="object-contain"
+                        className="object-contain w-40 md:w-60"
                       />
                     </div>
                   </div>

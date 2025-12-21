@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -26,6 +27,22 @@ export function MoodCardFlipCard({
   onReset,
   onExploreMore,
 }: MoodCardFlipCardProps) {
+  const hasAutoFlipped = useRef(false);
+
+  // Tự động flip card sau 2 giây khi component được hiển thị
+  useEffect(() => {
+    if (hasAutoFlipped.current) return;
+
+    const timer = setTimeout(() => {
+      if (!isCardFlipped && !hasAutoFlipped.current) {
+        hasAutoFlipped.current = true;
+        onCardFlip(true);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [isCardFlipped, onCardFlip]);
+
   return (
     <>
       {/* Backdrop overlay */}
