@@ -294,7 +294,6 @@ export function ShareRegistrationModal({
                       </span>
                     </label>
                   </div>
-product
                   {/* Register Button */}
                   <button
                     onClick={handleFormRegister}
