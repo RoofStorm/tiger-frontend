@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -18,6 +18,20 @@ export function ShareNoteSection() {
   const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
   const notesScrollRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Preload LCP image early
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = '/thuthachnhipsong/giadinhancom.svg';
+    link.fetchPriority = 'high';
+    document.head.appendChild(link);
+
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
 
   // Auto scroll notes loop
   useEffect(() => {
@@ -63,10 +77,11 @@ export function ShareNoteSection() {
     };
   }, []);
 
-  // Update modal background size for mobile
+  // Update modal background size for mobile with debounce
   useEffect(() => {
     if (!showSuccessModal) return;
 
+    let timeoutId: NodeJS.Timeout;
     const updateModalBackground = () => {
       if (modalRef.current) {
         const isMobile = window.matchMedia('(max-width: 767px)').matches;
@@ -75,16 +90,26 @@ export function ShareNoteSection() {
       }
     };
 
+    const debouncedUpdate = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        requestAnimationFrame(updateModalBackground);
+      }, 150);
+    };
+
     // Use requestAnimationFrame to ensure DOM is ready
     requestAnimationFrame(() => {
       updateModalBackground();
     });
 
-    window.addEventListener('resize', updateModalBackground);
-    return () => window.removeEventListener('resize', updateModalBackground);
+    window.addEventListener('resize', debouncedUpdate);
+    return () => {
+      window.removeEventListener('resize', debouncedUpdate);
+      clearTimeout(timeoutId);
+    };
   }, [showSuccessModal]);
 
-  const scrollToTextarea = () => {
+  const scrollToTextarea = useCallback(() => {
     setTimeout(() => {
       noteTextareaRef.current?.scrollIntoView({ 
         behavior: 'smooth', 
@@ -94,9 +119,9 @@ export function ShareNoteSection() {
         noteTextareaRef.current?.focus();
       }, 300);
     }, 100);
-  };
+  }, []);
 
-  const handleShareNote = () => {
+  const handleShareNote = useCallback(() => {
     if (!noteText.trim()) {
       toast({
         title: 'Vui lòng nhập nội dung',
@@ -113,7 +138,7 @@ export function ShareNoteSection() {
     setShowSuccessModal(true);
     // Reset textarea
     setNoteText('');
-  };
+  }, [noteText, toast, scrollToTextarea]);
 
   return (
     <>
@@ -208,7 +233,7 @@ export function ShareNoteSection() {
           {/* Left: Image, TextArea, Button */}
           <div className="space-y-4 flex flex-col items-center">
             <div className="space-y-4 flex flex-col">
-              {/* Image */}
+              {/* Image - LCP element, preload with priority */}
               <div className="relative w-full mt-6">
                 <Image
                   src="/thuthachnhipsong/giadinhancom.svg"
@@ -216,6 +241,8 @@ export function ShareNoteSection() {
                   width={800}
                   height={600}
                   className="w-full h-auto object-contain"
+                  priority
+                  fetchPriority="high"
                 />
               </div>
 

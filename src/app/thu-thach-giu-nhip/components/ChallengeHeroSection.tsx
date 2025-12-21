@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 
 export function ChallengeHeroSection() {
   return (
@@ -13,7 +12,8 @@ export function ChallengeHeroSection() {
     >
       {/* Central Image - Always Center */}
       <div className="flex items-center justify-center">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/thuthachnhipsong/tiger_giu_nhip.svg"
           alt="Tiger giữ nhịp"
           width={600}

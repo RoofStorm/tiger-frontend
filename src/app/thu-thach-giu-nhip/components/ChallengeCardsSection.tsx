@@ -1,22 +1,22 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { useCallback } from 'react';
 
 export function ChallengeCardsSection() {
-  const handleLunchboxClick = () => {
+  const handleLunchboxClick = useCallback(() => {
     const element = document.getElementById('lunchbox-upload-section');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, []);
 
-  const handleNoteClick = () => {
+  const handleNoteClick = useCallback(() => {
     const element = document.getElementById('highlighted-notes-section');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, []);
 
   return (
     <div className="w-screen relative left-1/2 -translate-x-1/2 grid grid-cols-1 lg:grid-cols-2 gap-0 md:mb-16 px-4">
@@ -28,11 +28,12 @@ export function ChallengeCardsSection() {
         transition={{ duration: 0.3 }}
       >
         <div className="relative w-full h-full">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/thuthachnhipsong/lunchbox_challenge.svg"
             alt="LunchBox Challenge"
-            fill
-            className="object-contain"
+            className="w-full h-full object-contain"
+            fetchPriority="high"
           />
         </div>
       </motion.div>
@@ -45,11 +46,12 @@ export function ChallengeCardsSection() {
         transition={{ duration: 0.3 }}
       >
         <div className="relative w-full h-full">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/thuthachnhipsong/note_giu_nhip.svg"
             alt="Note Giữ Nhịp"
-            fill
-            className="object-contain"
+            className="w-full h-full object-contain"
+            fetchPriority="high"
           />
         </div>
       </motion.div>

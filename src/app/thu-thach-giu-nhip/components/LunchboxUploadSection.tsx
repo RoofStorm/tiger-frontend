@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -236,13 +236,14 @@ export function LunchboxUploadSection() {
     }
   };
 
-  const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleCaptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     if (e.target.value.length <= 200) {
       setCaption(e.target.value);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
     const updateBackgroundStyle = () => {
       if (backgroundRef.current) {
         const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
@@ -251,9 +252,17 @@ export function LunchboxUploadSection() {
       }
     };
 
+    const debouncedUpdate = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(updateBackgroundStyle, 150);
+    };
+
     updateBackgroundStyle();
-    window.addEventListener('resize', updateBackgroundStyle);
-    return () => window.removeEventListener('resize', updateBackgroundStyle);
+    window.addEventListener('resize', debouncedUpdate);
+    return () => {
+      window.removeEventListener('resize', debouncedUpdate);
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   return (

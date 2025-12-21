@@ -126,7 +126,20 @@ export function NhipBepPageContent() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Preload all product images on mount for faster modal loading
+  useEffect(() => {
+    const uniqueProductImages = Array.from(new Set(baseProducts.map(p => p.image)));
+    uniqueProductImages.forEach(imageSrc => {
+      const img = new window.Image();
+      img.src = imageSrc;
+    });
+  }, []);
+
   const handleProductHover = (product: Product, index: number) => {
+    // Preload product image immediately when hovering
+    const img = new window.Image();
+    img.src = product.image;
+    
     // Clear any existing timeout
     if (hoverTimeout) {
       clearTimeout(hoverTimeout);
@@ -481,6 +494,8 @@ export function NhipBepPageContent() {
                         alt={selectedProduct.label}
                         fill
                         className="object-contain"
+                        priority
+                        sizes="(max-width: 768px) 180px, 180px"
                       />
                     </div>
                   </div>

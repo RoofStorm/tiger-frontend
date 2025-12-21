@@ -25,16 +25,16 @@ export function EmojiGrid({
   // Generate random delays and durations for each emoji
   const animationConfigs = useMemo(() => {
     return emojis.map(() => ({
-      delay: Math.random() * 2, // Random delay 0-2 seconds
-      duration: 2 + Math.random() * 1.5, // Random duration 2-3.5 seconds
-      repeatDelay: Math.random() * 1.5, // Random repeat delay 0-1.5 seconds
+      delay: Math.random() * 3, // Random delay 0-3 seconds
+      duration: 4 + Math.random() * 2, // Random duration 4-6 seconds (slower)
+      repeatDelay: Math.random() * 1, // Random repeat delay 0-1 seconds
       yValues: [
         0,
-        -8 - Math.random() * 4, // Random float up -8 to -12
+        -4 - Math.random() * 2, // Random float up -4 to -6 (gentler)
         0,
-        -6 - Math.random() * 3, // Random float up -6 to -9
+        -3 - Math.random() * 1.5, // Random float up -3 to -4.5
         0,
-        -4 - Math.random() * 2, // Random float up -4 to -6
+        -2 - Math.random() * 1, // Random float up -2 to -3
         0,
       ],
     }));
@@ -75,7 +75,7 @@ export function EmojiGrid({
                       repeat: Infinity,
                       repeatDelay: config.repeatDelay,
                       delay: config.delay,
-                      ease: "easeInOut",
+                      ease: [0.4, 0, 0.6, 1], // Smooth ease curve for gentle floating
                     }}
                   />
                 ) : (
@@ -89,7 +89,7 @@ export function EmojiGrid({
                       repeat: Infinity,
                       repeatDelay: config.repeatDelay,
                       delay: config.delay,
-                      ease: "easeInOut",
+                      ease: [0.4, 0, 0.6, 1], // Smooth ease curve for gentle floating
                     }}
                   >
                     {emoji.emoji}

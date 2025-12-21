@@ -275,6 +275,9 @@ export function DoiQuaPageContent() {
                       width={1200}
                       height={600}
                       className="w-full h-auto object-contain max-w-[90vw]"
+                      quality={100}
+                      sizes="(max-width: 768px) 90vw, 1200px"
+                      priority
                       // style={{ transform: 'scale(1)' }}
                     />
                   </motion.div>
@@ -306,7 +309,7 @@ export function DoiQuaPageContent() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex justify-center mb-8 px-4">
+            <div className="flex justify-center mb-8 px-4 pt-4 pb-4">
               <div 
                 className="flex items-center justify-center overflow-x-auto w-full max-w-full [&::-webkit-scrollbar]:hidden"
                 style={{
