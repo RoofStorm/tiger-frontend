@@ -32,14 +32,14 @@ export function EmojiSelectionSection({
       className="space-y-2 sm:space-y-4 text-center"
     >
       {/* Intro Text */}
-      <p className={`font-nunito text-[18px] leading-relaxed px-4 mt-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
+      <p className={`font-nunito text-[14px] md:text-[18px] leading-relaxed px-4 mt-2 md:mt-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
         Giữa muôn vàn hối hả,
         <br />
         hãy giữ cho mình một nhịp riêng mà bạn muốn.
       </p>
 
       {/* Main Title */}
-      <h2 className={`font-prata text-[28px] px-4 ${isDarkMode ? 'text-white' : 'text-tiger-blue-600'}`}>
+      <h2 className={`font-prata text-[20px] md:text-[28px] px-4 ${isDarkMode ? 'text-white' : 'text-tiger-blue-600'}`}>
         Chọn nhịp sống của bạn hôm nay.
       </h2>
 

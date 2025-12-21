@@ -143,7 +143,7 @@ export function ShareNoteSection() {
   return (
     <>
       {/* Share Section */}
-      <div className="mt-16 rounded-[30px] border-2 border-gray-200 overflow-hidden bg-white mx-4 md:mx-8 lg:mx-32 max-w-full md:max-w-none min-h-[300px] md:min-h-[250px]">
+      <div className="mt-16 rounded-[30px] border-2 border-gray-200 overflow-hidden bg-white mx-8 md:mx-8 lg:mx-32 max-w-full md:max-w-none min-h-[300px] md:min-h-[250px]">
         <div className="grid grid-cols-1 md:grid-cols-5 h-full">
           {/* Left Part: Text - 20% width */}
           <div 
@@ -156,7 +156,7 @@ export function ShareNoteSection() {
               backgroundSize: 'auto'
             }}
           >
-            <h3 className="font-prata text-white text-center relative z-10" style={{ fontSize: '36px' }}>
+            <h3 className="font-prata text-white text-center relative z-10 px-6 sm:px-8 md:px-0 text-3xl sm:text-4xl">
               Chia sẻ<br />ngay!
             </h3>
           </div>
@@ -208,42 +208,46 @@ export function ShareNoteSection() {
 
       {/* Write Note Section */}
       <div className="mt-16 text-center px-6 sm:px-8 md:px-0">
-        <h2 className="font-prata text-4xl md:text-5xl mb-6" style={{ color: '#00579F' }}>
+        <h2 className="font-prata text-3xl sm:text-4xl lg:text-5xl mb-6" style={{ color: '#00579F' }}>
           Viết note giữ nhịp!
         </h2>
-        <p className="text-gray-700 max-w-3xl mx-auto text-center leading-relaxed" style={{ fontSize: '16px' }}>
+        <p className="text-gray-700 max-w-3xl mx-auto text-left md:text-center leading-relaxed" style={{ fontSize: '16px' }}>
           Giữ nhịp đâu chỉ dừng lại ở bữa trưa. Bạn có lời nhắc nào muốn gửi đến chính mình, hay gửi
           đến một người quan trong. Đôi khi chỉ cần vài đôi điều ngắn gọn - cũng đủ trở thành nhịp
           sống dịu dàng cho cả bạn và người khác
         </p>
       </div>
 
-      {/* Highlighted Notes Section */}
-      <div 
-        id="highlighted-notes-section"
-        className="mt-16 rounded-lg overflow-hidden min-h-[700px]"
-        style={{
-          backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.svg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'top right',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
+     
+        {/* Highlighted Notes Section */}
+        <div 
+          id="highlighted-notes-section"
+          className="mt-16 rounded-lg overflow-hidden min-h-[700px] bg-center md:bg-[top_right]"
+          style={{
+            backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.svg)',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+          }}
+        >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-12 min-h-[700px]">
           {/* Left: Image, TextArea, Button */}
           <div className="space-y-4 flex flex-col items-center">
             <div className="space-y-4 flex flex-col">
               {/* Image - LCP element, preload with priority */}
-              <div className="relative w-full mt-6">
-                <Image
-                  src="/thuthachnhipsong/giadinhancom.svg"
-                  alt="Giadinhancom"
-                  width={800}
-                  height={600}
-                  className="w-full h-auto object-contain"
-                  priority
-                  fetchPriority="high"
-                />
+              <div className="relative w-full mt-6 overflow-visible">
+                  <Image
+                    src="/thuthachnhipsong/giadinhancom.svg"
+                    alt="Giadinhancom"
+                    width={800}
+                    height={600}
+                    className="w-full h-auto object-contain ml-[10px] md:ml-[20px]"
+                    style={{
+                      transform: 'scale(1.1)',
+                      transformOrigin: 'center'
+                    }}
+                    priority
+                    fetchPriority="high"
+                  />
               </div>
 
               {/* TextArea */}
@@ -377,7 +381,6 @@ export function ShareNoteSection() {
                       fontSize: '16px',
                       lineHeight: '20px',
                       letterSpacing: '0.03em',
-                      textAlign: 'center',
                       color: '#00579F'
                     }}
                   >
@@ -433,7 +436,7 @@ export function ShareNoteSection() {
 
                   {/* Info Text */}
                   <p 
-                    className="text-center mb-8 font-nunito mx-auto"
+                    className="text-left md:text-center mb-8 font-nunito mx-auto"
                     style={{
                       fontFamily: 'Nunito',
                       fontWeight: 400,
@@ -441,7 +444,6 @@ export function ShareNoteSection() {
                       fontSize: '14px',
                       lineHeight: '14px',
                       letterSpacing: '-0.05em',
-                      textAlign: 'center',
                       color: '#00579F',
                       maxWidth: '70%'
                     }}

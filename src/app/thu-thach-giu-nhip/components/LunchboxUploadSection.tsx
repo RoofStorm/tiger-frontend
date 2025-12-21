@@ -273,10 +273,10 @@ export function LunchboxUploadSection() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
-        className="mt-5 rounded-lg mx-12"
+        className="mt-5 rounded-lg mx-8"
         style={{ backgroundColor: '#004EA3' }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-12">
           {/* Left Column - Image */}
           <div className="relative w-full h-[250px] md:h-[300px] lg:h-full">
             <Image
@@ -299,8 +299,8 @@ export function LunchboxUploadSection() {
             }}
           >
           {/* Title */}
-          <div className="space-y-4 mt-2 px-6 sm:px-8 md:px-0">
-              <h2 className="font-prata font-bold text-white leading-tight text-center" style={{ fontSize: '28px' }}>
+          <div className="space-y-4 mt-2 px-0 sm:px-8 md:px-0">
+              <h2 className="font-prata font-bold text-white leading-tight text-center text-lg sm:text-3xl lg:text-4xl">
               Khoảnh khắc giữ nhịp – bữa trưa của bạn có câu chuyện gì?
             </h2>
              
@@ -321,7 +321,7 @@ export function LunchboxUploadSection() {
               onChange={handleFileSelect}
               className="hidden"
             />
-              <div className="text-center">
+              <div className="text-left md:text-center">
                 <div className="flex justify-center mb-4">
                   <div className="w-20 h-20 flex items-center justify-center">
                     <Image
@@ -571,7 +571,6 @@ export function LunchboxUploadSection() {
                         fontStyle: 'normal',
                         lineHeight: '20px',
                         letterSpacing: '0.03em',
-                        textAlign: 'center',
                         color: '#00579F'
                       }}
                     >
@@ -629,14 +628,13 @@ export function LunchboxUploadSection() {
                             />
                           </div>
                           <p 
-                            className="font-nunito text-sm md:text-base"
+                            className="font-nunito text-sm md:text-base text-left md:text-center"
                             style={{
                               fontFamily: 'Nunito',
                               fontWeight: 700,
                               fontStyle: 'italic',
                               lineHeight: '20px',
                               letterSpacing: '0%',
-                              textAlign: 'center',
                               color: '#00579F'
                               
                             }}
@@ -727,7 +725,7 @@ export function LunchboxUploadSection() {
 
                     {/* Footer Text */}
                     <p 
-                      className="text-center mt-4 md:mt-6 font-nunito"
+                      className="text-left md:text-center mt-4 md:mt-6 font-nunito"
                       style={{
                         fontFamily: 'Nunito',
                         fontWeight: 400,
@@ -735,7 +733,6 @@ export function LunchboxUploadSection() {
                         fontSize: '14px',
                         lineHeight: '20px',
                         letterSpacing: '0%',
-                        textAlign: 'center',
                         color: '#00579F'
                       }}
                     >

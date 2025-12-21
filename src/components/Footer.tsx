@@ -37,15 +37,16 @@ interface FooterSectionProps {
   children: React.ReactNode;
   isOpen: boolean;
   onToggle: () => void;
+  isLast?: boolean;
 }
 
-function FooterSection({ title, children, isOpen, onToggle }: FooterSectionProps) {
+function FooterSection({ title, children, isOpen, onToggle, isLast = false }: FooterSectionProps) {
   return (
-    <div className="text-center md:text-left">
+    <div className={`text-center md:text-left pb-4 md:pb-0 ${isLast ? 'pb-0' : ''}`}>
       {/* Mobile: Button with dropdown */}
       <button
         onClick={onToggle}
-        className="md:hidden w-full flex items-center justify-center font-bold text-white mb-4 py-2 relative"
+        className="md:hidden w-full flex items-center justify-center font-bold text-white py-3 relative"
       >
         <span>{title}</span>
         <ChevronDown
@@ -99,9 +100,9 @@ export function Footer() {
     <footer className="text-white" style={{ backgroundColor: '#48494A' }}>
       <div className="container mx-auto px-4 py-12">
         {/* Upper Section - Text Links */}
-        <div className="flex flex-col md:flex-row md:justify-between gap-8 mb-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:gap-8 mb-8">
           {/* Column 1: Thông tin sản phẩm & Khám phá & Tận hưởng */}
-          <div className="space-y-6">
+          <div className="md:space-y-6">
             <FooterSection
               title="Thông tin sản phẩm"
               isOpen={openSections['thong-tin-san-pham']}
@@ -147,7 +148,7 @@ export function Footer() {
           </div>
 
           {/* Column 3: Tin tức & Hỗ trợ Khách hàng */}
-          <div className="space-y-6">
+          <div className="md:space-y-6">
             <FooterSection
               title="Tin tức"
               isOpen={openSections['tin-tuc']}
@@ -183,6 +184,7 @@ export function Footer() {
               title="Nơi để mua"
               isOpen={openSections['noi-de-mua']}
               onToggle={() => toggleSection('noi-de-mua')}
+              isLast={true}
             >
               <div></div>
             </FooterSection>
