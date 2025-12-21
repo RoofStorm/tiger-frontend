@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Header } from '@/components/Header';
 import Image from 'next/image';
 import { TimelineInteractive } from '@/components/TimelineInteractive/TimelineInteractive';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
@@ -179,7 +178,6 @@ export function NhipBepPageContent() {
 
   return (
     <div className="min-h-screen">
-      <Header />
       <main className="min-h-[calc(100vh-80px)] bg-white">
         {/* Image Container - Relative for absolute text positioning */}
         <div className="relative w-full min-h-[500px] md:min-h-0">
@@ -240,17 +238,17 @@ export function NhipBepPageContent() {
             alt="Nhip Bep Background"
             width={1920}
             height={1080}
-            className="w-full h-auto object-cover min-h-[600px] md:min-h-[800px]"
+            className="w-full h-auto object-cover min-h-[300px] md:min-h-[800px]"
+           
           />
 
           {/* Text Content - Absolute, centered overlay */}
-          <div className="absolute top-[38%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl px-4">
+          <div className="absolute top-[15%] md:top-[38%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl px-4">
             <div className="text-center space-y-6">
               {/* Title */}
               <h2 className="text-4xl md:text-5xl font-prata" style={{ color: '#00579F' }}>
                 Cột mốc thời gian
               </h2>
-                trangchu
               {/* Body Text */}
               <div className="text-center max-w-3xl mx-auto">
                 <p className="text-base md:text-lg text-gray-800 font-sans leading-relaxed">
@@ -260,9 +258,22 @@ export function NhipBepPageContent() {
             </div>
           </div>
 
-          {/* Timeline Image - Absolute, bottom */}
-          <div className="absolute bottom-0 left-0 w-full z-10">
-            <TimelineInteractive />
+          {/* Timeline Image - Relative on mobile, absolute on desktop */}
+          <div className="relative md:absolute md:bottom-0 left-0 w-full z-10">
+            {/* Mobile: Static timeline image */}
+            <div className="md:hidden">
+              <Image
+                src="/nhipbep/timeline_mobile.svg"
+                alt="Timeline"
+                width={1920}
+                height={400}
+                className="w-full h-auto object-cover"
+              />
+            </div>
+            {/* Desktop: Interactive timeline */}
+            <div className="hidden md:block">
+              <TimelineInteractive />
+            </div>
           </div>
         </div>
 

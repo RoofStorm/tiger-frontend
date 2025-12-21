@@ -3,16 +3,16 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Gift, Star } from 'lucide-react';
+import { Gift, Star, Leaf } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Reward, CreateRedeemData } from '@/types';
-import { Header } from '@/components/Header';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useInputFix } from '@/hooks/useInputFix';
 import { PhoneInput } from '@/components/ui/phone-input';
+import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
 interface UserRedeem {
   id: string;
@@ -20,13 +20,14 @@ interface UserRedeem {
   status: string;
 }
 
-type TabType = 'doi-qua' | 'the-le' | 'nhip-song' | 'thu-thach';
+type TabType = 'doi-qua' | 'the-le' | 'nhip-song' | 'thu-thach' | 'nhip-bep';
 
-export function UuDaiPageContent() {
+export function DoiQuaPageContent() {
   const { user, isAuthenticated } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { onKeyDown: handleInputKeyDown } = useInputFix();
+  const { navigateWithLoading } = useGlobalNavigationLoading();
   const [activeTab, setActiveTab] = useState<TabType>('doi-qua');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
@@ -228,7 +229,6 @@ export function UuDaiPageContent() {
 
   return (
     <div className="min-h-screen">
-      <Header />
       <main 
         style={{ 
           backgroundImage: 'url(/uudai/traodoinhipsong_background.svg)',
@@ -317,14 +317,21 @@ export function UuDaiPageContent() {
               >
                 <div className="flex items-center justify-center gap-1 md:gap-0">
                   {[
-                    { id: 'doi-qua' as TabType, label: 'Đổi quà' },
-                    { id: 'the-le' as TabType, label: 'Thể lệ' },
-                    { id: 'nhip-song' as TabType, label: 'Nhịp sống' },
-                    { id: 'thu-thach' as TabType, label: 'Thử thách' },
+                    { id: 'doi-qua' as TabType, label: 'Đổi quà', href: null },
+                    { id: 'the-le' as TabType, label: 'Thể lệ', href: null },
+                    { id: 'nhip-song' as TabType, label: 'Nhịp sống', href: '/nhip-song' },
+                    { id: 'thu-thach' as TabType, label: 'Thử thách giữ nhịp', href: '/thu-thach-giu-nhip' },
+                    { id: 'nhip-bep' as TabType, label: 'Nhịp bếp', href: '/nhip-bep' },
                   ].map((tab, index, array) => (
                     <div key={tab.id} className="flex items-center flex-shrink-0">
                       <button
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={() => {
+                          if (tab.href) {
+                            navigateWithLoading(tab.href, `Đang chuyển đến ${tab.label}...`);
+                          } else {
+                            setActiveTab(tab.id);
+                          }
+                        }}
                         className={`px-3 py-2 md:px-6 md:py-3 font-medium transition-all duration-300 rounded-full whitespace-nowrap ${
                           activeTab === tab.id
                             ? 'bg-[#284A8F] text-white'
@@ -351,23 +358,25 @@ export function UuDaiPageContent() {
             </div>
 
             {/* Centered Title */}
-            <div className="text-center mb-12">
-              <h2 
-                className="font-prata"
-                style={{ 
-                  color: '#00579F',
-                  fontFamily: 'Prata',
-                  fontWeight: 400,
-                  fontStyle: 'normal',
-                  fontSize: '36px',
-                  lineHeight: '40px',
-                  letterSpacing: '0.03em',
-                  textAlign: 'center',
-                }}
-              >
-                Đổi quà
-              </h2>
-            </div>
+            {activeTab === 'doi-qua' && (
+              <div className="text-center mb-12">
+                <h2 
+                  className="font-prata"
+                  style={{ 
+                    color: '#00579F',
+                    fontFamily: 'Prata',
+                    fontWeight: 400,
+                    fontStyle: 'normal',
+                    fontSize: '36px',
+                    lineHeight: '40px',
+                    letterSpacing: '0.03em',
+                    textAlign: 'center',
+                  }}
+                >
+                  Đổi quà
+                </h2>
+              </div>
+            )}
 
             {/* Tab Content */}
             {activeTab === 'doi-qua' && (
@@ -481,22 +490,248 @@ export function UuDaiPageContent() {
             )}
 
             {activeTab === 'the-le' && (
-              <div className="mb-16 text-center py-16">
-                <p className="text-gray-600 text-lg">Nội dung thể lệ sẽ được cập nhật...</p>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="mb-16 max-w-4xl mx-auto"
+              >
+                {/* Title */}
+                <div className="text-center mb-8">
+                  <h2 
+                    className="font-prata mb-4"
+                    style={{ 
+                      color: '#00579F',
+                      fontFamily: 'Prata',
+                      fontWeight: 400,
+                      fontStyle: 'normal',
+                      fontSize: '36px',
+                      lineHeight: '40px',
+                      letterSpacing: '0.03em',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Thể lệ
+                  </h2>
+                  
+                  {/* Subtitle with leaf icon */}
+                  <div className="flex items-center justify-center gap-2 mb-8">
+                    <Leaf className="w-5 h-5" style={{ color: '#22c55e' }} />
+                    <p 
+                      className="font-noto-sans"
+                      style={{
+                        fontFamily: 'var(--font-noto-sans)',
+                        fontSize: '18px',
+                        fontWeight: 400,
+                        color: '#333',
+                        textAlign: 'center',
+                      }}
+                    >
+                      Cơ chế &quot;Điểm năng lượng – Nhịp sống&quot;
+                    </p>
+                  </div>
+                </div>
+
+                {/* Content Sections */}
+                <div className="space-y-8 text-left">
+                  {/* Section 1: Tích Điểm Năng Lượng */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                    className="bg-transparent"
+                  >
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      1. Tích Điểm Năng Lượng
+                    </h3>
+                    <p 
+                      className="font-noto-sans mb-4"
+                      style={{
+                        fontFamily: 'var(--font-noto-sans)',
+                        fontSize: '16px',
+                        color: '#333',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      Mỗi hoạt động nhỏ giúp bạn nạp thêm năng lượng:
+                    </p>
+                    <ul className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Đăng nhập mỗi ngày → <strong>+5 điểm</strong>
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Tham gia My lunchbox challenge → <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Tham gia viết Note giữ nhịp → <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Chia sẻ quote/lunchboxchallenge/note giữ nhịp → <strong>+10 điểm</strong> (Tối đa 1 lần/ngày)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Mời bạn bè tham gia → <strong>+50 điểm</strong> (Tối đa 2 lần/user/tuần) (đường link)
+                        </span>
+                      </li>
+                    </ul>
+                  </motion.div>
+
+                  {/* Section 2: Đổi Điểm Năng Lượng -> Nhịp sống */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="bg-transparent"
+                  >
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      2. Đổi Điểm Năng Lượng → Nhịp sống
+                    </h3>
+                    <p 
+                      className="font-noto-sans"
+                      style={{
+                        fontFamily: 'var(--font-noto-sans)',
+                        fontSize: '16px',
+                        color: '#333',
+                      }}
+                    >
+                      <strong>1.000 điểm năng lượng = 1 Nhịp sống</strong>
+                    </p>
+                  </motion.div>
+
+                  {/* Section 3: Đổi Nhịp sống -> Quà tặng Tiger */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="bg-transparent"
+                  >
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      3. Đổi Nhịp sống → Quà tặng Tiger
+                    </h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>200 điểm năng lượng</strong> → Voucher 50k cho sản phẩm Tiger (giới hạn 3 lần/user)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>300 điểm năng lượng</strong> → Voucher 100k cho sản phẩm Tiger (giới hạn 3 lần/user)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>500 điểm năng lượng</strong> → Voucher 300k cho sản phẩm Tiger (giới hạn 3 lần/user)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>1 Nhịp sống</strong> → 1 Hộp cơm Tiger (giới hạn 1 lần/user)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>2 Nhịp sống</strong> → 1 Bình giữ nhiệt Tiger (giới hạn 1 lần/user)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>3 Nhịp sống</strong> → 1 Máy xay sinh tố Tiger (giới hạn 1 lần/user)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>5 Nhịp sống</strong> → 1 Nồi cơm điện Tiger (bản thường) (giới hạn 1 lần/user)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>10 Nhịp sống</strong> → 1 Nồi cơm điện Tiger cao tần (phiên bản cao cấp) (giới hạn 1 lần/user)
+                        </span>
+                      </li>
+                    </ul>
+                  </motion.div>
+                </div>
+
+                {/* Action Buttons */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="flex flex-col sm:flex-row gap-4 justify-center mt-12"
+                >
+                  <button
+                    onClick={() => setActiveTab('doi-qua')}
+                    className="px-8 py-3 rounded-lg font-nunito font-semibold transition-all duration-300 bg-transparent border-2 border-[#00579F] text-[#00579F] hover:bg-[#00579F] hover:text-white"
+                    style={{
+                      fontFamily: 'var(--font-nunito)',
+                      fontSize: '16px',
+                    }}
+                  >
+                    Đổi quà ngay
+                  </button>
+                  <button
+                    onClick={() => navigateWithLoading('/thu-thach-giu-nhip', 'Đang chuyển đến Thử thách giữ nhịp...')}
+                    className="px-8 py-3 rounded-lg font-nunito font-semibold transition-all duration-300 bg-[#00579F] text-white hover:bg-[#284A8F]"
+                    style={{
+                      fontFamily: 'var(--font-nunito)',
+                      fontSize: '16px',
+                    }}
+                  >
+                    Thử thách ngay để nhận quà
+                  </button>
+                </motion.div>
+              </motion.div>
             )}
 
-            {activeTab === 'nhip-song' && (
-              <div className="mb-16 text-center py-16">
-                <p className="text-gray-600 text-lg">Nội dung nhịp sống sẽ được cập nhật...</p>
-              </div>
-            )}
-
-            {activeTab === 'thu-thach' && (
-              <div className="mb-16 text-center py-16">
-                <p className="text-gray-600 text-lg">Nội dung thử thách sẽ được cập nhật...</p>
-              </div>
-            )}
 
             {/* Redeem Modal */}
             {showRedeemModal && selectedReward && (

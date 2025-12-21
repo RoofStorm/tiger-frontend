@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Header } from '@/components/Header';
 import { EmojiSelectionSection } from './components/EmojiSelectionSection';
 import { MoodCardFlipCard } from './components/MoodCardFlipCard';
 import { ShareRegistrationModal } from './components/ShareRegistrationModal';
 import { RewardModal } from './components/RewardModal';
 import { useMoodCard } from '@/hooks/useMoodCard';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
+import { useHeaderDarkMode } from '@/contexts/HeaderDarkModeContext';
 
 const getBackgroundImage = (): string => {
   const now = new Date();
@@ -33,6 +33,12 @@ export function NhipSongPageContent() {
   const [backgroundImage, setBackgroundImage] = useState<string>(getBackgroundImage());
   const [isDark, setIsDark] = useState<boolean>(isDarkMode());
   const { navigateWithLoading } = useGlobalNavigationLoading();
+  const { setIsDarkMode } = useHeaderDarkMode();
+
+  // Update header dark mode when showShareModal changes
+  useEffect(() => {
+    setIsDarkMode(showShareModal);
+  }, [showShareModal, setIsDarkMode]);
 
   // Cập nhật background image và dark mode dựa trên thời gian
   useEffect(() => {
@@ -108,7 +114,6 @@ export function NhipSongPageContent() {
 
   return (
     <div>
-      <Header isDarkMode={showShareModal} />
       <main 
         style={{
           backgroundImage: backgroundImage,

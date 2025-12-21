@@ -4,6 +4,8 @@ import { Suspense } from 'react';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import { AuthSuccessHandler } from '@/components/AuthSuccessHandler';
+import { HeaderWrapper } from '@/components/HeaderWrapper';
+import { Footer } from '@/components/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 const nunito = Nunito({ subsets: ['latin', 'vietnamese'], variable: '--font-nunito' });
@@ -43,7 +45,9 @@ export default function RootLayout({
           <Suspense fallback={null}>
             <AuthSuccessHandler />
           </Suspense>
+          <HeaderWrapper />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>

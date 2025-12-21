@@ -64,7 +64,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
     { label: 'Nhịp sống', href: '/nhip-song' },
     { label: 'Thử thách giữ nhịp', href: '/thu-thach-giu-nhip' },
     { label: 'Nhịp bếp', href: '/nhip-bep' },
-    { label: 'Ưu đãi', href: '/uu-dai' },
+    { label: 'Đổi quà', href: '/doi-qua' },
   ];
 
   const handleOpenAuthModal = (mode: 'login' | 'register') => {
@@ -563,6 +563,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                     </button>
                   </>
                 )}
+
               </div>
             </motion.div>
           )}

@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Header } from '@/components/Header';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { Button } from '@/components/ui/button';
@@ -43,7 +42,6 @@ export function HomePageContent() {
 
   return (
     <div className="min-h-screen">
-      <Header />
       <main 
         ref={mainRef}
         className="min-h-[calc(100vh-80px)] relative flex flex-col md:block"

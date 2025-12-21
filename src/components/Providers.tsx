@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { useState } from 'react';
 import { Toaster } from '@/components/ui/toaster';
 import { LoadingProvider } from '@/contexts/LoadingContext';
+import { HeaderDarkModeProvider } from '@/contexts/HeaderDarkModeContext';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -41,9 +42,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
         refetchWhenOffline={false} // Don't refetch when offline
       >
         <LoadingProvider>
-          {children}
-          <LoadingOverlay />
-          <Toaster />
+          <HeaderDarkModeProvider>
+            {children}
+            <LoadingOverlay />
+            <Toaster />
+          </HeaderDarkModeProvider>
         </LoadingProvider>
       </SessionProvider>
     </QueryClientProvider>

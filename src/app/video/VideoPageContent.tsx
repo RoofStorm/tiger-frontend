@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Corner0 } from '@/components/Corner0/Corner0';
-import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { useRouter } from 'next/navigation';
@@ -20,7 +19,6 @@ export function VideoPageContent() {
 
   return (
     <div className="min-h-screen">
-      <Header />
       <main className="relative min-h-[calc(100vh-80px)] bg-gradient-to-b from-blue-50 to-indigo-100">
         <Corner0
           onVideoEnded={() => setShowIntroModal(true)}
