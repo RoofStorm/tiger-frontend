@@ -270,7 +270,7 @@ export function DoiQuaPageContent() {
                     transition={{ duration: 0.6, delay: 0.3 }}
                   >
                     <Image
-                      src="/uudai/traodoinhipsong_tips.svg"
+                      src="/uudai/traodoinhipsong_tips.webp"
                       alt="Trao đổi nhịp sống tips"
                       width={1200}
                       height={600}
@@ -311,14 +311,14 @@ export function DoiQuaPageContent() {
             {/* Tab Navigation */}
             <div className="flex justify-center mb-8 px-4 pt-4 pb-4">
               <div 
-                className="flex items-center justify-center overflow-x-auto w-full max-w-full [&::-webkit-scrollbar]:hidden"
+                className="flex items-center justify-center overflow-x-auto overflow-y-visible w-full max-w-full [&::-webkit-scrollbar]:hidden pb-1"
                 style={{
                   scrollbarWidth: 'none', /* Firefox */
                   msOverflowStyle: 'none', /* IE and Edge */
                   WebkitOverflowScrolling: 'touch', /* iOS smooth scrolling */
                 }}
               >
-                <div className="flex items-center justify-center gap-1 md:gap-0">
+                <div className="flex items-center justify-center gap-1 md:gap-0 pb-0.5">
                   {[
                     { id: 'doi-qua' as TabType, label: 'Đổi quà', href: null },
                     { id: 'the-le' as TabType, label: 'Thể lệ', href: null },
