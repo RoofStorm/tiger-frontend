@@ -276,7 +276,7 @@ export function NhipBepPageContent() {
             {/* Mobile: Static timeline image */}
             <div className="md:hidden">
               <Image
-                src="/nhipbep/timeline_mobile.svg"
+                src="/nhipbep/timeline_mobile.webp"
                 alt="Timeline"
                 width={1920}
                 height={400}
