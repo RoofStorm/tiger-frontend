@@ -2,6 +2,7 @@
 
 import { EmojiSelection } from '@/types';
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 interface EmojiGridProps {
   emojis: EmojiSelection[];
@@ -21,6 +22,24 @@ export function EmojiGrid({
 
   const canSelect = selectedEmojis.length < 3;
 
+  // Generate random delays and durations for each emoji
+  const animationConfigs = useMemo(() => {
+    return emojis.map(() => ({
+      delay: Math.random() * 2, // Random delay 0-2 seconds
+      duration: 2 + Math.random() * 1.5, // Random duration 2-3.5 seconds
+      repeatDelay: Math.random() * 1.5, // Random repeat delay 0-1.5 seconds
+      yValues: [
+        0,
+        -8 - Math.random() * 4, // Random float up -8 to -12
+        0,
+        -6 - Math.random() * 3, // Random float up -6 to -9
+        0,
+        -4 - Math.random() * 2, // Random float up -4 to -6
+        0,
+      ],
+    }));
+  }, [emojis.length]);
+
   return (
     <div>
       {/* Emoji Grid - 4 columns for 12 emojis */}
@@ -28,6 +47,7 @@ export function EmojiGrid({
         {emojis.map((emoji, index) => {
           const selected = isSelected(emoji.id);
           const disabled = !canSelect && !selected;
+          const config = animationConfigs[index];
 
           return (
             <button
@@ -48,15 +68,13 @@ export function EmojiGrid({
                     alt={emoji.label}
                     className="w-[70px] h-[70px] object-contain"
                     animate={{
-                      rotate: [
-                        0, -6, 6, -6, 6, -4, 4, -3, 3, -2, 0
-                      ],
+                      y: config.yValues,
                     }}
                     transition={{
-                      duration: 2,
+                      duration: config.duration,
                       repeat: Infinity,
-                      repeatDelay: 2,
-                      delay: index * 0.2,
+                      repeatDelay: config.repeatDelay,
+                      delay: config.delay,
                       ease: "easeInOut",
                     }}
                   />
@@ -64,15 +82,13 @@ export function EmojiGrid({
                   <motion.div
                     className="text-2xl sm:text-3xl"
                     animate={{
-                      rotate: [
-                        0, -6, 6, -6, 6, -4, 4, -3, 3, -2, 0
-                      ],
+                      y: config.yValues,
                     }}
                     transition={{
-                      duration: 2,
+                      duration: config.duration,
                       repeat: Infinity,
-                      repeatDelay: 2,
-                      delay: index * 0.2,
+                      repeatDelay: config.repeatDelay,
+                      delay: config.delay,
                       ease: "easeInOut",
                     }}
                   >
