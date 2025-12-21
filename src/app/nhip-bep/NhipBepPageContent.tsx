@@ -112,6 +112,7 @@ export function NhipBepPageContent() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentProductSlide, setCurrentProductSlide] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProductIndex, setSelectedProductIndex] = useState<number | null>(null);
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const currentContent = slides[currentSlide];
@@ -126,7 +127,7 @@ export function NhipBepPageContent() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const handleProductHover = (product: Product) => {
+  const handleProductHover = (product: Product, index: number) => {
     // Clear any existing timeout
     if (hoverTimeout) {
       clearTimeout(hoverTimeout);
@@ -134,6 +135,7 @@ export function NhipBepPageContent() {
     // Set new timeout to open modal after 500ms
     const timeout = setTimeout(() => {
       setSelectedProduct(product);
+      setSelectedProductIndex(index);
     }, 500);
     setHoverTimeout(timeout);
   };
@@ -248,7 +250,7 @@ export function NhipBepPageContent() {
               <h2 className="text-4xl md:text-5xl font-prata" style={{ color: '#00579F' }}>
                 Cột mốc thời gian
               </h2>
-
+                trangchu
               {/* Body Text */}
               <div className="text-center max-w-3xl mx-auto">
                 <p className="text-base md:text-lg text-gray-800 font-sans leading-relaxed">
@@ -321,8 +323,11 @@ export function NhipBepPageContent() {
                               backgroundPosition: 'center',
                               backgroundRepeat: 'no-repeat',
                             }}
-                            onClick={() => setSelectedProduct(product)}
-                            onMouseEnter={() => handleProductHover(product)}
+                            onClick={() => {
+                              setSelectedProduct(product);
+                              setSelectedProductIndex(actualIndex);
+                            }}
+                            onMouseEnter={() => handleProductHover(product, actualIndex)}
                             onMouseLeave={handleProductLeave}
                           >
                             <div className="flex flex-col items-center justify-center space-y-2 md:space-y-4 relative z-10 flex-1">
@@ -405,106 +410,130 @@ export function NhipBepPageContent() {
 
       {/* Product Modal */}
       <AnimatePresence>
-        {selectedProduct && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-[#00579F]/80 backdrop-blur-sm z-50"
-              onClick={() => setSelectedProduct(null)}
-            />
-            
-            {/* Modal Content */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-[51] flex items-center justify-center p-4 pointer-events-none"
-            >
-              <div 
-                className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto relative pointer-events-auto"
-                onClick={(e) => e.stopPropagation()}
+        {selectedProduct && selectedProductIndex !== null && (() => {
+          // Use the saved index to determine background
+          const backgroundIndex = (selectedProductIndex % 4) + 1; // Cycle through 1, 2, 3, 4
+          const modalBackground = `/nhipbep/card_flipped_${backgroundIndex}.svg`;
+          
+          return (
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 bg-[#00579F]/80 backdrop-blur-sm z-50"
+                onClick={() => {
+                  setSelectedProduct(null);
+                  setSelectedProductIndex(null);
+                }}
+              />
+              
+              {/* Modal Content */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 z-[51] flex items-center justify-center p-4 pointer-events-none"
               >
+                <div 
+                  className="rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] min-h-[550px] relative pointer-events-auto flex flex-col"
+                  style={{
+                    backgroundImage: `url(${modalBackground})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'top',
+                    backgroundRepeat: 'no-repeat',
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
                 {/* Close Button */}
                 <button
-                  onClick={() => setSelectedProduct(null)}
+                  onClick={() => {
+                    setSelectedProduct(null);
+                    setSelectedProductIndex(null);
+                  }}
                   className="absolute top-3 right-3 p-2 rounded-full transition-colors hover:bg-gray-100 z-10"
                   aria-label="Đóng"
                 >
                   <X className="w-5 h-5 text-[#00579F]" />
                 </button>
 
-                {/* Product Image Section */}
-                <div className="relative px-6 pt-8 pb-4 flex justify-center items-center">
-                  <div className="relative w-full max-w-[180px] aspect-square">
-                    <Image
-                      src={selectedProduct.image}
-                      alt={selectedProduct.label}
-                      fill
-                      className="object-contain"
-                    />
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto">
+                  {/* Product Image Section */}
+                  <div className="relative px-6 pt-8 pb-4 flex justify-center items-center">
+                    <div className="relative w-full max-w-[180px] aspect-square">
+                      <Image
+                        src={selectedProduct.image}
+                        alt={selectedProduct.label}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Product Title */}
+                  <div className="px-6 pb-2">
+                    <h2 
+                      className="text-center font-prata text-2xl md:text-3xl"
+                      style={{ color: '#00579F' }}
+                    >
+                      {selectedProduct.fullName}
+                    </h2>
                   </div>
                 </div>
 
-                {/* Product Title */}
-                <div className="px-6 pb-4">
-                  <h2 
-                    className="text-center font-prata text-2xl md:text-3xl"
-                    style={{ color: '#00579F' }}
-                  >
-                    {selectedProduct.fullName}
-                  </h2>
-                </div>
-
-                {/* Product Benefits */}
-                <div className="px-6 pb-6 space-y-3">
-                  {selectedProduct.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-start gap-4">
-                      {/* Check Circle Icon */}
-                      <div className="flex-shrink-0 mt-0.5">
-                        <Image
-                          src="/icons/check_circle.png"
-                          alt="Check"
-                          width={20}
-                          height={20}
-                          className="object-contain"
-                        />
+                {/* Bottom Section - Benefits and Button */}
+                <div className="flex-shrink-0">
+                  {/* Product Benefits */}
+                  <div className="px-6 pt-2 pb-4 space-y-3">
+                    {selectedProduct.benefits.map((benefit, index) => (
+                      <div key={index} className="flex items-start gap-4">
+                        {/* Check Circle Icon */}
+                        <div className="flex-shrink-0 mt-0.5">
+                          <Image
+                            src="/icons/check_circle.png"
+                            alt="Check"
+                            width={20}
+                            height={20}
+                            className="object-contain"
+                          />
+                        </div>
+                        {/* Benefit Text */}
+                        <p 
+                          className="flex-1 font-nunito text-sm leading-relaxed"
+                          style={{ color: '#00579F' }}
+                        >
+                          {benefit}
+                        </p>
                       </div>
-                      {/* Benefit Text */}
-                      <p 
-                        className="flex-1 font-nunito text-sm leading-relaxed"
-                        style={{ color: '#00579F' }}
-                      >
-                        {benefit}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
 
-                {/* Mua ngay Button */}
-                <div className="px-6 pb-6">
-                  <button
-                    className="w-full py-2.5 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90"
-                    style={{
-                      backgroundColor: '#00579F',
-                      fontSize: '15px',
-                    }}
-                    onClick={() => {
-                      // Handle buy now action
-                      console.log('Mua ngay:', selectedProduct.label);
-                    }}
-                  >
-                    Mua ngay
-                  </button>
+                  {/* Mua ngay Button */}
+                  <div className="px-6 pb-6 pt-2">
+                    <button
+                      className="w-full py-2.5 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90"
+                      style={{
+                        backgroundColor: '#00579F',
+                        fontSize: '15px',
+                      }}
+                      onClick={() => {
+                        // Handle buy now action
+                        console.log('Mua ngay:', selectedProduct.label);
+                      }}
+                    >
+                      Mua ngay
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
           </>
-        )}
+          );
+        })()}
       </AnimatePresence>
     </div>
   );

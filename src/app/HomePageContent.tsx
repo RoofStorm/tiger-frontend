@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Header } from '@/components/Header';
@@ -12,6 +12,7 @@ export function HomePageContent() {
   const { isAuthenticated } = useNextAuth();
   const router = useRouter();
   const { navigateWithLoading } = useGlobalNavigationLoading();
+  const mainRef = useRef<HTMLElement>(null);
 
   // Tạm thời tắt auto redirect đến /video
   // useEffect(() => {
@@ -23,15 +24,33 @@ export function HomePageContent() {
   //   }
   // }, [isAuthenticated, router]);
 
+  useEffect(() => {
+    const updateBackgroundStyle = () => {
+      if (mainRef.current) {
+        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        mainRef.current.style.backgroundImage = isMobile 
+          ? 'url(/trangchu/trangchu_background_mobile.svg)'
+          : 'url(/trangchu/trangchu_background.svg)';
+        mainRef.current.style.backgroundSize = isMobile ? 'contain' : 'cover';
+        mainRef.current.style.backgroundPosition = isMobile ? 'top' : 'center';
+      }
+    };
+
+    updateBackgroundStyle();
+    window.addEventListener('resize', updateBackgroundStyle);
+    return () => window.removeEventListener('resize', updateBackgroundStyle);
+  }, []);
+
   return (
     <div className="min-h-screen">
       <Header />
       <main 
+        ref={mainRef}
         className="min-h-[calc(100vh-80px)] relative flex flex-col md:block"
         style={{
-          backgroundImage: 'url(/trangchu/trangchu_background.svg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 0px',
+          backgroundImage: 'url(/trangchu/trangchu_background_mobile.svg)',
+          backgroundSize: 'contain',
+          backgroundPosition: 'top',
           backgroundRepeat: 'no-repeat',
         }}
       >
@@ -43,13 +62,13 @@ export function HomePageContent() {
           className="md:hidden relative z-10 flex justify-center w-full order-1"
           
         >
-          <div className="w-full max-w-md px-4" style={{ marginTop: '50%' }}>
+          <div className="w-full max-w-md px-4" style={{ marginTop: '30%' }}>
             <Image
-              src="/trangchu/sanpham.png"
+              src="/trangchu/sanpham.svg"
               alt="Sản phẩm"
               width={1000}
               height={800}
-              className="w-full h-auto object-contain"
+              className="w-full h-auto object-cover"
               style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
               priority
             />
@@ -113,17 +132,16 @@ export function HomePageContent() {
           </div>
         </div>
 
-        {/* Desktop: Product Image Bottom (absolute positioning) */}
+        {/* Desktop: Product Image Bottom */}
         <div 
-          className="hidden md:block absolute right-0 w-full z-10 flex justify-center"
-          style={{ bottom: '-100px', transform: 'translateY(100px)' }}
+          className="hidden md:block relative w-full z-10 flex justify-center mt-[-100px]"
         >
           <Image
-            src="/trangchu/sanpham.png"
+            src="/trangchu/sanpham.svg"
             alt="Sản phẩm"
             width={1000}
             height={800}
-            className="w-full h-auto object-contain"
+            className="w-full h-auto object-cover"
             style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
           />
         </div>
