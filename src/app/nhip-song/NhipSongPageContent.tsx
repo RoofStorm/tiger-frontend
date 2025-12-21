@@ -12,13 +12,18 @@ import { useHeaderDarkMode } from '@/contexts/HeaderDarkModeContext';
 const getBackgroundImage = (): string => {
   const now = new Date();
   const hour = now.getHours();
-  console.log('hour', hour);
-  // Từ 18:00 (6 giờ chiều) đến 05:59 (gần 6 giờ sáng) dùng dark background
-  // Từ 06:00 (6 giờ sáng) đến 17:59 (gần 6 giờ chiều) dùng light background
-  if (hour >= 18 || hour < 6) {
-    return 'url(/nhipsong/nhipsong_dark_background.svg)';
-  }
-  return 'url(/nhipsong/nhipsong_light_background.svg)';
+  const isDark = hour >= 18 || hour < 6;
+  
+  // Thêm timestamp để tránh browser cache (chỉ thay đổi mỗi giờ)
+  const cacheBuster = Math.floor(now.getTime() / (1000 * 60 * 60)); // Thay đổi mỗi giờ
+  
+  const bgImage = isDark 
+    ? `url(/nhipsong/nhipsong_dark_background.svg?v=${cacheBuster})`
+    : `url(/nhipsong/nhipsong_light_background.svg?v=${cacheBuster})`;
+  
+  console.log('getBackgroundImage - hour:', hour, 'isDark:', isDark, 'bgImage:', bgImage);
+  
+  return bgImage;
 };
 
 const isDarkMode = (): boolean => {
@@ -31,8 +36,10 @@ export function NhipSongPageContent() {
   const [showMoodCard, setShowMoodCard] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
-  const [backgroundImage, setBackgroundImage] = useState<string>(getBackgroundImage());
-  const [isDark, setIsDark] = useState<boolean>(isDarkMode());
+  // Không set initial value từ function để tránh SSR/hydration mismatch trong production
+  // Sẽ được set trong useEffect sau khi component mount trên client
+  const [backgroundImage, setBackgroundImage] = useState<string>('');
+  const [isDark, setIsDark] = useState<boolean>(false);
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const { setIsDarkMode } = useHeaderDarkMode();
 
@@ -41,14 +48,26 @@ export function NhipSongPageContent() {
     setIsDarkMode(showShareModal);
   }, [showShareModal, setIsDarkMode]);
 
+  // Debug: Log khi backgroundImage thay đổi
+  useEffect(() => {
+    console.log('backgroundImage state changed to:', backgroundImage);
+    console.log('isDark state changed to:', isDark);
+  }, [backgroundImage, isDark]);
+
   // Cập nhật background image và dark mode dựa trên thời gian
+  // Chỉ chạy trên client side sau khi component mount để tránh SSR/hydration mismatch
   useEffect(() => {
     const updateBackground = () => {
-      setBackgroundImage(getBackgroundImage());
-      setIsDark(isDarkMode());
+      const newBgImage = getBackgroundImage();
+      const newIsDark = isDarkMode();
+      
+      console.log('updateBackground - Setting backgroundImage:', newBgImage, 'isDark:', newIsDark);
+      
+      setBackgroundImage(newBgImage);
+      setIsDark(newIsDark);
     };
 
-    // Cập nhật ngay khi component mount
+    // Cập nhật ngay khi component mount trên client
     updateBackground();
 
     // Kiểm tra lại mỗi phút để đảm bảo background được cập nhật khi thời gian thay đổi
@@ -117,7 +136,7 @@ export function NhipSongPageContent() {
     <div>
       <main 
         style={{
-          backgroundImage: backgroundImage,
+          backgroundImage: backgroundImage || 'url(/nhipsong/nhipsong_light_background.svg)',
           backgroundSize: 'cover',
           backgroundPosition: isDark ? 'center' : 'bottom',
           backgroundRepeat: 'no-repeat',

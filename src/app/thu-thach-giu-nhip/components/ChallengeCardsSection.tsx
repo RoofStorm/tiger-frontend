@@ -30,7 +30,7 @@ export function ChallengeCardsSection() {
         <div className="relative w-full h-full">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/thuthachnhipsong/lunchbox_challenge.svg"
+            src="/thuthachnhipsong/lunchbox_challenge_optimized.svg"
             alt="LunchBox Challenge"
             className="w-full h-full object-contain"
             fetchPriority="high"

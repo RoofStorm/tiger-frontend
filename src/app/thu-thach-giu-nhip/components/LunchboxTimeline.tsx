@@ -356,12 +356,12 @@ export function LunchboxTimeline() {
                               </div>
                             </div>
                           ) : (
-                            <div className="relative w-full h-full rounded-lg overflow-hidden">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src="/thuthachnhipsong/slide_example.svg"
+                            <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
+                              <Image
+                                src="/thuthachnhipsong/slide_example_optimized.svg"
                                 alt="Slide example"
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
                               />
                               {/* Tiger Logo - Centered Top */}
                               <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
