@@ -290,11 +290,11 @@ export function ShareRegistrationModal({
                           color: '#333435',
                         }}
                       >
-                        Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies của La Vie, Thể lệ chương trình Yên một chút cùng La Vie như được đăng tải tại website
+                        Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies của Tiger, Thể lệ chương trình Yên một chút cùng Tiger như được đăng tải tại website
                       </span>
                     </label>
                   </div>
-
+product
                   {/* Register Button */}
                   <button
                     onClick={handleFormRegister}

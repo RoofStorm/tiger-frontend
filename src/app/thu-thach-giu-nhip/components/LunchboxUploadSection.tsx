@@ -299,7 +299,7 @@ export function LunchboxUploadSection() {
             }}
           >
           {/* Title */}
-          <div className="space-y-4 mt-2">
+          <div className="space-y-4 mt-2 px-6 sm:px-8 md:px-0">
               <h2 className="font-prata font-bold text-white leading-tight text-center" style={{ fontSize: '28px' }}>
               Khoảnh khắc giữ nhịp – bữa trưa của bạn có câu chuyện gì?
             </h2>

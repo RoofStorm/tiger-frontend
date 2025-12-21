@@ -73,11 +73,17 @@ export function MoodCardFlipCard({
             onClick={() => onCardFlip(!isCardFlipped)}
           >
             {/* Card */}
-            <div
-              className="relative w-full h-full min-h-[550px] transition-transform duration-700"
+            <motion.div
+              className="relative w-full h-full min-h-[550px]"
               style={{
                 transformStyle: 'preserve-3d',
-                transform: isCardFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+              }}
+              animate={{
+                rotateY: isCardFlipped ? 180 : 0,
+              }}
+              transition={{
+                duration: 1.2,
+                ease: [0.4, 0, 0.2, 1], // Custom cubic-bezier for smooth animation
               }}
             >
               {/* Back of Card (front_card_1.svg) */}
@@ -221,7 +227,7 @@ export function MoodCardFlipCard({
                   </Button>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </motion.div>

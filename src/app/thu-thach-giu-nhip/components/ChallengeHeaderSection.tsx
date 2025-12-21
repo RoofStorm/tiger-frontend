@@ -13,7 +13,7 @@ export function ChallengeHeaderSection() {
       <h1 className="font-prata text-tiger-blue-600 leading-tight" style={{ fontSize: '54px' }}>
         Thử thách giữ nhịp sống
       </h1>
-      <div>
+      <div className="px-6 sm:px-8 md:px-0">
         <p className="text-[16px] text-gray-700 leading-relaxed max-w-4xl mx-auto font-noto-sans text-center">
           Đôi khi, nhịp sống nằm trong hơi nóng từ bữa cơm giản dị. Đôi khi, nó gói gọn trong vài dòng chữ nhỏ.
         </p>

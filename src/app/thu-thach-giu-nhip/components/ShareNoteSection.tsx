@@ -207,7 +207,7 @@ export function ShareNoteSection() {
       </div>
 
       {/* Write Note Section */}
-      <div className="mt-16 text-center">
+      <div className="mt-16 text-center px-6 sm:px-8 md:px-0">
         <h2 className="font-prata text-4xl md:text-5xl mb-6" style={{ color: '#00579F' }}>
           Viết note giữ nhịp!
         </h2>
