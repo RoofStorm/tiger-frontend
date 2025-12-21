@@ -9,6 +9,7 @@ interface EmojiGridProps {
   selectedEmojis: EmojiSelection[];
   onEmojiSelect: (emoji: EmojiSelection) => void;
   onEmojiRemove: (emojiId: string) => void;
+  isDarkMode?: boolean;
 }
 
 export function EmojiGrid({
@@ -16,6 +17,7 @@ export function EmojiGrid({
   selectedEmojis,
   onEmojiSelect,
   // onEmojiRemove,
+  isDarkMode = false,
 }: EmojiGridProps) {
   const isSelected = (emojiId: string) =>
     selectedEmojis.some(emoji => emoji.id === emojiId);
@@ -103,7 +105,7 @@ export function EmojiGrid({
                   readOnly
                   className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 cursor-pointer flex-shrink-0"
                 />
-                <div className="text-xs font-medium text-center leading-tight line-clamp-2">
+                <div className={`text-xs font-medium text-center leading-tight line-clamp-2 ${isDarkMode ? 'text-white' : ''}`}>
                   {emoji.label}
                 </div>
               </div>

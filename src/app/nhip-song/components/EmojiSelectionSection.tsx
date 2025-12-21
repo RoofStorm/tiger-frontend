@@ -55,6 +55,7 @@ export function EmojiSelectionSection({
           selectedEmojis={selectedEmojis}
           onEmojiSelect={onEmojiSelect}
           onEmojiRemove={onEmojiRemove}
+          isDarkMode={isDarkMode}
         />
       </div>
 

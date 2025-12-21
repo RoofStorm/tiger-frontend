@@ -12,6 +12,7 @@ import { useHeaderDarkMode } from '@/contexts/HeaderDarkModeContext';
 const getBackgroundImage = (): string => {
   const now = new Date();
   const hour = now.getHours();
+  console.log('hour', hour);
   // Từ 18:00 (6 giờ chiều) đến 05:59 (gần 6 giờ sáng) dùng dark background
   // Từ 06:00 (6 giờ sáng) đến 17:59 (gần 6 giờ chiều) dùng light background
   if (hour >= 18 || hour < 6) {
