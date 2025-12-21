@@ -20,7 +20,7 @@ export function ChallengeContainer({ children }: ChallengeContainerProps) {
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="max-w-7xl mx-auto sm:px-2 lg:px-4 py-12">
+          <div className="max-w-7xl mx-auto sm:px-2 lg:px-4 pt-12 pb-0 md:pb-12">
             {children}
           </div>
         </div>

@@ -17,6 +17,7 @@ export function ShareNoteSection() {
   const [sharedNoteText, setSharedNoteText] = useState('');
   const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
   const notesScrollRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Auto scroll notes loop
   useEffect(() => {
@@ -62,6 +63,27 @@ export function ShareNoteSection() {
     };
   }, []);
 
+  // Update modal background size for mobile
+  useEffect(() => {
+    if (!showSuccessModal) return;
+
+    const updateModalBackground = () => {
+      if (modalRef.current) {
+        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        modalRef.current.style.backgroundSize = isMobile ? 'cover' : 'contain';
+        modalRef.current.style.minHeight = isMobile ? 'auto' : 'auto';
+      }
+    };
+
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+      updateModalBackground();
+    });
+
+    window.addEventListener('resize', updateModalBackground);
+    return () => window.removeEventListener('resize', updateModalBackground);
+  }, [showSuccessModal]);
+
   const scrollToTextarea = () => {
     setTimeout(() => {
       noteTextareaRef.current?.scrollIntoView({ 
@@ -103,7 +125,7 @@ export function ShareNoteSection() {
             onClick={scrollToTextarea}
             className="p-4 md:p-6 flex items-center justify-center bg-[#00579F] md:col-span-1 relative cursor-pointer transition-all duration-300 hover:opacity-90 hover:bg-[#1f3a6b]"
             style={{
-              backgroundImage: 'url(/thuthachnhipsong/bonghoa.png)',
+              backgroundImage: 'url(/thuthachnhipsong/bonghoa.svg)',
               backgroundPosition: 'top left',
               backgroundRepeat: 'no-repeat',
               backgroundSize: 'auto'
@@ -122,7 +144,7 @@ export function ShareNoteSection() {
               <div className="flex items-center gap-3">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                   <Image
-                    src="/thuthachnhipsong/slide_example.png"
+                    src="/thuthachnhipsong/slide_example.svg"
                     alt="User avatar"
                     fill
                     className="object-cover"
@@ -256,7 +278,7 @@ export function ShareNoteSection() {
                 <div className="flex items-center gap-3 mb-3 pt-4">
                   <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                     <Image
-                      src="/thuthachnhipsong/slide_example.png"
+                      src="/thuthachnhipsong/slide_example.svg"
                       alt="User avatar"
                       fill
                       className="object-cover"
@@ -296,7 +318,14 @@ export function ShareNoteSection() {
               className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
             >
               <div 
-                className="rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto bg-white pointer-events-auto"
+                ref={modalRef}
+                className="rounded-2xl shadow-xl max-w-2xl w-full overflow-y-auto pointer-events-auto"
+                style={{
+                  backgroundImage: 'url(/thuthachnhipsong/popup_share_note_background.svg)',
+                  backgroundSize: 'contain',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="p-8">
@@ -330,11 +359,13 @@ export function ShareNoteSection() {
 
                   {/* Content Box - Wraps both text and image */}
                   <div 
-                    className="mb-8 p-3 rounded-lg" 
+                    className="mb-8 p-3 rounded-lg mx-auto" 
                     style={{ 
                       border: '1px solid',
                       borderImageSource: 'linear-gradient(180deg, #CCF5FF 0%, #B2DCFF 100%)',
-                      borderImageSlice: 1
+                      borderImageSlice: 1,
+                      maxWidth: '80%',
+                      width: '100%'
                     }}
                   >
                     {/* Text Content - Blue background, white text */}
@@ -440,7 +471,7 @@ export function ShareNoteSection() {
                     >
                       Chia sẻ
                       <Image
-                        src="/icons/facebook.png"
+                        src="/icons/facebook.svg"
                         alt="Facebook"
                         width={20}
                         height={20}

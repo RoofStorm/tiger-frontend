@@ -21,25 +21,34 @@ export function useInputFix() {
           const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
                           ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
-          // Handle space after digit OR on mobile devices (to fix mobile space input issues)
-          // This ensures space works correctly in all cases:
-          // - After numbers (both mobile and desktop)
-          // - After text on mobile (fixes mobile IME issues)
-          // - After text on desktop (browser handles normally, but we can also handle it for consistency)
-          if (isAfterDigit || isMobile) {
+          // Only handle space after digit (both mobile and desktop)
+          // For mobile devices, only fix space after numbers, not after text
+          // This prevents duplicate space issues when typing normally
+          if (isAfterDigit) {
             e.preventDefault();
+            e.stopPropagation();
 
-            // Manually insert space
-            target.setRangeText(' ', selectionStart, selectionEnd, 'end');
+            // Create new value with space inserted
+            const newValue = 
+              value.substring(0, selectionStart) + 
+              ' ' + 
+              value.substring(selectionEnd);
+            
+            // Update the input value directly
+            target.value = newValue;
+            
+            // Set cursor position after the inserted space
+            const newCursorPos = selectionStart + 1;
+            target.setSelectionRange(newCursorPos, newCursorPos);
 
-            // Dispatch a native input event so React onChange fires
+            // Create a proper InputEvent that React will recognize
             const inputEvent = new InputEvent('input', {
               bubbles: true,
               cancelable: false,
-              data: ' ',
               inputType: 'insertText',
+              data: ' ',
             });
-
+            
             target.dispatchEvent(inputEvent);
           }
           // Note: On desktop, if not after digit, browser handles space normally

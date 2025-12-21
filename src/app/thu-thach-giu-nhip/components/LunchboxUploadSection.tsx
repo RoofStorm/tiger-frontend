@@ -358,7 +358,7 @@ export function LunchboxUploadSection() {
                   type="button"
                 >
                   <Image
-                    src="/icons/trash.png"
+                    src="/icons/trash.svg"
                     alt="Delete"
                     width={20}
                     height={20}

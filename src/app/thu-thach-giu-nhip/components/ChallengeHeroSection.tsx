@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export function ChallengeHeroSection() {
   return (
@@ -10,13 +11,15 @@ export function ChallengeHeroSection() {
       transition={{ duration: 0.6, delay: 0.2 }}
       className="relative mb-12 md:mb-48"
     >
-      {/* Central Text in Yellow Oval - Always Center */}
+      {/* Central Image - Always Center */}
       <div className="flex items-center justify-center">
-        <div className="bg-[#FFE5B4] rounded-full px-8 py-6 lg:px-12 lg:py-8">
-          <p className="text-2xl sm:text-3xl lg:text-4xl font-noto-sans text-gray-700 font-medium whitespace-nowrap">
-            CHỈ VÀNG TRAO TAY
-          </p>
-        </div>
+        <Image
+          src="/thuthachnhipsong/tiger_giu_nhip.svg"
+          alt="Tiger giữ nhịp"
+          width={600}
+          height={200}
+          className="w-full max-w-md md:max-w-lg lg:max-w-xl h-auto object-contain"
+        />
       </div>
     </motion.div>
   );

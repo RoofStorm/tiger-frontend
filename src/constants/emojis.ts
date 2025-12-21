@@ -6,20 +6,20 @@ export const EMOJI_OPTIONS: Array<{
 }> = [
   // 12 emoji từ hình - thứ tự theo giao diện
   // Row 1
-  { id: 'deadline', emoji: '😰', label: 'Deadline', imageUrl: '/emoji/v2/deadline.png' },
-  { id: 'thuthai', emoji: '😌', label: 'Thư thái', imageUrl: '/emoji/v2/thuthai.png' },
-  { id: 'tucgian', emoji: '😠', label: 'Tức giận', imageUrl: '/emoji/v2/tucgian.png' },
-  { id: 'binhyen', emoji: '😊', label: 'Bình yên', imageUrl: '/emoji/v2/binhyen.png' },
+  { id: 'deadline', emoji: '😰', label: 'Deadline', imageUrl: '/emoji/v2/deadline.svg' },
+  { id: 'thuthai', emoji: '😌', label: 'Thư thái', imageUrl: '/emoji/v2/thuthai.svg' },
+  { id: 'tucgian', emoji: '😠', label: 'Tức giận', imageUrl: '/emoji/v2/tucgian.svg' },
+  { id: 'binhyen', emoji: '😊', label: 'Bình yên', imageUrl: '/emoji/v2/binhyen.svg' },
   // Row 2
-  { id: 'chiudung', emoji: '😣', label: 'Chịu đựng', imageUrl: '/emoji/v2/chiudung.png' },
-  { id: 'tanvo', emoji: '😢', label: 'Tan vỡ', imageUrl: '/emoji/v2/tanvo.png' },
-  { id: 'thanhthoi', emoji: '😎', label: 'Thảnh thơi', imageUrl: '/emoji/v2/thanhthoi.png' },
-  { id: 'buacoman', emoji: '🍚', label: 'Bữa cơm ấm', imageUrl: '/emoji/v2/buacoman.png' },
+  { id: 'chiudung', emoji: '😣', label: 'Chịu đựng', imageUrl: '/emoji/v2/chiudung.svg' },
+  { id: 'tanvo', emoji: '😢', label: 'Tan vỡ', imageUrl: '/emoji/v2/tanvo.svg' },
+  { id: 'thanhthoi', emoji: '😎', label: 'Thảnh thơi', imageUrl: '/emoji/v2/thanhthoi.svg' },
+  { id: 'buacoman', emoji: '🍚', label: 'Bữa cơm ấm', imageUrl: '/emoji/v2/buacoman.svg' },
   // Row 3
-  { id: 'thammet', emoji: '😴', label: 'Thấm mệt', imageUrl: '/emoji/v2/thammet.png' },
-  { id: 'bungchay', emoji: '🔥', label: 'Bùng cháy', imageUrl: '/emoji/v2/bungchay.png' },
-  { id: 'camnin', emoji: '🤐', label: 'Câm nín', imageUrl: '/emoji/v2/camnin.png' },
-  { id: 'doigio', emoji: '💨', label: 'Đổi gió', imageUrl: '/emoji/v2/doigio.png' },
+  { id: 'thammet', emoji: '😴', label: 'Thấm mệt', imageUrl: '/emoji/v2/thammet.svg' },
+  { id: 'bungchay', emoji: '🔥', label: 'Bùng cháy', imageUrl: '/emoji/v2/bungchay.svg' },
+  { id: 'camnin', emoji: '🤐', label: 'Câm nín', imageUrl: '/emoji/v2/camnin.svg' },
+  { id: 'doigio', emoji: '💨', label: 'Đổi gió', imageUrl: '/emoji/v2/doigio.svg' },
 ];
 
 export const WHISPER_TEXTS = [

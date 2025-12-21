@@ -505,7 +505,7 @@ export function NhipBepPageContent() {
                         {/* Check Circle Icon */}
                         <div className="flex-shrink-0 mt-0.5">
                           <Image
-                            src="/icons/check_circle.png"
+                            src="/icons/check_circle.svg"
                             alt="Check"
                             width={20}
                             height={20}

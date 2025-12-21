@@ -317,7 +317,7 @@ export function LunchboxTimeline() {
                               {/* Tiger Logo - Centered Top */}
                               <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
                                 <Image
-                                  src="/thuthachnhipsong/tiger_logo.png"
+                                  src="/thuthachnhipsong/tiger_logo.svg"
                                   alt="Tiger Logo"
                                   width={80}
                                   height={80}
@@ -327,7 +327,7 @@ export function LunchboxTimeline() {
                               {/* White Heart Logo - Bottom Right */}
                               <div className="absolute bottom-2 right-2 z-10">
                                 <Image
-                                  src="/icons/white_heart.png"
+                                  src="/icons/white_heart.svg"
                                   alt="White Heart"
                                   width={32}
                                   height={32}
@@ -338,7 +338,7 @@ export function LunchboxTimeline() {
                           ) : (
                             <div className="relative w-full h-full rounded-lg overflow-hidden">
                               <Image
-                                src="/thuthachnhipsong/slide_example.png"
+                                src="/thuthachnhipsong/slide_example.svg"
                                 alt="Slide example"
                                 fill
                                 className="object-cover"
@@ -346,7 +346,7 @@ export function LunchboxTimeline() {
                               {/* Tiger Logo - Centered Top */}
                               <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">
                                 <Image
-                                  src="/thuthachnhipsong/tiger_logo.png"
+                                  src="/thuthachnhipsong/tiger_logo.svg"
                                   alt="Tiger Logo"
                                   width={80}
                                   height={80}
@@ -356,7 +356,7 @@ export function LunchboxTimeline() {
                               {/* White Heart Logo - Bottom Right */}
                               <div className="absolute bottom-2 right-2 z-10">
                                 <Image
-                                  src="/icons/white_heart.png"
+                                  src="/icons/white_heart.svg"
                                   alt="White Heart"
                                   width={32}
                                   height={32}
@@ -370,7 +370,7 @@ export function LunchboxTimeline() {
                         {/* Bottom Section - tramnamnhipsong image */}
                         <div className="flex justify-center items-center pb-2 px-2">
                           <Image
-                            src="/thuthachnhipsong/tramnamnhipsong.png"
+                            src="/thuthachnhipsong/tramnamgiunhipsong.svg"
                             alt="Trăm năm giữ nhịp sống"
                             width={120}
                             height={36}
