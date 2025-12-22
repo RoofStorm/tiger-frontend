@@ -15,6 +15,24 @@ import { Modal } from '@/components/ui/modal';
 // Temporary bypass flag - set to false when backend is ready
 const isByPass = true;
 
+// Helper to detect mobile devices more accurately
+const isMobileDevice = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  
+  // Check user agent for mobile devices
+  const userAgent = navigator.userAgent || navigator.vendor || '';
+  const isMobileUA = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+  
+  // Check for touch support (but exclude desktop devices with touch)
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  
+  // Check screen size to distinguish tablets in desktop mode
+  const isSmallScreen = window.innerWidth <= 768;
+  
+  // Only consider mobile if it's a mobile UA AND (has touch with small screen OR is clearly mobile)
+  return isMobileUA && (hasTouch && isSmallScreen || /iPhone|iPad|iPod|Android/i.test(userAgent));
+};
+
 export function LunchboxUploadSection() {
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
@@ -32,6 +50,15 @@ export function LunchboxUploadSection() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [uploadedCaption, setUploadedCaption] = useState<string>('');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(isMobileDevice());
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -447,7 +474,7 @@ export function LunchboxUploadSection() {
                 setCaption(e.target.value);
               }
             }}
-            onKeyDown={handleInputKeyDown}
+            onKeyDown={isMobile ? handleInputKeyDown : undefined}
             placeholder="Câu chuyện của bạn...(không quá 200 ký tự)"
             rows={4}
             className="w-full px-4 py-3 border border-white/30 rounded-lg resize-none focus:outline-none focus:border-blue-300 placeholder-gray-300 font-nunito backdrop-blur-sm mb-4"
@@ -497,7 +524,7 @@ export function LunchboxUploadSection() {
               ref={captionTextareaRef}
               value={caption}
               onChange={handleCaptionChange}
-              onKeyDown={handleInputKeyDown}
+              onKeyDown={isMobile ? handleInputKeyDown : undefined}
               placeholder="Câu chuyện của bạn..."
               rows={6}
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-500 text-gray-700 placeholder-gray-400 font-noto-sans"
