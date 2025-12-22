@@ -73,16 +73,29 @@ export function LunchboxUploadSection() {
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+    // Chỉ preventDefault khi có files đang được drag và target không phải là textarea
+    const hasFiles = e.dataTransfer.types.includes('Files');
+    const target = e.target as HTMLElement;
+    const isTextarea = target.tagName === 'TEXTAREA' || target.closest('textarea');
+    
+    if (hasFiles && !isTextarea) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    // Chỉ preventDefault khi có files và target không phải là textarea
+    const target = e.target as HTMLElement;
+    const isTextarea = target.tagName === 'TEXTAREA' || target.closest('textarea');
+    const file = e.dataTransfer.files?.[0];
+    
+    if (!file || isTextarea) {
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
-
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
 
     // Simulate file input change
     const dataTransfer = new DataTransfer();
@@ -441,9 +454,30 @@ export function LunchboxUploadSection() {
             ref={captionTextareaRef}
             value={caption}
             onChange={(e) => {
+              // Không trim - giữ nguyên giá trị người dùng nhập
               if (e.target.value.length <= 200) {
                 setCaption(e.target.value);
               }
+            }}
+            onKeyDown={(e) => {
+              // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+              e.stopPropagation();
+            }}
+            onKeyPress={(e) => {
+              // Ngăn event bubbling lên parent
+              e.stopPropagation();
+            }}
+            onKeyUp={(e) => {
+              // Ngăn event bubbling lên parent
+              e.stopPropagation();
+            }}
+            onDragOver={(e) => {
+              // Ngăn drag events từ parent ảnh hưởng đến textarea
+              e.stopPropagation();
+            }}
+            onDrop={(e) => {
+              // Ngăn drop events từ parent ảnh hưởng đến textarea
+              e.stopPropagation();
             }}
             placeholder="Câu chuyện của bạn...(không quá 200 ký tự)"
             rows={4}
@@ -457,7 +491,7 @@ export function LunchboxUploadSection() {
           {/* Upload Post Button */}
           <Button
             onClick={handleUploadPost}
-            disabled={!selectedFile || !caption.trim() || uploading || (!isByPass && !isAuthenticated)}
+            disabled={!selectedFile || caption.length === 0 || uploading || (!isByPass && !isAuthenticated)}
             className="w-full font-medium transition-all duration-300"
             style={{ 
               height: '48px',
@@ -470,7 +504,7 @@ export function LunchboxUploadSection() {
               borderWidth: '1px',
               backgroundColor: '#ffffff',
               color: '#00579F',
-              cursor: (!selectedFile || !caption.trim() || uploading || (!isByPass && !isAuthenticated)) ? 'not-allowed' : 'pointer'
+              cursor: (!selectedFile || caption.length === 0 || uploading || (!isByPass && !isAuthenticated)) ? 'not-allowed' : 'pointer'
             }}
           >
             {uploading ? 'Đang chia sẻ...' : 'Chia sẻ ngay!'}
@@ -494,6 +528,26 @@ export function LunchboxUploadSection() {
               ref={captionTextareaRef}
               value={caption}
               onChange={handleCaptionChange}
+              onKeyDown={(e) => {
+                // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+                e.stopPropagation();
+              }}
+              onKeyPress={(e) => {
+                // Ngăn event bubbling lên parent
+                e.stopPropagation();
+              }}
+              onKeyUp={(e) => {
+                // Ngăn event bubbling lên parent
+                e.stopPropagation();
+              }}
+              onDragOver={(e) => {
+                // Ngăn drag events từ parent ảnh hưởng đến textarea
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                // Ngăn drop events từ parent ảnh hưởng đến textarea
+                e.stopPropagation();
+              }}
               placeholder="Câu chuyện của bạn..."
               rows={6}
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg resize-none focus:outline-none focus:border-blue-500 text-gray-700 placeholder-gray-400 font-noto-sans"

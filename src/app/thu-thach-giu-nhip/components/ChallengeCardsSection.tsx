@@ -31,7 +31,7 @@ export function ChallengeCardsSection() {
           {/* Mobile Image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/thuthachnhipsong/lunchbox_challenge_mobile.svg"
+            src="/thuthachnhipsong/lunchbox_challenge_mobile.png"
             alt="LunchBox Challenge"
             className="w-full h-full object-contain md:hidden"
             fetchPriority="high"
@@ -39,7 +39,7 @@ export function ChallengeCardsSection() {
           {/* Desktop Image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/thuthachnhipsong/lunchbox_challenge.svg"
+            src="/thuthachnhipsong/lunchbox_challenge.png"
             alt="LunchBox Challenge"
             className="hidden md:block w-full h-full object-contain"
             fetchPriority="high"

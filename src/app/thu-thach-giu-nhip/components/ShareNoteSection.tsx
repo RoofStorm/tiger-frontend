@@ -51,7 +51,7 @@ export function ShareNoteSection() {
     const link = document.createElement('link');
     link.rel = 'preload';
     link.as = 'image';
-    link.href = '/thuthachnhipsong/giadinhancom.svg';
+    link.href = '/thuthachnhipsong/giadinhancom.png';
     link.fetchPriority = 'high';
     document.head.appendChild(link);
 
@@ -307,7 +307,7 @@ export function ShareNoteSection() {
           {/* Right: Highlighted Notes - Scrollable */}
           <div 
             ref={notesScrollRef}
-            className="space-y-8 h-full max-h-[900px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
+            className="space-y-8 h-full max-h-[1100px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
             style={{ 
               scrollBehavior: 'smooth',
               scrollbarWidth: 'none', /* Firefox */
