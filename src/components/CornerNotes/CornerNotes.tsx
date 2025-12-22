@@ -130,7 +130,30 @@ export function CornerNotes() {
             <div>
               <textarea
                 value={content}
-                onChange={e => setContent(e.target.value)}
+                onChange={e => {
+                  // Không trim - giữ nguyên giá trị người dùng nhập
+                  setContent(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+                  e.stopPropagation();
+                }}
+                onKeyPress={(e) => {
+                  // Ngăn event bubbling lên parent
+                  e.stopPropagation();
+                }}
+                onKeyUp={(e) => {
+                  // Ngăn event bubbling lên parent
+                  e.stopPropagation();
+                }}
+                onDragOver={(e) => {
+                  // Ngăn drag events từ parent ảnh hưởng đến textarea
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  // Ngăn drop events từ parent ảnh hưởng đến textarea
+                  e.stopPropagation();
+                }}
                 placeholder="Viết câu chuyện của bạn ở đây..."
                 rows={12}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl resize-none focus:outline-none focus:border-blue-500 text-gray-700 placeholder-gray-400 bg-white shadow-sm"

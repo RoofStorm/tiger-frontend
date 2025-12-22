@@ -310,12 +310,33 @@ export const RewardModal: React.FC<RewardModalProps> = ({
                 </label>
                 <textarea
                   value={rewardForm.description}
-                  onChange={e =>
+                  onChange={e => {
+                    // Không trim - giữ nguyên giá trị người dùng nhập
                     setRewardForm(prev => ({
                       ...prev,
                       description: e.target.value,
-                    }))
-                  }
+                    }));
+                  }}
+                  onKeyDown={(e) => {
+                    // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+                    e.stopPropagation();
+                  }}
+                  onKeyPress={(e) => {
+                    // Ngăn event bubbling lên parent
+                    e.stopPropagation();
+                  }}
+                  onKeyUp={(e) => {
+                    // Ngăn event bubbling lên parent
+                    e.stopPropagation();
+                  }}
+                  onDragOver={(e) => {
+                    // Ngăn drag events từ parent ảnh hưởng đến textarea
+                    e.stopPropagation();
+                  }}
+                  onDrop={(e) => {
+                    // Ngăn drop events từ parent ảnh hưởng đến textarea
+                    e.stopPropagation();
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Nhập mô tả phần thưởng"
                   rows={3}

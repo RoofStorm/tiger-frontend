@@ -379,7 +379,26 @@ export function Corner2_2() {
                 ref={captionTextareaRef}
                 value={caption}
                 onChange={handleCaptionChange}
-                onKeyDown={handleInputKeyDown}
+                onKeyDown={(e) => {
+                  // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+                  e.stopPropagation();
+                }}
+                onKeyPress={(e) => {
+                  // Ngăn event bubbling lên parent
+                  e.stopPropagation();
+                }}
+                onKeyUp={(e) => {
+                  // Ngăn event bubbling lên parent
+                  e.stopPropagation();
+                }}
+                onDragOver={(e) => {
+                  // Ngăn drag events từ parent ảnh hưởng đến textarea
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  // Ngăn drop events từ parent ảnh hưởng đến textarea
+                  e.stopPropagation();
+                }}
                 placeholder="Chia sẻ cảm xúc của bạn..."
                 className="w-full p-4 border-2 border-gray-200 rounded-2xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg font-normal"
                 rows={3}

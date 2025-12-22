@@ -374,7 +374,30 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
             <h3 className="text-lg font-semibold mb-4">Nhập lý do từ chối</h3>
             <textarea
               value={rejectionReason}
-              onChange={e => setRejectionReason(e.target.value)}
+              onChange={e => {
+                // Không trim - giữ nguyên giá trị người dùng nhập
+                setRejectionReason(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+                e.stopPropagation();
+              }}
+              onKeyPress={(e) => {
+                // Ngăn event bubbling lên parent
+                e.stopPropagation();
+              }}
+              onKeyUp={(e) => {
+                // Ngăn event bubbling lên parent
+                e.stopPropagation();
+              }}
+              onDragOver={(e) => {
+                // Ngăn drag events từ parent ảnh hưởng đến textarea
+                e.stopPropagation();
+              }}
+              onDrop={(e) => {
+                // Ngăn drop events từ parent ảnh hưởng đến textarea
+                e.stopPropagation();
+              }}
               placeholder="Nhập lý do từ chối yêu cầu đổi quà..."
               className="w-full h-24 p-3 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             />

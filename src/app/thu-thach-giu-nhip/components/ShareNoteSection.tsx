@@ -6,39 +6,10 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useInputFix } from '@/hooks/useInputFix';
-
-// Helper to detect mobile devices more accurately
-const isMobileDevice = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  
-  // Check user agent for mobile devices
-  const userAgent = navigator.userAgent || navigator.vendor || '';
-  const isMobileUA = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-  
-  // Check for touch support (but exclude desktop devices with touch)
-  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  
-  // Check screen size to distinguish tablets in desktop mode
-  const isSmallScreen = window.innerWidth <= 768;
-  
-  // Only consider mobile if it's a mobile UA AND (has touch with small screen OR is clearly mobile)
-  return isMobileUA && (hasTouch && isSmallScreen || /iPhone|iPad|iPod|Android/i.test(userAgent));
-};
 
 export function ShareNoteSection() {
   const router = useRouter();
   const { toast } = useToast();
-  const { onKeyDown: handleInputKeyDown } = useInputFix();
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect mobile on mount and resize
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(isMobileDevice());
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
   const [noteText, setNoteText] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sharedNoteText, setSharedNoteText] = useState('');
@@ -282,8 +253,30 @@ export function ShareNoteSection() {
                 id="share-note-textarea"
                 ref={noteTextareaRef}
                 value={noteText}
-                onChange={(e) => setNoteText(e.target.value)}
-                onKeyDown={isMobile ? handleInputKeyDown : undefined}
+                onChange={(e) => {
+                  // Không trim - giữ nguyên giá trị người dùng nhập
+                  setNoteText(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+                  e.stopPropagation();
+                }}
+                onKeyPress={(e) => {
+                  // Ngăn event bubbling lên parent
+                  e.stopPropagation();
+                }}
+                onKeyUp={(e) => {
+                  // Ngăn event bubbling lên parent
+                  e.stopPropagation();
+                }}
+                onDragOver={(e) => {
+                  // Ngăn drag events từ parent ảnh hưởng đến textarea
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  // Ngăn drop events từ parent ảnh hưởng đến textarea
+                  e.stopPropagation();
+                }}
                 placeholder="Câu chuyện của bạn thì sao? Chia sẻ cùng mình nhé!"
                 rows={4}
                 className="w-[90%] mx-auto px-4 py-3 border border-white/30 rounded-lg resize-none focus:outline-none focus:border-blue-300 placeholder-gray-300 font-nunito backdrop-blur-sm"

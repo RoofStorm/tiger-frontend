@@ -244,7 +244,30 @@ export default function WishesPage() {
                       </div>
                       <textarea
                         value={content}
-                        onChange={e => setContent(e.target.value)}
+                        onChange={e => {
+                          // Không trim - giữ nguyên giá trị người dùng nhập
+                          setContent(e.target.value);
+                        }}
+                        onKeyDown={(e) => {
+                          // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+                          e.stopPropagation();
+                        }}
+                        onKeyPress={(e) => {
+                          // Ngăn event bubbling lên parent
+                          e.stopPropagation();
+                        }}
+                        onKeyUp={(e) => {
+                          // Ngăn event bubbling lên parent
+                          e.stopPropagation();
+                        }}
+                        onDragOver={(e) => {
+                          // Ngăn drag events từ parent ảnh hưởng đến textarea
+                          e.stopPropagation();
+                        }}
+                        onDrop={(e) => {
+                          // Ngăn drop events từ parent ảnh hưởng đến textarea
+                          e.stopPropagation();
+                        }}
                         placeholder="Nhập lời chúc của bạn..."
                         className="w-full px-8 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none text-gray-700"
                         rows={6}

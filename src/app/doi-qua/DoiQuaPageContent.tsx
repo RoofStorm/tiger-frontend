@@ -803,13 +803,33 @@ export function DoiQuaPageContent() {
                       </label>
                       <textarea
                         value={redeemForm.receiverAddress}
-                        onChange={e =>
+                        onChange={e => {
+                          // Không trim - giữ nguyên giá trị người dùng nhập
                           setRedeemForm(prev => ({
                             ...prev,
                             receiverAddress: e.target.value,
-                          }))
-                        }
-                        onKeyDown={handleInputKeyDown}
+                          }));
+                        }}
+                        onKeyDown={(e) => {
+                          // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
+                          e.stopPropagation();
+                        }}
+                        onKeyPress={(e) => {
+                          // Ngăn event bubbling lên parent
+                          e.stopPropagation();
+                        }}
+                        onKeyUp={(e) => {
+                          // Ngăn event bubbling lên parent
+                          e.stopPropagation();
+                        }}
+                        onDragOver={(e) => {
+                          // Ngăn drag events từ parent ảnh hưởng đến textarea
+                          e.stopPropagation();
+                        }}
+                        onDrop={(e) => {
+                          // Ngăn drop events từ parent ảnh hưởng đến textarea
+                          e.stopPropagation();
+                        }}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 resize-none text-lg"
                         rows={3}
                         placeholder="Nhập địa chỉ nhận quà"
