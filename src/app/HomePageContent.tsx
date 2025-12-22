@@ -31,7 +31,7 @@ export function HomePageContent() {
           ? 'url(/trangchu/trangchu_background_mobile.svg)'
           : 'url(/trangchu/trangchu_background.svg)';
         mainRef.current.style.backgroundSize = isMobile ? 'contain' : 'cover';
-        mainRef.current.style.backgroundPosition = isMobile ? 'top' : 'center';
+        mainRef.current.style.backgroundPosition = isMobile ? 'top' : 'center -70px';
       }
     };
 
@@ -81,29 +81,46 @@ export function HomePageContent() {
           {/* Content - Mobile: Full width, Desktop: 1/3 right */}
           <div className="w-full md:w-1/2 px-6 md:px-12 py-8 md:py-12 md:mr-38 flex flex-col justify-center">
             {/* Title */}
-            <h1 className="font-prata text-3xl md:text-4xl lg:text-5xl font-normal mb-6 md:mb-8 leading-tight text-center" style={{ color: '#2A4A8C' }}>
-              Giữ nhịp trọn vẹn
+            <h1 
+              className="font-prata font-normal mb-6 md:mb-8 text-center" 
+              style={{ 
+                fontSize: '36px',
+                lineHeight: '40px',
+                letterSpacing: '0.03em',
+                color: '#0B4386'
+              }}
+            >
+              Giữ nhịp trọn vẹn hơn
               <br />
-              hơn một thế kỷ
+              một thế kỷ
             </h1>
 
             {/* Body Text */}
-            <div className="space-y-3 md:space-y-4 mb-6 md:mb-8 max-w-xl mx-auto" style={{ color: '#2A4A8C', fontSize: '15px', lineHeight: '1.6' }}>
-              <p className="leading-relaxed">
+            <div 
+              className="font-nunito font-normal space-y-3 md:space-y-4 mb-2 md:mb-4 max-w-xl mx-auto" 
+              style={{ 
+                fontSize: '16px',
+                lineHeight: '22px',
+                letterSpacing: '-0.02em',
+                textAlign: 'justify',
+                color: '#0B4386'
+              }}
+            >
+              <p>
                 Hơn một thế kỷ trước, chúng tôi chọn một con đường giản dị:
                 giữ lại hơi ấm trong từng khoảnh khắc, để nhịp sống được gìn
                 giữ trọn vẹn.
               </p>
-              <p className="leading-relaxed">
+              <p>
                 Năm 1923, những chiếc bình Tiger vẫn đứng vững sau trận động
                 đất Kanto, trở mang lại niềm tin cho hàng ngàn gia đình Nhật
                 Bản.
               </p>
-              <p className="leading-relaxed">
+              <p>
                 Từ di sản ấy, Tiger tiếp tục sáng tạo nồi cơm điện, hộp cơm,
                 bình nước...
               </p>
-              <p className="leading-relaxed">
+              <p>
                 Dù sản phẩm thay đổi, lời hứa vẫn nguyên vẹn: Giữ ấm từng bữa
                 ăn, giữ trọn từng nhịp sống.
               </p>
@@ -132,7 +149,7 @@ export function HomePageContent() {
 
         {/* Desktop: Product Image Bottom */}
         <div 
-          className="hidden md:block relative w-full z-10 flex justify-center mt-[-100px]"
+          className="hidden md:block relative w-full z-10 flex justify-center mt-[-150px]"
         >
           <Image
             src="/trangchu/sanpham.svg"
@@ -141,7 +158,7 @@ export function HomePageContent() {
             height={800}
             className="w-full h-auto object-cover"
             style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
-          />
+            />
         </div>
       </main>
     </div>

@@ -387,7 +387,4 @@ export const authOptions: NextAuthOptions = {
       return baseUrl;
     },
   },
-  pages: {
-    signIn: '/auth/login',
-  },
 };

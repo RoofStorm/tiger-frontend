@@ -5,10 +5,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { Button } from '@/components/ui/button';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { ShareRegistrationModal } from '@/app/nhip-song/components/ShareRegistrationModal';
+import apiClient from '@/lib/api';
 import {
   User,
   Menu,
@@ -33,6 +35,15 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('register');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user details including points
+  const { data: userDetails } = useQuery({
+    queryKey: ['userDetails', user?.id],
+    queryFn: () => apiClient.getCurrentUser(),
+    enabled: isAuthenticated,
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
+  });
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -78,12 +89,12 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
 
   const handleRegister = () => {
     setIsAuthModalOpen(false);
-    navigateWithLoading('/auth/register', 'Đang chuyển đến trang đăng ký...');
+    // Modal handles registration, no need to navigate
   };
 
   const handleLogin = () => {
     setIsAuthModalOpen(false);
-    navigateWithLoading('/auth/login', 'Đang chuyển đến trang đăng nhập...');
+    // Modal handles login, no need to navigate
   };
 
   return (
@@ -100,7 +111,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
           WebkitBackdropFilter: 'blur(16px)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="max-w-8xl mx-auto px-8 lg:px-12">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo - Left side */}
             <motion.div
@@ -239,10 +250,20 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                           setIsMenuOpen(false);
                         }
                       }}
-                      className="font-medium inline-flex items-center space-x-2 w-auto hover:opacity-70"
-                      style={{ color: isDarkMode ? '#FFFFFF' : '#333435' }}
+                      className="font-medium inline-flex items-center gap-2 w-auto hover:opacity-90 px-4 py-2"
+                      style={{ 
+                        backgroundColor: '#00579F',
+                        color: '#FFFFFF',
+                        borderRadius: '12px',
+                      }}
                     >
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                      <span className="font-bold whitespace-nowrap" style={{ fontSize: '14px' }}>
+                        {userDetails?.points || 0}
+                      </span>
+                      <span className="hidden md:inline font-medium whitespace-nowrap" style={{ fontSize: '14px' }}>
+                        Điểm năng lượng
+                      </span>
+                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center flex-shrink-0">
                         {user?.image ? (
                           <Image
                             src={user.image}
@@ -255,12 +276,9 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                             )}
                           />
                         ) : (
-                          <span className="font-bold text-sm" style={{ color: isDarkMode ? '#333435' : '#333435' }}>
-                            {user?.name?.charAt(0).toUpperCase()}
-                          </span>
+                          <User className="w-5 h-5" style={{ color: '#00579F' }} />
                         )}
                       </div>
-                      <span className="hidden lg:inline">{user?.name || 'User'}</span>
                       <ChevronDown
                         className={`w-4 h-4 transition-transform duration-200 ${isUserDropdownOpen ? 'rotate-180' : ''}`}
                       />

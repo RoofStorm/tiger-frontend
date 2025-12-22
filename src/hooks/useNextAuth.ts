@@ -82,19 +82,25 @@ export function useNextAuth(): UseNextAuthReturn {
           // Clear cache after session is updated
           queryClient.clear();
 
-          // Refresh router to ensure all components update
-          router.refresh();
-
           // Mark video as watched when user logs in
           localStorage.setItem('hasWatchedVideo', 'true');
 
-          // Redirect based on role - use the user from updated session
-          const userRole = updatedSession?.user?.role;
-          if (userRole === 'ADMIN') {
-            router.push('/admin');
-          } else {
-            router.push('/');
+          // Prevent any redirect to /auth/login
+          // If we're on /auth/login, replace with current page or home
+          if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
+            // Replace URL without navigation to prevent redirect
+            const currentUrl = window.location.href;
+            const newUrl = currentUrl.replace('/auth/login', '/');
+            window.history.replaceState({}, '', newUrl);
           }
+
+          // Refresh router to ensure all components update (header, etc.)
+          // Use setTimeout to ensure URL replacement happens first
+          setTimeout(() => {
+            router.refresh();
+          }, 0);
+
+          // Don't navigate - just update the UI (header will update automatically)
         }
       } catch (error) {
         console.error('Login failed:', error);
@@ -180,7 +186,7 @@ export function useNextAuth(): UseNextAuthReturn {
       queryClient.clear();
 
       await signOut({ redirect: false });
-      router.push('/auth/login');
+      router.push('/');
     } catch (error) {
       console.error('Logout failed:', error);
     }
