@@ -358,7 +358,7 @@ export function LunchboxTimeline() {
                           ) : (
                             <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-50">
                               <Image
-                                src="/thuthachnhipsong/slide_example_optimized.svg"
+                                src="/thuthachnhipsong/slide_example.png"
                                 alt="Slide example"
                                 fill
                                 className="object-cover"

@@ -169,7 +169,7 @@ export function ShareNoteSection() {
               <div className="flex items-center gap-3">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
                   <Image
-                    src="/thuthachnhipsong/slide_example.svg"
+                    src="/thuthachnhipsong/slide_example.png"
                     alt="User avatar"
                     fill
                     className="object-cover"
@@ -236,13 +236,13 @@ export function ShareNoteSection() {
               {/* Image - LCP element, preload with priority */}
               <div className="relative w-full mt-6 overflow-visible">
                   <Image
-                    src="/thuthachnhipsong/giadinhancom.svg"
+                    src="/thuthachnhipsong/giadinhancom.png"
                     alt="Giadinhancom"
-                    width={800}
+                    width={1000}
                     height={600}
                     className="w-full h-auto object-contain ml-[10px] md:ml-[20px]"
                     style={{
-                      transform: 'scale(1.1)',
+                      transform: 'scale(1)',
                       transformOrigin: 'center'
                     }}
                     priority
@@ -259,7 +259,7 @@ export function ShareNoteSection() {
                 onKeyDown={handleInputKeyDown}
                 placeholder="Câu chuyện của bạn thì sao? Chia sẻ cùng mình nhé!"
                 rows={4}
-                className="w-full px-4 py-3 border border-white/30 rounded-lg resize-none focus:outline-none focus:border-blue-300 placeholder-gray-300 font-nunito backdrop-blur-sm"
+                className="w-[90%] mx-auto px-4 py-3 border border-white/30 rounded-lg resize-none focus:outline-none focus:border-blue-300 placeholder-gray-300 font-nunito backdrop-blur-sm"
                 style={{ 
                   backgroundColor: '#FFFFFF1A',
                   color: '#DCDCDC'
@@ -269,7 +269,7 @@ export function ShareNoteSection() {
               {/* Button */}
               <Button
                 onClick={handleShareNote}
-                className="w-full font-medium py-3 rounded-lg transition-all duration-300 cursor-pointer hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+                className="w-[90%] mx-auto font-medium py-3 rounded-lg transition-all duration-300 cursor-pointer hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
                 style={{ backgroundColor: '#ffffff', color: '#00579F' }}
               >
                 Chia sẻ ngay!
@@ -309,7 +309,7 @@ export function ShareNoteSection() {
                 <div className="flex items-center gap-3 mb-3 pt-4">
                   <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
                     <Image
-                      src="/thuthachnhipsong/slide_example.svg"
+                      src="/thuthachnhipsong/slide_example.png"
                       alt="User avatar"
                       fill
                       className="object-cover"

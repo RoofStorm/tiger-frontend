@@ -93,7 +93,7 @@ export function MoodCardFlipCard({
               >
                 <div className="relative w-full h-full min-h-[550px]">
                   <Image
-                    src="/nhipsong/front_card_1.svg"
+                    src="/nhipsong/front_card_1.png"
                     alt="Mood Card Back"
                     fill
                     className="object-contain"
