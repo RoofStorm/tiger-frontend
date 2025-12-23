@@ -2,78 +2,89 @@ import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
-import { prisma } from './prisma';
 import jwt from 'jsonwebtoken';
-import {
-  checkDailyBonusAwarded,
-  markDailyBonusAwarded,
-  getTodayDateString,
-} from './cache';
-import { POINTS } from '@/constants/points';
 
-// Helper function to award daily login bonus with in-memory cache
-async function awardDailyLoginBonus(userId: string, provider: string) {
-  try {
-    const today = getTodayDateString();
+// Helper function to call backend API for OAuth login
+async function handleOAuthLogin(
+  provider: 'facebook' | 'google',
+  userData: {
+    id: string;
+    email?: string;
+    name?: string;
+    image?: string;
+  }
+) {
+  const apiBaseUrl =
+    process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+  const oauthUrl = `${apiBaseUrl}/auth/oauth/${provider}`;
 
-    // Check in-memory cache first (fast)
-    const alreadyAwarded = await checkDailyBonusAwarded(userId, today);
-
-    if (alreadyAwarded) {
-      return;
-    }
-
-    // Double-check with database as fallback (source of truth)
-    const todayDate = new Date();
-    todayDate.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(todayDate);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    const todayLogs = await prisma.pointLog.findMany({
-      where: {
-        userId: userId,
-        reason: 'Daily login bonus',
-        createdAt: {
-          gte: todayDate,
-          lt: tomorrow,
-        },
-      },
-    });
-
-    if (todayLogs.length > 0) {
-      // Mark in cache for future requests
-      await markDailyBonusAwarded(userId, today);
-      return;
-    }
-
-    // Award points
-    await prisma.pointLog.create({
-      data: {
-        userId: userId,
-        points: POINTS.DAILY_LOGIN_BONUS,
-        reason: 'Daily login bonus',
-      },
-    });
-
-    // Update user points
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        points: {
-          increment: POINTS.DAILY_LOGIN_BONUS,
-        },
-      },
-    });
-
-    // Mark as awarded in cache
-    await markDailyBonusAwarded(userId, today);
-  } catch (error) {
-    console.error(
-      `❌ Error awarding daily login bonus to ${provider} user:`,
-      error
+  // Xử lý email: Tạo email fallback nếu không có
+  let userEmail = userData.email;
+  if (!userEmail) {
+    userEmail = `${provider}_${userData.id}@${provider}.temp`;
+    console.warn(
+      `⚠️ ${provider} không cung cấp email, sử dụng email tạm:`,
+      userEmail
     );
   }
+
+  try {
+    const response = await fetch(oauthUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        providerId: userData.id,
+        email: userEmail,
+        name: userData.name || `${provider} User`,
+        avatarUrl: userData.image,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        message: 'OAuth login failed',
+      }));
+      console.error(`❌ ${provider} OAuth API error:`, {
+        status: response.status,
+        error: errorData,
+      });
+      return null;
+    }
+
+    const data = await response.json();
+    // Handle backend response format: { success: true, data: { user, accessToken, ... } }
+    const responseData =
+      data.success && data.data ? data.data : data;
+
+    if (!responseData.user) {
+      console.error(`❌ Invalid ${provider} OAuth response:`, data);
+      return null;
+    }
+
+    console.log(`✅ ${provider} OAuth login successful:`, {
+      userId: responseData.user.id,
+      email: responseData.user.email,
+    });
+
+    return {
+      id: responseData.user.id,
+      email: responseData.user.email,
+      name: responseData.user.name || userData.name || `${provider} User`,
+      image: responseData.user.avatarUrl || userData.image,
+      role: responseData.user.role || 'USER',
+      accessToken: responseData.accessToken,
+      refreshToken: responseData.refreshToken,
+    };
+  } catch (error) {
+    console.error(`❌ Error calling ${provider} OAuth API:`, error);
+    return null;
+  }
 }
+
+// Daily login bonus is now handled by backend API
+// No need to handle it in frontend anymore
 
 export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -249,66 +260,48 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === 'google') {
         try {
+          console.log('🔵 Google signIn callback:', {
+            hasEmail: !!user.email,
+            email: user.email,
+            hasName: !!user.name,
+            name: user.name,
+            hasImage: !!user.image,
+            userId: user.id,
+          });
+
           if (!user.email) {
             console.error('❌ No email provided by Google');
             return false;
           }
 
-          // Check if user exists
-          let existingUser = await prisma.user.findUnique({
-            where: { email: user.email },
+          // Call backend API to handle OAuth login
+          const backendUser = await handleOAuthLogin('google', {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
           });
 
-          if (!existingUser) {
-            // Create new user for Google login
-            existingUser = await prisma.user.create({
-              data: {
-                email: user.email,
-                name: user.name || 'Google User',
-                avatarUrl: user.image,
-                loginMethod: 'GOOGLE',
-                role: 'USER',
-                status: 'ACTIVE',
-                points: 0, // Starting points
-              },
-            });
-          } else {
-            // Update existing user's login method if needed
-            if (existingUser.loginMethod !== 'GOOGLE') {
-              existingUser = await prisma.user.update({
-                where: { id: existingUser.id },
-                data: {
-                  loginMethod: 'GOOGLE',
-                  avatarUrl: user.image,
-                },
-              });
-            }
+          if (!backendUser) {
+            console.error('❌ Failed to authenticate with backend API');
+            return false;
           }
 
-          // Award daily login bonus (non-blocking - don't fail sign in if this fails)
-          if (existingUser?.id) {
-            try {
-              // Use Promise with timeout to prevent hanging
-              await Promise.race([
-                awardDailyLoginBonus(existingUser.id, 'google'),
-                new Promise((_, reject) =>
-                  setTimeout(() => reject(new Error('Timeout')), 5000)
-                ),
-              ]).catch(error => {
-                console.warn(
-                  '⚠️ Daily bonus award failed (non-critical):',
-                  error
-                );
-                // Don't throw - allow sign in to continue
-              });
-            } catch (error) {
-              console.warn(
-                '⚠️ Error awarding daily bonus (non-critical):',
-                error
-              );
-              // Continue with sign in even if bonus fails
-            }
+          // Update user object with backend data
+          user.id = backendUser.id;
+          user.email = backendUser.email;
+          user.name = backendUser.name;
+          user.image = backendUser.image;
+          user.role = backendUser.role;
+
+          // Store tokens for JWT callback
+          interface UserWithTokens {
+            accessToken?: string;
+            refreshToken?: string;
           }
+          const userWithTokens = user as typeof user & UserWithTokens;
+          userWithTokens.accessToken = backendUser.accessToken;
+          userWithTokens.refreshToken = backendUser.refreshToken;
 
           return true;
         } catch (error) {
@@ -328,97 +321,34 @@ export const authOptions: NextAuthOptions = {
             userId: user.id,
           });
 
-          // Xử lý email: Facebook có thể không trả email
-          // Tạo email fallback từ Facebook ID nếu không có
-          let userEmail = user.email;
-          if (!userEmail) {
-            // Tạo email tạm từ Facebook ID (sẽ cần user cập nhật sau)
-            userEmail = `fb_${user.id}@facebook.temp`;
-            console.warn('⚠️ Facebook không cung cấp email, sử dụng email tạm:', userEmail);
-          }
-
-          // Check if user exists by email hoặc Facebook ID
-          let existingUser = await prisma.user.findUnique({
-            where: { email: userEmail },
+          // Call backend API to handle OAuth login
+          const backendUser = await handleOAuthLogin('facebook', {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
           });
 
-          // Nếu không tìm thấy và email là tạm, thử tìm bằng loginMethod + Facebook ID
-          if (!existingUser && userEmail.includes('@facebook.temp')) {
-            // Tìm user có loginMethod FACEBOOK và email pattern tương tự
-            existingUser = await prisma.user.findFirst({
-              where: {
-                loginMethod: 'FACEBOOK',
-                email: {
-                  contains: `fb_${user.id}`,
-                },
-              },
-            });
+          if (!backendUser) {
+            console.error('❌ Failed to authenticate with backend API');
+            return false;
           }
 
-          if (!existingUser) {
-            // Create new user for Facebook login
-            console.log('✅ Creating new Facebook user:', {
-              email: userEmail,
-              name: user.name || 'Facebook User',
-            });
-            existingUser = await prisma.user.create({
-              data: {
-                email: userEmail,
-                name: user.name || 'Facebook User',
-                avatarUrl: user.image,
-                loginMethod: 'FACEBOOK',
-                role: 'USER',
-                status: 'ACTIVE',
-                points: 0, // Starting points
-              },
-            });
-          } else {
-            // Update existing user's login method if needed
-            if (existingUser.loginMethod !== 'FACEBOOK') {
-              existingUser = await prisma.user.update({
-                where: { id: existingUser.id },
-                data: {
-                  loginMethod: 'FACEBOOK',
-                  avatarUrl: user.image,
-                },
-              });
-            } else {
-              // Update avatar nếu có thay đổi
-              if (user.image && existingUser.avatarUrl !== user.image) {
-                existingUser = await prisma.user.update({
-                  where: { id: existingUser.id },
-                  data: {
-                    avatarUrl: user.image,
-                  },
-                });
-              }
-            }
-          }
+          // Update user object with backend data
+          user.id = backendUser.id;
+          user.email = backendUser.email;
+          user.name = backendUser.name;
+          user.image = backendUser.image;
+          user.role = backendUser.role;
 
-          // Award daily login bonus (non-blocking - don't fail sign in if this fails)
-          if (existingUser?.id) {
-            try {
-              // Use Promise with timeout to prevent hanging
-              await Promise.race([
-                awardDailyLoginBonus(existingUser.id, 'facebook'),
-                new Promise((_, reject) =>
-                  setTimeout(() => reject(new Error('Timeout')), 5000)
-                ),
-              ]).catch(error => {
-                console.warn(
-                  '⚠️ Daily bonus award failed (non-critical):',
-                  error
-                );
-                // Don't throw - allow sign in to continue
-              });
-            } catch (error) {
-              console.warn(
-                '⚠️ Error awarding daily bonus (non-critical):',
-                error
-              );
-              // Continue with sign in even if bonus fails
-            }
+          // Store tokens for JWT callback
+          interface UserWithTokens {
+            accessToken?: string;
+            refreshToken?: string;
           }
+          const userWithTokens = user as typeof user & UserWithTokens;
+          userWithTokens.accessToken = backendUser.accessToken;
+          userWithTokens.refreshToken = backendUser.refreshToken;
 
           return true;
         } catch (error) {
@@ -445,37 +375,35 @@ export const authOptions: NextAuthOptions = {
           token.accessToken = userWithTokens.accessToken;
           token.refreshToken = userWithTokens.refreshToken;
         } else {
-          // For Google/Facebook login, we need to get the database user ID
-          // This still uses direct DB access for OAuth providers
-          // TODO: Refactor OAuth flow to use backend API as well
-          if (user.email) {
-            try {
-              const dbUser = await prisma.user.findUnique({
-                where: { email: user.email },
-              });
-              if (dbUser) {
-                // Create a real JWT token with the user ID
-                const accessToken = jwt.sign(
-                  {
-                    sub: dbUser.id,
-                    email: dbUser.email,
-                    role: dbUser.role,
-                  },
-                  process.env.NEXTAUTH_SECRET!,
-                  { expiresIn: '1h' }
-                );
-
-                token.accessToken = accessToken; // Use real JWT token
-                token.avatarUrl = dbUser.avatarUrl;
-
-                // Add refresh token if available
-                if (dbUser.refreshToken) {
-                  token.refreshToken = dbUser.refreshToken;
-                }
-              }
-            } catch (error) {
-              console.error('Error finding user in JWT callback:', error);
-            }
+          // For OAuth providers (Google/Facebook), tokens are already provided by backend API
+          // AccessToken and refreshToken are attached to user object in signIn callback
+          interface UserWithTokens {
+            accessToken?: string;
+            refreshToken?: string;
+            image?: string;
+          }
+          const userWithTokens = user as UserWithTokens;
+          
+          if (userWithTokens.accessToken) {
+            // Use tokens from backend API
+            token.accessToken = userWithTokens.accessToken;
+            token.refreshToken = userWithTokens.refreshToken;
+            token.avatarUrl = userWithTokens.image;
+          } else {
+            // Fallback: Create JWT token if backend didn't provide one
+            // This should not happen if backend API is working correctly
+            console.warn('⚠️ No accessToken from backend, creating fallback JWT');
+            const accessToken = jwt.sign(
+              {
+                sub: user.id,
+                email: user.email,
+                role: user.role || 'USER',
+              },
+              process.env.NEXTAUTH_SECRET!,
+              { expiresIn: '1h' }
+            );
+            token.accessToken = accessToken;
+            token.avatarUrl = user.image;
           }
         }
       }

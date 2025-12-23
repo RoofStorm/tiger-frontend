@@ -7,7 +7,16 @@ const globalForPrisma = globalThis as unknown as {
 // Validate DATABASE_URL in production
 const databaseUrl = process.env.DATABASE_URL;
 
-if (!databaseUrl) {
+// Log database URL (masked for security)
+if (databaseUrl) {
+  const maskedUrl = databaseUrl.replace(/:([^:@]+)@/, ':***@'); // Mask password
+  console.log('🔵 DATABASE_URL configured:', {
+    hasUrl: true,
+    url: maskedUrl,
+    isLocalhost: databaseUrl.includes('localhost'),
+    port: databaseUrl.match(/:(\d+)\//)?.[1] || 'default',
+  });
+} else {
   const errorMessage = 
     process.env.NODE_ENV === 'production'
       ? '❌ DATABASE_URL is not set in production environment variables. Please set DATABASE_URL in your deployment platform (Vercel, etc.).'
