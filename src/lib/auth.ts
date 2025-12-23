@@ -86,6 +86,20 @@ export const authOptions: NextAuthOptions = {
     FacebookProvider({
       clientId: process.env.OAUTH_FACEBOOK_CLIENT_ID!,
       clientSecret: process.env.OAUTH_FACEBOOK_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope: 'email,public_profile',
+        },
+      },
+      profile(profile) {
+        return {
+          id: profile.id,
+          name: profile.name || profile.first_name || 'Facebook User',
+          email: profile.email || `${profile.id}@facebook.temp`, // Fallback email nếu không có
+          image: profile.picture?.data?.url || profile.picture,
+          role: 'USER', // Default role
+        };
+      },
     }),
     CredentialsProvider({
       name: 'credentials',
@@ -140,7 +154,7 @@ export const authOptions: NextAuthOptions = {
               let errorData;
               try {
                 errorData = await response.json();
-              } catch (parseError) {
+              } catch {
                 // If response is not JSON, try to get text
                 const text = await response.text();
                 errorData = {
@@ -305,21 +319,51 @@ export const authOptions: NextAuthOptions = {
 
       if (account?.provider === 'facebook') {
         try {
-          if (!user.email) {
-            console.error('❌ No email provided by Facebook');
-            return false;
+          console.log('🔵 Facebook signIn callback:', {
+            hasEmail: !!user.email,
+            email: user.email,
+            hasName: !!user.name,
+            name: user.name,
+            hasImage: !!user.image,
+            userId: user.id,
+          });
+
+          // Xử lý email: Facebook có thể không trả email
+          // Tạo email fallback từ Facebook ID nếu không có
+          let userEmail = user.email;
+          if (!userEmail) {
+            // Tạo email tạm từ Facebook ID (sẽ cần user cập nhật sau)
+            userEmail = `fb_${user.id}@facebook.temp`;
+            console.warn('⚠️ Facebook không cung cấp email, sử dụng email tạm:', userEmail);
           }
 
-          // Check if user exists
+          // Check if user exists by email hoặc Facebook ID
           let existingUser = await prisma.user.findUnique({
-            where: { email: user.email },
+            where: { email: userEmail },
           });
+
+          // Nếu không tìm thấy và email là tạm, thử tìm bằng loginMethod + Facebook ID
+          if (!existingUser && userEmail.includes('@facebook.temp')) {
+            // Tìm user có loginMethod FACEBOOK và email pattern tương tự
+            existingUser = await prisma.user.findFirst({
+              where: {
+                loginMethod: 'FACEBOOK',
+                email: {
+                  contains: `fb_${user.id}`,
+                },
+              },
+            });
+          }
 
           if (!existingUser) {
             // Create new user for Facebook login
+            console.log('✅ Creating new Facebook user:', {
+              email: userEmail,
+              name: user.name || 'Facebook User',
+            });
             existingUser = await prisma.user.create({
               data: {
-                email: user.email,
+                email: userEmail,
                 name: user.name || 'Facebook User',
                 avatarUrl: user.image,
                 loginMethod: 'FACEBOOK',
@@ -338,6 +382,16 @@ export const authOptions: NextAuthOptions = {
                   avatarUrl: user.image,
                 },
               });
+            } else {
+              // Update avatar nếu có thay đổi
+              if (user.image && existingUser.avatarUrl !== user.image) {
+                existingUser = await prisma.user.update({
+                  where: { id: existingUser.id },
+                  data: {
+                    avatarUrl: user.image,
+                  },
+                });
+              }
             }
           }
 
