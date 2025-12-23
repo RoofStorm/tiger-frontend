@@ -60,10 +60,10 @@ export default function DataDeletionPage() {
               </p>
               <p className="text-lg font-semibold text-gray-900 mb-3">
                 <a 
-                  href="mailto:rinsocial099@gmail.com?subject=Yêu cầu xóa dữ liệu Facebook"
+                  href="mailto:trannhuanhvu099@gmail.com?subject=Yêu cầu xóa dữ liệu Facebook"
                   className="text-blue-600 hover:text-blue-800 underline"
                 >
-                  rinsocial099@gmail.com
+                  trannhuanhvu099@gmail.com
                 </a>
               </p>
               <p className="text-gray-700 mb-3">
@@ -105,10 +105,10 @@ export default function DataDeletionPage() {
               <p className="text-gray-700">
                 <strong>Email:</strong>{' '}
                 <a 
-                  href="mailto:rinsocial099@gmail.com"
+                  href="mailto:trannhuanhvu099@gmail.com"
                   className="text-blue-600 hover:text-blue-800 underline"
                 >
-                  rinsocial099@gmail.com
+                  trannhuanhvu099@gmail.com
                 </a>
               </p>
             </div>
