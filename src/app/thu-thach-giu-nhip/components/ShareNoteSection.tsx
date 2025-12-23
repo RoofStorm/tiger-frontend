@@ -33,6 +33,7 @@ export function ShareNoteSection() {
   const [noteText, setNoteText] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sharedNoteText, setSharedNoteText] = useState('');
+  const [createdWishId, setCreatedWishId] = useState<string | null>(null);
   const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
   const notesScrollRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -83,7 +84,10 @@ export function ShareNoteSection() {
   // Create wish mutation
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
-    onSuccess: (_, content) => {
+    onSuccess: (result, content) => {
+      // Lưu wish ID từ response
+      const wishId = result?.data?.id || result?.id || null;
+      setCreatedWishId(wishId);
       // Lưu nội dung note để hiển thị trong modal
       setSharedNoteText(content);
       // Hiển thị modal thành công
@@ -100,6 +104,35 @@ export function ShareNoteSection() {
       toast({
         title: 'Lỗi',
         description: 'Không thể gửi lời chúc. Vui lòng thử lại.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    },
+  });
+
+  // Share wish mutation
+  const shareWishMutation = useMutation({
+    mutationFn: ({ wishId, platform }: { wishId: string; platform?: string }) =>
+      apiClient.shareWish(wishId, platform),
+    onSuccess: result => {
+      // Invalidate user details to refresh points
+      queryClient.invalidateQueries({ queryKey: ['userDetails'] });
+      // Invalidate point logs to refresh point history
+      queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
+
+      // Show success message with points info
+      toast({
+        title: 'Chia sẻ thành công!',
+        description:
+          result.pointsMessage || 'Lời chúc đã được chia sẻ thành công.',
+        variant: result.pointsAwarded ? 'success' : 'default',
+        duration: 4000,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể chia sẻ lời chúc. Vui lòng thử lại.',
         variant: 'destructive',
         duration: 4000,
       });
@@ -233,6 +266,58 @@ export function ShareNoteSection() {
     // Gọi API tạo wish
     createWishMutation.mutate(noteText.trim());
   }, [noteText, toast, scrollToTextarea, isAuthenticated, createWishMutation]);
+
+  const handleFacebookShare = useCallback(() => {
+    if (!createdWishId) {
+      toast({
+        title: 'Lỗi',
+        description: 'Không tìm thấy lời chúc để chia sẻ.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Tạo URL preview cho wish với share page để có meta tags và image
+    const baseUrl =
+      process.env.NEXT_PUBLIC_PUBLIC_URL ||
+      process.env.NEXTAUTH_URL ||
+      'https://tiger-corporation-vietnam.vn';
+    const wishUrl = `${baseUrl}/wishes/share?wishId=${encodeURIComponent(createdWishId || '')}&content=${encodeURIComponent(sharedNoteText || '')}`;
+    const wishTitle = sharedNoteText || 'Lời chúc từ Tiger Mood Corner';
+
+    // Tạo Facebook Share URL với quote parameter
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(wishUrl)}&quote=${encodeURIComponent(wishTitle)}`;
+
+    // Mở popup Facebook Share Dialog
+    const popup = window.open(
+      facebookShareUrl,
+      'facebook-share-dialog',
+      'width=800,height=600,scrollbars=yes,resizable=yes'
+    );
+
+    // Kiểm tra nếu popup bị block
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      toast({
+        title: 'Popup bị chặn',
+        description: 'Vui lòng cho phép popup để chia sẻ.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Focus vào popup
+    if (popup) {
+      popup.focus();
+    }
+
+    // Gọi API share với platform facebook để được cộng điểm
+    shareWishMutation.mutate({ wishId: createdWishId, platform: 'facebook' });
+
+    // Đóng success modal sau khi mở share dialog thành công
+    setShowSuccessModal(false);
+  }, [createdWishId, sharedNoteText, shareWishMutation, toast]);
 
   return (
     <>
@@ -616,11 +701,9 @@ export function ShareNoteSection() {
                       Khám phá về TIGER
                     </Button>
                     <Button
-                      onClick={() => {
-                        // TODO: Handle Facebook share
-                        setShowSuccessModal(false);
-                      }}
-                      className="font-nunito transition-all duration-300 flex items-center justify-center gap-2 flex-1"
+                      onClick={handleFacebookShare}
+                      disabled={shareWishMutation.isPending || !createdWishId}
+                      className="font-nunito transition-all duration-300 flex items-center justify-center gap-2 flex-1 disabled:opacity-50"
                       style={{ 
                         backgroundColor: '#ffffff',
                         color: '#00579F',

@@ -97,7 +97,8 @@ export function Corner2_2() {
 
   // Share mutation
   const shareMutation = useMutation({
-    mutationFn: (postId: string) => apiClient.sharePost(postId),
+    mutationFn: ({ postId, platform }: { postId: string; platform?: string }) =>
+      apiClient.sharePost(postId, platform),
     onSuccess: result => {
       // Invalidate posts to refresh global counts
       queryClient.invalidateQueries({
@@ -113,6 +114,7 @@ export function Corner2_2() {
         title: 'Chia sẻ thành công!',
         description:
           result.pointsMessage || 'Bài viết đã được chia sẻ thành công.',
+        variant: result.pointsAwarded ? 'success' : 'default',
         duration: 4000,
       });
     },
@@ -325,8 +327,8 @@ export function Corner2_2() {
       popup.focus();
     }
 
-    // Cập nhật share count
-    shareMutation.mutate(post.id);
+    // Cập nhật share count với platform facebook để được cộng điểm
+    shareMutation.mutate({ postId: post.id, platform: 'facebook' });
   };
 
   return (

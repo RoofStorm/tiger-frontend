@@ -110,14 +110,14 @@ export default function ReferralSection() {
         <div>
           <h3 className="text-2xl font-bold text-gray-900 mb-2">Mời bạn bè</h3>
           <p className="text-gray-600">
-            Mời bạn bè tham gia và nhận 50 điểm cho mỗi người!
+            Mời bạn bè tham gia và cùng khám phá thế giới cảm xúc!
           </p>
         </div>
         <div className="text-right">
           <div className="text-3xl font-bold text-purple-600">
-            {referralData.totalEarned}
+            {referralData.totalReferrals}
           </div>
-          <div className="text-sm text-gray-500">điểm đã kiếm</div>
+          <div className="text-sm text-gray-500">bạn đã mời</div>
         </div>
       </div>
 
@@ -184,9 +184,9 @@ export default function ReferralSection() {
         <div className="bg-green-50 rounded-lg p-4 text-center">
           <Gift className="w-8 h-8 text-green-600 mx-auto mb-2" />
           <div className="text-2xl font-bold text-green-600">
-            {referralData.totalEarned}
+            {referralData.totalReferrals}
           </div>
-          <div className="text-sm text-green-500">Điểm kiếm được</div>
+          <div className="text-sm text-green-500">Bạn đã mời</div>
         </div>
       </div>
 
@@ -212,46 +212,6 @@ export default function ReferralSection() {
           </div>
         </div>
 
-        {/* Points Limit This Week */}
-        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="font-semibold text-blue-900 mb-1">
-                Điểm thưởng tuần này
-              </h4>
-              <p className="text-sm text-blue-700">
-                Chỉ cộng điểm cho 2 người đầu tiên mỗi tuần
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">
-                {referralData.weeklyStats.pointsAwarded}/
-                {referralData.weeklyStats.pointsLimit}
-              </div>
-              <div className="text-sm text-blue-500">
-                {referralData.weeklyStats.canEarnMorePoints
-                  ? 'Còn có thể cộng điểm'
-                  : 'Đã đạt giới hạn điểm'}
-              </div>
-            </div>
-          </div>
-
-          {/* Progress Bar */}
-          <div className="mt-3">
-            <div className="w-full bg-blue-200 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  referralData.weeklyStats.canEarnMorePoints
-                    ? 'bg-blue-500'
-                    : 'bg-red-500'
-                }`}
-                style={{
-                  width: `${(referralData.weeklyStats.pointsAwarded / referralData.weeklyStats.pointsLimit) * 100}%`,
-                }}
-              ></div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Recent Referrals */}

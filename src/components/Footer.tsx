@@ -65,17 +65,9 @@ function FooterSection({ title, children, isOpen, onToggle, isLast = false, titl
     }
   };
 
-  const handleMobileClick = (e: React.MouseEvent) => {
-    if (titleLink) {
-      // Open link in new tab
-      handleTitleClick(e);
-      // Also toggle section to show child links
-      if (!isOpen) {
-        onToggle();
-      }
-    } else {
-      onToggle();
-    }
+  const handleMobileClick = () => {
+    // On mobile, only toggle section, don't open link
+    onToggle();
   };
 
   const titleElement = titleLink ? (

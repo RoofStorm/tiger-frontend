@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { CreatePostData } from '@/types';
@@ -220,6 +220,39 @@ export function LunchboxUploadSection() {
     }
   }, []);
 
+  // Share mutation
+  const shareMutation = useMutation({
+    mutationFn: ({ postId, platform }: { postId: string; platform?: string }) =>
+      apiClient.sharePost(postId, platform),
+    onSuccess: result => {
+      // Invalidate posts to refresh global counts
+      queryClient.invalidateQueries({
+        queryKey: ['highlighted-posts-challenge', user?.id],
+      });
+      // Invalidate user details to refresh points
+      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      // Invalidate point logs to refresh point history
+      queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
+
+      // Show success message with points info
+      toast({
+        title: 'Chia sẻ thành công!',
+        description:
+          result.pointsMessage || 'Bài viết đã được chia sẻ thành công.',
+        variant: result.pointsAwarded ? 'success' : 'default',
+        duration: 4000,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể chia sẻ bài viết. Vui lòng thử lại.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    },
+  });
+
   const handleFacebookShare = () => {
     if (!createdPostId) {
       toast({
@@ -261,6 +294,9 @@ export function LunchboxUploadSection() {
     if (popup) {
       popup.focus();
     }
+
+    // Gọi API share với platform facebook để được cộng điểm
+    shareMutation.mutate({ postId: createdPostId, platform: 'facebook' });
 
     // Đóng success modal sau khi mở share dialog thành công
     setShowSuccessModal(false);

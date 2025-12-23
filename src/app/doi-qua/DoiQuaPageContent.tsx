@@ -571,7 +571,7 @@ export function DoiQuaPageContent() {
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Đăng nhập mỗi ngày → <strong>+5 điểm</strong>
+                          Đăng nhập mỗi ngày → <strong>+10 điểm</strong>
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
@@ -589,13 +589,13 @@ export function DoiQuaPageContent() {
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Chia sẻ quote/lunchboxchallenge/note giữ nhịp → <strong>+10 điểm</strong> (Tối đa 1 lần/ngày)
+                          Chia sẻ post/wish lên Facebook → <strong>+50 điểm</strong> (Tối đa 1 lần/tuần)
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Mời bạn bè tham gia → <strong>+50 điểm</strong> (Tối đa 2 lần/user/tuần) (đường link)
+                          Mời bạn bè tham gia → Giới thiệu bạn bè cùng khám phá thế giới cảm xúc (đường link)
                         </span>
                       </li>
                     </ul>

@@ -319,8 +319,17 @@ class ApiClient {
     return response.data;
   }
 
-  async sharePost(postId: string): Promise<any> {
-    const response = await this.client.post(`/posts/${postId}/share`);
+  async sharePost(postId: string, platform?: string): Promise<any> {
+    const response = await this.client.post(`/posts/${postId}/share`, {
+      ...(platform && { platform }),
+    });
+    return response.data;
+  }
+
+  async shareWish(wishId: string, platform?: string): Promise<any> {
+    const response = await this.client.post(`/wishes/${wishId}/share`, {
+      ...(platform && { platform }),
+    });
     return response.data;
   }
 

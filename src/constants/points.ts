@@ -1,9 +1,9 @@
 export const POINTS = {
-  DAILY_LOGIN_BONUS: 5,
-  REFERRAL_BONUS: 50,
+  DAILY_LOGIN_BONUS: 10,
+  REFERRAL_BONUS: 50, // Deprecated - no longer awarded
   POST_CREATION: 100, // 100 points for first post per week
   WISH_CREATION: 100, // 100 points for first wish per week
-  POST_SHARE: 10, // 10 points for sharing a post (once per day)
+  POST_SHARE: 50, // 50 points for sharing a post to Facebook (once per week)
   // POST_LIKE: 5, // Disabled - no points for likes
   // POST_COMMENT: 3, // Disabled - no points for comments
 } as const;
@@ -24,6 +24,6 @@ export const WISH_LIMITS = {
 } as const;
 
 export const SHARE_LIMITS = {
-  DAILY_SHARE_POINTS_LIMIT: 1, // Maximum 1 share bonus per day (resets at midnight)
-  DAILY_SHARE_POINTS: 10, // Points for sharing a post (10 points once per day)
+  WEEKLY_SHARE_POINTS_LIMIT: 1, // Maximum 1 share bonus per week (resets every Monday)
+  WEEKLY_SHARE_POINTS: 50, // Points for sharing a post/wish to Facebook (50 points once per week)
 } as const;
