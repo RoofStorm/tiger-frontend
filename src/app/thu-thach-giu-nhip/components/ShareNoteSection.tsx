@@ -443,9 +443,12 @@ export function ShareNoteSection() {
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-white font-medium text-sm bg-[#00579F]">
-                          {wish.user?.name?.charAt(0).toUpperCase() || 'U'}
-                        </div>
+                        <Image
+                          src="/thuthachnhipsong/slide_example.png"
+                          alt="Default avatar"
+                          fill
+                          className="object-cover"
+                        />
                       )}
                     </div>
                     <span className="font-medium text-sm" style={{ color: '#FFFFFF' }}>
