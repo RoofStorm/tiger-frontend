@@ -95,6 +95,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.error('❌ Missing credentials: email or password is empty');
           return null;
         }
 
@@ -102,62 +103,124 @@ export const authOptions: NextAuthOptions = {
           // Call backend API for login
           const apiBaseUrl =
             process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+          const loginUrl = `${apiBaseUrl}/auth/login`;
 
-          const response = await fetch(`${apiBaseUrl}/auth/login`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: credentials.email,
-              password: credentials.password,
-            }),
+          console.log('🔐 Attempting login:', {
+            email: credentials.email,
+            apiUrl: loginUrl,
+            timestamp: new Date().toISOString(),
           });
 
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({
-              message: 'Login failed',
-            }));
-            // Backend error format: { success: false, error: "...", message: "..." }
-            const errorMessage =
-              errorData.error ||
-              errorData.message ||
-              `Login failed with status ${response.status}`;
-            console.error('❌ Login failed:', errorMessage);
-            return null;
+          // Add timeout to prevent hanging
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+          try {
+            const response = await fetch(loginUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+              }),
+              signal: controller.signal,
+            });
+
+            clearTimeout(timeoutId);
+
+            console.log('📡 Backend response:', {
+              status: response.status,
+              statusText: response.statusText,
+              ok: response.ok,
+            });
+
+            if (!response.ok) {
+              let errorData;
+              try {
+                errorData = await response.json();
+              } catch (parseError) {
+                // If response is not JSON, try to get text
+                const text = await response.text();
+                errorData = {
+                  message: text || 'Login failed',
+                  status: response.status,
+                };
+              }
+
+              // Backend error format: { success: false, error: "...", message: "..." }
+              const errorMessage =
+                errorData.error ||
+                errorData.message ||
+                `Login failed with status ${response.status}`;
+
+              console.error('❌ Login failed:', {
+                status: response.status,
+                statusText: response.statusText,
+                error: errorMessage,
+                errorData,
+              });
+
+              return null;
+            }
+
+            const data = await response.json();
+            console.log('✅ Login response received:', {
+              hasSuccess: !!data.success,
+              hasData: !!data.data,
+              hasUser: !!(data.success && data.data ? data.data.user : data.user),
+            });
+
+            // Backend wraps response in { success: true, data: {...} } format via ResponseInterceptor
+            // Handle both wrapped and unwrapped formats for flexibility
+            const responseData = data.success && data.data ? data.data : data;
+
+            if (!responseData.user) {
+              console.error(
+                '❌ Invalid response format: missing user data',
+                JSON.stringify(data, null, 2)
+              );
+              return null;
+            }
+
+            console.log('✅ Login successful for user:', {
+              id: responseData.user.id,
+              email: responseData.user.email,
+              hasAccessToken: !!responseData.accessToken,
+            });
+
+            // Store tokens for later use in JWT callback
+            // We'll attach these to the user object so they're available in JWT callback
+            return {
+              id: responseData.user.id,
+              email: responseData.user.email,
+              name: responseData.user.name || 'User',
+              image: responseData.user.avatarUrl || undefined,
+              role: responseData.user.role,
+              // Store tokens for JWT callback
+              accessToken: responseData.accessToken,
+              refreshToken: responseData.refreshToken,
+            };
+          } catch (fetchError: unknown) {
+            clearTimeout(timeoutId);
+
+            if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+              console.error('❌ Login timeout: Backend did not respond within 15 seconds');
+              console.error('❌ API URL:', loginUrl);
+            } else {
+              console.error('❌ Fetch error:', fetchError);
+            }
+
+            throw fetchError; // Re-throw to be caught by outer catch
           }
-
-          const data = await response.json();
-
-          // Backend wraps response in { success: true, data: {...} } format via ResponseInterceptor
-          // Handle both wrapped and unwrapped formats for flexibility
-          const responseData = data.success && data.data ? data.data : data;
-
-          if (!responseData.user) {
-            console.error(
-              '❌ Invalid response format: missing user data',
-              JSON.stringify(data, null, 2)
-            );
-            return null;
-          }
-
-          // Store tokens for later use in JWT callback
-          // We'll attach these to the user object so they're available in JWT callback
-          return {
-            id: responseData.user.id,
-            email: responseData.user.email,
-            name: responseData.user.name || 'User',
-            image: responseData.user.avatarUrl || undefined,
-            role: responseData.user.role,
-            // Store tokens for JWT callback
-            accessToken: responseData.accessToken,
-            refreshToken: responseData.refreshToken,
-          };
         } catch (error: unknown) {
           console.error('❌ Auth error:', error);
           console.error('❌ Error details:', {
             message: error instanceof Error ? error.message : 'Unknown error',
+            name: error instanceof Error ? error.name : undefined,
             stack: error instanceof Error ? error.stack : undefined,
+            apiUrl: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api'}/auth/login`,
           });
           return null;
         }

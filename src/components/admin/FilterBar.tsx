@@ -1,11 +1,23 @@
 import React, { memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Filter, X } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface FilterState {
   role?: string;
   status?: string;
   type?: string;
+  month?: string;
+  year?: string;
+  isHighlighted?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 interface FilterBarProps {
@@ -16,11 +28,33 @@ interface FilterBarProps {
 
 export const FilterBar = memo<FilterBarProps>(
   ({ type, filters, setFilters }) => {
+    // Helper to convert "all" to empty string for filter state
+    const handleValueChange = (
+      field: keyof FilterState,
+      value: string
+    ) => {
+      setFilters({
+        ...filters,
+        [field]: value === 'all' ? '' : value,
+      });
+    };
+
+    // Helper to convert empty string to "all" for Select value
+    const getSelectValue = (value: string | undefined) => {
+      return value && value !== '' ? value : 'all';
+    };
+
     const clearFilters = () => {
       if (type === 'users') {
         setFilters({ role: '', status: '' });
       } else {
-        setFilters({ type: '' });
+        setFilters({
+          month: '',
+          year: '',
+          isHighlighted: '',
+          sortBy: '',
+          sortOrder: 'desc',
+        });
       }
     };
 
@@ -46,48 +80,96 @@ export const FilterBar = memo<FilterBarProps>(
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Role/Type Filter */}
-          <select
-            value={filters.role || filters.type || ''}
-            onChange={e =>
-              setFilters({
-                ...filters,
-                [type === 'users' ? 'role' : 'type']: e.target.value,
-              })
-            }
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">
-              Tất cả {type === 'users' ? 'vai trò' : 'loại'}
-            </option>
-            {type === 'users' ? (
-              <>
-                <option value="USER">USER</option>
-                <option value="ADMIN">ADMIN</option>
-              </>
-            ) : (
-              <>
-                <option value="EMOJI_CARD">EMOJI_CARD</option>
-                <option value="CONFESSION">CONFESSION</option>
-                <option value="IMAGE">IMAGE</option>
-                <option value="VIDEO">VIDEO</option>
-                <option value="CLIP">CLIP</option>
-              </>
-            )}
-          </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Role Filter (only for users) */}
+          {type === 'users' && (
+            <Select
+              value={getSelectValue(filters.role)}
+              onValueChange={value => handleValueChange('role', value)}
+            >
+              <SelectTrigger className={!filters.role ? 'text-gray-400' : ''}>
+                <SelectValue placeholder="Tất cả vai trò" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả vai trò</SelectItem>
+                <SelectItem value="USER">USER</SelectItem>
+                <SelectItem value="ADMIN">ADMIN</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
 
           {/* Status Filter (only for users) */}
           {type === 'users' && (
-            <select
-              value={filters.status}
-              onChange={e => setFilters({ ...filters, status: e.target.value })}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            <Select
+              value={getSelectValue(filters.status)}
+              onValueChange={value => handleValueChange('status', value)}
             >
-              <option value="">Tất cả trạng thái</option>
-              <option value="ACTIVE">ACTIVE</option>
-              <option value="INACTIVE">INACTIVE</option>
-            </select>
+              <SelectTrigger className={!filters.status ? 'text-gray-400' : ''}>
+                <SelectValue placeholder="Tất cả trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="ACTIVE">ACTIVE</SelectItem>
+                <SelectItem value="INACTIVE">INACTIVE</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Highlight Status Filter (only for posts) */}
+          {type === 'posts' && (
+            <Select
+              value={getSelectValue(filters.isHighlighted)}
+              onValueChange={value => handleValueChange('isHighlighted', value)}
+            >
+              <SelectTrigger className={!filters.isHighlighted ? 'text-gray-400' : ''}>
+                <SelectValue placeholder="Tất cả highlight" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả highlight</SelectItem>
+                <SelectItem value="true">Đã highlight</SelectItem>
+                <SelectItem value="false">Chưa highlight</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Month Filter (only for posts) */}
+          {type === 'posts' && (
+            <Select
+              value={getSelectValue(filters.month)}
+              onValueChange={value => handleValueChange('month', value)}
+            >
+              <SelectTrigger className={!filters.month ? 'text-gray-400' : ''}>
+                <SelectValue placeholder="Tất cả tháng" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả tháng</SelectItem>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                  <SelectItem key={month} value={month.toString()}>
+                    Tháng {month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          {/* Year Filter (only for posts) */}
+          {type === 'posts' && (
+            <Select
+              value={getSelectValue(filters.year)}
+              onValueChange={value => handleValueChange('year', value)}
+            >
+              <SelectTrigger className={!filters.year ? 'text-gray-400' : ''}>
+                <SelectValue placeholder="Tất cả năm" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả năm</SelectItem>
+                {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                  <SelectItem key={year} value={year.toString()}>
+                    Năm {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
         </div>
       </div>

@@ -301,7 +301,7 @@ export function Corner2_1() {
       process.env.NEXT_PUBLIC_PUBLIC_URL ||
       (typeof window !== 'undefined' ? window.location.origin : null) ||
       process.env.NEXTAUTH_URL ||
-      'https://tiger-frontend-eta.vercel.app'; // Fallback to production URL
+      'https://tiger-corporation-vietnam.vn'; // Fallback to production URL
     const postUrl = `${baseUrl}/posts/${post.id}`;
 
     // Console log để debug imageUrl

@@ -1,21 +1,64 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Pause, Play } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import apiClient from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
+import { useNextAuth } from '@/hooks/useNextAuth';
 
 interface Post {
   id: string;
   caption?: string;
   imageUrl?: string;
+  likeCount?: number;
+  isLiked?: boolean;
   user?: {
     name?: string;
     avatarUrl?: string;
   };
 }
 
-export function LunchboxTimeline() {
+// Mock data để fallback nếu không có đủ posts
+const mockPosts: Post[] = [
+  {
+    id: 'mock-1',
+    caption: 'Cột mốc thời gian 1',
+    imageUrl: undefined,
+    likeCount: 0,
+  },
+  {
+    id: 'mock-2',
+    caption: 'Cột mốc thời gian 2',
+    imageUrl: undefined,
+    likeCount: 0,
+  },
+  {
+    id: 'mock-3',
+    caption: 'Cột mốc thời gian 3',
+    imageUrl: undefined,
+    likeCount: 0,
+  },
+  {
+    id: 'mock-4',
+    caption: 'Cột mốc thời gian 4',
+    imageUrl: undefined,
+    likeCount: 0,
+  },
+  {
+    id: 'mock-5',
+    caption: 'Cột mốc thời gian 5',
+    imageUrl: undefined,
+    likeCount: 0,
+  },
+];
+
+export function LunchboxCarousel() {
+  const { isAuthenticated } = useNextAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -23,6 +66,7 @@ export function LunchboxTimeline() {
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+  const [likeCounts, setLikeCounts] = useState<Map<string, number>>(new Map());
   const carouselRef = useRef<HTMLDivElement>(null);
 
   // Detect mobile screen size with debounce
@@ -46,52 +90,157 @@ export function LunchboxTimeline() {
   }, []);
 
   // Fetch highlighted posts for carousel
-  // Tạm thời disable để dùng mock data
-  // const { data: postsData, isLoading } = useQuery({
-  //   queryKey: ['highlighted-posts-timeline'],
-  //   queryFn: () => apiClient.getHighlightedPosts(),
-  //   staleTime: 5 * 60 * 1000, // 5 minutes
-  //   refetchOnWindowFocus: false,
-  // });
-  const isLoading = false;
+  const { data: postsData, isLoading } = useQuery({
+    queryKey: ['highlighted-posts-lunchbox-carousel'],
+    queryFn: () => apiClient.getHighlightedPosts(1, 20), // Get up to 20 posts
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
 
-  // Mock data để test 5 slides
-  const mockPosts: Post[] = [
-    {
-      id: 'mock-1',
-      caption: 'Cột mốc thời gian 1',
-      imageUrl: undefined,
-    },
-    {
-      id: 'mock-2',
-      caption: 'Cột mốc thời gian 2',
-      imageUrl: undefined,
-    },
-    {
-      id: 'mock-3',
-      caption: 'Cột mốc thời gian 3',
-      imageUrl: undefined,
-    },
-    {
-      id: 'mock-4',
-      caption: 'Cột mốc thời gian 4',
-      imageUrl: undefined,
-    },
-    {
-      id: 'mock-5',
-      caption: 'Cột mốc thời gian 5',
-      imageUrl: undefined,
-    },
-  ];
+  // Xử lý posts: lấy từ API, nếu không đủ thì bổ sung bằng mock data
+  const highlightedPosts = useMemo(() => {
+    const apiPosts = Array.isArray(postsData?.data?.posts)
+      ? postsData.data.posts
+      : [];
 
-  // Luôn dùng mock data để test 5 slides
-  const highlightedPosts = mockPosts;
+    // Nếu có posts từ API, dùng posts đó
+    if (apiPosts.length > 0) {
+      // Nếu không đủ 5 posts, bổ sung bằng mock data
+      if (apiPosts.length < 5) {
+        const needed = 5 - apiPosts.length;
+        return [...apiPosts, ...mockPosts.slice(0, needed)];
+      }
+      return apiPosts;
+    }
 
-  // Nếu muốn dùng data thật, uncomment dòng sau và comment dòng trên:
-  // const highlightedPosts =
-  //   Array.isArray(postsData?.data?.posts) && postsData.data.posts.length >= 5
-  //     ? postsData.data.posts
-  //     : mockPosts;
+    // Nếu không có posts từ API, dùng mock data
+    return mockPosts;
+  }, [postsData]);
+
+  // Khởi tạo và cập nhật likeCounts và likedPosts từ posts khi data thay đổi
+  useEffect(() => {
+    const newCounts = new Map<string, number>();
+    const newLikedPosts = new Set<string>();
+    
+    highlightedPosts.forEach((post: Post) => {
+      // Cập nhật likeCount
+      if (post.likeCount !== undefined) {
+        newCounts.set(post.id, post.likeCount);
+      } else {
+        newCounts.set(post.id, 0);
+      }
+      
+      // Cập nhật likedPosts từ isLiked field (ưu tiên isLiked từ server)
+      if (post.isLiked === true) {
+        newLikedPosts.add(post.id);
+      }
+    });
+    
+    // Merge với state hiện tại để giữ lại các thay đổi local chưa được sync
+    setLikeCounts(prev => {
+      const merged = new Map(prev);
+      newCounts.forEach((count, id) => {
+        merged.set(id, count);
+      });
+      return merged;
+    });
+    
+    setLikedPosts(prev => {
+      const merged = new Set(prev);
+      // Thêm các posts được liked từ server
+      newLikedPosts.forEach(id => merged.add(id));
+      // Giữ lại các posts đã được liked local nhưng chưa có trong server data
+      // (trường hợp optimistic update)
+      return merged;
+    });
+  }, [highlightedPosts]);
+
+  // Like mutation
+  const likeMutation = useMutation({
+    mutationFn: (postId: string) => apiClient.likePost(postId),
+    onSuccess: (response, postId) => {
+      // API response structure: {success: true, data: {action: "liked", liked: true}, message: "Success"}
+      // apiClient.likePost() returns response.data, so we get: {success: true, data: {action: "liked", liked: true}, message: "Success"}
+      // Therefore, we need to access response.data.action
+      const responseData = response?.data || response;
+      const action = responseData?.action || (responseData?.liked === true ? 'liked' : 'unliked');
+      
+      // Cập nhật local state ngay lập tức để UI responsive
+      setLikedPosts(prev => {
+        const newSet = new Set(prev);
+        if (action === 'liked') {
+          newSet.add(postId);
+        } else if (action === 'unliked') {
+          newSet.delete(postId);
+        }
+        return newSet;
+      });
+
+      // Cập nhật likeCount ngay lập tức
+      setLikeCounts(prevCounts => {
+        const newCounts = new Map(prevCounts);
+        const currentCount = newCounts.get(postId) ?? 0;
+        if (action === 'liked') {
+          newCounts.set(postId, currentCount + 1);
+        } else if (action === 'unliked') {
+          newCounts.set(postId, Math.max(0, currentCount - 1));
+        }
+        return newCounts;
+      });
+
+      // Cập nhật cache trực tiếp để sync với server
+      queryClient.setQueryData(
+        ['highlighted-posts-lunchbox-carousel'],
+        (oldData: { data?: { posts?: Post[] } } | undefined) => {
+          if (!oldData?.data?.posts) return oldData;
+          
+          const updatedPosts = oldData.data.posts.map((post: Post) => {
+            if (post.id === postId) {
+              const currentLikeCount = post.likeCount ?? 0;
+              return {
+                ...post,
+                likeCount: action === 'liked' 
+                  ? currentLikeCount + 1 
+                  : Math.max(0, currentLikeCount - 1),
+                isLiked: action === 'liked',
+              };
+            }
+            return post;
+          });
+
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              posts: updatedPosts,
+            },
+          };
+        }
+      );
+
+      if (action === 'liked') {
+        toast({
+          title: 'Đã thích bài viết!',
+          description: 'Cảm ơn bạn đã chia sẻ cảm xúc.',
+          duration: 3000,
+        });
+      } else if (action === 'unliked') {
+        toast({
+          title: 'Đã bỏ thích bài viết',
+          description: 'Bạn đã bỏ thích bài viết này.',
+          duration: 3000,
+        });
+      }
+    },
+    onError: () => {
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể thích bài viết. Vui lòng thử lại.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    },
+  });
 
   // Navigation functions
   const nextSlide = useCallback(() => {
@@ -167,16 +316,20 @@ export function LunchboxTimeline() {
   // Toggle like for a post
   const toggleLike = useCallback((postId: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent slide click when clicking heart
-    setLikedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-      }
-      return newSet;
-    });
-  }, []);
+    
+    // Kiểm tra đăng nhập trước khi like
+    if (!isAuthenticated) {
+      toast({
+        title: 'Cần đăng nhập',
+        description: 'Vui lòng đăng nhập để thích bài viết.',
+        duration: 3000,
+      });
+      return;
+    }
+    
+    // Gọi API để like/unlike post
+    likeMutation.mutate(postId);
+  }, [likeMutation, isAuthenticated, toast]);
 
   return (
     <div className="mt-16 pt-12 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
@@ -309,7 +462,7 @@ export function LunchboxTimeline() {
                       >
                         {/* Image Section - Top */}
                         <div className="relative flex-1 p-2 overflow-hidden">
-                          {post.imageUrl ? (
+                          {post.imageUrl && typeof post.imageUrl === 'string' && post.imageUrl.trim() !== '' ? (
                             <div className="relative w-full h-full rounded-lg overflow-hidden">
                               <Image
                                 src={post.imageUrl}
@@ -333,26 +486,33 @@ export function LunchboxTimeline() {
                               </div>
                               {/* White Heart Logo - Bottom Right */}
                               <div 
-                                className="absolute bottom-2 right-2 z-10 cursor-pointer transition-all duration-200 hover:scale-110"
-                                onClick={(e) => toggleLike(post.id, e)}
+                                className="absolute bottom-2 right-2 z-10 flex flex-col items-center gap-0.5"
                               >
-                                <svg 
-                                  width="32" 
-                                  height="32" 
-                                  viewBox="0 0 30 30" 
-                                  fill="none" 
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="transition-all duration-200"
+                                <div
+                                  className="cursor-pointer transition-all duration-200 hover:scale-110"
+                                  onClick={(e) => toggleLike(post.id, e)}
                                 >
-                                  <path 
-                                    d="M15.775 26.0125C15.35 26.1625 14.65 26.1625 14.225 26.0125C10.6 24.775 2.5 19.6125 2.5 10.8625C2.5 7 5.6125 3.875 9.45 3.875C11.725 3.875 13.7375 4.975 15 6.675C16.2625 4.975 18.2875 3.875 20.55 3.875C24.3875 3.875 27.5 7 27.5 10.8625C27.5 19.6125 19.4 24.775 15.775 26.0125Z" 
-                                    fill={likedPosts.has(post.id) ? "#EF4444" : "none"}
-                                    stroke={likedPosts.has(post.id) ? "#EF4444" : "white"}
-                                    strokeWidth="1.875" 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                  <svg 
+                                    width="32" 
+                                    height="32" 
+                                    viewBox="0 0 30 30" 
+                                    fill="none" 
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="transition-all duration-200"
+                                  >
+                                    <path 
+                                      d="M15.775 26.0125C15.35 26.1625 14.65 26.1625 14.225 26.0125C10.6 24.775 2.5 19.6125 2.5 10.8625C2.5 7 5.6125 3.875 9.45 3.875C11.725 3.875 13.7375 4.975 15 6.675C16.2625 4.975 18.2875 3.875 20.55 3.875C24.3875 3.875 27.5 7 27.5 10.8625C27.5 19.6125 19.4 24.775 15.775 26.0125Z" 
+                                      fill={(post.isLiked || likedPosts.has(post.id)) ? "#EF4444" : "none"}
+                                      stroke={(post.isLiked || likedPosts.has(post.id)) ? "#EF4444" : "white"}
+                                      strokeWidth="1.875" 
+                                      strokeLinecap="round" 
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </div>
+                                <span className="text-white text-xs font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                                  {likeCounts.get(post.id) ?? post.likeCount ?? 0}
+                                </span>
                               </div>
                             </div>
                           ) : (
@@ -376,26 +536,33 @@ export function LunchboxTimeline() {
                               </div>
                               {/* White Heart Logo - Bottom Right */}
                               <div 
-                                className="absolute bottom-2 right-2 z-10 cursor-pointer transition-all duration-200 hover:scale-110"
-                                onClick={(e) => toggleLike(post.id, e)}
+                                className="absolute bottom-2 right-2 z-10 flex flex-col items-center gap-0.5"
                               >
-                                <svg 
-                                  width="32" 
-                                  height="32" 
-                                  viewBox="0 0 30 30" 
-                                  fill="none" 
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="transition-all duration-200"
+                                <div
+                                  className="cursor-pointer transition-all duration-200 hover:scale-110"
+                                  onClick={(e) => toggleLike(post.id, e)}
                                 >
-                                  <path 
-                                    d="M15.775 26.0125C15.35 26.1625 14.65 26.1625 14.225 26.0125C10.6 24.775 2.5 19.6125 2.5 10.8625C2.5 7 5.6125 3.875 9.45 3.875C11.725 3.875 13.7375 4.975 15 6.675C16.2625 4.975 18.2875 3.875 20.55 3.875C24.3875 3.875 27.5 7 27.5 10.8625C27.5 19.6125 19.4 24.775 15.775 26.0125Z" 
-                                    fill={likedPosts.has(post.id) ? "#EF4444" : "none"}
-                                    stroke={likedPosts.has(post.id) ? "#EF4444" : "white"}
-                                    strokeWidth="1.875" 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                  <svg 
+                                    width="32" 
+                                    height="32" 
+                                    viewBox="0 0 30 30" 
+                                    fill="none" 
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="transition-all duration-200"
+                                  >
+                                    <path 
+                                      d="M15.775 26.0125C15.35 26.1625 14.65 26.1625 14.225 26.0125C10.6 24.775 2.5 19.6125 2.5 10.8625C2.5 7 5.6125 3.875 9.45 3.875C11.725 3.875 13.7375 4.975 15 6.675C16.2625 4.975 18.2875 3.875 20.55 3.875C24.3875 3.875 27.5 7 27.5 10.8625C27.5 19.6125 19.4 24.775 15.775 26.0125Z" 
+                                      fill={(post.isLiked || likedPosts.has(post.id)) ? "#EF4444" : "none"}
+                                      stroke={(post.isLiked || likedPosts.has(post.id)) ? "#EF4444" : "white"}
+                                      strokeWidth="1.875" 
+                                      strokeLinecap="round" 
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </div>
+                                <span className="text-white text-xs font-semibold drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+                                  {likeCounts.get(post.id) ?? post.likeCount ?? 0}
+                                </span>
                               </div>
                             </div>
                           )}
@@ -456,7 +623,7 @@ export function LunchboxTimeline() {
         )}
         {/* Navigation Dots */}
         <div className="flex justify-center items-center gap-1.5 md:gap-2 mt-4 md:mt-8">
-              {highlightedPosts.map((_, index) => (
+              {highlightedPosts.map((_: Post, index: number) => (
                 <button
                   key={index}
                   onClick={() => {

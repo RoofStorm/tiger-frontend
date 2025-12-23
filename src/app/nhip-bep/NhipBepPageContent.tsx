@@ -15,30 +15,47 @@ interface SlideContent {
 
 const slides: SlideContent[] = [
   {
-    dates: '1953 - 1967',
-    subtitle: 'An Large Variety of Vacuum Bottles',
+    dates: '1923 – 1959',
+    subtitle: 'Khởi đầu và Chứng nhận',
     paragraphs: [
-      "The 'Five-fold Power Vacuum Bottle' was launched in the early days of the company and went on to become a popular product further down the road, but at the time of its initial release it was still only useful for hiking or traveling, and domestic demand was low.",
-      "However, the company continued to develop new products. These included a baby bottle with a teat over the opening (thermal baby bottle), and a vacuum bottle for sake that kept the sake inside warm. Many other amazing products went on to be developed, such as a container for ice cream, and a vacuum bottle for ayu fishing to refrigerate and transport freshly caught fish."
-    ],
-    image: '/nhipbep/history1_background.svg'
-  },
-  // Add more slides as needed
-  {
-    dates: '1968 - 1980',
-    subtitle: 'Expansion and Innovation',
-    paragraphs: [
-      "During this period, the company expanded its product line and continued to innovate in vacuum bottle technology.",
-      "New manufacturing processes were developed, and the company began to establish itself as a leader in thermal insulation products."
+      'Tiger bắt đầu sản xuất và kinh doanh bình chân không tại Nhật Bản.',
+      'Trở thành nhà máy đầu tiên trong ngành được MITI (nay là METI) chứng nhận đạt chuẩn JIS.'
     ],
     image: '/nhipbep/history1_background.svg'
   },
   {
-    dates: '1981 - 2000',
-    subtitle: 'Global Reach',
+    dates: '1960 – 1970',
+    subtitle: 'Mở rộng và Phát triển',
     paragraphs: [
-      "The company expanded globally, bringing its innovative vacuum bottle technology to markets around the world.",
-      "This era marked significant growth in both product diversity and international presence."
+      'Kỷ niệm 45 năm thành lập, ông Takenori Kikuchi được bổ nhiệm làm Chủ tịch HĐQT, ông Yoshito Kikuchi giữ vai trò Chủ tịch Điều hành.',
+      'Thành lập Tiger Bussan Co., Ltd. tại Hiroshima. Hoàn thành mở rộng Trụ sở chính (Tòa nhà thứ ba).'
+    ],
+    image: '/nhipbep/history1_background.svg'
+  },
+  {
+    dates: '1980 – 1999',
+    subtitle: 'Đổi mới và Tái cấu trúc',
+    paragraphs: [
+      'Ra mắt ấm đun nước điện "Wakitate" đầu tiên.',
+      'Kỷ niệm 60 năm thành lập và chính thức đổi tên thành Tiger Corporation. Hoàn thành Trung tâm Bình chân không Kadoma và xây dựng nhà xưởng đúc.'
+    ],
+    image: '/nhipbep/history1_background.svg'
+  },
+  {
+    dates: '2000 – 2019',
+    subtitle: 'Chứng nhận Quốc tế và Mở rộng',
+    paragraphs: [
+      'Trụ sở chính đạt chứng nhận ISO 9001. Thành lập Công ty TNHH TIGER Việt Nam.',
+      'Tiger Corporation nhận Giải thưởng Bộ trưởng Bộ Giáo dục, Văn hóa, Thể thao, Khoa học & Công nghệ Nhật Bản tại Giải thưởng Công nghệ Công nghiệp Nhật Bản lần thứ 48.'
+    ],
+    image: '/nhipbep/history1_background.svg'
+  },
+  {
+    dates: '2020 – Nay',
+    subtitle: '100 Năm Thành tựu',
+    paragraphs: [
+      'Thành lập Công ty TNHH TIGER MARKETING Việt Nam.',
+      'Tập đoàn Tiger kỷ niệm 100 năm hoạt động, khẳng định vị thế thương hiệu gia dụng hàng đầu Nhật Bản.'
     ],
     image: '/nhipbep/history1_background.svg'
   }
@@ -176,6 +193,17 @@ export function NhipBepPageContent() {
     const interval = setInterval(() => {
       setCurrentProductSlide((prev) => (prev + 1) % products.length);
     }, 3000); // Change slide every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Auto-loop for history slides
+  useEffect(() => {
+    if (slides.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 4000); // Change slide every 4 seconds
 
     return () => clearInterval(interval);
   }, []);

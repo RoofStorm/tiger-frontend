@@ -126,7 +126,7 @@ export function Corner1() {
       process.env.NEXT_PUBLIC_PUBLIC_URL ||
       (typeof window !== 'undefined' ? window.location.origin : null) ||
       process.env.NEXTAUTH_URL ||
-      'https://tiger-frontend-eta.vercel.app'; // Fallback to production URL
+      'https://tiger-corporation-vietnam.vn'; // Fallback to production URL
     const shareUrl = `${baseUrl}/mood-card?emojis=${selectedEmojis.map(e => e.id).join(',')}&whisper=${encodeURIComponent(whisper)}&reminder=${encodeURIComponent(reminder)}`;
 
     // Tạo title và description cho mood card

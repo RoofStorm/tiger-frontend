@@ -1,21 +1,110 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import apiClient from '@/lib/api';
+import { useNextAuth } from '@/hooks/useNextAuth';
+
+// Wish type for highlighted wishes with user info
+interface Wish {
+  id: string;
+  content: string;
+  isHighlighted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    id: string;
+    name?: string;
+    email?: string;
+    avatarUrl?: string;
+  };
+}
 
 export function ShareNoteSection() {
   const router = useRouter();
   const { toast } = useToast();
+  const { isAuthenticated } = useNextAuth();
+  const queryClient = useQueryClient();
   const [noteText, setNoteText] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sharedNoteText, setSharedNoteText] = useState('');
   const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
   const notesScrollRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Fetch highlighted wishes
+  const { data: wishesData, isLoading: isLoadingWishes } = useQuery({
+    queryKey: ['highlighted-wishes-share-note'],
+    queryFn: () => apiClient.getHighlightedWishes(),
+    staleTime: 60 * 1000, // 1 minute
+    refetchOnWindowFocus: true,
+  });
+
+  // Extract and duplicate wishes if less than 15 to enable smooth auto scroll
+  const wishes = useMemo(() => {
+    // Extract wishes from response
+    // Normalized response structure: { success: true, data: [...], pagination: {...} }
+    const rawWishes: Wish[] = Array.isArray(wishesData)
+      ? wishesData
+      : Array.isArray(wishesData?.data)
+        ? wishesData.data
+        : [];
+
+    if (rawWishes.length === 0) return [];
+    
+    const MIN_ITEMS = 15;
+    if (rawWishes.length >= MIN_ITEMS) {
+      return rawWishes;
+    }
+    
+    // Calculate how many times we need to duplicate
+    const timesToDuplicate = Math.ceil(MIN_ITEMS / rawWishes.length);
+    const duplicated: Wish[] = [];
+    
+    for (let i = 0; i < timesToDuplicate; i++) {
+      rawWishes.forEach((wish: Wish, index: number) => {
+        duplicated.push({
+          ...wish,
+          // Add unique key by combining id with duplicate index
+          id: `${wish.id}-dup-${i}-${index}`,
+        });
+      });
+    }
+    
+    // Return exactly 15 items (or more if needed for smooth scroll)
+    return duplicated.slice(0, MIN_ITEMS);
+  }, [wishesData]);
+
+  // Create wish mutation
+  const createWishMutation = useMutation({
+    mutationFn: (content: string) => apiClient.createWish(content),
+    onSuccess: (_, content) => {
+      // Lưu nội dung note để hiển thị trong modal
+      setSharedNoteText(content);
+      // Hiển thị modal thành công
+      setShowSuccessModal(true);
+      // Reset textarea
+      setNoteText('');
+      // Invalidate queries để refresh data
+      queryClient.invalidateQueries({ queryKey: ['highlighted-wishes-share-note'] });
+      queryClient.invalidateQueries({ queryKey: ['highlighted-wishes'] });
+      queryClient.invalidateQueries({ queryKey: ['userDetails'] });
+      queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
+    },
+    onError: () => {
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể gửi lời chúc. Vui lòng thử lại.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    },
+  });
 
   // Preload LCP image early
   useEffect(() => {
@@ -130,13 +219,20 @@ export function ShareNoteSection() {
       scrollToTextarea();
       return;
     }
-    // Lưu nội dung note để hiển thị trong modal
-    setSharedNoteText(noteText);
-    // Hiển thị modal thành công
-    setShowSuccessModal(true);
-    // Reset textarea
-    setNoteText('');
-  }, [noteText, toast, scrollToTextarea]);
+
+    if (!isAuthenticated) {
+      toast({
+        title: 'Vui lòng đăng nhập',
+        description: 'Bạn cần đăng nhập để chia sẻ lời chúc.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Gọi API tạo wish
+    createWishMutation.mutate(noteText.trim());
+  }, [noteText, toast, scrollToTextarea, isAuthenticated, createWishMutation]);
 
   return (
     <>
@@ -289,10 +385,11 @@ export function ShareNoteSection() {
               {/* Button */}
               <Button
                 onClick={handleShareNote}
-                className="w-[90%] mx-auto font-medium py-3 rounded-lg transition-all duration-300 cursor-pointer hover:opacity-90 hover:scale-[1.02] active:scale-[0.98]"
+                disabled={createWishMutation.isPending}
+                className="w-[90%] mx-auto font-medium py-3 rounded-lg transition-all duration-300 cursor-pointer hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: '#ffffff', color: '#00579F' }}
               >
-                Chia sẻ ngay!
+                {createWishMutation.isPending ? 'Đang gửi...' : 'Chia sẻ ngay!'}
               </Button>
             </div>
           </div>
@@ -307,41 +404,60 @@ export function ShareNoteSection() {
               msOverflowStyle: 'none', /* IE and Edge */
             }}
           >
-            {/* Mock highlighted notes - Replace with actual data */}
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map((index) => (
-              <div
-                key={index}
-                className={`backdrop-blur-sm rounded-lg p-6 border border-white/30 relative w-[80%] ${
-                  index % 2 === 0 ? 'ml-[20%]' : ''
-                }`}
-                style={{ backgroundColor: '#FFFFFF1A' }}
-              >
-                {/* Quote Mark - Top Left */}
-                <div className="absolute top-[-10px] md:top-[-20px] left-3">
-                  <Image
-                    src="/icons/quotemark_white.svg"
-                    alt="Quote mark"
-                    width={40}
-                    height={40}
-                    className="object-contain w-6 h-6 md:w-10 md:h-10"
-                  />
-                </div>
-                <div className="flex items-center gap-3 mb-3 pt-4">
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                    <Image
-                      src="/thuthachnhipsong/slide_example.png"
-                      alt="User avatar"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <span className="font-medium text-sm" style={{ color: '#FFFFFF' }}>Hanh Nguyen</span>
-                </div>
-                <div className="text-sm leading-relaxed" style={{ color: '#FFFFFF' }}>
-                  Một hộp cơm giản dị, một bình nước bên bàn làm việc, hay nụ cười bên đồng nghiệp cũng đủ trở thành &quot;nhịp giữ&quot; trong ngày bận rộn.
+            {isLoadingWishes ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-white text-sm">Đang tải...</div>
+              </div>
+            ) : wishes.length === 0 ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="text-white text-sm text-center">
+                  Chưa có lời chúc nào được highlight
                 </div>
               </div>
-            ))}
+            ) : (
+              wishes.map((wish: Wish, index: number) => (
+                <div
+                  key={wish.id || index}
+                  className={`backdrop-blur-sm rounded-lg p-6 border border-white/30 relative w-[80%] ${
+                    index % 2 === 0 ? 'ml-[20%]' : ''
+                  }`}
+                  style={{ backgroundColor: '#FFFFFF1A' }}
+                >
+                  {/* Quote Mark - Top Left */}
+                  <div className="absolute top-[-10px] md:top-[-20px] left-3">
+                    <Image
+                      src="/icons/quotemark_white.svg"
+                      alt="Quote mark"
+                      width={40}
+                      height={40}
+                      className="object-contain w-6 h-6 md:w-10 md:h-10"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 mb-3 pt-4">
+                    <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-300">
+                      {wish.user?.avatarUrl ? (
+                        <Image
+                          src={wish.user.avatarUrl}
+                          alt={wish.user?.name || 'User avatar'}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-white font-medium text-sm bg-[#00579F]">
+                          {wish.user?.name?.charAt(0).toUpperCase() || 'U'}
+                        </div>
+                      )}
+                    </div>
+                    <span className="font-medium text-sm" style={{ color: '#FFFFFF' }}>
+                      {wish.user?.name || 'Người dùng ẩn danh'}
+                    </span>
+                  </div>
+                  <div className="text-sm leading-relaxed" style={{ color: '#FFFFFF' }}>
+                    {wish.content}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

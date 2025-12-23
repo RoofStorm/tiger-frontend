@@ -81,7 +81,7 @@ export async function generateMetadata({
   const baseUrl =
     process.env.NEXT_PUBLIC_PUBLIC_URL ||
     process.env.NEXTAUTH_URL ||
-    'https://tiger-frontend-eta.vercel.app'; // Fallback to production HTTPS URL
+    'https://tiger-corporation-vietnam.vn'; // Fallback to production HTTPS URL
   const postUrl = `${baseUrl}/posts/${id}`;
   const defaultImageUrl =
     'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
@@ -93,13 +93,18 @@ export async function generateMetadata({
     defaultImageUrl // Fallback URL
   );
 
+  // Format title với prefix "Tiger - "
+  const postTitle = post.caption 
+    ? `Tiger - ${post.caption}` 
+    : 'Tiger - Bài viết nổi bật từ Tiger Mood Corner';
+
   return {
-    title: post.caption || 'Bài viết nổi bật từ Tiger Mood Corner',
+    title: postTitle,
     description: post.caption
       ? `${post.caption.substring(0, 160)}...`
       : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.',
     openGraph: {
-      title: post.caption || 'Bài viết nổi bật từ Tiger Mood Corner',
+      title: postTitle,
       description: post.caption
         ? `${post.caption.substring(0, 160)}...`
         : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.',
@@ -113,7 +118,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: 'summary_large_image',
-      title: post.caption || 'Bài viết nổi bật từ Tiger Mood Corner',
+      title: postTitle,
       description: post.caption
         ? `${post.caption.substring(0, 160)}...`
         : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.',
@@ -125,6 +130,7 @@ export async function generateMetadata({
     // Thêm explicit meta tags để đảm bảo Facebook nhận được
     other: {
       'og:url': postUrl,
+      'og:title': postTitle,
       'og:type': 'article',
       'og:image': ogImage.url,
       'og:image:width': String(ogImage.width),

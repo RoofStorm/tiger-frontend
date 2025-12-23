@@ -11,8 +11,6 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@/components/ui/modal';
 
-// Temporary bypass flag - set to false when backend is ready
-const isByPass = true;
 
 export function LunchboxUploadSection() {
   const { isAuthenticated, user } = useNextAuth();
@@ -30,6 +28,7 @@ export function LunchboxUploadSection() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [uploadedCaption, setUploadedCaption] = useState<string>('');
+  const [createdPostId, setCreatedPostId] = useState<string | null>(null);
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -37,8 +36,8 @@ export function LunchboxUploadSection() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Check authentication if not bypassing
-    if (!isByPass && !isAuthenticated) {
+    // Check authentication
+    if (!isAuthenticated) {
       toast({
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để chia sẻ ảnh.',
@@ -119,6 +118,7 @@ export function LunchboxUploadSection() {
     setUploadProgress(0);
     setShowCaptionModal(false);
     setCaption('');
+    setCreatedPostId(null);
   };
 
   const handleUploadPost = async () => {
@@ -132,8 +132,8 @@ export function LunchboxUploadSection() {
       return;
     }
 
-    // Check authentication if not bypassing
-    if (!isByPass && !isAuthenticated) {
+    // Check authentication
+    if (!isAuthenticated) {
       toast({
         title: 'Cần đăng nhập',
         description: 'Vui lòng đăng nhập để đăng bài.',
@@ -157,84 +157,50 @@ export function LunchboxUploadSection() {
         });
       }, 200);
 
-      if (isByPass) {
-        // Frontend-only solution: Convert file to base64
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        clearInterval(progressInterval);
-        setUploadProgress(100);
+      // Upload file directly to backend
+      const uploadResult = await apiClient.uploadFile(selectedFile);
 
-        // Convert file to base64 for display (temporary FE-only solution)
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          
-          // Save uploaded image URL (using base64) and caption for modal
-          setUploadedImageUrl(base64String);
-          setUploadedCaption(caption || '');
-          
-          // Reset form
-          setCaption('');
-          setSelectedFile(null);
-          if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-          }
-          setPreviewUrl(null);
-          setUploadProgress(0);
-          if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-          }
+      clearInterval(progressInterval);
+      setUploadProgress(100);
 
-          // Show success modal
-          setShowSuccessModal(true);
-          setUploading(false);
-        };
-        reader.onerror = () => {
-          throw new Error('Failed to read file');
-        };
-        reader.readAsDataURL(selectedFile);
-      } else {
-        // Backend solution: Upload file and create post
-        // Upload file directly to backend
-        const uploadResult = await apiClient.uploadFile(selectedFile);
+      // Create post
+      const postData: CreatePostData = {
+        imageUrl: uploadResult.data.url,
+        caption: caption || '',
+      };
 
-        clearInterval(progressInterval);
-        setUploadProgress(100);
+      const createPostResult = await apiClient.createPost(postData);
 
-        // Create post
-        const postData: CreatePostData = {
-          imageUrl: uploadResult.data.url,
-          caption: caption || '',
-        };
+      // Save post ID for sharing
+      const postId = createPostResult?.data?.id || createPostResult?.id || null;
+      setCreatedPostId(postId);
 
-        await apiClient.createPost(postData);
+      // Invalidate queries
+      queryClient.invalidateQueries({
+        queryKey: ['highlighted-posts-challenge', user?.id],
+      });
+      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
-        // Invalidate queries
-        queryClient.invalidateQueries({
-          queryKey: ['highlighted-posts-challenge', user?.id],
-        });
-        queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
-        queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
-
-        // Save uploaded image URL and caption for modal
-        setUploadedImageUrl(uploadResult.data.url);
-        setUploadedCaption(caption || '');
-        
-        // Reset form
-        setCaption('');
-        setSelectedFile(null);
-        if (previewUrl) {
-          URL.revokeObjectURL(previewUrl);
-        }
-        setPreviewUrl(null);
-        setUploadProgress(0);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-
-        // Show success modal
-        setShowSuccessModal(true);
-        setUploading(false);
+      // Save uploaded image URL and caption for modal
+      setUploadedImageUrl(uploadResult.data.url);
+      setUploadedCaption(caption || '');
+      
+      // Reset form
+      setCaption('');
+      setSelectedFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
       }
+      setPreviewUrl(null);
+      setUploadProgress(0);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
+      // Show success modal
+      setShowSuccessModal(true);
+      setUploading(false);
     } catch (error) {
       console.error('Upload failed:', error);
       toast({
@@ -244,6 +210,7 @@ export function LunchboxUploadSection() {
         duration: 4000,
       });
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -252,6 +219,52 @@ export function LunchboxUploadSection() {
       setCaption(e.target.value);
     }
   }, []);
+
+  const handleFacebookShare = () => {
+    if (!createdPostId) {
+      toast({
+        title: 'Lỗi',
+        description: 'Không tìm thấy bài viết để chia sẻ.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Tạo URL preview cho bài viết - Ưu tiên production URL
+    // Facebook cần HTTPS và public URL để crawl meta tags
+    const baseUrl = 'https://tiger-corporation-vietnam.vn'; //  production URL
+    const postUrl = `${baseUrl}/posts/${createdPostId}`;
+
+    // Tạo Facebook Share URL
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+
+    // Mở popup Facebook Share Dialog
+    const popup = window.open(
+      facebookShareUrl,
+      'facebook-share-dialog',
+      'width=800,height=600,scrollbars=yes,resizable=yes'
+    );
+
+    // Kiểm tra nếu popup bị block
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      toast({
+        title: 'Popup bị chặn',
+        description: 'Vui lòng cho phép popup để chia sẻ.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Focus vào popup
+    if (popup) {
+      popup.focus();
+    }
+
+    // Đóng success modal sau khi mở share dialog thành công
+    setShowSuccessModal(false);
+  };
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -340,7 +353,7 @@ export function LunchboxUploadSection() {
                       alt="Upload"
                       width={48}
                       height={48}
-                      className="w-12 h-12"
+                      className="w-12 h-auto"
                     />
                   </div>
                 </div>
@@ -491,7 +504,7 @@ export function LunchboxUploadSection() {
           {/* Upload Post Button */}
           <Button
             onClick={handleUploadPost}
-            disabled={!selectedFile || caption.length === 0 || uploading || (!isByPass && !isAuthenticated)}
+            disabled={!selectedFile || caption.length === 0 || uploading || !isAuthenticated}
             className="w-full font-medium transition-all duration-300"
             style={{ 
               height: '48px',
@@ -504,7 +517,7 @@ export function LunchboxUploadSection() {
               borderWidth: '1px',
               backgroundColor: '#ffffff',
               color: '#00579F',
-              cursor: (!selectedFile || caption.length === 0 || uploading || (!isByPass && !isAuthenticated)) ? 'not-allowed' : 'pointer'
+              cursor: (!selectedFile || caption.length === 0 || uploading || !isAuthenticated) ? 'not-allowed' : 'pointer'
             }}
           >
             {uploading ? 'Đang chia sẻ...' : 'Chia sẻ ngay!'}
@@ -736,10 +749,7 @@ export function LunchboxUploadSection() {
                             Để lại lời nhắn
                           </Button>
                           <Button
-                            onClick={() => {
-                              // TODO: Handle Facebook share
-                              setShowSuccessModal(false);
-                            }}
+                            onClick={handleFacebookShare}
                             className="w-full md:flex-1 font-nunito transition-all duration-300 flex items-center justify-center gap-2"
                             style={{ 
                               height: '36px',

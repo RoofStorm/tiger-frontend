@@ -5,5 +5,5 @@ export { ChallengeHeroSection } from './ChallengeHeroSection';
 export { ChallengeCardsSection } from './ChallengeCardsSection';
 export { LunchboxChallengeIntro } from './LunchboxChallengeIntro';
 export { LunchboxUploadSection } from './LunchboxUploadSection';
-export { LunchboxTimeline } from './LunchboxTimeline';
+export { LunchboxCarousel } from './LunchboxCarousel';
 export { ShareNoteSection } from './ShareNoteSection';

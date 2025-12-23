@@ -45,7 +45,7 @@ export async function generateMetadata({
   const baseUrl =
     process.env.NEXT_PUBLIC_PUBLIC_URL ||
     process.env.NEXTAUTH_URL ||
-    'https://tiger-frontend-eta.vercel.app';
+    'https://tiger-corporation-vietnam.vn';
   const shareUrl = `${baseUrl}/nhip-song/share?imageUrl=${encodeURIComponent(imageUrl)}&whisper=${encodeURIComponent(whisper)}&reminder=${encodeURIComponent(reminder)}`;
 
   return {

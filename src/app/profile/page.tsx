@@ -521,9 +521,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Referral Section */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <ReferralSection />
-        </div>
+        </div> */}
       </div>
     </div>
   );

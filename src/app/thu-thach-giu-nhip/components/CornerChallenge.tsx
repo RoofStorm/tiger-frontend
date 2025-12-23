@@ -6,7 +6,7 @@ import { ChallengeHeroSection } from './ChallengeHeroSection';
 import { ChallengeCardsSection } from './ChallengeCardsSection';
 import { LunchboxChallengeIntro } from './LunchboxChallengeIntro';
 import { LunchboxUploadSection } from './LunchboxUploadSection';
-import { LunchboxTimeline } from './LunchboxTimeline';
+import { LunchboxCarousel } from './LunchboxCarousel';
 import { ShareNoteSection } from './ShareNoteSection';
 
 export function CornerChallenge() {
@@ -29,8 +29,8 @@ export function CornerChallenge() {
       {/* Lunchbox Upload Section */}
       <LunchboxUploadSection />
 
-      {/* Lunchbox Timeline Section */}
-      <LunchboxTimeline />
+      {/* Lunchbox carousel Section */}
+      <LunchboxCarousel />
 
       {/* Share Note Section */}
       <ShareNoteSection />

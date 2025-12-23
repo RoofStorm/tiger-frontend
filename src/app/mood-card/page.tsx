@@ -60,7 +60,7 @@ export async function generateMetadata({
   const baseUrl =
     process.env.NEXT_PUBLIC_PUBLIC_URL ||
     process.env.NEXTAUTH_URL ||
-    'https://tiger-frontend-eta.vercel.app'; // Fallback to production HTTPS URL
+    'https://tiger-corporation-vietnam.vn'; // Fallback to production HTTPS URL
   const imageUrl =
     'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
 

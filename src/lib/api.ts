@@ -62,13 +62,21 @@ class ApiClient {
 
         // Public endpoints that don't need authentication
         const publicEndpoints = [
-          '/posts/highlighted',
           '/wishes/highlighted',
           '/rewards', // rewards is hybrid - works with or without auth
           '/storage/video', // video streaming endpoints are public
         ];
 
+        // Optional auth endpoints - send token if authenticated, but allow without auth
+        const optionalAuthEndpoints = [
+          '/posts/highlighted',
+        ];
+
         const isPublicEndpoint = publicEndpoints.some(endpoint =>
+          config.url?.includes(endpoint)
+        );
+
+        const isOptionalAuthEndpoint = optionalAuthEndpoints.some(endpoint =>
           config.url?.includes(endpoint)
         );
 
@@ -76,7 +84,10 @@ class ApiClient {
           !isPublicEndpoint &&
           protectedEndpoints.some(endpoint => config.url?.includes(endpoint));
 
-        if (needsAuth) {
+        // For optional auth endpoints, send token if available but don't require it
+        const shouldAddAuth = needsAuth || isOptionalAuthEndpoint;
+
+        if (shouldAddAuth) {
           // Only get session on client side
           if (typeof window !== 'undefined') {
             // Use JWT access token from NextAuth session for all endpoints
@@ -100,6 +111,7 @@ class ApiClient {
               } else if (storedUserId) {
                 config.headers.Authorization = `Bearer ${storedUserId}`;
               }
+              // For optional auth endpoints, if no token found, continue without auth
             }
           }
         }
@@ -391,9 +403,34 @@ class ApiClient {
     return response.data;
   }
 
-  async getHighlightedWishes(): Promise<any> {
-    const response = await this.client.get('/wishes/highlighted');
-    return response.data;
+  async getHighlightedWishes(page = 1, limit = 20): Promise<any> {
+    // Use Next.js API route instead of direct backend call
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    
+    // Call Next.js API route (works on both client and server)
+    const apiUrl = typeof window !== 'undefined' 
+      ? `/api/wishes/highlighted?${queryParams.toString()}`
+      : `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/wishes/highlighted?${queryParams.toString()}`;
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        error: 'Failed to fetch highlighted wishes',
+      }));
+      throw new Error(errorData.error || 'Failed to fetch highlighted wishes');
+    }
+
+    const data = await response.json();
+    return data;
   }
 
   async getUserWishes(page = 1, limit = 20): Promise<any> {
@@ -488,15 +525,26 @@ class ApiClient {
   async getAdminPosts(
     page = 1,
     limit = 10,
-    highlighted?: boolean
+    options?: {
+      highlighted?: boolean;
+      month?: number;
+      year?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+    }
   ): Promise<any> {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
     });
 
-    if (highlighted !== undefined)
-      params.append('highlighted', highlighted.toString());
+    if (options?.highlighted !== undefined)
+      params.append('isHighlighted', options.highlighted.toString());
+    
+    if (options?.month) params.append('month', options.month.toString());
+    if (options?.year) params.append('year', options.year.toString());
+    if (options?.sortBy) params.append('sortBy', options.sortBy);
+    if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
 
     const response = await this.client.get(`/admin/posts?${params.toString()}`);
     return response.data;

@@ -22,6 +22,8 @@ export interface Post {
   id: string;
   caption: string;
   type: string;
+  imageUrl?: string;
+  url?: string;
   likeCount: number;
   shareCount: number;
   commentCount: number;
