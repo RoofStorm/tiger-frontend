@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
     console.log(`Facebook data deletion request for user: ${userId}`);
 
     return NextResponse.json({
-      url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/data-deletion.html`,
+      url: `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/data-deletion`,
       confirmation_code: `DELETION_${userId}_${Date.now()}`,
     });
   } catch (error) {
