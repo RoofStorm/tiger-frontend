@@ -129,6 +129,7 @@ const getProductBackgroundImage = (index: number): string => {
 
 export function NhipBepPageContent() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
   const [currentProductSlide, setCurrentProductSlide] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedProductIndex, setSelectedProductIndex] = useState<number | null>(null);
@@ -211,11 +212,32 @@ export function NhipBepPageContent() {
     if (slides.length <= 1) return;
 
     const interval = setInterval(() => {
+      setSlideDirection('right');
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 4000); // Change slide every 4 seconds
 
     return () => clearInterval(interval);
   }, []);
+
+  // Functions to handle slide navigation with direction
+  const goToSlide = (index: number) => {
+    if (index > currentSlide) {
+      setSlideDirection('right');
+    } else if (index < currentSlide) {
+      setSlideDirection('left');
+    }
+    setCurrentSlide(index);
+  };
+
+  const nextSlide = () => {
+    setSlideDirection('right');
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setSlideDirection('left');
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
 
   // Cleanup hover timeout on unmount
   useEffect(() => {
@@ -231,13 +253,27 @@ export function NhipBepPageContent() {
       <main className="min-h-[calc(100vh-80px)] bg-white">
         {/* Image Container - Relative for absolute text positioning */}
         <div className="relative w-full min-h-[500px] md:min-h-0 max-h-[600px] md:max-h-[700px] overflow-hidden">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" custom={slideDirection}>
             <motion.div
               key={currentSlide}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.6, ease: 'easeInOut' }}
+              custom={slideDirection}
+              initial={{ 
+                opacity: 0,
+                x: slideDirection === 'right' ? '100%' : '-100%'
+              }}
+              animate={{ 
+                opacity: 1,
+                x: 0
+              }}
+              exit={{ 
+                opacity: 0,
+                x: slideDirection === 'right' ? '-100%' : '100%'
+              }}
+              transition={{ 
+                duration: 0.8,
+                ease: [0.25, 0.1, 0.25, 1], // Custom cubic-bezier for smoother animation
+                opacity: { duration: 0.6 }
+              }}
               className="relative w-full h-full"
             >
               <Image
@@ -260,13 +296,31 @@ export function NhipBepPageContent() {
 
           {/* Text Content - Absolute, center bottom overlay */}
           <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-6xl px-4 pb-8 md:pb-12 z-10">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" custom={slideDirection}>
               <motion.div
                 key={currentSlide}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.6, ease: 'easeInOut', delay: 0.2 }}
+                custom={slideDirection}
+                initial={{ 
+                  opacity: 0, 
+                  y: 20,
+                  x: slideDirection === 'right' ? 50 : -50
+                }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  x: 0
+                }}
+                exit={{ 
+                  opacity: 0, 
+                  y: -20,
+                  x: slideDirection === 'right' ? -50 : 50
+                }}
+                transition={{ 
+                  duration: 0.8,
+                  ease: [0.25, 0.1, 0.25, 1], // Custom cubic-bezier for smoother animation
+                  delay: 0.15,
+                  opacity: { duration: 0.6 }
+                }}
                 className="text-center"
               >
                 {/* Dates */}
@@ -302,20 +356,41 @@ export function NhipBepPageContent() {
               </motion.div>
             </AnimatePresence>
 
-            {/* Navigation Dots */}
-            <div className="flex justify-center items-center gap-2 md:gap-3 mt-6 md:mt-8">
-              {slides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`transition-all duration-300 rounded-full ${
-                    index === currentSlide
-                      ? 'w-2.5 h-2.5 md:w-3 md:h-3 bg-white'
-                      : 'w-2 h-2 md:w-2 md:h-2 bg-white/50 hover:bg-white/75'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
+            {/* Navigation Dots with Arrows */}
+            <div className="flex justify-center items-center gap-4 mt-6 md:mt-8">
+              {/* Left Arrow */}
+              <button
+                onClick={prevSlide}
+                className="bg-white/80 hover:bg-white rounded-full p-1.5 shadow-lg transition-all duration-300"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
+              </button>
+
+              {/* Dot Navigation */}
+              <div className="flex items-center gap-2 md:gap-3">
+                {slides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToSlide(index)}
+                    className={`transition-all duration-300 rounded-full ${
+                      index === currentSlide
+                        ? 'w-2.5 h-2.5 md:w-3 md:h-3 bg-white'
+                        : 'w-2 h-2 md:w-2 md:h-2 bg-white/50 hover:bg-white/75'
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+
+              {/* Right Arrow */}
+              <button
+                onClick={nextSlide}
+                className="bg-white/80 hover:bg-white rounded-full p-1.5 shadow-lg transition-all duration-300"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
+              </button>
             </div>
           </div>
         </div>

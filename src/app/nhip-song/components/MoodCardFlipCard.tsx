@@ -205,7 +205,7 @@ export function MoodCardFlipCard({
                 }}
               >
                 {/* Main Content Section - 80% height */}
-                <div className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-y-auto mt-[190px] md:mt-[130px]" style={{ height: '80%'}}>
+                <div className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-y-auto mt-[190px]" style={{ height: '80%'}}>
                   {/* Content wrapper */}
                   <div className="flex flex-col items-center justify-center w-full max-w-xs">
                     {/* Whisper Section */}

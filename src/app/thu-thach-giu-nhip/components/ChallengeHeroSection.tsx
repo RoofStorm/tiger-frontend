@@ -8,7 +8,7 @@ export function ChallengeHeroSection() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="relative mb-12 md:mb-36 hidden md:block"
+      className="relative mb-12 md:mb-32 hidden md:block"
     >
       {/* Central Image - Always Center */}
       <div className="flex items-center justify-center relative">

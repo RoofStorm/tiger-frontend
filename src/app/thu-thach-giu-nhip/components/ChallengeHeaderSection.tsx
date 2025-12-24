@@ -46,7 +46,7 @@ export function ChallengeHeaderSection() {
           textAlign: 'center',
           verticalAlign: 'middle',
           color: '#616364',
-          marginTop: '48px',
+          marginTop: '28px',
         }}
       >
         <span>Cùng </span>

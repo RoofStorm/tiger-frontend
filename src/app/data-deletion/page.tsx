@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Yêu cầu xóa dữ liệu người dùng - Tiger',
-  description: 'Hướng dẫn xóa dữ liệu người dùng Facebook trên ứng dụng Tiger',
+  title: 'Yêu cầu xóa dữ liệu người dùng - TIGER',
+  description: 'Hướng dẫn xóa dữ liệu người dùng Facebook trên ứng dụng TIGER',
   robots: 'index, follow',
 };
 
@@ -17,7 +17,7 @@ export default function DataDeletionPage() {
         <div className="prose prose-lg max-w-none">
           <section className="mb-8">
             <p className="text-gray-700 leading-relaxed mb-4">
-              Ứng dụng <strong className="text-gray-900">Tiger - Social Mood & Rewards</strong> sử dụng đăng nhập Facebook
+              Ứng dụng <strong className="text-gray-900">TIGER - Social Mood & Rewards</strong> sử dụng đăng nhập Facebook
               và có thể thu thập một số thông tin cơ bản để phục vụ chức năng đăng nhập và cải thiện trải nghiệm người dùng.
             </p>
 
@@ -45,7 +45,7 @@ export default function DataDeletionPage() {
               <ol className="list-decimal list-inside space-y-2 text-gray-700">
                 <li>Đăng nhập vào tài khoản Facebook của bạn</li>
                 <li>Vào <strong>Cài đặt</strong> → <strong>Ứng dụng và trang web</strong></li>
-                <li>Tìm ứng dụng <strong>Tiger</strong> trong danh sách</li>
+                <li>Tìm ứng dụng <strong>TIGER</strong> trong danh sách</li>
                 <li>Nhấp vào ứng dụng và chọn <strong>Gỡ</strong> hoặc <strong>Xóa</strong></li>
                 <li>Xác nhận việc gỡ ứng dụng</li>
               </ol>
@@ -116,7 +116,7 @@ export default function DataDeletionPage() {
 
           <div className="border-t border-gray-200 pt-6 mt-8">
             <p className="text-sm text-gray-500 text-center">
-              © {new Date().getFullYear()} Tiger - Social Mood & Rewards. Tất cả quyền được bảo lưu.
+              © {new Date().getFullYear()} TIGER - Social Mood & Rewards. Tất cả quyền được bảo lưu.
             </p>
           </div>
         </div>

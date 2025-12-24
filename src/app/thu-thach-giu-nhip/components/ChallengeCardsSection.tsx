@@ -19,7 +19,7 @@ export function ChallengeCardsSection() {
   }, []);
 
   return (
-    <div className="w-screen relative left-1/2 -translate-x-1/2 grid grid-cols-1 lg:grid-cols-2 gap-0 md:mb-16 px-4 lg:top-[-100px]">
+    <div className="w-screen relative left-1/2 -translate-x-1/2 grid grid-cols-1 lg:grid-cols-2 gap-0 md:mb-2 px-4 lg:top-[-100px]">
       {/* Left - LunchBox Challenge Image */}
       <motion.div 
         className="relative w-full h-[300px] lg:h-[450px] flex items-center justify-center cursor-pointer p-2"
@@ -40,6 +40,7 @@ export function ChallengeCardsSection() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/thuthachnhipsong/lunchbox_challenge.png"
+            style={{ scale: 0.9 }}
             alt="LunchBox Challenge"
             className="hidden md:block w-full h-full object-contain"
             fetchPriority="high"
@@ -68,6 +69,7 @@ export function ChallengeCardsSection() {
           <img
             src="/thuthachnhipsong/note_giu_nhip.svg"
             alt="Note Giữ Nhịp"
+            style={{ scale: 0.9 }}
             className="hidden md:block w-full h-full object-contain"
             fetchPriority="high"
           />

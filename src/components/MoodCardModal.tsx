@@ -283,7 +283,7 @@ export function MoodCardModal({
                   {/* Description Text */}
                   <p className="font-noto-sans text-[14px] text-gray-700 leading-relaxed max-w-3xl mx-auto px-4">
                     Mood là khởi đầu. Giữ nhịp đâu chỉ là cảm xúc mà còn là
-                    những điều bạn tự tạo ra mỗi ngày. Cùng Tiger tham gia thử
+                    những điều bạn tự tạo ra mỗi ngày. Cùng TIGER tham gia thử
                     thách Giữ Nhịp nhé.
                   </p>
 

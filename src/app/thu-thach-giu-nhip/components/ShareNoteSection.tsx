@@ -673,7 +673,7 @@ export function ShareNoteSection() {
             }}
           >
             <h3 className="font-prata text-white text-center relative z-10 px-6 sm:px-8 md:px-0 text-3xl sm:text-4xl">
-              Chia sẻ<br />ngay!
+              Viết Note ngay<br />ngay!
             </h3>
           </div>
 
@@ -727,7 +727,7 @@ export function ShareNoteSection() {
         <h2 className="font-prata text-3xl sm:text-4xl lg:text-5xl mb-6" style={{ color: '#00579F' }}>
           Viết note giữ nhịp!
         </h2>
-        <p className="text-gray-700 max-w-3xl mx-auto text-left md:text-center leading-relaxed" style={{ fontSize: '16px' }}>
+        <p className="text-gray-700 max-w-7xl mx-auto text-left md:text-center leading-relaxed" style={{ fontSize: '16px' }}>
           Giữ nhịp đâu chỉ dừng lại ở bữa trưa. Bạn có lời nhắc nào muốn gửi đến chính mình, hay gửi
           đến một người quan trong. Đôi khi chỉ cần vài đôi điều ngắn gọn - cũng đủ trở thành nhịp
           sống dịu dàng cho cả bạn và người khác
@@ -738,19 +738,22 @@ export function ShareNoteSection() {
         {/* Highlighted Notes Section */}
         <div 
           id="highlighted-notes-section"
-          className="mt-16 overflow-hidden min-h-[500px] bg-center md:bg-[top_right]"
+          className="mt-4 mb-8 mx-24 min-h-[500px] bg-center md:bg-[top_right] rounded-3xl"
           style={{
-            backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.svg)',
+            backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.png)',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
+            maxHeight: '650px',
+            // position: 'relative',
+            // top:'15px'
           }}
         >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-12 min-h-[500px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-8 min-h-[500px]">
           {/* Left: Image, TextArea, Button */}
           <div className="space-y-4 flex flex-col items-center">
-            <div className="space-y-4 flex flex-col">
+            <div className="space-y-4 flex flex-col w-[80%]">
               {/* Image - LCP element, preload with priority */}
-              <div className="relative w-full mt-6 overflow-visible">
+              <div className="relative w-full overflow-visible mt-6">
                   <Image
                     src="/thuthachnhipsong/giadinhancom.png"
                     alt="Giadinhancom"
@@ -797,7 +800,7 @@ export function ShareNoteSection() {
                   e.stopPropagation();
                 }}
                 placeholder="Câu chuyện của bạn thì sao? Chia sẻ cùng mình nhé!"
-                rows={4}
+                rows={3}
                 className="w-[90%] mx-auto px-4 py-3 border border-white/30 rounded-lg resize-none focus:outline-none focus:border-blue-300 placeholder-gray-300 font-nunito backdrop-blur-sm"
                 style={{ 
                   backgroundColor: '#FFFFFF1A',
@@ -820,7 +823,7 @@ export function ShareNoteSection() {
           {/* Right: Highlighted Notes - Scrollable */}
           <div 
             ref={notesScrollRef}
-            className="space-y-8 h-full max-h-[850px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
+            className="space-y-8 h-full max-h-[600px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
             style={{ 
               scrollBehavior: 'smooth',
               scrollbarWidth: 'none', /* Firefox */

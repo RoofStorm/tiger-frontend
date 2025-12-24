@@ -117,7 +117,7 @@ export function RewardModal({
                     color: '#FFFFFF',
                   }}
                 >
-                  Cho sản phẩm Tiger (giới hạn 3 lần/user)
+                  Cho sản phẩm TIGER (giới hạn 3 lần/user)
                 </p>
               </div>
             </div>

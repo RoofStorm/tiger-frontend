@@ -38,7 +38,7 @@ export default function LoginPage() {
       // Don't call router.push here - login() already handles redirect
       toast({
         title: 'Đăng nhập thành công!',
-        description: 'Chào mừng bạn trở lại với Tiger.',
+        description: 'Chào mừng bạn trở lại với TIGER.',
         duration: 3000,
       });
     } catch (error: unknown) {
@@ -102,7 +102,7 @@ export default function LoginPage() {
             <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
               <span className="text-white font-bold text-2xl">T</span>
             </div>
-            <span className="text-3xl font-bold text-gray-900">Tiger</span>
+            <span className="text-3xl font-bold text-gray-900">TIGER</span>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900">Đăng nhập</h2>
           <p className="mt-2 text-gray-600">Chào mừng bạn trở lại!</p>

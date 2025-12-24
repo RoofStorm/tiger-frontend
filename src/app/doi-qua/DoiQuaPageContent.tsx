@@ -49,7 +49,7 @@ export function DoiQuaPageContent() {
     {
       id: 'voucher-50k',
       name: 'Voucher 50K',
-      description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
+      description: 'Cho sản phẩm TIGER (giới hạn 3 lần/user)',
       pointsRequired: 200,
       imageUrl: '/uudai/card_voucher_background.svg',
       isActive: true,
@@ -59,7 +59,7 @@ export function DoiQuaPageContent() {
     {
       id: 'voucher-100k',
       name: 'Voucher 100K',
-      description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
+      description: 'Cho sản phẩm TIGER (giới hạn 3 lần/user)',
       pointsRequired: 200,
       imageUrl: '/uudai/card_voucher_background.svg',
       isActive: true,
@@ -69,7 +69,7 @@ export function DoiQuaPageContent() {
     {
       id: 'voucher-500k',
       name: 'Voucher 500K',
-      description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
+      description: 'Cho sản phẩm TIGER (giới hạn 3 lần/user)',
       pointsRequired: 200,
       imageUrl: '/uudai/card_voucher_background.svg',
       isActive: true,
@@ -79,7 +79,7 @@ export function DoiQuaPageContent() {
     {
       id: 'voucher-700k',
       name: 'Voucher 700K',
-      description: 'Cho sản phẩm Tiger (giới hạn 3 lần/user)',
+      description: 'Cho sản phẩm TIGER (giới hạn 3 lần/user)',
       pointsRequired: 200,
       imageUrl: '/uudai/card_voucher_background.svg',
       isActive: true,
@@ -282,7 +282,7 @@ export function DoiQuaPageContent() {
                     color: '#374151'
                   }}
                 >
-                  Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. <br/>Đổi điểm để nhận về những món quà từ Tiger – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
+                  Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. <br/>Đổi điểm để nhận về những món quà từ TIGER – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
                 </p>
 
                 {/* Tips Image */}
@@ -387,7 +387,7 @@ export function DoiQuaPageContent() {
 
             {/* Centered Title */}
             {activeTab === 'doi-qua' && (
-              <div className="text-center mb-8">
+              <div className="text-center mb-4">
                 <h2 
                   className="font-prata"
                   style={{ 
@@ -492,7 +492,7 @@ export function DoiQuaPageContent() {
                                   color: '#FFFFFF',
                                 }}
                               >
-                                Cho sản phẩm Tiger (giới hạn 3 lần/user)
+                                Cho sản phẩm TIGER (giới hạn 3 lần/user)
                               </p>
                             </div>
                           </div>
@@ -560,7 +560,7 @@ export function DoiQuaPageContent() {
                         textAlign: 'center',
                       }}
                     >
-                      Cơ chế &quot;Điểm năng lượng – Nhịp sống&quot;
+                      Cơ chế &quot;Điểm năng lượng&quot;
                     </p>
                   </div>
                 </div>
@@ -601,37 +601,31 @@ export function DoiQuaPageContent() {
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Đăng nhập mỗi ngày → <strong>+10 điểm</strong>
+                          Đăng nhập mỗi ngày: <strong>+10 điểm</strong>
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Tham gia My lunchbox challenge → <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
+                          Tham gia My lunchbox challenge: <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Tham gia viết Note giữ nhịp → <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
+                          Tham gia viết Note giữ nhịp: <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Chia sẻ post/wish lên Facebook → <strong>+50 điểm</strong> (Tối đa 1 lần/tuần)
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="text-[#00579F] font-bold mt-1">•</span>
-                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Mời bạn bè tham gia → Giới thiệu bạn bè cùng khám phá thế giới cảm xúc (đường link)
+                          Chia sẻ quote/lunchbox challenge/note giữ nhịp: <strong>+50 điểm</strong> (Tối đa 1 lần/user/tuần)
                         </span>
                       </li>
                     </ul>
                   </motion.div>
 
-                  {/* Section 2: Đổi Điểm Năng Lượng -> Nhịp sống */}
+                  {/* Section 2: Đổi Nhịp sống -> Quà tặng đến từ TIGER */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -648,21 +642,25 @@ export function DoiQuaPageContent() {
                         marginBottom: '16px',
                       }}
                     >
-                      2. Đổi Điểm Năng Lượng → Nhịp sống
+                      2. Đổi Nhịp sống → Quà tặng đến từ TIGER
                     </h3>
-                    <p 
-                      className="font-noto-sans"
-                      style={{
-                        fontFamily: 'var(--font-noto-sans)',
-                        fontSize: '16px',
-                        color: '#333',
-                      }}
-                    >
-                      <strong>1.000 điểm năng lượng = 1 Nhịp sống</strong>
-                    </p>
+                    <ul className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>300 điểm năng lượng</strong> → Voucher 50k Got It
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <strong>500 điểm năng lượng</strong> → Voucher 100k Got It
+                        </span>
+                      </li>
+                    </ul>
                   </motion.div>
 
-                  {/* Section 3: Đổi Nhịp sống -> Quà tặng Tiger */}
+                  {/* Section 3: Phần thưởng cho nhịp sống được lan toả nhất tại Lunchbox Challenge */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -679,55 +677,19 @@ export function DoiQuaPageContent() {
                         marginBottom: '16px',
                       }}
                     >
-                      3. Đổi Nhịp sống → Quà tặng Tiger
+                      3. Phần thưởng cho nhịp sống được lan toả nhất tại Lunchbox Challenge
                     </h3>
                     <ul className="space-y-3">
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>200 điểm năng lượng</strong> → Voucher 50k cho sản phẩm Tiger (giới hạn 3 lần/user)
+                          Số lượt tym cao nhất mỗi tháng sẽ nhận được voucher Got It trị giá <strong>1,000,000 VND</strong>
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>300 điểm năng lượng</strong> → Voucher 100k cho sản phẩm Tiger (giới hạn 3 lần/user)
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="text-[#00579F] font-bold mt-1">•</span>
-                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>500 điểm năng lượng</strong> → Voucher 300k cho sản phẩm Tiger (giới hạn 3 lần/user)
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="text-[#00579F] font-bold mt-1">•</span>
-                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>1 Nhịp sống</strong> → 1 Hộp cơm Tiger (giới hạn 1 lần/user)
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="text-[#00579F] font-bold mt-1">•</span>
-                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>2 Nhịp sống</strong> → 1 Bình giữ nhiệt Tiger (giới hạn 1 lần/user)
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="text-[#00579F] font-bold mt-1">•</span>
-                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>3 Nhịp sống</strong> → 1 Máy xay sinh tố Tiger (giới hạn 1 lần/user)
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="text-[#00579F] font-bold mt-1">•</span>
-                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>5 Nhịp sống</strong> → 1 Nồi cơm điện Tiger (bản thường) (giới hạn 1 lần/user)
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="text-[#00579F] font-bold mt-1">•</span>
-                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>10 Nhịp sống</strong> → 1 Nồi cơm điện Tiger cao tần (phiên bản cao cấp) (giới hạn 1 lần/user)
+                          Số lượt tym cao thứ hai mỗi tháng sẽ nhận được voucher Got It trị giá <strong>500,000 VND</strong>
                         </span>
                       </li>
                     </ul>
@@ -761,6 +723,26 @@ export function DoiQuaPageContent() {
                   >
                     Thử thách ngay để nhận quà
                   </button>
+                </motion.div>
+
+                {/* Disclaimer */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="mt-8 text-center"
+                >
+                  <p 
+                    className="font-noto-sans"
+                    style={{
+                      fontFamily: 'var(--font-noto-sans)',
+                      fontSize: '14px',
+                      color: '#60A5FA',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    *Mỗi user có thể nhận được tối đa một giải thưởng trên mỗi hạng mục giải thưởng xuyên suốt thời gian diễn ra chương trình
+                  </p>
                 </motion.div>
               </motion.div>
             )}

@@ -21,22 +21,22 @@ export async function generateMetadata({
   let title = '';
   if (reminder) {
     const shortReminder = reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
-    title = `${shortReminder} - Tiger Nhịp Sống`;
+    title = `${shortReminder} - TIGER Nhịp Sống`;
   } else if (whisper) {
     const shortWhisper = whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
-    title = `"${shortWhisper}" - Tiger Nhịp Sống`;
+    title = `"${shortWhisper}" - TIGER Nhịp Sống`;
   } else {
-    title = 'Mood Card - Tiger Nhịp Sống';
+    title = 'Mood Card - TIGER Nhịp Sống';
   }
 
   // Tạo description
   let description = '';
   if (whisper && reminder) {
-    description = `"${whisper}"\n\n${reminder}\n\n#TigerNhịpSống #MoodCard`;
+    description = `"${whisper}"\n\n${reminder}\n\n#TIGERNhịpSống #MoodCard`;
   } else if (whisper) {
-    description = `"${whisper}"\n\n#TigerNhịpSống #MoodCard`;
+    description = `"${whisper}"\n\n#TIGERNhịpSống #MoodCard`;
   } else if (reminder) {
-    description = `${reminder}\n\n#TigerNhịpSống #MoodCard`;
+    description = `${reminder}\n\n#TIGERNhịpSống #MoodCard`;
   } else {
     description = 'Khám phá cảm xúc của bạn qua mood card. Cùng TIGER tham gia thử thách Giữ Nhịp nhé.';
   }
@@ -55,7 +55,7 @@ export async function generateMetadata({
       title,
       description,
       url: shareUrl,
-      siteName: 'Tiger Nhịp Sống',
+      siteName: 'TIGER Nhịp Sống',
       images: [
         {
           url: imageUrl,
@@ -97,7 +97,7 @@ export default async function SharePage({
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Tiger Nhịp Sống
+            TIGER Nhịp Sống
           </h1>
           <p className="text-lg text-gray-600">
             Mood là khởi đầu - Giữ nhịp là điều bạn tự tạo nên mỗi ngày

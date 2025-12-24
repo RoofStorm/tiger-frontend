@@ -362,8 +362,8 @@ export function LunchboxUploadSection() {
           >
           {/* Title */}
           <div className="space-y-4 mt-2 px-0 sm:px-8 md:px-0">
-              <h2 className="font-prata font-bold text-white leading-tight text-center text-lg sm:text-3xl lg:text-4xl">
-              Khoảnh khắc giữ nhịp – bữa trưa của bạn có câu chuyện gì?
+              <h2 className="font-prata font-bold text-white leading-tight text-center text-lg sm:text-3xl lg:text-3xl">
+              Khoảnh khắc giữ nhịp <br/> bữa trưa của bạn có câu chuyện gì?
             </h2>
              
           </div>

@@ -102,7 +102,7 @@ export default function MoodCardDisplay() {
           <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
               {combination.category === 'mindful' && '🧘 Mindful'}
-              {combination.category === 'tiger-linked' && '🐅 Tiger Spirit'}
+              {combination.category === 'tiger-linked' && '🐅 TIGER Spirit'}
               {combination.category === 'trendy' && '✨ Trendy'}
             </h3>
             <p className="text-gray-700">{combination.whisper}</p>
@@ -136,12 +136,12 @@ export default function MoodCardDisplay() {
           </h3>
           <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
             {whisper && reminder
-              ? `"${whisper}"\n\n${reminder}\n\n#TigerMoodCorner #MoodCard ${emojis.map(e => e.emoji).join(' ')}`
+              ? `"${whisper}"\n\n${reminder}\n\n#TIGERMoodCorner #MoodCard ${emojis.map(e => e.emoji).join(' ')}`
               : whisper
-                ? `"${whisper}"\n\n#TigerMoodCorner #MoodCard ${emojis.map(e => e.emoji).join(' ')}`
+                ? `"${whisper}"\n\n#TIGERMoodCorner #MoodCard ${emojis.map(e => e.emoji).join(' ')}`
                 : reminder
-                  ? `${reminder}\n\n#TigerMoodCorner #MoodCard ${emojis.map(e => e.emoji).join(' ')}`
-                  : `Khám phá cảm xúc của bạn qua emoji: ${emojis.map(e => e.emoji).join(' ')}\n\n#TigerMoodCorner #MoodCard`}
+                  ? `${reminder}\n\n#TIGERMoodCorner #MoodCard ${emojis.map(e => e.emoji).join(' ')}`
+                  : `Khám phá cảm xúc của bạn qua emoji: ${emojis.map(e => e.emoji).join(' ')}\n\n#TIGERMoodCorner #MoodCard`}
           </p>
         </div>
 
@@ -150,7 +150,7 @@ export default function MoodCardDisplay() {
           <p className="text-sm text-gray-500">
             Tạo mood card của bạn tại{' '}
             <span className="font-semibold text-purple-600">
-              Tiger Mood Corner
+              TIGER Mood Corner
             </span>
           </p>
         </div>

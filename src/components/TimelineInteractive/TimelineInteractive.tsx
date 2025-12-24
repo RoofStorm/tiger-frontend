@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 // Temporarily disabled hover feature - commented out unused imports
@@ -106,12 +107,12 @@ export function TimelineInteractive() {
 
   return (
     <div className="relative w-full">
-      <Image
+      <img
         src="/nhipbep/timeline.svg"
         alt="Timeline"
-        width={1920}
-        height={400}
-        className="w-full h-auto object-cover"
+        // width={1920}
+        // height={400}
+        className="object-contain"
       />
 
       {/* Timeline Product Hover Areas */}

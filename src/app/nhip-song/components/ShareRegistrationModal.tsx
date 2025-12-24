@@ -19,7 +19,6 @@ const loginSchema = z.object({
 const registerSchema = z.object({
   name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự'),
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
-  referralCode: z.string().optional(),
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -151,8 +150,7 @@ export function ShareRegistrationModal({
       await registerUser(
         email,
         data.password,
-        data.name,
-        data.referralCode
+        data.name
       );
       // Success toast and navigation are handled in useNextAuth
       onRegister();
@@ -369,35 +367,6 @@ export function ShareRegistrationModal({
                         {registerForm.formState.errors.password.message}
                       </p>
                     )}
-                  </div>
-
-                  {/* Referral Code Field */}
-                  <div>
-                    <label 
-                      htmlFor="register-referral-code"
-                      className="block font-nunito mb-2"
-                      style={{
-                        fontFamily: 'Nunito',
-                        fontWeight: 500,
-                        fontSize: '14px',
-                        lineHeight: '20px',
-                        color: '#333435',
-                      }}
-                    >
-                      Mã mời bạn (tùy chọn)
-                    </label>
-                    <input
-                      {...registerForm.register('referralCode')}
-                      type="text"
-                      id="register-referral-code"
-                      placeholder="Nhập mã mời"
-                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      style={{ 
-                        backgroundColor: '#FFFFFF',
-                        borderColor: '#E0E0E0',
-                        fontSize: '14px',
-                      }}
-                    />
                   </div>
 
                   {/* Checkboxes */}

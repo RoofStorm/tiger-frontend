@@ -267,7 +267,7 @@ export function NhipSongPageContent() {
                 : moodCardData.reminder) + ' - Tiger Nhịp Sống'
             : moodCardData?.whisper
             ? `"${moodCardData.whisper.length > 50 ? moodCardData.whisper.substring(0, 50) + '...' : moodCardData.whisper}" - Tiger Nhịp Sống`
-            : 'Mood Card - Tiger Nhịp Sống';
+            : 'Mood Card - TIGER Nhịp Sống';
           
           const shareDescription = moodCardData?.whisper && moodCardData?.reminder
             ? `"${moodCardData.whisper}"\n\n${moodCardData.reminder}\n\n#TigerNhịpSống #MoodCard`
@@ -394,7 +394,7 @@ export function NhipSongPageContent() {
           height: 'calc(100vh)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isDark ? 'py-6' : 'py-12'}`}>
           {!showMoodCard ? (
             <EmojiSelectionSection
               selectedEmojis={selectedEmojis}
