@@ -280,9 +280,21 @@ export function NhipBepPageContent() {
                 </h3>
 
                 {/* Body Text */}
-                <div className="text-white space-y-1 font-nunito leading-relaxed text-sm md:text-base lg:text-lg px-2">
+                <div className="text-white space-y-1 font-nunito px-2">
                   {currentContent.paragraphs.map((paragraph, index) => (
-                    <p key={index}>
+                    <p 
+                      key={index}
+                      className="text-center"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 400,
+                        fontStyle: 'normal',
+                        fontSize: '18px',
+                        lineHeight: '24px',
+                        letterSpacing: '0%',
+                        textAlign: 'center'
+                      }}
+                    >
                       {paragraph}
                     </p>
                   ))}

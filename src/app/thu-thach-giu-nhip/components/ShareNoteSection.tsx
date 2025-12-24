@@ -17,6 +17,7 @@ interface Wish {
   isHighlighted: boolean;
   createdAt: string;
   updatedAt: string;
+  isFromCache?: boolean; // Field để phân biệt note mới tạo từ cache
   user?: {
     id: string;
     name?: string;
@@ -28,7 +29,7 @@ interface Wish {
 export function ShareNoteSection() {
   const router = useRouter();
   const { toast } = useToast();
-  const { isAuthenticated } = useNextAuth();
+  const { isAuthenticated, user } = useNextAuth();
   const queryClient = useQueryClient();
   const [noteText, setNoteText] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -50,11 +51,14 @@ export function ShareNoteSection() {
   const wishes = useMemo(() => {
     // Extract wishes from response
     // Normalized response structure: { success: true, data: [...], pagination: {...} }
+    console.log('📋 [ShareNoteSection] wishesData from query:', wishesData);
     const rawWishes: Wish[] = Array.isArray(wishesData)
       ? wishesData
       : Array.isArray(wishesData?.data)
         ? wishesData.data
         : [];
+
+    console.log('📋 [ShareNoteSection] Extracted rawWishes:', rawWishes);
 
     if (rawWishes.length === 0) return [];
     
@@ -90,12 +94,168 @@ export function ShareNoteSection() {
       setCreatedWishId(wishId);
       // Lưu nội dung note để hiển thị trong modal
       setSharedNoteText(content);
+      
+      // Tạo wish object mới để thêm vào danh sách Highlighted Notes
+      if (wishId && user) {
+        // Ưu tiên sử dụng data từ response nếu có đầy đủ thông tin
+        const responseWish = result?.data || result;
+        // Luôn đặt isHighlighted: true để note mới xuất hiện ngay trong danh sách highlight
+        const newWish: Wish = responseWish && 
+          responseWish.id && 
+          responseWish.content
+          ? {
+              id: responseWish.id,
+              content: responseWish.content,
+              isHighlighted: true, // Luôn true để hiển thị trong danh sách highlight
+              isFromCache: true, // Đánh dấu note này được thêm từ cache
+              createdAt: responseWish.createdAt || new Date().toISOString(),
+              updatedAt: responseWish.updatedAt || new Date().toISOString(),
+              user: responseWish.user || {
+                id: user.id,
+                name: user.name || undefined,
+                email: user.email || undefined,
+                avatarUrl: user.image || undefined,
+              },
+            }
+          : {
+              id: wishId,
+              content: content.trim(),
+              isHighlighted: true,
+              isFromCache: true, // Đánh dấu note này được thêm từ cache
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              user: {
+                id: user.id,
+                name: user.name || undefined,
+                email: user.email || undefined,
+                avatarUrl: user.image || undefined,
+              },
+            };
+
+        // Thêm wish mới vào đầu danh sách trong cache ngay lập tức để hiển thị
+        queryClient.setQueryData(['highlighted-wishes-share-note'], (oldData: Wish[] | { success?: boolean; data: Wish[]; pagination?: { total?: number; page?: number; limit?: number; totalPages?: number } } | undefined) => {
+          // Normalize old data structure - API trả về { success: true, data: [...], pagination: {...} }
+          const oldWishes: Wish[] = Array.isArray(oldData)
+            ? oldData
+            : Array.isArray(oldData?.data)
+              ? oldData.data
+              : [];
+
+          console.log('📋 [ShareNoteSection] Highlighted wishes BEFORE update:', oldWishes);
+
+          // Thêm wish mới vào cuối danh sách
+          const updatedWishes = [...oldWishes, newWish];
+
+          // Trả về cấu trúc giống với response từ API: { success: true, data: [...], pagination: {...} }
+          const newCacheData = Array.isArray(oldData)
+            ? {
+                success: true,
+                data: updatedWishes,
+                pagination: {
+                  total: updatedWishes.length,
+                  page: 1,
+                  limit: updatedWishes.length,
+                  totalPages: 1,
+                },
+              }
+            : oldData && 'data' in oldData
+              ? {
+                  ...oldData,
+                  data: updatedWishes,
+                  pagination: {
+                    ...oldData.pagination,
+                    total: updatedWishes.length,
+                  },
+                }
+              : {
+                  success: true,
+                  data: updatedWishes,
+                  pagination: {
+                    total: updatedWishes.length,
+                    page: 1,
+                    limit: updatedWishes.length,
+                    totalPages: 1,
+                  },
+                };
+          
+          console.log('📋 [ShareNoteSection] Highlighted wishes AFTER update:', updatedWishes);
+          return newCacheData;
+        });
+
+        // Fetch data từ server và merge note mới nếu chưa có trong response
+        // Sử dụng fetchQuery để có thể xử lý response trước khi update cache
+        apiClient.getHighlightedWishes()
+          .then((serverData: Wish[] | { success?: boolean; data: Wish[]; pagination?: { total?: number; page?: number; limit?: number; totalPages?: number } } | undefined) => {
+            // Normalize server response structure
+            const serverWishes: Wish[] = Array.isArray(serverData)
+              ? serverData
+              : Array.isArray(serverData?.data)
+                ? serverData.data
+                : [];
+
+            console.log('📋 [ShareNoteSection] Server data after refetch:', serverWishes);
+
+            // Kiểm tra xem note mới đã có trong response từ server chưa
+            const wishExists = serverWishes.some(wish => wish.id === wishId);
+            
+            // Nếu note đã có trong server, xóa isFromCache vì nó đã được lấy từ server
+            // Nếu chưa có, merge note mới với isFromCache: true vào cuối
+            const finalWishes = wishExists 
+              ? serverWishes.map(wish => 
+                  wish.id === wishId 
+                    ? { ...wish, isFromCache: false } // Xóa flag isFromCache vì đã có từ server
+                    : wish
+                )
+              : [...serverWishes, newWish]; // Giữ isFromCache: true cho note mới
+
+            console.log('📋 [ShareNoteSection] Final wishes after merge:', finalWishes);
+            console.log('📋 [ShareNoteSection] Note already exists in server:', wishExists);
+
+            // Update cache với data đã merge
+            const cacheData = Array.isArray(serverData)
+              ? {
+                  success: true,
+                  data: finalWishes,
+                  pagination: {
+                    total: finalWishes.length,
+                    page: 1,
+                    limit: finalWishes.length,
+                    totalPages: 1,
+                  },
+                }
+              : serverData && 'data' in serverData
+                ? {
+                    ...serverData,
+                    data: finalWishes,
+                    pagination: {
+                      ...serverData.pagination,
+                      total: finalWishes.length,
+                    },
+                  }
+                : {
+                    success: true,
+                    data: finalWishes,
+                    pagination: {
+                      total: finalWishes.length,
+                      page: 1,
+                      limit: finalWishes.length,
+                      totalPages: 1,
+                    },
+                  };
+
+            queryClient.setQueryData(['highlighted-wishes-share-note'], cacheData);
+          })
+          .catch((error) => {
+            console.error('❌ [ShareNoteSection] Error fetching highlighted wishes:', error);
+            // Nếu lỗi, vẫn giữ note mới trong cache
+          });
+      }
+
       // Hiển thị modal thành công
       setShowSuccessModal(true);
       // Reset textarea
       setNoteText('');
-      // Invalidate queries để refresh data
-      queryClient.invalidateQueries({ queryKey: ['highlighted-wishes-share-note'] });
+      // Invalidate các query khác
       queryClient.invalidateQueries({ queryKey: ['highlighted-wishes'] });
       queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
@@ -537,7 +697,14 @@ export function ShareNoteSection() {
                         />
                       )}
                     </div>
-                    <span className="font-medium text-sm" style={{ color: '#FFFFFF' }}>
+                    <span 
+                      className="font-medium text-sm" 
+                      style={{ 
+                        color: wish.isFromCache
+                          ? '#FFD700' // Màu vàng cho note mới tạo từ cache
+                          : '#FFFFFF' // Màu trắng cho note từ server
+                      }}
+                    >
                       {wish.user?.name || 'Người dùng ẩn danh'}
                     </span>
                   </div>
