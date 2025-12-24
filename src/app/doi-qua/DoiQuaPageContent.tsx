@@ -411,27 +411,28 @@ export function DoiQuaPageContent() {
                         }}
                       >
                         {/* Voucher Card Content */}
-                        <div className="p-6 flex flex-col h-full">
-                          {/* Points Requirement */}
-                          <div className="text-center mb-4">
-                            <p className="text-white font-nunito font-medium" style={{ fontSize: '14px' }}>
-                              {pointsRequired} Điểm năng lượng
-                            </p>
-                          </div>
-
+                        <div className="px-6 py-10 flex flex-col h-full">
                           {/* Dashed Border Section */}
-                          <div 
-                            className="border-2 border-dashed rounded-lg p-6 mb-4 flex-1 flex flex-col justify-center"
-                            style={{ borderColor: '#3B65AD' }}
-                          >
+                          <div className="mt-auto mb-6">
+                            {/* Points Requirement */}
+                            <div className="text-center mb-3">
+                              <p className="text-white font-nunito font-medium" style={{ fontSize: '24px' }}>
+                                {pointsRequired} Điểm năng lượng
+                              </p>
+                            </div>
+
+                            <div 
+                              className="border-[2px] border-dashed rounded-lg px-3 py-2 mb-4 flex flex-col justify-center"
+                              style={{ borderColor: '#FFFFFF' }}
+                            >
                             <div className="text-center">
                               {/* VOUCHER Label */}
                               <p 
-                                className="font-prata text-white mb-3"
+                                className="font-prata text-white mb-2"
                                 style={{
                                   fontFamily: 'Prata',
                                   fontWeight: 400,
-                                  fontSize: '24px',
+                                  fontSize: '28px',
                                   letterSpacing: '0.03em',
                                   color: '#FFFFFF',
                                 }}
@@ -441,12 +442,12 @@ export function DoiQuaPageContent() {
 
                               {/* Voucher Value */}
                               <p 
-                                className="font-nunito font-bold mb-3"
+                                className="font-nunito font-bold mb-2"
                                 style={{
                                   fontFamily: 'Nunito',
                                   fontWeight: 700,
-                                  fontSize: '64px',
-                                  lineHeight: '64px',
+                                  fontSize: '88px',
+                                  lineHeight: '88px',
                                   color: '#ADD1EE',
                                 }}
                               >
@@ -459,7 +460,7 @@ export function DoiQuaPageContent() {
                                 style={{
                                   fontFamily: 'Nunito',
                                   fontWeight: 400,
-                                  fontSize: '14px',
+                                  fontSize: '12px',
                                   lineHeight: '20px',
                                   color: '#FFFFFF',
                                 }}
@@ -467,6 +468,7 @@ export function DoiQuaPageContent() {
                                 Cho sản phẩm Tiger (giới hạn 3 lần/user)
                               </p>
                             </div>
+                          </div>
                           </div>
 
                           {/* Button */}

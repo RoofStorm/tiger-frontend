@@ -322,7 +322,7 @@ export function ShareNoteSection() {
   return (
     <>
       {/* Share Section */}
-      <div className="mt-16 rounded-[30px] border-2 border-gray-200 overflow-hidden bg-white mx-8 md:mx-8 lg:mx-32 max-w-full md:max-w-none min-h-[300px] md:min-h-[250px]">
+      <div className="mt-16 rounded-[30px] border-2 border-gray-200 overflow-hidden bg-white mx-8 md:mx-8 lg:mx-32 max-w-full md:max-w-none min-h-[200px] md:min-h-[180px]">
         <div className="grid grid-cols-1 md:grid-cols-5 h-full">
           {/* Left Part: Text - 20% width */}
           <div 
@@ -341,7 +341,7 @@ export function ShareNoteSection() {
           </div>
 
           {/* Right Part: Content - 80% width */}
-          <div className="bg-[#FFFDF5] md:col-span-4 grid grid-cols-1 md:grid-cols-2 md:min-h-[250px]">
+          <div className="bg-[#FFFDF5] md:col-span-4 grid grid-cols-1 md:grid-cols-2 md:min-h-[180px]">
             {/* Left: Avatar, Name, Content */}
             <div className="p-4 md:p-6 space-y-3 flex flex-col justify-center">
               {/* Avatar + Name */}
@@ -401,14 +401,14 @@ export function ShareNoteSection() {
         {/* Highlighted Notes Section */}
         <div 
           id="highlighted-notes-section"
-          className="mt-16 rounded-lg overflow-hidden min-h-[700px] bg-center md:bg-[top_right]"
+          className="mt-16 overflow-hidden min-h-[500px] bg-center md:bg-[top_right]"
           style={{
             backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.svg)',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
           }}
         >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-12 min-h-[700px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-12 min-h-[500px]">
           {/* Left: Image, TextArea, Button */}
           <div className="space-y-4 flex flex-col items-center">
             <div className="space-y-4 flex flex-col">
@@ -419,10 +419,11 @@ export function ShareNoteSection() {
                     alt="Giadinhancom"
                     width={1000}
                     height={600}
-                    className="w-full h-auto object-contain ml-[10px] md:ml-[20px]"
+                    className="w-full h-auto object-contain md:ml-[2px]"
                     style={{
-                      transform: 'scale(1)',
-                      transformOrigin: 'center'
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'top',
+
                     }}
                     priority
                     fetchPriority="high"
@@ -482,7 +483,7 @@ export function ShareNoteSection() {
           {/* Right: Highlighted Notes - Scrollable */}
           <div 
             ref={notesScrollRef}
-            className="space-y-8 h-full max-h-[1100px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
+            className="space-y-8 h-full max-h-[700px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
             style={{ 
               scrollBehavior: 'smooth',
               scrollbarWidth: 'none', /* Firefox */

@@ -21,34 +21,37 @@ const slides: SlideContent[] = [
       'Tiger bắt đầu sản xuất và kinh doanh bình chân không tại Nhật Bản.',
       'Trở thành nhà máy đầu tiên trong ngành được MITI (nay là METI) chứng nhận đạt chuẩn JIS.'
     ],
-    image: '/nhipbep/history1_background.svg'
+    image: '/nhipbep/history_1923_1959_background.jpg'
   },
   {
     dates: '1960 – 1970',
     subtitle: 'Mở rộng và Phát triển',
     paragraphs: [
       'Kỷ niệm 45 năm thành lập, ông Takenori Kikuchi được bổ nhiệm làm Chủ tịch HĐQT, ông Yoshito Kikuchi giữ vai trò Chủ tịch Điều hành.',
-      'Thành lập Tiger Bussan Co., Ltd. tại Hiroshima. Hoàn thành mở rộng Trụ sở chính (Tòa nhà thứ ba).'
+      'Thành lập Tiger Bussan Co., Ltd. tại Hiroshima.',
+      'Hoàn thành mở rộng Trụ sở chính (Tòa nhà thứ ba).'
     ],
-    image: '/nhipbep/history1_background.svg'
+    image: '/nhipbep/history_1960_1970_background.jpg'
   },
   {
     dates: '1980 – 1999',
     subtitle: 'Đổi mới và Tái cấu trúc',
     paragraphs: [
       'Ra mắt ấm đun nước điện "Wakitate" đầu tiên.',
-      'Kỷ niệm 60 năm thành lập và chính thức đổi tên thành Tiger Corporation. Hoàn thành Trung tâm Bình chân không Kadoma và xây dựng nhà xưởng đúc.'
+      'Kỷ niệm 60 năm thành lập và chính thức đổi tên thành Tiger Corporation.',
+      'Hoàn thành Trung tâm Bình chân không Kadoma và xây dựng nhà xưởng đúc.'
     ],
-    image: '/nhipbep/history1_background.svg'
+    image: '/nhipbep/history_1980_1999_background.jpg'
   },
   {
     dates: '2000 – 2019',
     subtitle: 'Chứng nhận Quốc tế và Mở rộng',
     paragraphs: [
-      'Trụ sở chính đạt chứng nhận ISO 9001. Thành lập Công ty TNHH TIGER Việt Nam.',
+      'Trụ sở chính đạt chứng nhận ISO 9001.',
+      'Thành lập Công ty TNHH TIGER Việt Nam.',
       'Tiger Corporation nhận Giải thưởng Bộ trưởng Bộ Giáo dục, Văn hóa, Thể thao, Khoa học & Công nghệ Nhật Bản tại Giải thưởng Công nghệ Công nghiệp Nhật Bản lần thứ 48.'
     ],
-    image: '/nhipbep/history1_background.svg'
+    image: '/nhipbep/history_2000_2019_background.jpg'
   },
   {
     dates: '2020 – Nay',
@@ -57,7 +60,7 @@ const slides: SlideContent[] = [
       'Thành lập Công ty TNHH TIGER MARKETING Việt Nam.',
       'Tập đoàn Tiger kỷ niệm 100 năm hoạt động, khẳng định vị thế thương hiệu gia dụng hàng đầu Nhật Bản.'
     ],
-    image: '/nhipbep/history1_background.svg'
+    image: '/nhipbep/history_2020_nay_background.jpg'
   }
 ];
 
@@ -221,13 +224,13 @@ export function NhipBepPageContent() {
     <div className="min-h-screen">
       <main className="min-h-[calc(100vh-80px)] bg-white">
         {/* Image Container - Relative for absolute text positioning */}
-        <div className="relative w-full min-h-[500px] md:min-h-0">
+        <div className="relative w-full min-h-[500px] md:min-h-0 max-h-[600px] md:max-h-[700px]">
           <Image
             src={currentContent.image}
             alt="History Background"
             width={1920}
             height={1080}
-            className="w-full h-[500px] md:h-auto object-cover md:object-cover"
+            className="w-full h-[500px] md:h-auto max-h-[600px] md:max-h-[750px] object-cover"
             priority
           />
 
