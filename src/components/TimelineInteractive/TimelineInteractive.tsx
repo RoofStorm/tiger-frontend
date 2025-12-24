@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+// Temporarily disabled hover feature - commented out unused imports
+// import { useState, useEffect } from 'react';
+import { useRef } from 'react';
 import Image from 'next/image';
 
 interface TimelineProduct {
@@ -68,38 +70,39 @@ const timelineProducts: TimelineProduct[] = [
 ];
 
 export function TimelineInteractive() {
-  const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+  // Temporarily disabled hover feature
+  // const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
+  // const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const hoverRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  useEffect(() => {
-    if (hoveredProduct && hoverRefs.current[hoveredProduct]) {
-      const updatePosition = () => {
-        const rect = hoverRefs.current[hoveredProduct]!.getBoundingClientRect();
-        setTooltipPosition({
-          top: rect.top - 8,
-          left: rect.left + rect.width / 2,
-        });
-      };
-      
-      updatePosition();
-      
-      const handleScroll = () => updatePosition();
-      const handleResize = () => updatePosition();
-      
-      window.addEventListener('scroll', handleScroll, true);
-      window.addEventListener('resize', handleResize);
-      
-      return () => {
-        window.removeEventListener('scroll', handleScroll, true);
-        window.removeEventListener('resize', handleResize);
-      };
-    }
-  }, [hoveredProduct]);
+  // useEffect(() => {
+  //   if (hoveredProduct && hoverRefs.current[hoveredProduct]) {
+  //     const updatePosition = () => {
+  //       const rect = hoverRefs.current[hoveredProduct]!.getBoundingClientRect();
+  //       setTooltipPosition({
+  //         top: rect.top - 8,
+  //         left: rect.left + rect.width / 2,
+  //       });
+  //     };
+  //     
+  //     updatePosition();
+  //     
+  //     const handleScroll = () => updatePosition();
+  //     const handleResize = () => updatePosition();
+  //     
+  //     window.addEventListener('scroll', handleScroll, true);
+  //     window.addEventListener('resize', handleResize);
+  //     
+  //     return () => {
+  //       window.removeEventListener('scroll', handleScroll, true);
+  //       window.removeEventListener('resize', handleResize);
+  //     };
+  //   }
+  // }, [hoveredProduct]);
 
-  const currentProduct = hoveredProduct
-    ? timelineProducts.find((p) => p.id === hoveredProduct)
-    : null;
+  // const currentProduct = hoveredProduct
+  //   ? timelineProducts.find((p) => p.id === hoveredProduct)
+  //   : null;
 
   return (
     <div className="relative w-full">
@@ -118,7 +121,7 @@ export function TimelineInteractive() {
           ref={(el) => {
             hoverRefs.current[product.id] = el;
           }}
-          className="absolute rounded-full cursor-pointer transition-all duration-300"
+          className="absolute rounded-full"
           style={{
             left: product.position.left,
             top: product.position.top,
@@ -126,13 +129,14 @@ export function TimelineInteractive() {
             paddingBottom: product.position.width,
             backgroundColor: 'transparent',
           }}
-          onMouseEnter={() => setHoveredProduct(product.id)}
-          onMouseLeave={() => setHoveredProduct(null)}
+          // Temporarily disabled hover feature
+          // onMouseEnter={() => setHoveredProduct(product.id)}
+          // onMouseLeave={() => setHoveredProduct(null)}
         />
       ))}
 
-      {/* Tooltip */}
-      {hoveredProduct && currentProduct && tooltipPosition.top > 0 && (
+      {/* Tooltip - Temporarily disabled */}
+      {/* {hoveredProduct && currentProduct && tooltipPosition.top > 0 && (
         <div
           className="fixed z-[9999] px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg pointer-events-none"
           style={{
@@ -146,7 +150,7 @@ export function TimelineInteractive() {
           <div>{currentProduct.description}</div>
           <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

@@ -242,22 +242,47 @@ export function DoiQuaPageContent() {
         <div
           data-corner="4"
           id="corner-4"
-          className="min-h-screen py-12 lg:py-20"
+          className="min-h-screen py-12 lg:py-5"
         >
           <div className="max-w-[90%] mx-auto px-0.5 sm:px-1 lg:px-2">
             {/* Header Section */}
-            <div className="text-center mb-16">
+            <div className="text-center mb-8">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 className="space-y-6"
               >
-                <h2 className="font-prata text-4xl md:text-5xl mb-6" style={{ color: '#00579F' }}>
+                <h2 
+                  className="mb-6" 
+                  style={{ 
+                    fontFamily: 'Prata',
+                    fontWeight: 400,
+                    fontStyle: 'normal',
+                    fontSize: '54px',
+                    lineHeight: '64px',
+                    letterSpacing: '0.03em',
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                    color: '#004F93'
+                  }}
+                >
                   Trao đổi nhịp sống
                 </h2>
-                <p className="text-gray-700 max-w-3xl mx-auto text-center leading-relaxed font-noto-sans" style={{ fontSize: '16px' }}>
-                  Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. Đổi điểm để nhận về những món quà từ Tiger – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
+                <p 
+                  className="max-w-3xl mx-auto" 
+                  style={{ 
+                    fontFamily: 'Nunito',
+                    fontWeight: 400,
+                    fontStyle: 'normal',
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    letterSpacing: '0',
+                    textAlign: 'center',
+                    color: '#374151'
+                  }}
+                >
+                  Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. <br/>Đổi điểm để nhận về những món quà từ Tiger – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
                 </p>
 
                 {/* Tips Image */}
@@ -309,7 +334,7 @@ export function DoiQuaPageContent() {
             </div>
 
             {/* Tab Navigation */}
-            <div className="flex justify-center mb-8 px-4 pt-4 pb-4">
+            <div className="flex justify-center mb-2 px-4 py-2">
               <div 
                 className="flex items-center justify-center overflow-x-auto overflow-y-visible w-full max-w-full [&::-webkit-scrollbar]:hidden pb-1"
                 style={{
@@ -362,7 +387,7 @@ export function DoiQuaPageContent() {
 
             {/* Centered Title */}
             {activeTab === 'doi-qua' && (
-              <div className="text-center mb-12">
+              <div className="text-center mb-8">
                 <h2 
                   className="font-prata"
                   style={{ 
@@ -384,7 +409,7 @@ export function DoiQuaPageContent() {
             {/* Tab Content */}
             {activeTab === 'doi-qua' && (
               <div className="mb-16">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-3 justify-items-center max-w-6xl mx-auto">
                   {rewards.map((reward: Reward, index: number) => {
                     // Extract voucher value from reward name (e.g., "50K", "100K")
                     const voucherMatch = reward.name.match(/(\d+K|\d+k)/i);
@@ -407,32 +432,34 @@ export function DoiQuaPageContent() {
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat',
-                          minHeight: '500px' 
+                          aspectRatio: '3/4',
+                          minHeight: '360px',
+                          maxHeight: '400px'
                         }}
                       >
                         {/* Voucher Card Content */}
-                        <div className="px-6 py-10 flex flex-col h-full">
+                        <div className="px-4 py-6 flex flex-col h-full">
                           {/* Dashed Border Section */}
-                          <div className="mt-auto mb-6">
+                          <div className="mt-auto mb-4">
                             {/* Points Requirement */}
-                            <div className="text-center mb-3">
-                              <p className="text-white font-nunito font-medium" style={{ fontSize: '24px' }}>
+                            <div className="text-center mb-2">
+                              <p className="text-white font-nunito font-medium" style={{ fontSize: '18px' }}>
                                 {pointsRequired} Điểm năng lượng
                               </p>
                             </div>
 
                             <div 
-                              className="border-[2px] border-dashed rounded-lg px-3 py-2 mb-4 flex flex-col justify-center"
+                              className="border-[2px] border-dashed rounded-lg px-2 py-2 mb-3 flex flex-col justify-center"
                               style={{ borderColor: '#FFFFFF' }}
                             >
                             <div className="text-center">
                               {/* VOUCHER Label */}
                               <p 
-                                className="font-prata text-white mb-2"
+                                className="font-prata text-white mb-1"
                                 style={{
                                   fontFamily: 'Prata',
                                   fontWeight: 400,
-                                  fontSize: '28px',
+                                  fontSize: '22px',
                                   letterSpacing: '0.03em',
                                   color: '#FFFFFF',
                                 }}
@@ -442,12 +469,12 @@ export function DoiQuaPageContent() {
 
                               {/* Voucher Value */}
                               <p 
-                                className="font-nunito font-bold mb-2"
+                                className="font-nunito font-bold mb-1"
                                 style={{
                                   fontFamily: 'Nunito',
                                   fontWeight: 700,
-                                  fontSize: '88px',
-                                  lineHeight: '88px',
+                                  fontSize: '64px',
+                                  lineHeight: '64px',
                                   color: '#ADD1EE',
                                 }}
                               >
@@ -460,8 +487,8 @@ export function DoiQuaPageContent() {
                                 style={{
                                   fontFamily: 'Nunito',
                                   fontWeight: 400,
-                                  fontSize: '12px',
-                                  lineHeight: '20px',
+                                  fontSize: '11px',
+                                  lineHeight: '16px',
                                   color: '#FFFFFF',
                                 }}
                               >
@@ -475,13 +502,14 @@ export function DoiQuaPageContent() {
                           <button
                             onClick={() => handleRedeem(reward)}
                             disabled={!canRedeem(reward)}
-                            className={`w-full py-3 rounded-lg font-nunito font-semibold transition-all duration-300 ${
+                            className={`w-full py-2 rounded-lg font-nunito font-semibold transition-all duration-300 ${
                               canRedeem(reward)
                                 ? 'bg-white hover:bg-gray-100'
                                 : 'bg-gray-300 cursor-not-allowed'
                             }`}
                             style={{ 
-                              color: canRedeem(reward) ? '#284A8F' : '#666666'
+                              color: canRedeem(reward) ? '#284A8F' : '#666666',
+                              fontSize: '14px'
                             }}
                           >
                             Đổi quà ngay

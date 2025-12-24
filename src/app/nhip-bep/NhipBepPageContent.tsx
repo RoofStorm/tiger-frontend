@@ -303,7 +303,7 @@ export function NhipBepPageContent() {
           </div>
 
           {/* Timeline Image - Relative on mobile, absolute on desktop */}
-          <div className="relative md:absolute md:bottom-0 left-0 w-full z-10">
+          <div className="relative md:absolute md:bottom-[20px] left-0 w-full z-10">
             {/* Mobile: Static timeline image */}
             <div className="md:hidden">
               <Image
@@ -341,14 +341,21 @@ export function NhipBepPageContent() {
               </h2>
 
               {/* Description */}
-              <div className="max-w-4xl mx-auto">
-                <p className="text-white text-base md:text-lg font-nunito leading-relaxed mb-4">
+              <div className="max-w-6xl mx-auto">
+                <p 
+                  className="mb-4"
+                  style={{
+                    fontFamily: 'Nunito',
+                    fontWeight: 400,
+                    fontStyle: 'normal',
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    letterSpacing: '0',
+                    textAlign: 'center',
+                    color: '#FFFFFF'
+                  }}
+                >
                   Gian bếp là nơi nhịp sống được nuôi dưỡng. Ở đó, một mẹo nhỏ, một thói quen đơn giản có thể giữ nhịp cả ngày cho bạn. Tiger đồng hành với bạn trong từng nhịp ấy – bởi Tiger bắt đầu bằng công nghệ giữ nhiệt, rồi phát triển để giữ trọn hương vị, độ ẩm và sự an toàn.
-                </p>
-
-                {/* Quote */}
-                <p className="text-white text-base md:text-lg font-nunito leading-relaxed italic">
-                  &quot;Những nhịp nhỏ này giữ ta cân bằng mỗi ngày. Và đằng sau từng nhịp nhỏ ấy... luôn có một người bạn lặng lẽ đồng hành.&quot;
                 </p>
               </div>
             </div>
