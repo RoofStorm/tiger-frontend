@@ -149,7 +149,7 @@ export function MoodCardFlipCard({
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="w-full flex flex-col relative z-50"
+        className="w-full flex flex-col items-center justify-center relative z-50"
       >
         {/* Flip Card Container */}
         <div
@@ -205,32 +205,32 @@ export function MoodCardFlipCard({
                 }}
               >
                 {/* Main Content Section - 80% height */}
-                <div className="flex-1 p-8 flex flex-col items-center justify-center overflow-y-auto" style={{ height: '80%', marginTop: '130px' }}>
+                <div className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-y-auto mt-[190px] md:mt-[130px]" style={{ height: '80%'}}>
                   {/* Content wrapper */}
                   <div className="flex flex-col items-center justify-center w-full max-w-xs">
                     {/* Whisper Section */}
                     <div className="mb-4 text-center">
-                      <h3 className="font-bold text-white mb-2" style={{ fontSize: '16px' }}>
+                      <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
                         Whisper:
                       </h3>
-                      <p className="text-white leading-relaxed" style={{ fontSize: '14px' }}>
+                      <p className="text-white leading-relaxed text-xs md:text-sm max-w-[200px] md:max-w-none mx-auto" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
                         {whisper}
                       </p>
                     </div>
 
                     {/* Reminder Section */}
                     <div className="mb-4 text-center">
-                      <h3 className="font-bold text-white mb-2" style={{ fontSize: '16px' }}>
+                      <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
                         Reminder:
                       </h3>
-                      <p className="text-white leading-relaxed" style={{ fontSize: '14px' }}>
+                      <p className="text-white leading-relaxed text-xs md:text-sm max-w-[200px] md:max-w-none mx-auto" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
                         {reminder}
                       </p>
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="mt-4 pt-6 w-full flex flex-col items-center">
+                  <div className="md:mt-4 mt-0 pt-6 w-full flex flex-col items-center">
                     <div className="grid grid-cols-2 gap-3 mb-4 max-w-xs w-full">
                       <Button
                         onClick={(e) => {
@@ -345,24 +345,24 @@ export function MoodCardFlipCard({
             priority
             sizes="543px"
           />
-          <div className="absolute inset-0 flex-1 p-8 flex flex-col items-center justify-center" style={{ height: '80%', marginTop: '130px' }}>
+          <div className="absolute inset-0 flex-1 p-4 md:p-8 flex flex-col items-center justify-center" style={{ height: '80%', marginTop: '130px' }}>
             <div className="flex flex-col items-center justify-center w-full max-w-xs relative z-10">
               {/* Whisper Section */}
               <div className="mb-4 text-center">
-                <h3 className="font-bold text-white mb-2" style={{ fontSize: '16px' }}>
+                <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
                   Whisper:
                 </h3>
-                <p className="text-white leading-relaxed" style={{ fontSize: '14px' }}>
+                <p className="text-white leading-relaxed text-xs md:text-sm" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
                   {whisper}
                 </p>
               </div>
 
               {/* Reminder Section */}
               <div className="mb-4 text-center">
-                <h3 className="font-bold text-white mb-2" style={{ fontSize: '16px' }}>
+                <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
                   Reminder:
                 </h3>
-                <p className="text-white leading-relaxed" style={{ fontSize: '14px' }}>
+                <p className="text-white leading-relaxed text-xs md:text-sm" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
                   {reminder}
                 </p>
               </div>

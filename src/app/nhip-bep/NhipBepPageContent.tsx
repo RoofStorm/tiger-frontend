@@ -146,12 +146,18 @@ export function NhipBepPageContent() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Preload all product images on mount for faster modal loading
   useEffect(() => {
+  // Preload all product images on mount for faster modal loading
     const uniqueProductImages = Array.from(new Set(baseProducts.map(p => p.image)));
     uniqueProductImages.forEach(imageSrc => {
       const img = new window.Image();
       img.src = imageSrc;
+    });
+
+     // Preload all slide images on mount for faster slide transitions
+     slides.forEach(slide => {
+      const img = new window.Image();
+      img.src = slide.image;
     });
   }, []);
 
@@ -224,53 +230,80 @@ export function NhipBepPageContent() {
     <div className="min-h-screen">
       <main className="min-h-[calc(100vh-80px)] bg-white">
         {/* Image Container - Relative for absolute text positioning */}
-        <div className="relative w-full min-h-[500px] md:min-h-0 max-h-[600px] md:max-h-[700px]">
-          <Image
-            src={currentContent.image}
-            alt="History Background"
-            width={1920}
-            height={1080}
-            className="w-full h-[500px] md:h-auto max-h-[600px] md:max-h-[750px] object-cover"
-            priority
-          />
+        <div className="relative w-full min-h-[500px] md:min-h-0 max-h-[600px] md:max-h-[700px] overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
+              className="relative w-full h-full"
+            >
+              <Image
+                src={currentContent.image}
+                alt="History Background"
+                width={1920}
+                height={1080}
+                className="w-full h-[500px] md:h-auto max-h-[600px] md:max-h-[750px] object-cover"
+                priority
+              />
+              {/* Gradient Overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(180deg, rgba(93, 93, 93, 0) 0%, rgba(37, 37, 37, 0.605237) 35.7%, #000000 100%)',
+                }}
+              />
+            </motion.div>
+          </AnimatePresence>
 
           {/* Text Content - Absolute, center bottom overlay */}
-          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-6xl px-4 pb-8 md:pb-12">
-            <div className="text-center">
-              {/* Dates */}
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white mb-3 md:mb-4">
-                {currentContent.dates}
-              </h2>
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-6xl px-4 pb-8 md:pb-12 z-10">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentSlide}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.6, ease: 'easeInOut', delay: 0.2 }}
+                className="text-center"
+              >
+                {/* Dates */}
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white mb-3 md:mb-4">
+                  {currentContent.dates}
+                </h2>
 
-              {/* Subtitle */}
-              <h3 className="text-lg md:text-xl lg:text-2xl font-serif text-white mb-2">
-                {currentContent.subtitle}
-              </h3>
+                {/* Subtitle */}
+                <h3 className="text-lg md:text-xl lg:text-2xl font-serif text-white mb-2">
+                  {currentContent.subtitle}
+                </h3>
 
-              {/* Body Text */}
-              <div className="text-white space-y-1 font-nunito leading-relaxed text-sm md:text-base lg:text-lg px-2">
-                {currentContent.paragraphs.map((paragraph, index) => (
-                  <p key={index}>
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
+                {/* Body Text */}
+                <div className="text-white space-y-1 font-nunito leading-relaxed text-sm md:text-base lg:text-lg px-2">
+                  {currentContent.paragraphs.map((paragraph, index) => (
+                    <p key={index}>
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-              {/* Navigation Dots */}
-              <div className="flex justify-center items-center gap-2 md:gap-3 mt-6 md:mt-8">
-                {slides.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`transition-all duration-300 rounded-full ${
-                      index === currentSlide
-                        ? 'w-2.5 h-2.5 md:w-3 md:h-3 bg-white'
-                        : 'w-2 h-2 md:w-2 md:h-2 bg-white/50 hover:bg-white/75'
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                ))}
-              </div>
+            {/* Navigation Dots */}
+            <div className="flex justify-center items-center gap-2 md:gap-3 mt-6 md:mt-8">
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentSlide(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === currentSlide
+                      ? 'w-2.5 h-2.5 md:w-3 md:h-3 bg-white'
+                      : 'w-2 h-2 md:w-2 md:h-2 bg-white/50 hover:bg-white/75'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
