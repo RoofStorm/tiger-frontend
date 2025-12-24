@@ -408,10 +408,13 @@ export function LunchboxCarousel() {
                     : pos === 0 ? 1.12 : Math.abs(pos) === 1 ? 0.94 : 0.8;
                   const zIndex = pos === 0 ? 30 : Math.abs(pos) === 1 ? 20 : 10;
 
-                  // Kích thước responsive
-                  const height = isMobile
-                    ? pos === 0 ? 300 : 260
-                    : pos === 0 ? 420 : Math.abs(pos) === 1 ? 380 : 320;
+                  // Kích thước responsive - đảm bảo tỉ lệ 3:4
+                  // Tính height dựa trên width với tỉ lệ 3:4 (height = width * 4/3)
+                  const widthValue = isMobile
+                    ? pos === 0 ? 256 : 224 // 16rem = 256px, 14rem = 224px
+                    : pos === 0 ? 320 : Math.abs(pos) === 1 ? 288 : 224; // 20rem = 320px, 18rem = 288px, 14rem = 224px
+                  
+                  const height = Math.round(widthValue * 4 / 3); // Tỉ lệ 3:4
 
                   const width = isMobile
                     ? pos === 0 ? 'w-[16rem]' : 'w-[14rem]'
@@ -574,10 +577,7 @@ export function LunchboxCarousel() {
                           <img
                             src="/thuthachnhipsong/tramnamgiunhipsong.svg"
                             alt="Trăm năm giữ nhịp sống"
-                            // width={180}
-                            // height={54}
-                            className="object-contain"
-                            // style={{ height: 'auto' }}
+                            className="object-contain max-w-[100px] md:max-w-none"
                           />
                         </div>
                       </div>
