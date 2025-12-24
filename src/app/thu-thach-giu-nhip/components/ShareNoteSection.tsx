@@ -373,7 +373,7 @@ export function ShareNoteSection() {
                 className="relative overflow-hidden w-full"
               >
                 <Image
-                  src="/thuthachnhipsong/buaangiadinh.svg"
+                  src="/thuthachnhipsong/buaangiadinh.png"
                   alt="Bữa ăn gia đình"
                   width={500}
                   height={200}

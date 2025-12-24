@@ -198,8 +198,8 @@ export function MoodCardFlipCard({
                 style={{
                   backfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
-                  backgroundImage: 'url(/nhipsong/card_content.png)',
-                  backgroundSize: 'cover',
+                  backgroundImage: 'url(/nhipsong/card_content1.png)',
+                  backgroundSize: 'contain',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat',
                 }}
@@ -338,10 +338,10 @@ export function MoodCardFlipCard({
       >
         <div className="relative w-full h-full min-h-[550px]">
           <Image
-            src="/nhipsong/card_content.png"
+            src="/nhipsong/card_content1.png"
             alt="Card Background"
             fill
-            className="object-cover"
+            className="object-contain"
             priority
             sizes="543px"
           />

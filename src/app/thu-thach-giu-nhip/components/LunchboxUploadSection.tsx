@@ -340,7 +340,7 @@ export function LunchboxUploadSection() {
           {/* Left Column - Image */}
           <div className="relative w-full h-[250px] md:h-[300px] lg:h-full">
             <Image
-              src="/thuthachnhipsong/upload_section.svg"
+              src="/thuthachnhipsong/upload_section.jpg"
               alt="Upload section"
               fill
               className="object-contain object-top lg:object-cover lg:object-center rounded-lg"

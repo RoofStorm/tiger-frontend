@@ -574,10 +574,10 @@ export function LunchboxCarousel() {
                           <img
                             src="/thuthachnhipsong/tramnamgiunhipsong.svg"
                             alt="Trăm năm giữ nhịp sống"
-                            width={180}
-                            height={54}
+                            // width={180}
+                            // height={54}
                             className="object-contain w-32 md:w-44"
-                            style={{ display: 'block', height: 'auto' }}
+                            // style={{ height: 'auto' }}
                           />
                         </div>
                       </div>
