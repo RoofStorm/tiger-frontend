@@ -23,6 +23,10 @@ export default function PostDetailClient({ post }: PostDetailClientProps) {
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              unoptimized={
+                post.imageUrl?.includes('localhost:9000') ||
+                post.imageUrl?.includes('storage.tiger-corporation-vietnam.vn')
+              }
             />
             {/* Highlight Badge */}
             {post.isHighlighted && (

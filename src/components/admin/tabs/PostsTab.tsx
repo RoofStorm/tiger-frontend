@@ -341,6 +341,9 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
                         unoptimized={
                           (post.imageUrl || post.url || '').includes(
                             'platform-lookaside.fbsbx.com'
+                          ) ||
+                          (post.imageUrl || post.url || '').includes(
+                            'storage.tiger-corporation-vietnam.vn'
                           )
                         }
                       />

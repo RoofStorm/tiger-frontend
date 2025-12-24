@@ -29,6 +29,7 @@ export function LunchboxUploadSection() {
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [uploadedCaption, setUploadedCaption] = useState<string>('');
   const [createdPostId, setCreatedPostId] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -185,6 +186,7 @@ export function LunchboxUploadSection() {
       // Save uploaded image URL and caption for modal
       setUploadedImageUrl(uploadResult.data.url);
       setUploadedCaption(caption || '');
+      setImageError(false); // Reset error state when new image is uploaded
       
       // Reset form
       setCaption('');
@@ -682,12 +684,28 @@ export function LunchboxUploadSection() {
                       <div className="relative w-full max-w-[180px] mx-auto md:max-w-none md:mx-0 aspect-square rounded-lg overflow-hidden">
                         {uploadedImageUrl && (
                           <>
-                            <Image
-                              src={uploadedImageUrl}
-                              alt="Uploaded image"
-                              fill
-                              className="object-cover"
-                            />
+                            {!imageError ? (
+                              <Image
+                                src={uploadedImageUrl}
+                                alt="Uploaded image"
+                                fill
+                                className="object-cover"
+                                unoptimized={uploadedImageUrl.includes('storage.tiger-corporation-vietnam.vn')}
+                                onError={() => setImageError(true)}
+                              />
+                            ) : (
+                              // Fallback to regular img tag if Next.js Image fails
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={uploadedImageUrl}
+                                alt="Uploaded image"
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Hide image if still fails
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                            )}
                             {/* Tramnamgiutronnhipsong overlay - Bottom Right */}
                             <div 
                               className="absolute z-10"

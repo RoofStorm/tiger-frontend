@@ -57,6 +57,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'tiger-minio.fly.dev',
       },
+      {
+        protocol: 'https',
+        hostname: 'storage.tiger-corporation-vietnam.vn',
+      },
     ],
   },
   serverExternalPackages: ['html2canvas'],
