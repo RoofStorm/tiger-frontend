@@ -16,16 +16,11 @@ export interface OGImageConfig {
  * @returns OGImageConfig object
  */
 export function createOGImage(
-  imageUrl?: string,
-  fallbackUrl?: string
+  imageUrl: string,
 ): OGImageConfig {
   // URL ảnh mặc định nếu không có ảnh
-  const defaultImage =
-    fallbackUrl ||
-    'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
-
   // Sử dụng ảnh gốc nếu có, ngược lại dùng ảnh mặc định
-  const finalImageUrl = imageUrl || defaultImage;
+  const finalImageUrl = imageUrl;
 
   return {
     url: finalImageUrl,
@@ -72,38 +67,30 @@ export function isValidOGImage(imageUrl: string): boolean {
  */
 export function selectBestOGImage(
   images: string[],
-  fallbackUrl?: string
 ): OGImageConfig {
   // Tìm ảnh đầu tiên hợp lệ
   const validImage = images.find(img => isValidOGImage(img));
 
-  return createOGImage(validImage, fallbackUrl);
+  return createOGImage(validImage || '');
 }
 
-/**
- * Tạo ảnh preview từ bài viết
- * @param post - Object bài viết
- * @param fallbackUrl - URL ảnh mặc định nếu không có ảnh hợp lệ
- * @returns OGImageConfig object
- */
 export function generatePostOGImage(
   post: {
-    imageUrl?: string;
+    imageUrl: string;
     images?: string[];
     title: string;
-  },
-  fallbackUrl?: string
+  }
 ): OGImageConfig {
   // Ưu tiên ảnh chính
   if (post.imageUrl && isValidOGImage(post.imageUrl)) {
-    return createOGImage(post.imageUrl, fallbackUrl);
+    return createOGImage(post.imageUrl);
   }
 
   // Nếu có nhiều ảnh, chọn ảnh đầu tiên
   if (post.images && post.images.length > 0) {
-    return selectBestOGImage(post.images, fallbackUrl);
+    return selectBestOGImage(post.images);
   }
 
   // Sử dụng ảnh mặc định
-  return createOGImage(undefined, fallbackUrl);
+  return createOGImage('');
 }

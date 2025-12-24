@@ -5,6 +5,7 @@ interface SharePageProps {
   searchParams: Promise<{
     wishId?: string;
     content?: string;
+    imageUrl?: string;
   }>;
 }
 
@@ -14,6 +15,14 @@ export async function generateMetadata({
   const params = await searchParams;
   const content = params.content || '';
   const wishId = params.wishId || '';
+  
+  // Parse imageUrl từ query params - chỉ dùng nếu có
+  const imageUrl = params.imageUrl;
+  
+  // Debug log (chỉ trong development)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 [WISHES/SHARE] generateMetadata - imageUrl:', imageUrl);
+  }
 
   // Tạo title từ content
   let title = 'Lời chúc từ Tiger Mood Corner';
@@ -33,11 +42,16 @@ export async function generateMetadata({
     process.env.NEXTAUTH_URL ||
     'https://tiger-corporation-vietnam.vn';
   
-  const imageUrl = 'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
-  
-  const shareUrl = `${baseUrl}/wishes/share?wishId=${encodeURIComponent(wishId)}&content=${encodeURIComponent(content)}`;
+  // Đảm bảo imageUrl được encode đúng cách
+  const shareUrlParams = new URLSearchParams({
+    ...(wishId && { wishId }),
+    ...(content && { content }),
+    ...(imageUrl && { imageUrl }),
+  });
+  const shareUrl = `${baseUrl}/wishes/share?${shareUrlParams.toString()}`;
 
-  return {
+  // Chỉ thêm images vào metadata nếu có imageUrl
+  const metadata: Metadata = {
     title,
     description,
     openGraph: {
@@ -45,32 +59,38 @@ export async function generateMetadata({
       description,
       url: shareUrl,
       siteName: 'Tiger Mood Corner',
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: title,
-        },
-      ],
       type: 'website',
       locale: 'vi_VN',
+      ...(imageUrl && {
+        images: [
+          {
+            url: imageUrl,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
+      }),
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: [imageUrl],
+      ...(imageUrl && { images: [imageUrl] }),
     },
     // Thêm meta tags riêng biệt để đảm bảo Facebook nhận diện
     other: {
       'og:url': shareUrl,
-      'og:image': imageUrl,
-      'og:image:width': '1200',
-      'og:image:height': '630',
-      'og:image:alt': title,
+      ...(imageUrl && {
+        'og:image': imageUrl,
+        'og:image:width': '1200',
+        'og:image:height': '630',
+        'og:image:alt': title,
+      }),
     },
   };
+
+  return metadata;
 }
 
 export default async function WishSharePage({
@@ -79,6 +99,14 @@ export default async function WishSharePage({
   const params = await searchParams;
   const content = params.content || '';
   const wishId = params.wishId || '';
+  
+  // Parse imageUrl từ query params - chỉ dùng nếu có
+  const imageUrl = params.imageUrl;
+  
+  // Debug log (chỉ trong development)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('🔍 [WISHES/SHARE] WishSharePage - imageUrl:', imageUrl);
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">
@@ -106,21 +134,23 @@ export default async function WishSharePage({
           </div>
         )}
 
-        <div className="text-center">
-          <p className="text-gray-600 mb-6">
-            Khám phá thế giới cảm xúc qua những lời chúc đặc biệt
-          </p>
-          <div className="flex justify-center">
-            <Image
-              src="https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png"
-              alt="Tiger Mood Corner"
-              width={400}
-              height={300}
-              className="rounded-lg"
-              unoptimized
-            />
+        {imageUrl && (
+          <div className="text-center">
+            <p className="text-gray-600 mb-6">
+              Khám phá thế giới cảm xúc qua những lời chúc đặc biệt
+            </p>
+            <div className="flex justify-center">
+              <Image
+                src={imageUrl}
+                alt="Tiger Mood Corner"
+                width={400}
+                height={300}
+                className="rounded-lg"
+                unoptimized
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

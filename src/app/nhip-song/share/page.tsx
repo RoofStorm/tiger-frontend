@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 interface SharePageProps {
   searchParams: Promise<{
-    imageUrl?: string;
+    imageUrl: string;
     whisper?: string;
     reminder?: string;
   }>;
@@ -13,7 +13,7 @@ export async function generateMetadata({
   searchParams,
 }: SharePageProps): Promise<Metadata> {
   const params = await searchParams;
-  const imageUrl = params.imageUrl || 'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
+  const imageUrl = params.imageUrl;
   const whisper = params.whisper || '';
   const reminder = params.reminder || '';
 
@@ -88,7 +88,7 @@ export default async function SharePage({
   searchParams,
 }: SharePageProps) {
   const params = await searchParams;
-  const imageUrl = params.imageUrl || 'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
+  const imageUrl = params.imageUrl;
   const whisper = params.whisper || '';
   const reminder = params.reminder || '';
 

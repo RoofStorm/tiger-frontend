@@ -83,15 +83,10 @@ export async function generateMetadata({
     process.env.NEXTAUTH_URL ||
     'https://tiger-corporation-vietnam.vn'; // Fallback to production HTTPS URL
   const postUrl = `${baseUrl}/posts/${id}`;
-  const defaultImageUrl =
-    'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
-  const ogImage = generatePostOGImage(
-    {
-      imageUrl: post.imageUrl, // Sử dụng ảnh thật từ post
-      title: post.caption || 'Bài viết nổi bật từ Tiger Mood Corner',
-    },
-    defaultImageUrl // Fallback URL
-  );
+  const ogImage = generatePostOGImage({
+    imageUrl: post.imageUrl,
+    title: post.caption || 'Bài viết nổi bật từ Tiger Mood Corner',
+  });
 
   // Format title với prefix "Tiger - "
   const postTitle = post.caption 

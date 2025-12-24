@@ -248,7 +248,7 @@ export function NhipSongPageContent() {
         try {
           const uploadResult = await apiClient.uploadFile(file);
           console.log('✅ [SHARE] Upload thành công:', uploadResult);
-          const imageUrl = uploadResult.data.url || 'https://tiger-minio.fly.dev/tiger-uploads/uploads/1762095387737-mood-card-1760773086183.png';
+          const imageUrl = uploadResult.data.url;
           console.log('🔗 [SHARE] Image URL:', imageUrl);
 
           // Tạo URL share với meta tags (giống Corner2_2)

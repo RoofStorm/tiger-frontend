@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
+import html2canvas from 'html2canvas';
 
 // Wish type for highlighted wishes with user info
 interface Wish {
@@ -35,6 +36,7 @@ export function ShareNoteSection() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sharedNoteText, setSharedNoteText] = useState('');
   const [createdWishId, setCreatedWishId] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
   const notesScrollRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -427,7 +429,148 @@ export function ShareNoteSection() {
     createWishMutation.mutate(noteText.trim());
   }, [noteText, toast, scrollToTextarea, isAuthenticated, createWishMutation]);
 
-  const handleFacebookShare = useCallback(() => {
+  // Function để capture modal và upload lên S3
+  const captureModalAndUpload = useCallback(async (): Promise<string | null> => {
+    if (!modalRef.current) {
+      console.error('❌ [SHARE] Modal ref không tồn tại');
+      return null;
+    }
+
+    try {
+      setIsGeneratingImage(true);
+      console.log('📸 [SHARE] Bắt đầu capture modal thành image');
+
+      const element = modalRef.current;
+      const originalStyle = {
+        opacity: element.style.opacity,
+        visibility: element.style.visibility,
+        pointerEvents: element.style.pointerEvents,
+      };
+
+      // Đảm bảo element có thể được capture
+      element.style.opacity = '1';
+      element.style.visibility = 'visible';
+      element.style.pointerEvents = 'none';
+      console.log('🎨 [SHARE] Đã cập nhật style của element để capture');
+
+      // Đợi một chút để đảm bảo render
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Đợi tất cả images trong element load xong
+      const images = element.querySelectorAll('img');
+      console.log('🖼️ [SHARE] Tìm thấy', images.length, 'images trong element');
+      await Promise.all(
+        Array.from(images).map(
+          (img, index) =>
+            new Promise((resolve, reject) => {
+              if (img.complete) {
+                console.log(`✅ [SHARE] Image ${index + 1} đã load xong`);
+                resolve(null);
+              } else {
+                console.log(`⏳ [SHARE] Đang đợi image ${index + 1} load...`);
+                img.onload = () => {
+                  console.log(`✅ [SHARE] Image ${index + 1} đã load xong`);
+                  resolve(null);
+                };
+                img.onerror = (error) => {
+                  console.error(`❌ [SHARE] Image ${index + 1} load lỗi:`, error);
+                  reject(error);
+                };
+              }
+            })
+        )
+      );
+
+      // Đợi thêm một chút để đảm bảo mọi thứ đã render hoàn toàn
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      console.log('🎬 [SHARE] Bắt đầu html2canvas...');
+      const canvas = await html2canvas(element, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+      });
+      console.log('✅ [SHARE] html2canvas thành công, canvas size:', {
+        width: canvas.width,
+        height: canvas.height,
+      });
+
+      // Khôi phục style ban đầu
+      element.style.opacity = originalStyle.opacity || '1';
+      element.style.visibility = originalStyle.visibility || 'visible';
+      element.style.pointerEvents = originalStyle.pointerEvents || 'auto';
+      console.log('🔄 [SHARE] Đã khôi phục style ban đầu của element');
+
+      // Convert canvas thành blob
+      console.log('💾 [SHARE] Bắt đầu convert canvas thành blob...');
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            console.error('❌ [SHARE] Failed to create image blob');
+            setIsGeneratingImage(false);
+            reject(new Error('Failed to create image blob'));
+            return;
+          }
+
+          console.log('✅ [SHARE] Blob created, size:', blob.size, 'bytes');
+
+          // Tạo File từ blob
+          const file = new File([blob], `share-note-${Date.now()}.png`, {
+            type: 'image/png',
+          });
+          console.log('📁 [SHARE] File created:', {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+          });
+
+          // Upload image lên server
+          console.log('☁️ [SHARE] Bắt đầu upload image lên server...');
+          try {
+            const uploadResult = await apiClient.uploadFile(file);
+            console.log('✅ [SHARE] Upload thành công, full response:', JSON.stringify(uploadResult, null, 2));
+            
+            // Parse URL từ response - API trả về { success: true, data: { url: "..." } }
+            let imageUrl: string | null = null;
+            if (uploadResult?.data?.url) {
+              imageUrl = uploadResult.data.url;
+            } else if (uploadResult?.url) {
+              imageUrl = uploadResult.url;
+            } else if (uploadResult?.data && typeof uploadResult.data === 'string') {
+              // Nếu data là string URL trực tiếp
+              imageUrl = uploadResult.data;
+            }
+            
+            console.log('🔗 [SHARE] Parsed Image URL:', imageUrl);
+            
+            if (!imageUrl) {
+              console.error('❌ [SHARE] Không tìm thấy URL trong response:', uploadResult);
+              setIsGeneratingImage(false);
+              reject(new Error('Không tìm thấy URL ảnh trong response'));
+              return;
+            }
+            
+            setIsGeneratingImage(false);
+            resolve(imageUrl);
+          } catch (uploadError) {
+            console.error('❌ [SHARE] Upload lỗi:', uploadError);
+            setIsGeneratingImage(false);
+            reject(uploadError);
+          }
+        }, 'image/png');
+      });
+    } catch (error) {
+      console.error('❌ [SHARE] Error capturing modal:', error);
+      setIsGeneratingImage(false);
+      return null;
+    }
+  }, []);
+
+  const handleFacebookShare = useCallback(async () => {
     if (!createdWishId) {
       toast({
         title: 'Lỗi',
@@ -438,46 +581,80 @@ export function ShareNoteSection() {
       return;
     }
 
-    // Tạo URL preview cho wish với share page để có meta tags và image
-    const baseUrl =
-      process.env.NEXT_PUBLIC_PUBLIC_URL ||
-      process.env.NEXTAUTH_URL ||
-      'https://tiger-corporation-vietnam.vn';
-    const wishUrl = `${baseUrl}/wishes/share?wishId=${encodeURIComponent(createdWishId || '')}&content=${encodeURIComponent(sharedNoteText || '')}`;
-    const wishTitle = sharedNoteText || 'Lời chúc từ Tiger Mood Corner';
-
-    // Tạo Facebook Share URL với quote parameter
-    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(wishUrl)}&quote=${encodeURIComponent(wishTitle)}`;
-
-    // Mở popup Facebook Share Dialog
-    const popup = window.open(
-      facebookShareUrl,
-      'facebook-share-dialog',
-      'width=800,height=600,scrollbars=yes,resizable=yes'
-    );
-
-    // Kiểm tra nếu popup bị block
-    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+    try {
+      // Hiển thị toast đang xử lý
       toast({
-        title: 'Popup bị chặn',
-        description: 'Vui lòng cho phép popup để chia sẻ.',
+        title: 'Đang xử lý...',
+        description: 'Đang tạo ảnh để chia sẻ.',
+        duration: 2000,
+      });
+
+      // Generate ảnh từ modal và upload lên S3
+      const imageUrl = await captureModalAndUpload();
+      
+      if (!imageUrl) {
+        toast({
+          title: 'Lỗi',
+          description: 'Không thể tạo ảnh để chia sẻ. Vui lòng thử lại.',
+          variant: 'destructive',
+          duration: 4000,
+        });
+        return;
+      }
+
+      console.log('🖼️ [SHARE] Image URL từ upload:', imageUrl);
+
+      // Tạo URL preview cho wish với share page để có meta tags và image
+      const baseUrl =
+        process.env.NEXT_PUBLIC_PUBLIC_URL ||
+        process.env.NEXTAUTH_URL ||
+        'https://tiger-corporation-vietnam.vn';
+      const wishUrl = `${baseUrl}/wishes/share?wishId=${encodeURIComponent(createdWishId || '')}&content=${encodeURIComponent(sharedNoteText || '')}&imageUrl=${encodeURIComponent(imageUrl)}`;
+      const wishTitle = sharedNoteText || 'Lời chúc từ Tiger Mood Corner';
+
+      console.log('🔗 [SHARE] Share URL với imageUrl:', wishUrl);
+
+      // Tạo Facebook Share URL với quote parameter
+      const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(wishUrl)}&quote=${encodeURIComponent(wishTitle)}`;
+
+      // Mở popup Facebook Share Dialog
+      const popup = window.open(
+        facebookShareUrl,
+        'facebook-share-dialog',
+        'width=800,height=600,scrollbars=yes,resizable=yes'
+      );
+
+      // Kiểm tra nếu popup bị block
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        toast({
+          title: 'Popup bị chặn',
+          description: 'Vui lòng cho phép popup để chia sẻ.',
+          variant: 'destructive',
+          duration: 4000,
+        });
+        return;
+      }
+
+      // Focus vào popup
+      if (popup) {
+        popup.focus();
+      }
+
+      // Gọi API share với platform facebook để được cộng điểm
+      shareWishMutation.mutate({ wishId: createdWishId, platform: 'facebook' });
+
+      // Đóng success modal sau khi mở share dialog thành công
+      setShowSuccessModal(false);
+    } catch (error) {
+      console.error('❌ [SHARE] Error in handleFacebookShare:', error);
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể chia sẻ. Vui lòng thử lại.',
         variant: 'destructive',
         duration: 4000,
       });
-      return;
     }
-
-    // Focus vào popup
-    if (popup) {
-      popup.focus();
-    }
-
-    // Gọi API share với platform facebook để được cộng điểm
-    shareWishMutation.mutate({ wishId: createdWishId, platform: 'facebook' });
-
-    // Đóng success modal sau khi mở share dialog thành công
-    setShowSuccessModal(false);
-  }, [createdWishId, sharedNoteText, shareWishMutation, toast]);
+  }, [createdWishId, sharedNoteText, shareWishMutation, toast, captureModalAndUpload]);
 
   return (
     <>
@@ -643,7 +820,7 @@ export function ShareNoteSection() {
           {/* Right: Highlighted Notes - Scrollable */}
           <div 
             ref={notesScrollRef}
-            className="space-y-8 h-full max-h-[700px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
+            className="space-y-8 h-full max-h-[850px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
             style={{ 
               scrollBehavior: 'smooth',
               scrollbarWidth: 'none', /* Firefox */
@@ -870,7 +1047,7 @@ export function ShareNoteSection() {
                     </Button>
                     <Button
                       onClick={handleFacebookShare}
-                      disabled={shareWishMutation.isPending || !createdWishId}
+                      disabled={shareWishMutation.isPending || !createdWishId || isGeneratingImage}
                       className="font-nunito transition-all duration-300 flex items-center justify-center gap-2 flex-1 disabled:opacity-50"
                       style={{ 
                         backgroundColor: '#ffffff',
@@ -888,7 +1065,7 @@ export function ShareNoteSection() {
                         paddingLeft: '16px'
                       }}
                     >
-                      Chia sẻ
+                      {isGeneratingImage ? 'Đang tạo ảnh...' : 'Chia sẻ'}
                       <Image
                         src="/icons/facebook.svg"
                         alt="Facebook"
