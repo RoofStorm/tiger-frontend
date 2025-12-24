@@ -19,7 +19,7 @@ export function ChallengeCardsSection() {
   }, []);
 
   return (
-    <div className="w-screen relative left-1/2 -translate-x-1/2 grid grid-cols-1 lg:grid-cols-2 gap-0 md:mb-16 px-4">
+    <div className="w-screen relative left-1/2 -translate-x-1/2 grid grid-cols-1 lg:grid-cols-2 gap-0 md:mb-16 px-4 lg:top-[-100px]">
       {/* Left - LunchBox Challenge Image */}
       <motion.div 
         className="relative w-full h-[300px] lg:h-[450px] flex items-center justify-center cursor-pointer p-2"
@@ -31,9 +31,9 @@ export function ChallengeCardsSection() {
           {/* Mobile Image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/thuthachnhipsong/lunchbox_challenge_mobile.png"
+            src="/thuthachnhipsong/lunchbox_challenge_mobile.svg"
             alt="LunchBox Challenge"
-            className="w-full h-full object-contain md:hidden"
+            className="object-contain md:hidden"
             fetchPriority="high"
           />
           {/* Desktop Image */}

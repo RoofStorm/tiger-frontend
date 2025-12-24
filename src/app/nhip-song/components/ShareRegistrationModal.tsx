@@ -201,19 +201,6 @@ export function ShareRegistrationModal({
           >
             <div className="px-8 py-8">
               {/* Header Text */}
-              <p 
-                className="font-noto-sans text-center mb-2"
-                style={{
-                  fontFamily: 'Noto Sans',
-                  fontWeight: 400,
-                  fontSize: '14px',
-                  lineHeight: '20px',
-                  color: '#999999',
-                }}
-              >
-                Giữa muôn vàn hối hả, hãy giữ cho mình một nhìn riêng
-              </p>
-
               {/* Title */}
               <h2 
                 className="font-prata text-center mb-2"
@@ -316,7 +303,7 @@ export function ShareRegistrationModal({
                         color: '#333435',
                       }}
                     >
-                      Tên người dùng
+                      Tên đăng nhập
                     </label>
                     <input
                       {...registerForm.register('name')}
@@ -403,7 +390,7 @@ export function ShareRegistrationModal({
                       {...registerForm.register('referralCode')}
                       type="text"
                       id="register-referral-code"
-                      placeholder="Nhập mã mời bạn để nhận 50 điểm"
+                      placeholder="Nhập mã mời"
                       className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       style={{ 
                         backgroundColor: '#FFFFFF',

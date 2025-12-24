@@ -8,7 +8,7 @@ export function LunchboxChallengeIntro() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: 0.45 }}
-      className="mb-2 md:mb-16 mt-2 md:mt-[60px]"
+      className="mb-2 mt-2 md:my-[30px]"
     >
       <div className="flex flex-col items-center space-y-2">
         {/* Title */}

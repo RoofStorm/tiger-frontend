@@ -15,12 +15,12 @@ export function ChallengeContainer({ children }: ChallengeContainerProps) {
           className="relative rounded-lg overflow-hidden"
           style={{
             backgroundImage: 'url(/thuthachnhipsong/thuthachgiunhip_background.png)',
-            backgroundSize: '90%',
-            backgroundPosition: 'center 20px',
+            backgroundSize: '70%',
+            backgroundPosition: 'center 50px',
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="max-w-7xl mx-auto sm:px-2 lg:px-4 pt-12 pb-0 md:pb-12">
+          <div className="max-w-8xl mx-auto sm:px-2 lg:px-4 pt-4 pb-0 md:pb-4">
             {children}
           </div>
         </div>

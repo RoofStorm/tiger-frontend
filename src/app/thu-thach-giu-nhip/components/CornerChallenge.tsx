@@ -21,11 +21,9 @@ export function CornerChallenge() {
 
         {/* Challenge Cards Section - LunchBox and Note Giữ Nhịp */}
         <ChallengeCardsSection />
-
-        {/* Lunchbox Challenge Intro */}
-        <LunchboxChallengeIntro />
       </ChallengeContainer>
-
+      {/* Lunchbox Challenge Intro */}
+      <LunchboxChallengeIntro />
       {/* Lunchbox Upload Section */}
       <LunchboxUploadSection />
 

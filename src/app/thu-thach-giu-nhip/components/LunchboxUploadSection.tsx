@@ -333,7 +333,7 @@ export function LunchboxUploadSection() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
-        className="mt-5 rounded-lg mx-8"
+        className="mt-5 rounded-lg mx-12 md:mx-24 lg:scale-y-[0.8] lg:origin-top"
         style={{ backgroundColor: '#004EA3' }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 lg:gap-12">
@@ -350,7 +350,7 @@ export function LunchboxUploadSection() {
           {/* Right Column - Upload và Input */}
           <div 
             ref={backgroundRef}
-            className="space-y-6 p-8 lg:p-12"
+            className="space-y-6 p-8 lg:p-8 lg:space-y-4"
             style={{ 
               backgroundImage: 'url(/thuthachnhipsong/upload_background.svg)',
               backgroundSize: '200%',

@@ -41,7 +41,7 @@ export function HomePageContent() {
   }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="">
       <main 
         ref={mainRef}
         className="min-h-[calc(100vh-80px)] relative flex flex-col md:block"
@@ -149,15 +149,14 @@ export function HomePageContent() {
 
         {/* Desktop: Product Image Bottom */}
         <div 
-          className="hidden md:block relative w-full z-10 flex justify-center mt-[-150px]"
+          className="hidden md:flex relative w-full z-10 flex justify-center mt-[-170px]"
         >
           <Image
-            src="/trangchu/sanpham.svg"
+            src="/trangchu/sanpham.png"
             alt="Sản phẩm"
             width={1000}
             height={800}
-            className="w-full h-auto object-cover"
-            style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
+            className="w-[80%] h-auto object-contain"
             />
         </div>
       </main>

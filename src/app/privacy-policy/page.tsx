@@ -172,7 +172,7 @@ export default function PrivacyPolicyPage() {
                   Phương thức 2: Gửi email yêu cầu
                 </h3>
                 <p className="text-gray-700 mb-2">
-                  Gửi email đến <strong>trannhuanhvu099@gmail.com</strong> với tiêu đề 
+                  Gửi email đến <strong>rinsocial099@gmail.com</strong> với tiêu đề 
                   <strong> &quot;Yêu cầu xóa dữ liệu Facebook&quot;</strong>
                 </p>
                 <p className="text-gray-700">
@@ -243,10 +243,10 @@ export default function PrivacyPolicyPage() {
               <p className="text-gray-700">
                 <strong>Email:</strong>{' '}
                 <a 
-                  href="mailto:trannhuanhvu099@gmail.com"
+                  href="mailto:rinsocial099@gmail.com"
                   className="text-blue-600 hover:text-blue-800 underline"
                 >
-                  trannhuanhvu099@gmail.com
+                  rinsocial099@gmail.com
                 </a>
               </p>
               <p className="text-gray-700 mt-2">

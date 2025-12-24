@@ -332,7 +332,7 @@ export function LunchboxCarousel() {
   }, [likeMutation, isAuthenticated, toast]);
 
   return (
-    <div className="mt-16 pt-12 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+    <div className="mt-4 pt-6 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
        
         {/* Carousel Section */}
@@ -576,7 +576,7 @@ export function LunchboxCarousel() {
                             alt="Trăm năm giữ nhịp sống"
                             // width={180}
                             // height={54}
-                            className="object-contain w-32 md:w-44"
+                            className="object-contain"
                             // style={{ height: 'auto' }}
                           />
                         </div>
