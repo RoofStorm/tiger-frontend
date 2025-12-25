@@ -63,7 +63,7 @@ export function EmojiGrid({
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
-              <div className="flex items-center justify-center mb-1 h-[4.5rem] sm:h-[5rem]">
+              <div className="flex items-center justify-center mb-1 pl-[15px] h-[4.5rem] sm:h-[5rem]">
                 {emoji.imageUrl ? (
                   <motion.img
                     src={emoji.imageUrl}
