@@ -25,7 +25,7 @@ export function ChallengeHeroSection() {
           <div className="text-center px-4">
             {/* Top text */}
             <p
-              className="font-nunito mb-2"
+              className="font-nunito"
               style={{
                 fontFamily: 'Nunito, sans-serif',
                 fontWeight: 600,
@@ -39,30 +39,29 @@ export function ChallengeHeroSection() {
               Tổng giá trị giải thưởng
             </p>
             {/* Number and unit */}
-            <div className="flex items-center justify-center pl-[65px]">
+            <div className="flex flex-col items-center justify-center">
               <span
                 className="font-nunito font-bold"
                 style={{
                   fontFamily: 'Nunito, sans-serif',
                   fontWeight: 700,
-                  fontSize: '72px',
-                  lineHeight: '72px',
-                  color: ' #FDB022',
+                  fontSize: '54px',
+                  lineHeight: '60px',
+                  color: '#FDB022',
                 }}
               >
-                12
+                12.000.000
               </span>
               <span
                 className="font-nunito"
                 style={{
                   fontFamily: 'Nunito, sans-serif',
-                  fontWeight: 400,
-                  fontSize: '18px',
+                  fontSize: '14px',
                   color: '#000000',
-                  marginLeft: '8px',
+                  fontWeight: 700,
                 }}
               >
-                triệu đồng
+                VNĐ
               </span>
             </div>
           </div>
