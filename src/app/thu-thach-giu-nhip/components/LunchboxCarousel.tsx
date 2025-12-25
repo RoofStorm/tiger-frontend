@@ -472,6 +472,7 @@ export function LunchboxCarousel() {
                                 alt={post.caption || 'Post image'}
                                 fill
                                 className="object-cover"
+                                sizes="(max-width: 768px) 256px, 320px"
                                 unoptimized={
                                   post.imageUrl?.includes('localhost:9000') ||
                                   post.imageUrl?.includes('storage.tiger-corporation-vietnam.vn')

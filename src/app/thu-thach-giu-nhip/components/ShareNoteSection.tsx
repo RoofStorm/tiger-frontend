@@ -301,19 +301,6 @@ export function ShareNoteSection() {
     },
   });
 
-  // Preload LCP image early
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = '/thuthachnhipsong/giadinhancom.png';
-    link.fetchPriority = 'high';
-    document.head.appendChild(link);
-
-    return () => {
-      document.head.removeChild(link);
-    };
-  }, []);
 
   // Auto scroll notes loop
   useEffect(() => {
@@ -739,12 +726,11 @@ export function ShareNoteSection() {
         {/* Highlighted Notes Section */}
         <div 
           id="highlighted-notes-section"
-          className="mt-4 mb-8 mx-24 min-h-[500px] bg-center md:bg-[top_right] rounded-3xl"
+          className="mt-4 mb-8 mx-24 min-h-[500px] bg-center md:bg-[top_right] rounded-3xl md:max-h-[650px] lg:max-h-[750px]  "
           style={{
             backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.png)',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
-            maxHeight: '650px',
             // position: 'relative',
             // top:'15px'
           }}
@@ -868,6 +854,7 @@ export function ShareNoteSection() {
                           alt={wish.user?.name || 'User avatar'}
                           fill
                           className="object-cover"
+                          sizes="40px"
                         />
                       ) : (
                         <Image
