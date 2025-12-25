@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   output: 'standalone',
   images: {
+    qualities: [75, 90, 100],
     remotePatterns: [
       {
         protocol: 'https',
@@ -51,15 +52,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'example.com',
+        hostname: 'storage.tiger-corporation-vietnam.vn',
       },
       {
         protocol: 'https',
         hostname: 'tiger-minio.fly.dev',
-      },
-      {
-        protocol: 'https',
-        hostname: 'storage.tiger-corporation-vietnam.vn',
       },
     ],
   },

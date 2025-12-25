@@ -689,6 +689,7 @@ export function ShareNoteSection() {
                     alt="User avatar"
                     fill
                     className="object-cover"
+                    sizes="48px"
                   />
                 </div>
                 <span className="text-lg font-medium text-gray-700">
@@ -874,6 +875,7 @@ export function ShareNoteSection() {
                           alt="Default avatar"
                           fill
                           className="object-cover"
+                          sizes="40px"
                         />
                       )}
                     </div>
@@ -940,6 +942,7 @@ export function ShareNoteSection() {
                       width={120}
                       height={40}
                       className="object-contain"
+                      style={{ width: "auto", height: "auto" }}
                     />
                   </div>
 

@@ -68,7 +68,6 @@ export function HomePageContent() {
               height={800}
               className="w-full h-auto object-cover"
               style={{ maxWidth: '100%', height: 'auto', display: 'block' }}
-              priority
             />
           </div>
         </div>
@@ -157,6 +156,9 @@ export function HomePageContent() {
             width={1000}
             height={800}
             className="w-[80%] h-auto object-contain"
+            sizes="(max-width: 768px) 100vw, (max-width: 1536px) 80vw, 1536px"
+            priority
+            quality={90}
             />
         </div>
       </main>

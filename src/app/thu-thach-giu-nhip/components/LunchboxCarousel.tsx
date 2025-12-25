@@ -526,6 +526,7 @@ export function LunchboxCarousel() {
                                 alt="Slide example"
                                 fill
                                 className="object-cover"
+                                sizes="(max-width: 768px) 256px, 320px"
                               />
                               {/* Tiger Logo - Centered Top */}
                               <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10">

@@ -346,6 +346,7 @@ export function LunchboxUploadSection() {
               alt="Upload section"
               fill
               className="object-cover object-center lg:object-cover rounded-lg"
+              sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </div>
 
@@ -660,6 +661,7 @@ export function LunchboxUploadSection() {
                         width={120}
                         height={40}
                         className="object-contain"
+                        style={{ width: "auto", height: "auto" }}
                       />
                     </div>
 
