@@ -987,11 +987,13 @@ export function ShareNoteSection() {
                     {/* TRĂM NĂM GIỮ TRỌN nhịp sống */}
                     <div className="flex justify-center">
                       <Image
-                        src="/thuthachnhipsong/tramnamgiunhipsong.svg"
+                        src="/thuthachnhipsong/tramnamgiunhipsong.png"
                         alt="Trăm năm giữ trọn nhịp sống"
                         width={240}
                         height={72}
-                        className="object-contain w-40 md:w-60"
+                        className="max-w-[100px] md:max-w-[140px]"
+                        sizes="(max-width: 768px) 100px, 140px"
+                        quality={90}
                       />
                     </div>
                   </div>

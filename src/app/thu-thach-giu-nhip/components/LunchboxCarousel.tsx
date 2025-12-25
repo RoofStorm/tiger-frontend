@@ -577,8 +577,8 @@ export function LunchboxCarousel() {
                             alt="Trăm năm giữ nhịp sống"
                             width={200}
                             height={60}
-                            className="max-w-[100px] md:max-w-[140px] lg:max-w-[200px]"
-                            sizes="(max-width: 768px) 100px, (max-width: 1536px) 140px, 200px"
+                            className="max-w-[100px] md:max-w-[140px]"
+                            sizes="(max-width: 768px) 100px, 140px"
                             quality={90}
                           />
                         </div>
