@@ -4,11 +4,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Gift, Calendar, Star, LogOut, Home, RefreshCw } from 'lucide-react';
+import { Gift, Calendar, Star, LogOut, Home, RefreshCw, ChefHat } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
-import ReferralSection from '@/components/ReferralSection';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
@@ -52,32 +51,6 @@ export default function ProfilePage() {
       queryClient.refetchQueries({ queryKey: ['referralStats'] });
     }
   }, [isAuthenticated, user?.id, queryClient]);
-
-  // Function to scroll to corner
-  const scrollToCorner = (cornerId: string) => {
-    navigateWithLoading('/', 'Đang chuyển về trang chủ...');
-    setTimeout(() => {
-      const element = document.getElementById(cornerId);
-      if (element) {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-      } else {
-        // Try again after a longer delay
-        setTimeout(() => {
-          const retryElement = document.getElementById(cornerId);
-          if (retryElement) {
-            retryElement.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          } else {
-          }
-        }, 500);
-      }
-    }, 300);
-  };
 
   // Fetch user details including points
   const { data: userDetails } = useQuery({
@@ -138,7 +111,16 @@ export default function ProfilePage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: 'url(/uudai/traodoinhipsong_background.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
+        }}
+      >
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
             Cần đăng nhập
@@ -155,8 +137,17 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-20">
-      <div className="max-w-4xl mx-auto px-4">
+    <div 
+      className="min-h-screen py-20"
+      style={{
+        backgroundImage: 'url(/uudai/traodoinhipsong_background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'top',
+        backgroundRepeat: 'no-repeat',
+        // backgroundAttachment: 'fixed',
+      }}
+    >
+      <div className="max-w-6xl mx-auto px-4">
         {/* Profile Header */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
@@ -459,65 +450,86 @@ export default function ProfilePage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-8 grid md:grid-cols-3 gap-6">
-          <button
-            onClick={() => scrollToCorner('corner-1')}
-            className="group h-full text-left"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow h-full flex flex-col">
-              <div className="flex items-center space-x-4 flex-1">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-xl">😊</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 group-hover:text-purple-600">
-                    Tạo Mood Card
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    Chia sẻ cảm xúc của bạn
-                  </p>
+        <div className="bg-white rounded-2xl shadow-lg p-8 mt-6">
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <button
+              onClick={() => navigateWithLoading('/nhip-song', 'Đang chuyển về trang nhịp sống...')}
+              className="group h-full text-left"
+            >
+              <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors h-full flex flex-col">
+                <div className="flex items-center space-x-4 flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-bold text-xl">😊</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-purple-600">
+                      Tạo emoji card
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Chia sẻ cảm xúc của bạn
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </button>
+            </button>
 
-          <button
-            onClick={() => scrollToCorner('corner-2')}
-            className="group h-full text-left"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow h-full flex flex-col">
-              <div className="flex items-center space-x-4 flex-1">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-xl">📸</span>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
-                    Chia sẻ ảnh
-                  </h3>
-                  <p className="text-sm text-gray-600">Kết nối với cộng đồng</p>
+            <button
+              onClick={() => navigateWithLoading('/thu-thach-giu-nhip', 'Đang chuyển về trang thử thách giữ nhịp...')}
+              className="group h-full text-left"
+            >
+              <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors h-full flex flex-col">
+                <div className="flex items-center space-x-4 flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-bold text-xl">📸</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                      Chia sẻ ảnh
+                    </h3>
+                    <p className="text-sm text-gray-600">Tham gia Thử thách giữ nhịp</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </button>
+            </button>
 
-          <button
-            onClick={() => scrollToCorner('corner-4')}
-            className="group h-full text-left"
-          >
-            <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow h-full flex flex-col">
-              <div className="flex items-center space-x-4 flex-1">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Gift className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 group-hover:text-green-600">
-                    Đổi quà
-                  </h3>
-                  <p className="text-sm text-gray-600">Sử dụng điểm của bạn</p>
+            <Link href="/nhip-bep" className="group h-full">
+              <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors h-full flex flex-col">
+                <div className="flex items-center space-x-4 flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <ChefHat className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-orange-600">
+                      Tips cho căn bếp
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Khám phá sản phẩm của TIGER
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </button>
+            </Link>
+
+            <button
+              onClick={() => navigateWithLoading('/doi-qua', 'Đang chuyển về trang đổi quà...')}
+              className="group h-full text-left"
+            >
+              <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors h-full flex flex-col">
+                <div className="flex items-center space-x-4 flex-1">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Gift className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-green-600">
+                      Đổi quà
+                    </h3>
+                    <p className="text-sm text-gray-600">Sử dụng điểm năng lượng của bạn</p>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Referral Section */}

@@ -58,6 +58,9 @@ module.exports = {
             600: '#00579F',
           },
         },
+        cream: {
+          DEFAULT: '#FBF9F3',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
