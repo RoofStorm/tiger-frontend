@@ -726,7 +726,7 @@ export function ShareNoteSection() {
         {/* Highlighted Notes Section */}
         <div 
           id="highlighted-notes-section"
-          className="mt-4 mb-8 mx-24 min-h-[500px] bg-center md:bg-[top_right] rounded-3xl md:max-h-[650px] lg:max-h-[800px]  "
+          className="mt-4 mb-8 mx-6 md:mx-24 min-h-[500px] bg-center md:bg-[top_right] rounded-3xl md:max-h-[650px] lg:max-h-[800px]  "
           style={{
             backgroundImage: 'url(/thuthachnhipsong/highlightedNote_background.png)',
             backgroundSize: 'cover',

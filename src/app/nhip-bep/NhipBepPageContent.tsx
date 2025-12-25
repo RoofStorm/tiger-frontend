@@ -93,7 +93,7 @@ const baseProducts: Product[] = [
     ]
   },
   {
-    image: '/nhipbep/hopcom.svg',
+    image: '/nhipbep/hopcom.png',
     label: 'Hộp cơm',
     fullName: 'Hộp cơm Tiger',
     benefits: [
@@ -103,7 +103,7 @@ const baseProducts: Product[] = [
     ]
   },
   {
-    image: '/nhipbep/mayxay.svg',
+    image: '/nhipbep/mayxay.png',
     label: 'Máy xay',
     fullName: 'Máy xay Tiger',
     benefits: [
@@ -519,6 +519,7 @@ export function NhipBepPageContent() {
                                   src={product.image}
                                   alt={product.label}
                                   fill
+                                  sizes="(max-width: 768px) 180px, 180px"
                                   className="object-contain"
                                 />
                               </div>
