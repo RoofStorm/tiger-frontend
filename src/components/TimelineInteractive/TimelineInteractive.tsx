@@ -106,9 +106,9 @@ export function TimelineInteractive() {
   //   : null;
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full justify-center items-center">
       <img
-        src="/nhipbep/timeline.svg"
+        src="/nhipbep/timeline.png"
         alt="Timeline"
         // width={1920}
         // height={400}
