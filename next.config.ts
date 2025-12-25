@@ -56,6 +56,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 's3.tiger-corporation-vietnam.vn',
+      },
+      {
+        protocol: 'https',
         hostname: 'tiger-minio.fly.dev',
       },
     ],

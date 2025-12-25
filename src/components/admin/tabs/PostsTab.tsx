@@ -344,6 +344,9 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
                           ) ||
                           (post.imageUrl || post.url || '').includes(
                             'storage.tiger-corporation-vietnam.vn'
+                          ) ||
+                          (post.imageUrl || post.url || '').includes(
+                            's3.tiger-corporation-vietnam.vn'
                           )
                         }
                       />
@@ -473,9 +476,11 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
               fill
               className="object-contain"
               sizes="(max-width: 768px) 100vw, 768px"
-              unoptimized={selectedImageUrl.includes(
-                'platform-lookaside.fbsbx.com'
-              )}
+              unoptimized={
+                selectedImageUrl.includes('platform-lookaside.fbsbx.com') ||
+                selectedImageUrl.includes('storage.tiger-corporation-vietnam.vn') ||
+                selectedImageUrl.includes('s3.tiger-corporation-vietnam.vn')
+              }
             />
           )}
           {/* Close button inside content */}
