@@ -73,7 +73,7 @@ interface Product {
 
 const baseProducts: Product[] = [
   {
-    image: '/nhipbep/noicom.svg',
+    image: '/nhipbep/noicom.png',
     label: 'Nồi cơm điện',
     fullName: 'Nồi cơm điện Tiger',
     benefits: [
@@ -83,7 +83,7 @@ const baseProducts: Product[] = [
     ]
   },
   {
-    image: '/nhipbep/binhgiunhiet.svg',
+    image: '/nhipbep/binhgiunhiet.png',
     label: 'Bình giữ nhiệt',
     fullName: 'Bình giữ nhiệt Tiger',
     benefits: [

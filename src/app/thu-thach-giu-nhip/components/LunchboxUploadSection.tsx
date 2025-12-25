@@ -392,7 +392,8 @@ export function LunchboxUploadSection() {
                       alt="Upload"
                       width={48}
                       height={48}
-                      className="w-12 h-auto"
+                      className="object-contain"
+                      sizes="(max-width: 768px) 48px, 48px"
                     />
                   </div>
                 </div>
