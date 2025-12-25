@@ -692,7 +692,7 @@ export function LunchboxUploadSection() {
                                 alt="Uploaded image"
                                 fill
                                 className="object-cover"
-                                unoptimized={uploadedImageUrl.includes('storage.tiger-corporation-vietnam.vn')}
+                                sizes="(max-width: 768px) 180px, 200px"
                                 onError={() => setImageError(true)}
                               />
                             ) : (

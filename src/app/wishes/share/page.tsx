@@ -146,7 +146,7 @@ export default async function WishSharePage({
                 width={400}
                 height={300}
                 className="rounded-lg"
-                unoptimized
+                sizes="(max-width: 768px) 400px, 800px"
               />
             </div>
           </div>

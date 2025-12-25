@@ -113,7 +113,7 @@ export default async function SharePage({
                 width={800}
                 height={600}
                 className="w-full h-auto rounded-lg"
-                unoptimized
+                sizes="(max-width: 768px) 800px, 1200px"
               />
             </div>
           )}

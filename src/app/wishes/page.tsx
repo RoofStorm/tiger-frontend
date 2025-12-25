@@ -212,9 +212,7 @@ export default function WishesPage() {
                       width={64}
                       height={64}
                       className="w-16 h-16 rounded-full object-cover"
-                      unoptimized={user.image.includes(
-                        'platform-lookaside.fbsbx.com'
-                      )}
+                      sizes="64px"
                     />
                   ) : (
                     <span className="text-white font-bold text-xl">

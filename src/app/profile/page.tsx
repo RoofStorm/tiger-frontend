@@ -160,9 +160,7 @@ export default function ProfilePage() {
                   width={96}
                   height={96}
                   className="w-24 h-24 rounded-full object-cover"
-                  unoptimized={user.image.includes(
-                    'platform-lookaside.fbsbx.com'
-                  )}
+                  sizes="96px"
                   onError={e => {
                     // Hide the image and show fallback
                     e.currentTarget.style.display = 'none';

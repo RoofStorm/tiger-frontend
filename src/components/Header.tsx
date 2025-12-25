@@ -272,9 +272,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                             width={32}
                             height={32}
                             className="w-8 h-8 rounded-full object-cover"
-                            unoptimized={user.image.includes(
-                              'platform-lookaside.fbsbx.com'
-                            )}
+                            sizes="32px"
                           />
                         ) : (
                           <User className="w-5 h-5" style={{ color: '#00579F' }} />
