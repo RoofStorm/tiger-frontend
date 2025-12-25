@@ -114,6 +114,8 @@ export default async function SharePage({
                 height={600}
                 className="w-full h-auto rounded-lg"
                 sizes="(max-width: 768px) 800px, 1200px"
+                priority
+                quality={90}
               />
             </div>
           )}

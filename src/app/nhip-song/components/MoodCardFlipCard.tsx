@@ -187,6 +187,7 @@ export function MoodCardFlipCard({
                     className="object-contain"
                     priority
                     sizes="(max-width: 768px) 100vw, 880px"
+                    quality={90}
                   />
                 </div>
               </div>
@@ -344,6 +345,7 @@ export function MoodCardFlipCard({
             className="object-contain"
             priority
             sizes="543px"
+            quality={90}
           />
           <div className="absolute inset-0 flex-1 p-4 md:p-8 flex flex-col items-center justify-center" style={{ height: '80%', marginTop: '130px' }}>
             <div className="flex flex-col items-center justify-center w-full max-w-xs relative z-10">

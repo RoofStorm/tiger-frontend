@@ -22,8 +22,8 @@ const getBackgroundImage = (): string => {
   const cacheBuster = Math.floor(now.getTime() / (1000 * 60 * 60)); // Thay đổi mỗi giờ
   
   const bgImage = isDark 
-    ? `url(/nhipsong/nhipsong_dark_background.svg?v=${cacheBuster})`
-    : `url(/nhipsong/nhipsong_light_background.svg?v=${cacheBuster})`;
+    ? `url(/nhipsong/nhipsong_dark_background.jpg?v=${cacheBuster})`
+    : `url(/nhipsong/nhipsong_light_background.jpg?v=${cacheBuster})`;
   
   console.log('getBackgroundImage - hour:', hour, 'isDark:', isDark, 'bgImage:', bgImage);
   
@@ -59,6 +59,20 @@ export function NhipSongPageContent() {
     console.log('backgroundImage state changed to:', backgroundImage);
     console.log('isDark state changed to:', isDark);
   }, [backgroundImage, isDark]);
+
+  // Preload background images để tối ưu hóa hiệu năng
+  useEffect(() => {
+    // Preload cả 2 background images (dark và light) để tránh delay khi switch
+    const preloadImages = () => {
+      const darkBg = new Image();
+      darkBg.src = '/nhipsong/nhipsong_dark_background.jpg';
+      
+      const lightBg = new Image();
+      lightBg.src = '/nhipsong/nhipsong_light_background.jpg';
+    };
+
+    preloadImages();
+  }, []);
 
   // Cập nhật background image và dark mode dựa trên thời gian
   // Chỉ chạy trên client side sau khi component mount để tránh SSR/hydration mismatch
@@ -387,7 +401,7 @@ export function NhipSongPageContent() {
     <div>
       <main 
         style={{
-          backgroundImage: backgroundImage || 'url(/nhipsong/nhipsong_light_background.svg)',
+          backgroundImage: backgroundImage || 'url(/nhipsong/nhipsong_light_background.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: isDark ? 'center' : 'bottom',
           backgroundRepeat: 'no-repeat',
