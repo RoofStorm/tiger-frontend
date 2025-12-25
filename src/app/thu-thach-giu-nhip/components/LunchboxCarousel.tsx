@@ -572,11 +572,14 @@ export function LunchboxCarousel() {
 
                         {/* Bottom Section - tramnamnhipsong image */}
                         <div className="flex justify-center items-center pb-2 px-2 flex-shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src="/thuthachnhipsong/tramnamgiunhipsong.svg"
+                          <Image
+                            src="/thuthachnhipsong/tramnamgiunhipsong.png"
                             alt="Trăm năm giữ nhịp sống"
-                            className="object-contain max-w-[100px] md:max-w-none"
+                            width={200}
+                            height={60}
+                            className="max-w-[100px] md:max-w-[140px] lg:max-w-[200px]"
+                            sizes="(max-width: 768px) 100px, (max-width: 1536px) 140px, 200px"
+                            quality={90}
                           />
                         </div>
                       </div>

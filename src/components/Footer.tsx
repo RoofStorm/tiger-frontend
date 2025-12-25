@@ -230,7 +230,7 @@ export function Footer() {
               onToggle={() => toggleSection('kinh-doanh')}
             >
               <ul className="space-y-4 text-center md:text-left">
-                <li><FooterLink href="https://www.tiger-corporation.com/vi/vnm/support/inquiry/business/">Kinh doanh</FooterLink></li>
+                {/* <li><FooterLink href="https://www.tiger-corporation.com/vi/vnm/support/inquiry/business/">Kinh doanh</FooterLink></li> */}
               </ul>
             </FooterSection>
             <FooterSection
@@ -241,7 +241,7 @@ export function Footer() {
               isLast={true}
             >
               <ul className="space-y-4 text-center md:text-left">
-                <li><FooterLink href="https://www.tiger-corporation.com/vi/vnm/where-to-buy/">Nơi để mua</FooterLink></li>
+                {/* <li><FooterLink href="https://www.tiger-corporation.com/vi/vnm/where-to-buy/">Nơi để mua</FooterLink></li> */}
               </ul>
             </FooterSection>
           </div>

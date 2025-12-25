@@ -660,7 +660,7 @@ export function ShareNoteSection() {
             }}
           >
             <h3 className="font-prata text-white text-center relative z-10 px-6 sm:px-8 md:px-0 text-3xl sm:text-4xl">
-              Viết Note ngay<br />ngay!
+              Viết note<br />ngay!
             </h3>
           </div>
 
