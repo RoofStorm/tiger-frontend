@@ -195,18 +195,17 @@ export function MoodCardFlipCard({
               {/* Front of Card (Content) */}
               <div
                 ref={cardContentRef}
-                className="absolute inset-0 w-full h-full flex flex-col"
+                className="absolute inset-0 w-full h-full flex flex-col bg-contain md:bg-cover"
                 style={{
                   backfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
                   backgroundImage: 'url(/nhipsong/card_content1.png)',
-                  backgroundSize: 'contain',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat',
                 }}
               >
                 {/* Main Content Section - 80% height */}
-                <div className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-y-auto mt-[190px]" style={{ height: '80%'}}>
+                <div className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-hidden mt-[190px] md:mt-[140px] 2xl:mt-[190px]" style={{ height: '80%'}}>
                   {/* Content wrapper */}
                   <div className="flex flex-col items-center justify-center w-full max-w-xs">
                     {/* Whisper Section */}
@@ -214,7 +213,7 @@ export function MoodCardFlipCard({
                       <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
                         Whisper:
                       </h3>
-                      <p className="text-white leading-relaxed text-xs md:text-sm max-w-[200px] md:max-w-none mx-auto" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
+                      <p className="text-white leading-relaxed text-xs md:text-sm max-w-[300px] md:max-w-none mx-auto" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
                         {whisper}
                       </p>
                     </div>
@@ -224,7 +223,7 @@ export function MoodCardFlipCard({
                       <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
                         Reminder:
                       </h3>
-                      <p className="text-white leading-relaxed text-xs md:text-sm max-w-[200px] md:max-w-none mx-auto" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
+                      <p className="text-white leading-relaxed text-xs md:text-sm max-w-[300px] md:max-w-none mx-auto" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
                         {reminder}
                       </p>
                     </div>
@@ -342,12 +341,12 @@ export function MoodCardFlipCard({
             src="/nhipsong/card_content1.png"
             alt="Card Background"
             fill
-            className="object-contain"
+            className="object-cover"
             priority
             sizes="543px"
             quality={90}
           />
-          <div className="absolute inset-0 flex-1 p-4 md:p-8 flex flex-col items-center justify-center" style={{ height: '80%', marginTop: '130px' }}>
+          <div className="absolute inset-0 flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-hidden" style={{ height: '80%', marginTop: '70px' }}>
             <div className="flex flex-col items-center justify-center w-full max-w-xs relative z-10">
               {/* Whisper Section */}
               <div className="mb-4 text-center">
