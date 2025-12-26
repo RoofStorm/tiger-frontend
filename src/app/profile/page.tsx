@@ -203,14 +203,14 @@ export default function ProfilePage() {
                     <span>Trang chủ</span>
                   </Button>
                 </Link>
-                <Button
+                {/* <Button
                   variant="outline"
                   onClick={logout}
                   className="text-red-600 hover:text-red-800 hover:bg-red-50 border-red-200 hover:border-red-300 transition-colors"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
-                  Đăng xuất
-                </Button>
+                  Đăng xuất 2
+                </Button> */}
               </div>
 
               {/* Stats Grid */}

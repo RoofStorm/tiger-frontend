@@ -253,7 +253,7 @@ export function Footer() {
         {/* Lower Section - Social Media Icons */}
         <div className="flex justify-center items-center gap-6">
           <Link
-            href="#"
+            href="https://www.facebook.com/tiger.vietnam"
             className="hover:opacity-80 transition-opacity"
             aria-label="Facebook"
           >
@@ -266,7 +266,7 @@ export function Footer() {
             />
           </Link>
           <Link
-            href="#"
+            href="https://www.instagram.com/tiger.vietnam/"
             className="hover:opacity-80 transition-opacity"
             aria-label="Instagram"
           >
@@ -279,7 +279,7 @@ export function Footer() {
             />
           </Link>
           <Link
-            href="#"
+            href="https://www.youtube.com/playlist?list=PLWZD9SRMWifAhasnLWwID_8f-JYDcD5tZ"
             className="hover:opacity-80 transition-opacity"
             aria-label="YouTube"
           >
