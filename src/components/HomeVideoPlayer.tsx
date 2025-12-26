@@ -35,8 +35,9 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
 
   // TEMPORARY: Sử dụng URL trực tiếp thay vì fetch từ API
   // TODO: Sau này sẽ quay lại fetch signed URL từ backend
+  // Xử lý CORS bằng cách fetch video qua blob và tạo object URL
   useEffect(() => {
-    const loadVideoUrl = () => {
+    const loadVideoUrl = async () => {
       if (!videoRef.current) return;
 
       // URL tạm thời
@@ -54,15 +55,44 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       addDebugLog(`🎬 Browser H.264 support: ${h264Support || 'no'}`);
 
       try {
-        addDebugLog(`🔗 Setting video URL: ${videoUrl}`);
-        videoRef.current.src = videoUrl;
-        addDebugLog('✅ Loaded video with direct URL');
-        addDebugLog(`🔗 Video URL: ${videoUrl.substring(0, 100)}...`);
+        addDebugLog(`🔗 Fetching video via blob to avoid CORS: ${videoUrl}`);
+        
+        // Fetch video qua blob để tránh CORS
+        const response = await fetch(videoUrl, {
+          mode: 'cors',
+          credentials: 'omit',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        
+        addDebugLog(`✅ Created blob URL from video`);
+        videoRef.current.src = blobUrl;
+        addDebugLog('✅ Loaded video with blob URL (CORS handled)');
+        
+        // Cleanup blob URL khi component unmount
+        return () => {
+          URL.revokeObjectURL(blobUrl);
+        };
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        addDebugLog(`❌ Error setting video URL: ${errorMsg}`);
-        setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra kết nối mạng.`);
-        setIsLoading(false);
+        addDebugLog(`❌ Error fetching video: ${errorMsg}`);
+        
+        // Fallback: thử set URL trực tiếp (không có crossOrigin)
+        addDebugLog(`🔄 Trying direct URL without CORS...`);
+        try {
+          videoRef.current.src = videoUrl;
+          addDebugLog('✅ Fallback: Using direct URL');
+        } catch (fallbackError) {
+          const fallbackMsg = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
+          addDebugLog(`❌ Fallback also failed: ${fallbackMsg}`);
+          setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra kết nối mạng hoặc CORS settings.`);
+          setIsLoading(false);
+        }
       }
     };
 
@@ -278,7 +308,6 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
           playsInline
           autoPlay
           preload="metadata"
-          crossOrigin="anonymous"
         >
           {/* Video URL will be loaded dynamically via Signed URL */}
           Your browser does not support the video tag.
