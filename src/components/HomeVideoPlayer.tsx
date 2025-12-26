@@ -21,9 +21,18 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
   const [isLoading, setIsLoading] = useState(true);
   const [hasShownIntro, setHasShownIntro] = useState(false);
   const [useFallback, setUseFallback] = useState(false);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
 
   // Sử dụng context để chia sẻ trạng thái video
   const { setIsVideoPlaying } = useVideo();
+
+  // Helper function để thêm debug log
+  const addDebugLog = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logMessage = `[${timestamp}] ${message}`;
+    console.log(logMessage);
+    setDebugLogs((prev) => [...prev.slice(-19), logMessage]); // Giữ tối đa 20 logs
+  };
 
   // Fetch signed URL from backend - hardcode filename "tiger 11.mp4"
   useEffect(() => {
@@ -35,45 +44,57 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       const videoFilename = 'tiger 11.mp4'; // Hardcode filename
       const fallbackUrl = `${apiUrl}/storage/video/${encodeURIComponent(videoFilename)}`;
 
+      addDebugLog('🔄 Starting to fetch video URL...');
+      addDebugLog(`📡 API URL: ${apiUrl}`);
+      addDebugLog(`📁 Video filename: ${videoFilename}`);
+
       // Nếu đã dùng fallback, không thử lại signed URL
       if (useFallback) {
         videoRef.current.src = fallbackUrl;
-        console.log('⚠️ Using fallback streaming endpoint (CORS issue)');
+        addDebugLog('⚠️ Using fallback streaming endpoint (CORS issue)');
+        addDebugLog(`🔗 Fallback URL: ${fallbackUrl}`);
         return;
       }
 
       try {
-        const response = await fetch(
-          `${apiUrl}/storage/video-signed/${encodeURIComponent(videoFilename)}`
-        );
+        const signedUrl = `${apiUrl}/storage/video-signed/${encodeURIComponent(videoFilename)}`;
+        addDebugLog(`🌐 Fetching signed URL: ${signedUrl}`);
+        
+        const response = await fetch(signedUrl);
+        addDebugLog(`📥 Response status: ${response.status} ${response.statusText}`);
+        
         if (response.ok) {
           const result = await response.json();
+          addDebugLog(`📦 Response data: ${JSON.stringify(result).substring(0, 200)}...`);
+          
           // API response format: { success: true, data: { url: "..." }, message: "Success" }
           const videoUrl = result.data?.url;
           if (videoUrl) {
             videoRef.current.src = videoUrl;
-            console.log(
-              '✅ Loaded video with Signed URL from Cloudflare R2:',
-              videoUrl
-            );
+            addDebugLog('✅ Loaded video with Signed URL from Cloudflare R2');
+            addDebugLog(`🔗 Video URL: ${videoUrl.substring(0, 100)}...`);
           } else {
             // Fallback to NestJS streaming endpoint
             setUseFallback(true);
             videoRef.current.src = fallbackUrl;
-            console.log('⚠️ No URL in response, using fallback');
+            addDebugLog('⚠️ No URL in response, using fallback');
+            addDebugLog(`🔗 Fallback URL: ${fallbackUrl}`);
           }
         } else {
           // Fallback to NestJS streaming endpoint
           setUseFallback(true);
           videoRef.current.src = fallbackUrl;
-          console.log('⚠️ Using fallback streaming endpoint');
+          addDebugLog(`⚠️ Response not OK (${response.status}), using fallback`);
+          addDebugLog(`🔗 Fallback URL: ${fallbackUrl}`);
         }
       } catch (error) {
-        console.error('❌ Error fetching signed URL:', error);
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        addDebugLog(`❌ Error fetching signed URL: ${errorMsg}`);
         // Fallback to NestJS streaming endpoint
         setUseFallback(true);
         if (videoRef.current) {
           videoRef.current.src = fallbackUrl;
+          addDebugLog(`🔗 Using fallback URL: ${fallbackUrl}`);
         }
       }
     };
@@ -88,16 +109,21 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
     const handleLoadedMetadata = () => {
       setIsVideoReady(true);
       setIsLoading(false);
-      console.log('✅ Video metadata loaded successfully');
-      console.log('📹 Video source:', video.currentSrc);
-      console.log('⏱️ Video duration:', video.duration, 'seconds');
+      addDebugLog('✅ Video metadata loaded successfully');
+      addDebugLog(`📹 Video source: ${video.currentSrc?.substring(0, 100)}...`);
+      addDebugLog(`⏱️ Video duration: ${video.duration} seconds`);
+      addDebugLog(`📐 Video dimensions: ${video.videoWidth}x${video.videoHeight}`);
     };
     const handleCanPlay = () => {
       setIsVideoReady(true);
       setIsLoading(false);
+      addDebugLog('▶️ Video can play');
       // Auto play khi video ready
-      video.play().catch((err) => {
-        console.error('Auto play failed:', err);
+      video.play().then(() => {
+        addDebugLog('✅ Auto play started');
+      }).catch((err) => {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        addDebugLog(`❌ Auto play failed: ${errorMsg}`);
       });
     };
     const handlePlay = () => {
@@ -122,9 +148,18 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       const video = e.target as HTMLVideoElement;
       const error = video.error;
       
+      let errorDetails = 'Unknown error';
+      if (error) {
+        errorDetails = `Code: ${error.code}, Message: ${error.message || 'No message'}`;
+        addDebugLog(`❌ Video error: ${errorDetails}`);
+        addDebugLog(`📹 Current source: ${video.currentSrc?.substring(0, 100)}...`);
+        addDebugLog(`🔄 Network state: ${video.networkState}`);
+        addDebugLog(`📊 Ready state: ${video.readyState}`);
+      }
+      
       // Nếu đang dùng signed URL từ Cloudflare R2 và gặp lỗi, thử fallback
       if (error && video.currentSrc.includes('cloudflarestorage.com') && !useFallback) {
-        console.warn('⚠️ Error loading video from Cloudflare R2 (possibly CORS), switching to fallback:', error);
+        addDebugLog('⚠️ Error loading from Cloudflare R2, switching to fallback');
         
         // Switch to fallback streaming endpoint
         setUseFallback(true);
@@ -133,7 +168,9 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
         const videoFilename = 'tiger 11.mp4';
         // Remove crossOrigin để tránh CORS issue với fallback
         video.removeAttribute('crossorigin');
-        video.src = `${apiUrl}/storage/video/${encodeURIComponent(videoFilename)}`;
+        const fallbackUrl = `${apiUrl}/storage/video/${encodeURIComponent(videoFilename)}`;
+        video.src = fallbackUrl;
+        addDebugLog(`🔗 Switching to fallback: ${fallbackUrl}`);
         setVideoError(null);
         setIsLoading(true);
         return;
@@ -141,8 +178,8 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       
       // Nếu đã dùng fallback mà vẫn lỗi, hiển thị error message
       if (useFallback || !video.currentSrc.includes('cloudflarestorage.com')) {
-        console.warn('Video loading error:', e, error);
-        setVideoError('Video loading failed. Please try refreshing the page.');
+        addDebugLog('❌ Video loading failed after fallback');
+        setVideoError(`Video loading failed: ${errorDetails}`);
         setIsLoading(false);
       }
     };
@@ -150,7 +187,8 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       setVideoError(null);
       setIsVideoReady(false);
       setIsLoading(true);
-      console.log('🎬 Video loading started...');
+      addDebugLog('🎬 Video loading started...');
+      addDebugLog(`📹 Video source: ${video.src?.substring(0, 100)}...`);
     };
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -203,7 +241,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       <div className="absolute inset-0 z-0">
         <video
           ref={videoRef}
-          className="w-full h-full object-cover"
+          className="w-full h-full md:h-auto object-contain"
           muted={isMuted}
           playsInline
           autoPlay
@@ -295,6 +333,43 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
           </div>
         </div>
       )}
+
+      {/* Debug Panel - hiển thị logs trên màn hình */}
+      <div className="absolute top-20 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 bg-black/90 text-white text-xs p-4 rounded-lg max-h-[60vh] overflow-y-auto">
+        <div className="flex justify-between items-center mb-2">
+          <h4 className="font-bold text-sm">🔍 Debug Logs</h4>
+          <button
+            onClick={() => setDebugLogs([])}
+            className="px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs"
+          >
+            Clear
+          </button>
+        </div>
+        <div className="space-y-1 font-mono">
+          {debugLogs.length === 0 ? (
+            <p className="text-gray-400">No logs yet...</p>
+          ) : (
+            debugLogs.map((log, index) => (
+              <div key={index} className="text-xs break-words">
+                {log}
+              </div>
+            ))
+          )}
+        </div>
+        <div className="mt-2 pt-2 border-t border-gray-700 text-xs">
+          <div>Video Ready: {isVideoReady ? '✅' : '❌'}</div>
+          <div>Loading: {isLoading ? '⏳' : '✅'}</div>
+          <div>Playing: {isPlaying ? '▶️' : '⏸️'}</div>
+          <div>Muted: {isMuted ? '🔇' : '🔊'}</div>
+          <div>Use Fallback: {useFallback ? '✅' : '❌'}</div>
+          <div>Current Source: {videoRef.current?.currentSrc ? '✅' : '❌'}</div>
+          {videoRef.current?.error && (
+            <div className="text-red-400">
+              Error: {videoRef.current.error.code} - {videoRef.current.error.message}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
