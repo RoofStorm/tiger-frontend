@@ -1,17 +1,20 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { Button } from '@/components/ui/button';
+import { HomeVideoPlayer } from '@/components/HomeVideoPlayer';
 
 export function HomePageContent() {
   const { isAuthenticated } = useNextAuth();
   const router = useRouter();
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const mainRef = useRef<HTMLElement>(null);
+  const [showVideo, setShowVideo] = useState(true);
 
   // Tạm thời tắt auto redirect đến /video
   // useEffect(() => {
@@ -23,7 +26,18 @@ export function HomePageContent() {
   //   }
   // }, [isAuthenticated, router]);
 
+  const handleVideoEnded = () => {
+    setShowVideo(false);
+  };
+
+  const handleSkipVideo = () => {
+    setShowVideo(false);
+  };
+
   useEffect(() => {
+    // Chỉ update background khi content đã hiển thị (showVideo = false)
+    if (showVideo) return;
+
     const updateBackgroundStyle = () => {
       if (mainRef.current) {
         const isMobile = window.matchMedia('(max-width: 767px)').matches;
@@ -32,26 +46,52 @@ export function HomePageContent() {
           : 'url(/trangchu/trangchu_background.svg)';
         mainRef.current.style.backgroundSize = isMobile ? 'contain' : 'cover';
         mainRef.current.style.backgroundPosition = isMobile ? 'top' : 'center -70px';
+        mainRef.current.style.backgroundRepeat = 'no-repeat';
       }
     };
 
-    updateBackgroundStyle();
+    // Sử dụng requestAnimationFrame để đảm bảo DOM đã render
+    let rafId2: number | null = null;
+    const rafId = requestAnimationFrame(() => {
+      // Thêm một frame nữa để chắc chắn
+      rafId2 = requestAnimationFrame(() => {
+        updateBackgroundStyle();
+      });
+    });
+
     window.addEventListener('resize', updateBackgroundStyle);
-    return () => window.removeEventListener('resize', updateBackgroundStyle);
-  }, []);
+    return () => {
+      cancelAnimationFrame(rafId);
+      if (rafId2 !== null) {
+        cancelAnimationFrame(rafId2);
+      }
+      window.removeEventListener('resize', updateBackgroundStyle);
+    };
+  }, [showVideo]);
 
   return (
     <div className="">
-      <main 
-        ref={mainRef}
-        className="min-h-[calc(100vh-80px)] relative flex flex-col md:block"
-        style={{
-          backgroundImage: 'url(/trangchu/trangchu_background_mobile.svg)',
-          backgroundSize: 'contain',
-          backgroundPosition: 'top',
-          backgroundRepeat: 'no-repeat',
-        }}
-      >
+      {/* Video Player - hiển thị trước khi show content */}
+      <AnimatePresence>
+        {showVideo && (
+          <HomeVideoPlayer
+            onVideoEnded={handleVideoEnded}
+            onSkip={handleSkipVideo}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Main Content - chỉ hiển thị sau khi video kết thúc */}
+      <AnimatePresence>
+        {!showVideo && (
+          <motion.main
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }} 
+            ref={mainRef}
+            className="min-h-[calc(100vh-80px)] relative flex flex-col md:block"
+          >
         {/* Mobile Layout: Product Image First, Content Second */}
         {/* Desktop Layout: Content Right, Product Image Bottom (absolute) */}
 
@@ -161,7 +201,9 @@ export function HomePageContent() {
             quality={90}
             />
         </div>
-      </main>
+      </motion.main>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -7,7 +7,7 @@ interface VideoContextType {
   setIsVideoPlaying: (playing: boolean) => void;
 }
 
-const VideoContext = createContext<VideoContextType | undefined>(undefined);
+export const VideoContext = createContext<VideoContextType | undefined>(undefined);
 
 export function VideoProvider({ children }: { children: ReactNode }) {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
