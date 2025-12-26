@@ -203,7 +203,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       <div className="absolute inset-0 z-0">
         <video
           ref={videoRef}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           muted={isMuted}
           playsInline
           autoPlay
@@ -235,7 +235,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
                 <Loader2 className="w-12 h-12 text-white" />
               </motion.div>
               <h3 className="text-2xl font-bold mb-2">
-                Video đang load từ MinIO
+                Video đang tải
               </h3>
               <p className="text-white/70">Vui lòng chờ trong giây lát...</p>
             </div>
