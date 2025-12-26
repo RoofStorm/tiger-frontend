@@ -47,6 +47,15 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       addDebugLog('🔄 Starting to fetch video URL...');
       addDebugLog(`📡 API URL: ${apiUrl}`);
       addDebugLog(`📁 Video filename: ${videoFilename}`);
+      addDebugLog(`🌐 User Agent: ${navigator.userAgent}`);
+      addDebugLog(`📱 Is Mobile: ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}`);
+      
+      // Check video format support before loading
+      const testVideoElement = document.createElement('video');
+      const mp4Support = testVideoElement.canPlayType('video/mp4');
+      const h264Support = testVideoElement.canPlayType('video/mp4; codecs="avc1.42E01E"');
+      addDebugLog(`🎬 Browser MP4 support: ${mp4Support || 'no'}`);
+      addDebugLog(`🎬 Browser H.264 support: ${h264Support || 'no'}`);
 
       // Nếu đã dùng fallback, không thử lại signed URL
       if (useFallback) {
@@ -148,13 +157,35 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       const video = e.target as HTMLVideoElement;
       const error = video.error;
       
+      // Error code meanings:
+      // 1 = MEDIA_ERR_ABORTED
+      // 2 = MEDIA_ERR_NETWORK
+      // 3 = MEDIA_ERR_DECODE
+      // 4 = MEDIA_ERR_SRC_NOT_SUPPORTED
+      const errorCodeNames: { [key: number]: string } = {
+        1: 'MEDIA_ERR_ABORTED',
+        2: 'MEDIA_ERR_NETWORK',
+        3: 'MEDIA_ERR_DECODE',
+        4: 'MEDIA_ERR_SRC_NOT_SUPPORTED'
+      };
+      
       let errorDetails = 'Unknown error';
       if (error) {
-        errorDetails = `Code: ${error.code}, Message: ${error.message || 'No message'}`;
+        const errorName = errorCodeNames[error.code] || `Unknown(${error.code})`;
+        errorDetails = `Code: ${error.code} (${errorName}), Message: ${error.message || 'No message'}`;
         addDebugLog(`❌ Video error: ${errorDetails}`);
         addDebugLog(`📹 Current source: ${video.currentSrc?.substring(0, 100)}...`);
-        addDebugLog(`🔄 Network state: ${video.networkState}`);
-        addDebugLog(`📊 Ready state: ${video.readyState}`);
+        addDebugLog(`🔄 Network state: ${video.networkState} (0=EMPTY, 1=IDLE, 2=LOADING, 3=NO_SOURCE, 4=LOADED_METADATA)`);
+        addDebugLog(`📊 Ready state: ${video.readyState} (0=HAVE_NOTHING, 1=HAVE_METADATA, 2=HAVE_CURRENT_DATA, 3=HAVE_FUTURE_DATA, 4=HAVE_ENOUGH_DATA)`);
+        addDebugLog(`🌐 User Agent: ${navigator.userAgent}`);
+        addDebugLog(`📱 Is Mobile: ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}`);
+        
+        // Check video format support
+        const errorTestVideo = document.createElement('video');
+        const mp4SupportError = errorTestVideo.canPlayType('video/mp4');
+        const h264SupportError = errorTestVideo.canPlayType('video/mp4; codecs="avc1.42E01E"');
+        addDebugLog(`🎬 Can play MP4: ${mp4SupportError || 'no'}`);
+        addDebugLog(`🎬 Can play H.264: ${h264SupportError || 'no'}`);
       }
       
       // Nếu đang dùng signed URL từ Cloudflare R2 và gặp lỗi, thử fallback
