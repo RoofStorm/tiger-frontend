@@ -203,7 +203,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       <div className="absolute inset-0 z-0">
         <video
           ref={videoRef}
-          className="w-full h-full md:h-auto object-contain"
+          className="w-full h-full object-contain"
           muted={isMuted}
           playsInline
           autoPlay
