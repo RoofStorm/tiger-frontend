@@ -33,20 +33,16 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
     setDebugLogs((prev) => [...prev.slice(-19), logMessage]); // Giữ tối đa 20 logs
   };
 
-  // Fetch signed URL from backend - hardcode filename "tiger 11.mp4"
-  // IMPORTANT: Only use presigned URL directly - NO fallback to proxy endpoint
-  // HTML5 video doesn't need CORS, presigned URLs must be called directly from FE
+  // TEMPORARY: Sử dụng URL trực tiếp thay vì fetch từ API
+  // TODO: Sau này sẽ quay lại fetch signed URL từ backend
   useEffect(() => {
-    const fetchVideoUrl = async () => {
+    const loadVideoUrl = () => {
       if (!videoRef.current) return;
 
-      const apiUrl =
-        process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
-      const videoFilename = 'tiger 11.mp4'; // Hardcode filename
+      // URL tạm thời
+      const videoUrl = 'https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2011.mp4';
 
-      addDebugLog('🔄 Starting to fetch video URL...');
-      addDebugLog(`📡 API URL: ${apiUrl}`);
-      addDebugLog(`📁 Video filename: ${videoFilename}`);
+      addDebugLog('🔄 Starting to load video URL...');
       addDebugLog(`🌐 User Agent: ${navigator.userAgent}`);
       addDebugLog(`📱 Is Mobile: ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}`);
       
@@ -58,44 +54,84 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       addDebugLog(`🎬 Browser H.264 support: ${h264Support || 'no'}`);
 
       try {
-        const signedUrl = `${apiUrl}/storage/video-signed/${encodeURIComponent(videoFilename)}`;
-        addDebugLog(`🌐 Fetching signed URL: ${signedUrl}`);
-        
-        const response = await fetch(signedUrl);
-        addDebugLog(`📥 Response status: ${response.status} ${response.statusText}`);
-        
-        if (response.ok) {
-          const result = await response.json();
-          addDebugLog(`📦 Response data: ${JSON.stringify(result).substring(0, 200)}...`);
-          
-          // API response format: { success: true, data: { url: "..." }, message: "Success" }
-          const videoUrl = result.data?.url;
-          if (videoUrl) {
-            videoRef.current.src = videoUrl;
-            addDebugLog('✅ Loaded video with Signed URL from Cloudflare R2');
-            addDebugLog(`🔗 Video URL: ${videoUrl.substring(0, 100)}...`);
-          } else {
-            const errorMsg = 'No presigned URL in API response';
-            addDebugLog(`❌ ${errorMsg}`);
-            setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra backend API.`);
-            setIsLoading(false);
-          }
-        } else {
-          const errorMsg = `API returned ${response.status} ${response.statusText}`;
-          addDebugLog(`❌ ${errorMsg}`);
-          setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra backend API.`);
-          setIsLoading(false);
-        }
+        addDebugLog(`🔗 Setting video URL: ${videoUrl}`);
+        videoRef.current.src = videoUrl;
+        addDebugLog('✅ Loaded video with direct URL');
+        addDebugLog(`🔗 Video URL: ${videoUrl.substring(0, 100)}...`);
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        addDebugLog(`❌ Error fetching signed URL: ${errorMsg}`);
+        addDebugLog(`❌ Error setting video URL: ${errorMsg}`);
         setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra kết nối mạng.`);
         setIsLoading(false);
       }
     };
 
-    fetchVideoUrl();
+    loadVideoUrl();
   }, []);
+
+  // OLD CODE: Fetch signed URL from backend - hardcode filename "tiger 11.mp4"
+  // IMPORTANT: Only use presigned URL directly - NO fallback to proxy endpoint
+  // HTML5 video doesn't need CORS, presigned URLs must be called directly from FE
+  // useEffect(() => {
+  //   const fetchVideoUrl = async () => {
+  //     if (!videoRef.current) return;
+
+  //     const apiUrl =
+  //       process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
+  //     const videoFilename = 'tiger 11.mp4'; // Hardcode filename
+
+  //     addDebugLog('🔄 Starting to fetch video URL...');
+  //     addDebugLog(`📡 API URL: ${apiUrl}`);
+  //     addDebugLog(`📁 Video filename: ${videoFilename}`);
+  //     addDebugLog(`🌐 User Agent: ${navigator.userAgent}`);
+  //     addDebugLog(`📱 Is Mobile: ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}`);
+      
+  //     // Check video format support before loading
+  //     const testVideoElement = document.createElement('video');
+  //     const mp4Support = testVideoElement.canPlayType('video/mp4');
+  //     const h264Support = testVideoElement.canPlayType('video/mp4; codecs="avc1.42E01E"');
+  //     addDebugLog(`🎬 Browser MP4 support: ${mp4Support || 'no'}`);
+  //     addDebugLog(`🎬 Browser H.264 support: ${h264Support || 'no'}`);
+
+  //     try {
+  //       const signedUrl = `${apiUrl}/storage/video-signed/${encodeURIComponent(videoFilename)}`;
+  //       addDebugLog(`🌐 Fetching signed URL: ${signedUrl}`);
+        
+  //       const response = await fetch(signedUrl);
+  //       addDebugLog(`📥 Response status: ${response.status} ${response.statusText}`);
+        
+  //       if (response.ok) {
+  //         const result = await response.json();
+  //         addDebugLog(`📦 Response data: ${JSON.stringify(result).substring(0, 200)}...`);
+          
+  //         // API response format: { success: true, data: { url: "..." }, message: "Success" }
+  //         const videoUrl = result.data?.url;
+  //         if (videoUrl) {
+  //           videoRef.current.src = videoUrl;
+  //           addDebugLog('✅ Loaded video with Signed URL from Cloudflare R2');
+  //           addDebugLog(`🔗 Video URL: ${videoUrl.substring(0, 100)}...`);
+  //         } else {
+  //           const errorMsg = 'No presigned URL in API response';
+  //           addDebugLog(`❌ ${errorMsg}`);
+  //           setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra backend API.`);
+  //           setIsLoading(false);
+  //         }
+  //       } else {
+  //         const errorMsg = `API returned ${response.status} ${response.statusText}`;
+  //         addDebugLog(`❌ ${errorMsg}`);
+  //         setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra backend API.`);
+  //         setIsLoading(false);
+  //       }
+  //     } catch (error) {
+  //       const errorMsg = error instanceof Error ? error.message : String(error);
+  //       addDebugLog(`❌ Error fetching signed URL: ${errorMsg}`);
+  //       setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra kết nối mạng.`);
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   fetchVideoUrl();
+  // }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -331,7 +367,8 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       )}
 
       {/* Debug Panel - hiển thị logs trên màn hình */}
-      <div className="absolute top-20 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 bg-black/90 text-white text-xs p-4 rounded-lg max-h-[60vh] overflow-y-auto">
+      {/* Commented out - không hiển thị logs trên màn hình */}
+      {/* <div className="absolute top-20 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 bg-black/90 text-white text-xs p-4 rounded-lg max-h-[60vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-2">
           <h4 className="font-bold text-sm">🔍 Debug Logs</h4>
           <button
@@ -364,7 +401,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
             </div>
           )}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
