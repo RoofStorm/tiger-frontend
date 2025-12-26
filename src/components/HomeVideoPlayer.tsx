@@ -213,7 +213,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
           {/* Video URL will be loaded dynamically via Signed URL */}
           Your browser does not support the video tag.
         </video>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t via-black/40 to-transparent" />
       </div>
 
       {/* Loading Indicator */}
