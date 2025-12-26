@@ -29,6 +29,8 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
   const { setIsVideoPlaying } = useVideo();
 
   // Fetch signed URL from backend
+  // IMPORTANT: Only use presigned URL directly - NO fallback to proxy endpoint
+  // HTML5 video doesn't need CORS, presigned URLs must be called directly from FE
   useEffect(() => {
     const fetchVideoUrl = async () => {
       if (!videoRef.current) return;
@@ -49,29 +51,26 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
           if (videoUrl) {
             videoRef.current.src = videoUrl;
             console.log(
-              '✅ Loaded video with Signed URL from MinIO:',
+              '✅ Loaded video with Signed URL from Cloudflare R2:',
               videoUrl
             );
           } else {
-            // Fallback to NestJS streaming endpoint
-            videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
-            console.log('⚠️ No URL in response, using fallback');
+            const errorMsg = 'No presigned URL in API response';
+            console.error(`❌ ${errorMsg}`);
+            setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra backend API.`);
+            setIsLoading(false);
           }
         } else {
-          // Fallback to NestJS streaming endpoint
-          videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
-          console.log('⚠️ Using fallback streaming endpoint');
+          const errorMsg = `API returned ${response.status} ${response.statusText}`;
+          console.error(`❌ ${errorMsg}`);
+          setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra backend API.`);
+          setIsLoading(false);
         }
       } catch (error) {
-        console.error('❌ Error fetching signed URL:', error);
-        // Fallback to NestJS streaming endpoint
-        if (videoRef.current) {
-          const apiUrl =
-            process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
-          const videoFilename =
-            process.env.NEXT_PUBLIC_VIDEO_FILENAME || 'exampleclip.mp4';
-          videoRef.current.src = `${apiUrl}/storage/video/${videoFilename}`;
-        }
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        console.error('❌ Error fetching signed URL:', errorMsg);
+        setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra kết nối mạng.`);
+        setIsLoading(false);
       }
     };
 
@@ -119,8 +118,30 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
       }
     };
     const handleError = (e: Event) => {
-      console.warn('Video loading error, trying fallback:', e);
-      setVideoError('Video loading failed, trying fallback...');
+      const video = e.target as HTMLVideoElement;
+      const error = video.error;
+      
+      // Error code meanings:
+      // 1 = MEDIA_ERR_ABORTED
+      // 2 = MEDIA_ERR_NETWORK
+      // 3 = MEDIA_ERR_DECODE
+      // 4 = MEDIA_ERR_SRC_NOT_SUPPORTED
+      const errorCodeNames: { [key: number]: string } = {
+        1: 'MEDIA_ERR_ABORTED',
+        2: 'MEDIA_ERR_NETWORK',
+        3: 'MEDIA_ERR_DECODE',
+        4: 'MEDIA_ERR_SRC_NOT_SUPPORTED'
+      };
+      
+      let errorDetails = 'Unknown error';
+      if (error) {
+        const errorName = errorCodeNames[error.code] || `Unknown(${error.code})`;
+        errorDetails = `Code: ${error.code} (${errorName}), Message: ${error.message || 'No message'}`;
+      }
+      
+      console.error('❌ Video loading error:', errorDetails);
+      console.error('📹 Current source:', video.currentSrc);
+      setVideoError(`Video loading failed: ${errorDetails}`);
       setIsLoading(false);
     };
     const handleLoadStart = () => {
