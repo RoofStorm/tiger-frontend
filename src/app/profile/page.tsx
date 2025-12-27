@@ -4,11 +4,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Gift, Calendar, Star, LogOut, Home, RefreshCw, ChefHat } from 'lucide-react';
+import { Gift, Calendar, Star, Home, RefreshCw, ChefHat } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Tooltip } from '@/components/ui/tooltip';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
 interface RedeemItem {
@@ -36,7 +35,7 @@ interface PointLog {
 }
 
 export default function ProfilePage() {
-  const { user, isAuthenticated, logout } = useNextAuth();
+  const { user, isAuthenticated } = useNextAuth();
   const queryClient = useQueryClient();
   const { navigateWithLoading } = useGlobalNavigationLoading();
 

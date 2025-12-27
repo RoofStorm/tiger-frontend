@@ -17,7 +17,6 @@ import { Post, CreatePostData } from '@/types';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
-import { useInputFix } from '@/hooks/useInputFix';
 import { EmojiPicker } from '@/components/EmojiPicker';
 import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 
@@ -25,7 +24,6 @@ export function Corner2_2() {
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { onKeyDown: handleInputKeyDown } = useInputFix();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const captionTextareaRef = useRef<HTMLTextAreaElement>(null);

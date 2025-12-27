@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { EmojiSelection } from '@/types';
 import { findCombinationByEmojis } from '@/constants/emojiCombinations';
-import { findCardByEmojis, CardConfig } from '@/constants/cardConfig';
+import { findCardByEmojis } from '@/constants/cardConfig';
 
 export type CombinationCategory = 'mindful' | 'tiger-linked' | 'trendy' | null;
 

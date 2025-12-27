@@ -4,7 +4,6 @@
 // Temporarily disabled hover feature - commented out unused imports
 // import { useState, useEffect } from 'react';
 import { useRef } from 'react';
-import Image from 'next/image';
 
 interface TimelineProduct {
   id: string;

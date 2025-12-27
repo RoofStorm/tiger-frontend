@@ -15,7 +15,6 @@ interface MoodCardFlipCardProps {
   onSave: () => void;
   onShare: (cardElementRef?: React.RefObject<HTMLDivElement | null>) => void;
   onReset: () => void;
-  onExploreMore: () => void;
   cardNumber?: 1 | 2 | 3 | 4;
   frontCardImage?: string;
   contentCardImage?: string;
@@ -30,7 +29,6 @@ export function MoodCardFlipCard({
   onSave: _onSave, // Không sử dụng để tránh đóng modal khi download
   onShare,
   onReset,
-  onExploreMore,
   cardNumber = 1,
   frontCardImage,
   contentCardImage,

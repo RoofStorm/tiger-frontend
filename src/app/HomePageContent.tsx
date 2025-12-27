@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useNextAuth } from '@/hooks/useNextAuth';
@@ -10,8 +9,6 @@ import { Button } from '@/components/ui/button';
 import { HomeVideoPlayer } from '@/components/HomeVideoPlayer';
 
 export function HomePageContent() {
-  const { isAuthenticated } = useNextAuth();
-  const router = useRouter();
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const mainRef = useRef<HTMLElement>(null);
   const [showVideo, setShowVideo] = useState(true);

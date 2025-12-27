@@ -40,7 +40,7 @@ export function EmojiGrid({
         0,
       ],
     }));
-  }, [emojis.length]);
+  }, [emojis]);
 
   return (
     <div>

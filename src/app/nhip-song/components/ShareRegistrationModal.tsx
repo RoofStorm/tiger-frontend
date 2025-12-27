@@ -9,7 +9,7 @@ import { z } from 'zod';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { signIn } from 'next-auth/react';
-import { Eye, EyeOff, User } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 const loginSchema = z.object({
   username: z.string().min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự'),

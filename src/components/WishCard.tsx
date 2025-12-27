@@ -64,9 +64,6 @@ export const WishCard = ({ wish }: WishCardProps) => {
       'https://tiger-corporation-vietnam.vn';
     const wishUrl = `${baseUrl}/wishes`;
     const wishTitle = wish.content || 'Lời chúc từ Tiger Mood Corner';
-    const wishDescription = wish.content
-      ? `${wish.content.substring(0, 160)}...`
-      : 'Khám phá thế giới cảm xúc qua những lời chúc đặc biệt.';
 
     // Tạo Facebook Share URL
     const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(wishUrl)}&quote=${encodeURIComponent(wishTitle)}`;

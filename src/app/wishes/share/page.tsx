@@ -98,7 +98,6 @@ export default async function WishSharePage({
 }: SharePageProps) {
   const params = await searchParams;
   const content = params.content || '';
-  const wishId = params.wishId || '';
   
   // Parse imageUrl từ query params - chỉ dùng nếu có
   const imageUrl = params.imageUrl;

@@ -13,14 +13,10 @@ interface HomeVideoPlayerProps {
 
 export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [videoError, setVideoError] = useState<string | null>(null);
-  const [isVideoReady, setIsVideoReady] = useState(false);
-  const [isVideoEnded, setIsVideoEnded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasShownIntro, setHasShownIntro] = useState(false);
-  const [debugLogs, setDebugLogs] = useState<string[]>([]);
 
   // Sử dụng context để chia sẻ trạng thái video
   const { setIsVideoPlaying } = useVideo();
@@ -30,7 +26,6 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
     const timestamp = new Date().toLocaleTimeString();
     const logMessage = `[${timestamp}] ${message}`;
     console.log(logMessage);
-    setDebugLogs((prev) => [...prev.slice(-19), logMessage]); // Giữ tối đa 20 logs
   };
 
   // TEMPORARY: Sử dụng URL trực tiếp thay vì fetch từ API
@@ -168,7 +163,6 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
     if (!video) return;
 
     const handleLoadedMetadata = () => {
-      setIsVideoReady(true);
       setIsLoading(false);
       addDebugLog('✅ Video metadata loaded successfully');
       addDebugLog(`📹 Video source: ${video.currentSrc?.substring(0, 100)}...`);
@@ -176,7 +170,6 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       addDebugLog(`📐 Video dimensions: ${video.videoWidth}x${video.videoHeight}`);
     };
     const handleCanPlay = () => {
-      setIsVideoReady(true);
       setIsLoading(false);
       addDebugLog('▶️ Video can play');
       // Auto play khi video ready
@@ -188,18 +181,13 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       });
     };
     const handlePlay = () => {
-      setIsPlaying(true);
-      setIsVideoEnded(false);
       setIsVideoPlaying(true); // Cập nhật context
     };
     const handlePause = () => {
-      setIsPlaying(false);
       setIsVideoPlaying(false); // Cập nhật context
     };
     const handleEnded = () => {
-      setIsPlaying(false);
       setIsVideoPlaying(false); // Cập nhật context
-      setIsVideoEnded(true);
       if (!hasShownIntro) {
         setHasShownIntro(true);
         if (onVideoEnded) onVideoEnded();
@@ -247,7 +235,6 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
     };
     const handleLoadStart = () => {
       setVideoError(null);
-      setIsVideoReady(false);
       setIsLoading(true);
       addDebugLog('🎬 Video loading started...');
       addDebugLog(`📹 Video source: ${video.src?.substring(0, 100)}...`);
@@ -283,9 +270,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
     try {
       video.pause();
     } catch {}
-    setIsPlaying(false);
     setIsVideoPlaying(false);
-    setIsVideoEnded(true);
     if (onVideoEnded) onVideoEnded();
   };
 

@@ -147,13 +147,16 @@ export function DoiQuaPageContent() {
   const handleRedeemSubmit = (formData: { receiverPhone: string; receiverEmail: string }) => {
     if (!selectedReward) return;
 
-    const data: any = {
+    // API accepts CreateRedeemData with additional receiverEmail field
+    const data = {
       rewardId: selectedReward.id,
+      receiverName: '', // Not used in current form but required by API
       receiverPhone: formData.receiverPhone,
+      receiverAddress: '', // Not used in current form but required by API
       receiverEmail: formData.receiverEmail,
     };
 
-    redeemMutation.mutate(data);
+    redeemMutation.mutate(data as CreateRedeemData & { receiverEmail: string });
   };
 
   const canRedeem = (reward: Reward) => {
