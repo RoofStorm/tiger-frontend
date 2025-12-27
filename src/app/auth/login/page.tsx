@@ -9,11 +9,11 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Eye, EyeOff, User, Lock } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 
 const loginSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
+  username: z.string().min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự'),
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 });
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginForm) => {
     try {
-      await login(data.email, data.password);
+      await login(data.username, data.password);
       // Don't call router.push here - login() already handles redirect
       toast({
         title: 'Đăng nhập thành công!',
@@ -111,29 +111,29 @@ export default function LoginPage() {
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Email Field */}
+            {/* Username Field */}
             <div>
               <label
-                htmlFor="email"
+                htmlFor="username"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Email
+                Tên đăng nhập
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+                  <User className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  {...register('email')}
-                  type="email"
-                  id="email"
+                  {...register('username')}
+                  type="text"
+                  id="username"
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Nhập email của bạn"
+                  placeholder="Nhập tên đăng nhập của bạn"
                 />
               </div>
-              {errors.email && (
+              {errors.username && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.email.message}
+                  {errors.username.message}
                 </p>
               )}
             </div>

@@ -115,12 +115,12 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: 'credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
+        username: { label: 'Username', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          console.error('❌ Missing credentials: email or password is empty');
+        if (!credentials?.username || !credentials?.password) {
+          console.error('❌ Missing credentials: username or password is empty');
           return null;
         }
 
@@ -131,7 +131,7 @@ export const authOptions: NextAuthOptions = {
           const loginUrl = `${apiBaseUrl}/auth/login`;
 
           console.log('🔐 Attempting login:', {
-            email: credentials.email,
+            username: credentials.username,
             apiUrl: loginUrl,
             timestamp: new Date().toISOString(),
           });
@@ -147,7 +147,7 @@ export const authOptions: NextAuthOptions = {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                email: credentials.email,
+                username: credentials.username,
                 password: credentials.password,
               }),
               signal: controller.signal,

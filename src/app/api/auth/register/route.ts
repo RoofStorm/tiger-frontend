@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name, referralCode } = await request.json();
+    const { email, password, name, referralCode, username } = await request.json();
 
-    if (!email || !password || !name) {
+    if (!email || !password || !name || !username) {
       return NextResponse.json(
         {
-          error: 'Vui lòng điền đầy đủ thông tin: email, mật khẩu và tên',
+          error: 'Vui lòng điền đầy đủ thông tin: email, mật khẩu, tên và tên đăng nhập',
         },
         { status: 400 }
       );
@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
           email,
           password,
           name,
+          username,
           referralCode: referralCode || null,
         }),
       });

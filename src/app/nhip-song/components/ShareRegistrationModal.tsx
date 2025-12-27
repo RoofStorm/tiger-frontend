@@ -9,15 +9,16 @@ import { z } from 'zod';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { signIn } from 'next-auth/react';
-import { Eye, EyeOff, Mail } from 'lucide-react';
+import { Eye, EyeOff, User } from 'lucide-react';
 
 const loginSchema = z.object({
-  email: z.string().email('Email không hợp lệ'),
+  username: z.string().min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự'),
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 });
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự'),
+  username: z.string().min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự').regex(/^[a-zA-Z0-9_]+$/, 'Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới'),
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 });
 
@@ -110,7 +111,7 @@ export function ShareRegistrationModal({
 
   const handleFormLogin = async (data: LoginForm) => {
     try {
-      await login(data.email, data.password);
+      await login(data.username, data.password);
       // Don't call router.push here - login() already handles redirect
       toast({
         title: 'Đăng nhập thành công!',
@@ -150,7 +151,9 @@ export function ShareRegistrationModal({
       await registerUser(
         email,
         data.password,
-        data.name
+        data.name,
+        undefined, // referralCode
+        data.username
       );
       // Success toast and navigation are handled in useNextAuth
       onRegister();
@@ -301,13 +304,13 @@ export function ShareRegistrationModal({
                         color: '#333435',
                       }}
                     >
-                      Tên đăng nhập
+                      Họ và tên
                     </label>
                     <input
                       {...registerForm.register('name')}
                       type="text"
                       id="register-name"
-                      placeholder="Nhập tên người dùng"
+                      placeholder="Nhập họ và tên"
                       className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       style={{ 
                         backgroundColor: '#FFFFFF',
@@ -318,6 +321,40 @@ export function ShareRegistrationModal({
                     {registerForm.formState.errors.name && (
                       <p className="mt-1 text-sm" style={{ color: '#EF4444' }}>
                         {registerForm.formState.errors.name.message}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Username Field */}
+                  <div>
+                    <label 
+                      htmlFor="register-username"
+                      className="block font-nunito mb-2"
+                      style={{
+                        fontFamily: 'Nunito',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#333435',
+                      }}
+                    >
+                      Tên đăng nhập
+                    </label>
+                    <input
+                      {...registerForm.register('username')}
+                      type="text"
+                      id="register-username"
+                      placeholder="Nhập tên đăng nhập"
+                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        backgroundColor: '#FFFFFF',
+                        borderColor: registerForm.formState.errors.username ? '#EF4444' : '#E0E0E0',
+                        fontSize: '14px',
+                      }}
+                    />
+                    {registerForm.formState.errors.username && (
+                      <p className="mt-1 text-sm" style={{ color: '#EF4444' }}>
+                        {registerForm.formState.errors.username.message}
                       </p>
                     )}
                   </div>
@@ -477,10 +514,10 @@ export function ShareRegistrationModal({
                 <>
                 {/* Login Form */}
                 <form onSubmit={loginForm.handleSubmit(handleFormLogin)} className="space-y-4">
-                  {/* Email Field */}
+                  {/* Username Field */}
                   <div>
                     <label 
-                      htmlFor="login-email"
+                      htmlFor="login-username"
                       className="block font-nunito mb-2"
                       style={{
                         fontFamily: 'Nunito',
@@ -490,28 +527,25 @@ export function ShareRegistrationModal({
                         color: '#333435',
                       }}
                     >
-                      Tên tài khoản
+                      Tên đăng nhập
                     </label>
                     <div className="relative">
-                      {/* <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Mail className="h-5 w-5" style={{ color: '#999999' }} />
-                      </div> */}
                       <input
-                        {...loginForm.register('email')}
-                        type="email"
-                        id="login-email"
-                        placeholder="Nhập email của bạn"
+                        {...loginForm.register('username')}
+                        type="text"
+                        id="login-username"
+                        placeholder="Nhập tên đăng nhập của bạn"
                         className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{ 
                           backgroundColor: '#FFFFFF',
-                          borderColor: loginForm.formState.errors.email ? '#EF4444' : '#E0E0E0',
+                          borderColor: loginForm.formState.errors.username ? '#EF4444' : '#E0E0E0',
                           fontSize: '14px',
                         }}
                       />
                     </div>
-                    {loginForm.formState.errors.email && (
+                    {loginForm.formState.errors.username && (
                       <p className="mt-1 text-sm" style={{ color: '#EF4444' }}>
-                        {loginForm.formState.errors.email.message}
+                        {loginForm.formState.errors.username.message}
                       </p>
                     )}
                   </div>

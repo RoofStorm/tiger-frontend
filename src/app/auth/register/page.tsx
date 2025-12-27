@@ -14,6 +14,7 @@ import { signIn } from 'next-auth/react';
 const registerSchema = z
   .object({
     name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự'),
+    username: z.string().min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự').regex(/^[a-zA-Z0-9_]+$/, 'Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới'),
     email: z.string().email('Email không hợp lệ'),
     password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
     confirmPassword: z.string(),
@@ -45,7 +46,9 @@ function RegisterForm() {
       await registerUser(
         data.email,
         data.password,
-        data.name
+        data.name,
+        undefined, // referralCode
+        data.username
       );
       // Success toast and navigation are handled in useNextAuth
     } catch (error: unknown) {
@@ -143,6 +146,33 @@ function RegisterForm() {
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600">
                   {errors.name.message}
+                </p>
+              )}
+            </div>
+
+            {/* Username Field */}
+            <div>
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Tên đăng nhập
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  {...register('username')}
+                  type="text"
+                  id="username"
+                  className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  placeholder="Nhập tên đăng nhập"
+                />
+              </div>
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.username.message}
                 </p>
               )}
             </div>

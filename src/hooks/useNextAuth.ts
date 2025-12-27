@@ -13,12 +13,13 @@ interface UseNextAuthReturn {
     role: 'USER' | 'ADMIN';
   } | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (username: string, password: string) => Promise<void>;
   register: (
     email: string,
     password: string,
     name: string,
-    referralCode?: string
+    referralCode?: string,
+    username?: string
   ) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
@@ -35,10 +36,10 @@ export function useNextAuth(): UseNextAuthReturn {
   const isAdmin = useMemo(() => user?.role === 'ADMIN', [user?.role]);
 
   const login = useCallback(
-    async (email: string, password: string) => {
+    async (username: string, password: string) => {
       try {
         const result = await signIn('credentials', {
-          email,
+          username,
           password,
           redirect: false,
         });
@@ -46,7 +47,7 @@ export function useNextAuth(): UseNextAuthReturn {
         if (result?.error) {
           throw new Error(
             result.error === 'CredentialsSignin'
-              ? 'Email hoặc mật khẩu không đúng'
+              ? 'Tên đăng nhập hoặc mật khẩu không đúng'
               : 'Đăng nhập thất bại'
           );
         }
@@ -115,7 +116,8 @@ export function useNextAuth(): UseNextAuthReturn {
       email: string,
       password: string,
       name: string,
-      referralCode?: string
+      referralCode?: string,
+      username?: string
     ) => {
       try {
         // Call your custom register API
@@ -124,17 +126,22 @@ export function useNextAuth(): UseNextAuthReturn {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email, password, name, referralCode }),
+          body: JSON.stringify({ email, password, name, referralCode, username }),
         });
 
+        const responseData = await response.json();
+        
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Đăng ký thất bại');
+          throw new Error(responseData.error || 'Đăng ký thất bại');
         }
 
-        // After successful registration, sign in
+        // After successful registration, sign in with username
+        // Use the username that was provided during registration, or get from response
+        const userData = responseData.user || responseData;
+        const loginUsername = username || userData?.username || name.toLowerCase().replace(/\s+/g, '');
+        
         const signInResult = await signIn('credentials', {
-          email,
+          username: loginUsername,
           password,
           redirect: false,
         });
