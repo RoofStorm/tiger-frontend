@@ -24,9 +24,7 @@ const getBackgroundImage = (): string => {
   const bgImage = isDark 
     ? `url(/nhipsong/nhipsong_dark_background.jpg?v=${cacheBuster})`
     : `url(/nhipsong/nhipsong_light_background.jpg?v=${cacheBuster})`;
-  
-  console.log('getBackgroundImage - hour:', hour, 'isDark:', isDark, 'bgImage:', bgImage);
-  
+    
   return bgImage;
 };
 

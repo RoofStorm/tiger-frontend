@@ -147,7 +147,7 @@ export default function ProfilePage() {
     >
       <div className="max-w-6xl mx-auto px-4">
         {/* Profile Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <div className="rounded-2xl shadow-lg p-8 mb-8" style={{ backgroundColor: 'rgb(0, 87, 159)' }}>
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
             {/* Avatar */}
             <div className="w-24 h-24 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
@@ -177,10 +177,10 @@ export default function ProfilePage() {
 
             {/* User Info */}
             <div className="flex-1 text-center md:text-left">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-white mb-2">
                 {user?.name}
               </h1>
-              <p className="text-gray-600 mb-4">{user?.email}</p>
+              <p className="text-white mb-4">{user?.email}</p>
 
               {/* Points Display */}
               <div className="inline-flex items-center space-x-2 bg-yellow-100 px-4 py-2 rounded-full mb-4">
@@ -196,7 +196,7 @@ export default function ProfilePage() {
               {/* Action Buttons */}
               <div className="flex items-center space-x-3">
                 <Link href="/">
-                  <Button className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white border-0 transition-colors">
+                  <Button className="flex items-center space-x-2 border-0 transition-colors" style={{ backgroundColor: 'rgba(251, 249, 243, 1)', color: 'black' }}>
                     <Home className="w-4 h-4" />
                     <span>Trang chủ</span>
                   </Button>
@@ -214,20 +214,20 @@ export default function ProfilePage() {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-white">
                     {redeemHistory.length}
                   </div>
-                  <div className="text-sm text-gray-600">Lần đổi quà</div>
+                  <div className="text-sm text-white">Lần đổi quà</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
+                  <div className="text-2xl font-bold text-white">
                     {
                       redeemHistory.filter(
                         (r: RedeemItem) => r.status === 'DELIVERED'
                       ).length
                     }
                   </div>
-                  <div className="text-sm text-gray-600">Quà đã nhận</div>
+                  <div className="text-sm text-white">Quà đã nhận</div>
                 </div>
               </div>
             </div>
@@ -235,9 +235,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Point History */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="rounded-2xl shadow-lg p-8" style={{ backgroundColor: 'rgb(0, 87, 159)' }}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-white">
               Lịch sử cộng điểm
             </h2>
             <Button
@@ -245,7 +245,7 @@ export default function ProfilePage() {
               size="sm"
               onClick={handleRefreshPointHistory}
               disabled={pointHistoryLoading}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+              className="flex items-center space-x-2 text-black hover:text-black hover:bg-white/20 border-white bg-white"
             >
               <RefreshCw
                 className={`w-4 h-4 ${pointHistoryLoading ? 'animate-spin' : ''}`}
@@ -256,43 +256,43 @@ export default function ProfilePage() {
 
           {pointHistoryLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-500 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Đang tải lịch sử điểm...</p>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto"></div>
+              <p className="mt-4 text-white">Đang tải lịch sử điểm...</p>
             </div>
           ) : pointHistoryError ? (
             <div className="text-center py-12">
-              <p className="text-red-500">Lỗi khi tải lịch sử điểm</p>
+              <p className="text-white">Lỗi khi tải lịch sử điểm</p>
             </div>
           ) : pointHistory.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">Chưa có lịch sử cộng điểm</p>
+              <p className="text-white">Chưa có lịch sử cộng điểm</p>
             </div>
           ) : (
             <div className="max-h-96 overflow-y-auto space-y-4 pr-2">
               {pointHistory.map((log: PointLog) => (
                 <div
                   key={log.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-between p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
                 >
                   <div className="flex items-center space-x-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Star className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <Star className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900">{log.reason}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="font-medium text-white">{log.reason}</p>
+                      <p className="text-sm text-white/80">
                         {new Date(log.createdAt).toLocaleDateString('vi-VN')}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p
-                      className={`font-bold ${log.points > 0 ? 'text-green-600' : 'text-red-600'}`}
+                      className={`font-bold ${log.points > 0 ? 'text-white' : 'text-white'}`}
                     >
                       {log.points > 0 ? '+' : ''}
                       {log.points}
                     </p>
-                    <p className="text-sm text-gray-500">điểm</p>
+                    <p className="text-sm text-white/80">điểm</p>
                   </div>
                 </div>
               ))}
@@ -301,9 +301,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Redeem History */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mt-6">
+        <div className="rounded-2xl shadow-lg p-8 mt-6" style={{ backgroundColor: 'rgb(0, 87, 159)' }}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-white">
               Lịch sử đổi quà
             </h2>
             <div className="flex items-center space-x-3">
@@ -312,7 +312,7 @@ export default function ProfilePage() {
                 size="sm"
                 onClick={handleRefreshRedeemHistory}
                 disabled={redeemHistoryLoading}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
+                className="flex items-center space-x-2 text-black hover:text-black hover:bg-white/20 border-white bg-white"
               >
                 <RefreshCw
                   className={`w-4 h-4 ${redeemHistoryLoading ? 'animate-spin' : ''}`}
@@ -320,8 +320,9 @@ export default function ProfilePage() {
                 <span>Làm mới</span>
               </Button>
               <Link href="/#corner-4">
-                <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white">
-                  Đổi quà mới
+                <Button className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 flex items-center space-x-2">
+                  <Gift className="w-5 h-5 text-yellow-600" />
+                  <span>Đổi quà mới</span>
                 </Button>
               </Link>
             </div>
@@ -329,51 +330,51 @@ export default function ProfilePage() {
 
           {redeemHistoryLoading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-500 mx-auto"></div>
-              <p className="mt-6 text-gray-600 text-lg">Đang tải lịch sử...</p>
+              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mx-auto"></div>
+              <p className="mt-6 text-white text-lg">Đang tải lịch sử...</p>
             </div>
           ) : redeemHistoryError ? (
             <div className="text-center py-12">
-              <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Gift className="w-12 h-12 text-red-400" />
+              <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Gift className="w-12 h-12 text-white" />
               </div>
-              <p className="text-red-600 text-lg mb-2">Lỗi tải lịch sử</p>
-              <p className="text-gray-500">
+              <p className="text-white text-lg mb-2">Lỗi tải lịch sử</p>
+              <p className="text-white/80">
                 Không thể tải lịch sử đổi quà. Vui lòng thử lại sau.
               </p>
             </div>
           ) : redeemHistory.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Gift className="w-12 h-12 text-gray-400" />
+              <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Gift className="w-12 h-12 text-white" />
               </div>
-              <p className="text-gray-600 text-lg mb-2">
+              <p className="text-white text-lg mb-2">
                 Chưa có lịch sử đổi quà
               </p>
-              <p className="text-gray-500">Hãy bắt đầu đổi quà ngay!</p>
+              <p className="text-white/80">Hãy bắt đầu đổi quà ngay!</p>
             </div>
           ) : (
             <div className="space-y-4">
               {redeemHistory.map((redeem: RedeemItem) => (
                 <div
                   key={redeem.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-between p-4 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
                 >
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg flex items-center justify-center">
                       <Gift className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-semibold text-white">
                         {redeem.reward?.name || 'Unknown Reward'}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-white/80">
                         SĐT: {redeem.receiverPhone}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-white/80">
                         Email: {redeem.receiverEmail}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-white/80">
                         <Calendar className="w-4 h-4 inline mr-1" />
                         {new Date(redeem.createdAt).toLocaleDateString(
                           'vi-VN'
@@ -382,7 +383,7 @@ export default function ProfilePage() {
                         {new Date(redeem.createdAt).toLocaleTimeString('vi-VN')}
                       </p>
                       {redeem.updatedAt !== redeem.createdAt && (
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-white/60">
                           Cập nhật:{' '}
                           {new Date(redeem.updatedAt).toLocaleDateString(
                             'vi-VN'
@@ -426,7 +427,7 @@ export default function ProfilePage() {
                         </p>
                       </div>
                     )}
-                    <div className="flex items-center space-x-1 text-sm text-gray-500">
+                    <div className="flex items-center space-x-1 text-sm text-white/80">
                       <Star className="w-4 h-4" />
                       <span>-{redeem.pointsUsed} điểm</span>
                     </div>
@@ -438,23 +439,23 @@ export default function ProfilePage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mt-6">
+        <div className="rounded-2xl shadow-lg p-8 mt-6" style={{ backgroundColor: 'rgb(0, 87, 159)' }}>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <button
               onClick={() => navigateWithLoading('/nhip-song', 'Đang chuyển về trang nhịp sống...')}
               className="group h-full text-left"
             >
-              <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors h-full flex flex-col">
+              <div className="bg-white/10 rounded-lg p-6 hover:bg-white/20 transition-colors h-full flex flex-col">
                 <div className="flex items-center space-x-4 flex-1">
                   <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold text-xl">😊</span>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-purple-600">
+                    <h3 className="font-semibold text-white group-hover:text-white">
                       Tạo emoji card
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-white/80">
                       Chia sẻ cảm xúc của bạn
                     </p>
                   </div>
@@ -466,32 +467,32 @@ export default function ProfilePage() {
               onClick={() => navigateWithLoading('/thu-thach-giu-nhip', 'Đang chuyển về trang thử thách giữ nhịp...')}
               className="group h-full text-left"
             >
-              <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors h-full flex flex-col">
+              <div className="bg-white/10 rounded-lg p-6 hover:bg-white/20 transition-colors h-full flex flex-col">
                 <div className="flex items-center space-x-4 flex-1">
                   <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold text-xl">📸</span>
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600">
+                    <h3 className="font-semibold text-white group-hover:text-white">
                       Chia sẻ ảnh
                     </h3>
-                    <p className="text-sm text-gray-600">Tham gia Thử thách giữ nhịp</p>
+                    <p className="text-sm text-white/80">Tham gia Thử thách giữ nhịp</p>
                   </div>
                 </div>
               </div>
             </button>
 
             <Link href="/nhip-bep" className="group h-full">
-              <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors h-full flex flex-col">
+              <div className="bg-white/10 rounded-lg p-6 hover:bg-white/20 transition-colors h-full flex flex-col">
                 <div className="flex items-center space-x-4 flex-1">
                   <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <ChefHat className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-orange-600">
+                    <h3 className="font-semibold text-white group-hover:text-white">
                       Tips cho căn bếp
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-white/80">
                       Khám phá sản phẩm của TIGER
                     </p>
                   </div>
@@ -503,16 +504,16 @@ export default function ProfilePage() {
               onClick={() => navigateWithLoading('/doi-qua', 'Đang chuyển về trang đổi quà...')}
               className="group h-full text-left"
             >
-              <div className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-colors h-full flex flex-col">
+              <div className="bg-white/10 rounded-lg p-6 hover:bg-white/20 transition-colors h-full flex flex-col">
                 <div className="flex items-center space-x-4 flex-1">
                   <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
                     <Gift className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-green-600">
+                    <h3 className="font-semibold text-white group-hover:text-white">
                       Đổi quà
                     </h3>
-                    <p className="text-sm text-gray-600">Sử dụng điểm năng lượng của bạn</p>
+                    <p className="text-sm text-white/80">Sử dụng điểm năng lượng của bạn</p>
                   </div>
                 </div>
               </div>

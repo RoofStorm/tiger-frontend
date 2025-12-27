@@ -73,7 +73,7 @@ export function EmojiSelectionSection({
       </div>
 
       {/* Instruction Text */}
-      <p className={`font-noto-sans text-[12px] pt-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+      <p className={`font-noto-sans text-[12px] pt-2 ${isDarkMode ? 'text-white' : 'text-gray-600'}`}>
         *Bạn chọn ít nhất 3 trạng thái đúng nhất với mình hiện tại nhé!
       </p>
     </motion.div>
