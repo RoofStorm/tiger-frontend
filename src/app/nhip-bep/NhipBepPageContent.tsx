@@ -250,7 +250,7 @@ export function NhipBepPageContent() {
 
   return (
     <div className="min-h-screen">
-      <main className="min-h-[calc(100vh-80px)] bg-white">
+      <main className="min-h-[calc(100vh-80px)] bg-white mt-[64px] md:mt-[80px]">
         {/* Image Container - Relative for absolute text positioning */}
         <div className="relative w-full min-h-[500px] md:min-h-0 max-h-[600px] md:max-h-[700px] overflow-hidden">
           <AnimatePresence mode="wait" custom={slideDirection}>

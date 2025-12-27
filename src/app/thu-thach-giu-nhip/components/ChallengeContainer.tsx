@@ -9,7 +9,7 @@ interface ChallengeContainerProps {
 export function ChallengeContainer({ children }: ChallengeContainerProps) {
   return (
     <div style={{ backgroundColor: '#FFFDF5' }}>
-      <div className="mx-auto sm:px-2 lg:px-4 py-4">
+      <div className="mx-auto sm:px-2 lg:px-4 py-4 mt-[64px] md:mt-[80px]">
         {/* Container with Background */}
         <div
           className="relative rounded-lg overflow-hidden"

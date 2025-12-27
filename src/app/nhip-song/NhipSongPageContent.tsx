@@ -408,7 +408,7 @@ export function NhipSongPageContent() {
           height: 'calc(100vh)',
         }}
       >
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${isDark ? 'py-6' : 'py-12'}`}>
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-[64px] md:mt-[80px] ${isDark ? 'py-6' : 'py-12'}`}>
           {!showMoodCard ? (
             <EmojiSelectionSection
               selectedEmojis={selectedEmojis}

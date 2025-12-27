@@ -33,6 +33,8 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('register');
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +46,27 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
     staleTime: 60 * 1000, // 1 minute
     refetchOnWindowFocus: true,
   });
+
+  // Handle scroll to show/hide header
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show header when scrolling up or at the top
+      if (currentScrollY < lastScrollY || currentScrollY < 10) {
+        setIsHeaderVisible(true);
+      } 
+      // Hide header when scrolling down (only if scrolled past a threshold)
+      else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsHeaderVisible(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -102,9 +125,13 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -100, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        animate={{ 
+          opacity: isHeaderVisible ? 1 : 0,
+          y: isHeaderVisible ? 0 : -100,
+          scale: isHeaderVisible ? 1 : 0.95
+        }}
         transition={{ duration: 0.3, ease: 'easeOut' }}
-        className="relative top-0 left-0 right-0 z-[60]"
+        className="fixed top-0 left-0 right-0 z-[60]"
         style={{
           backgroundColor: isDarkMode ? '#333435' : '#FBF9F380',
           backdropFilter: 'blur(16px)',
