@@ -428,6 +428,9 @@ export function NhipSongPageContent() {
                 onShare={handleShare}
                 onReset={handleReset}
                 onExploreMore={handleExploreMore}
+                cardNumber={moodCardData.cardNumber}
+                frontCardImage={moodCardData.frontCardImage}
+                contentCardImage={moodCardData.contentCardImage}
               />
             )
           )}

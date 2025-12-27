@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { EmojiSelection } from '@/types';
 import { findCombinationByEmojis } from '@/constants/emojiCombinations';
+import { findCardByEmojis, CardConfig } from '@/constants/cardConfig';
 
 export type CombinationCategory = 'mindful' | 'tiger-linked' | 'trendy' | null;
 
@@ -8,6 +9,9 @@ interface MoodCardData {
   whisper: string;
   reminder: string;
   category: CombinationCategory;
+  cardNumber?: 1 | 2 | 3 | 4;
+  frontCardImage?: string;
+  contentCardImage?: string;
 }
 
 const DEFAULT_WHISPER = 'Bạn đã tạo ra một tổ hợp cảm xúc độc đáo. Hãy để những emoji này nói lên điều bạn đang cảm nhận.';
@@ -40,6 +44,26 @@ export function useMoodCard() {
   const generateMoodCard = useCallback(() => {
     if (selectedEmojis.length !== 3) return null;
 
+    // Tìm card config và combination group dựa trên emoji IDs
+    const emojiIds = selectedEmojis.map(emoji => emoji.id);
+    const result = findCardByEmojis(emojiIds);
+
+    // Nếu tìm thấy card config và combination group, sử dụng whisper và reminder từ combination group
+    if (result) {
+      const { card, combinationGroup } = result;
+      const data: MoodCardData = {
+        whisper: combinationGroup.whisper,
+        reminder: combinationGroup.reminder,
+        category: null, // Không dùng category nữa với hệ thống mới
+        cardNumber: card.cardNumber,
+        frontCardImage: card.frontCardImage,
+        contentCardImage: card.contentCardImage,
+      };
+      setMoodCardData(data);
+      return data;
+    }
+
+    // Fallback: Tìm trong hệ thống cũ nếu không tìm thấy trong config mới
     const emojiStrings = selectedEmojis.map(emoji => emoji.emoji);
     const combination = findCombinationByEmojis(emojiStrings);
 

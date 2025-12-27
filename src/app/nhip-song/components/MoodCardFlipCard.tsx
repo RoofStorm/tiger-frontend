@@ -16,6 +16,9 @@ interface MoodCardFlipCardProps {
   onShare: (cardElementRef?: React.RefObject<HTMLDivElement | null>) => void;
   onReset: () => void;
   onExploreMore: () => void;
+  cardNumber?: 1 | 2 | 3 | 4;
+  frontCardImage?: string;
+  contentCardImage?: string;
 }
 
 export function MoodCardFlipCard({
@@ -28,7 +31,15 @@ export function MoodCardFlipCard({
   onShare,
   onReset,
   onExploreMore,
+  cardNumber = 1,
+  frontCardImage,
+  contentCardImage,
 }: MoodCardFlipCardProps) {
+  // Sử dụng cardNumber để xác định images nếu không có props truyền vào
+  const frontImage = frontCardImage || `/nhipsong/front_card_${cardNumber}.png`;
+  const contentImage = contentCardImage || `/nhipsong/card_content${cardNumber}.png`;
+  // Màu text cho whisper và reminder: Card2 và Card3 dùng #333435, các card khác dùng trắng
+  const textColor = cardNumber === 2 || cardNumber === 3 ? '#333435' : '#ffffff';
   const hasAutoFlipped = useRef(false);
   const frontCardRef = useRef<HTMLDivElement>(null);
   const cardContentRef = useRef<HTMLDivElement>(null);
@@ -174,14 +185,14 @@ export function MoodCardFlipCard({
                 ease: [0.4, 0, 0.2, 1], // Custom cubic-bezier for smooth animation
               }}
             >
-              {/* Back of Card (front_card_1.svg) */}
+              {/* Back of Card (front_card_${cardNumber}.png) */}
               <div
                 className="absolute inset-0 w-full h-full"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <div className="relative w-full h-full min-h-[550px]">
                   <Image
-                    src="/nhipsong/front_card_1.png"
+                    src={frontImage}
                     alt="Mood Card Back"
                     fill
                     className="object-contain"
@@ -199,121 +210,111 @@ export function MoodCardFlipCard({
                 style={{
                   backfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
-                  backgroundImage: 'url(/nhipsong/card_content1.png)',
+                  backgroundImage: `url(${contentImage})`,
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat',
                 }}
               >
                 {/* Main Content Section - 80% height */}
-                <div className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-hidden mt-[190px] md:mt-[140px] 2xl:mt-[190px]" style={{ height: '80%'}}>
+                <div className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-hidden mt-[140px] md:mt-[100px] 2xl:mt-[140px]">
                   {/* Content wrapper */}
-                  <div className="flex flex-col items-center justify-center w-full max-w-xs">
+                  <div className="flex flex-col items-center justify-center w-full max-w-xs gap-4">
                     {/* Whisper Section */}
-                    <div className="mb-4 text-center">
-                      <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
+                    <div className="text-center">
+                      <h3 className="font-bold mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)', color: textColor }}>
                         Whisper:
                       </h3>
-                      <p className="text-white leading-relaxed text-xs md:text-sm max-w-[300px] md:max-w-none mx-auto" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
+                      <p className="max-w-[300px] md:max-w-none mx-auto" style={{ 
+                        fontFamily: 'Nunito',
+                        fontWeight: 400,
+                        fontStyle: 'normal',
+                        fontSize: '14px',
+                        lineHeight: '16px',
+                        textAlign: 'center',
+                        color: textColor
+                      }}>
                         {whisper}
                       </p>
                     </div>
 
                     {/* Reminder Section */}
-                    <div className="mb-4 text-center">
-                      <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
-                        Reminder:
+                    <div className="text-center">
+                    <h3 className="font-bold mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)', color: textColor }}>
+                    Reminder:
                       </h3>
-                      <p className="text-white leading-relaxed text-xs md:text-sm max-w-[300px] md:max-w-none mx-auto" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
+                      <p className="max-w-[300px] md:max-w-none mx-auto" style={{ 
+                        fontFamily: 'Nunito',
+                        fontWeight: 400,
+                        fontStyle: 'normal',
+                        fontSize: '14px',
+                        lineHeight: '16px',
+                        textAlign: 'center',
+                        color: textColor
+                      }}>
                         {reminder}
                       </p>
                     </div>
-                  </div>
 
-                  {/* Action Buttons */}
-                  <div className="md:mt-4 mt-0 pt-6 w-full flex flex-col items-center">
-                    <div className="grid grid-cols-2 gap-3 mb-4 max-w-xs w-full">
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDownloadFrontCard();
-                        }}
-                        variant="outline"
-                        className="w-full py-3 rounded-lg border border-white text-white bg-transparent hover:text-white hover:opacity-80 hover:scale-105 active:scale-95 transition-all duration-200"
-                        style={{ fontSize: '14px', backgroundColor: 'transparent', color: '#ffffff' }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = '#ffffff';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = '#ffffff';
-                        }}
-                      >
-                        Lưu cảm xúc
-                      </Button>
+                    {/* Action Buttons */}
+                    <div className="w-full flex flex-col items-center">
+                      <div className="grid grid-cols-2 gap-3 mb-4 max-w-xs w-full">
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDownloadFrontCard();
+                          }}
+                          variant="outline"
+                          className="w-full py-3 rounded-lg border border-white text-white bg-transparent hover:text-white hover:opacity-80 hover:scale-105 active:scale-95 transition-all duration-200"
+                          style={{ fontSize: '14px', backgroundColor: 'transparent', color: '#ffffff' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#ffffff';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#ffffff';
+                          }}
+                        >
+                          Lưu cảm xúc
+                        </Button>
 
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onShare(cardContentRef);
-                        }}
-                        className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-                        style={{ fontSize: '14px' }}
-                      >
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Chia sẻ ngay
-                      </Button>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onShare(cardContentRef);
+                          }}
+                          className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                          style={{ fontSize: '14px' }}
+                        >
+                          <Share2 className="w-4 h-4 mr-2" />
+                          Chia sẻ ngay
+                        </Button>
+                      </div>
+
+                      {/* Try Again Link */}
+                      <div className="text-center mb-4">
+                        <span style={{ fontSize: '14px', color: textColor }}>Chọn lại nhịp sống? </span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onReset();
+                          }}
+                          className="underline transition-colors inline-flex items-center gap-1"
+                          style={{ 
+                            fontSize: '14px',
+                            color: textColor
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.opacity = '0.8';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.opacity = '1';
+                          }}
+                        >
+                          <span>Thử lại ngay</span>
+                          <RotateCcw className="w-4 h-4" style={{ color: textColor }} />
+                        </button>
+                      </div>
                     </div>
-
-                    {/* Try Again Link */}
-                    <div className="text-center mb-4">
-                      <span className="text-white" style={{ fontSize: '14px' }}>Chọn lại nhịp sống? </span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onReset();
-                        }}
-                        className="text-white underline hover:text-white/80 transition-colors inline-flex items-center gap-1"
-                        style={{ fontSize: '14px' }}
-                      >
-                        <span>Thử lại ngay</span>
-                        <RotateCcw className="w-4 h-4" />
-                      </button>
-                    </div>
                   </div>
-                </div>
-
-                {/* Bottom Section - 20% height */}
-                <div 
-                  className="w-full flex flex-col items-center justify-center px-8 pb-6"
-                  style={{ height: '20%', minHeight: '110px', backgroundColor: '#ffffff' }}
-                >
-                  {/* Subtitle */}
-                  <p className="mb-3 mt-2 text-center" style={{ fontSize: '14px', lineHeight: '1.5', color: '#00579F' }}>
-                    Mood là khởi đầu - Giữ nhịp là điều bạn tự tạo nên mỗi ngày. Cùng TIGER tham gia thử thách Giữ Nhịp nhé.
-                  </p>
-                  
-                  {/* Join Now Button */}
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onExploreMore();
-                    }}
-                    className="w-full max-w-md py-3 rounded-lg border-2 transition-all duration-200 inline-flex items-center justify-center gap-2 hover:scale-105 active:scale-95"
-                    style={{ 
-                      fontSize: '16px', 
-                      backgroundColor: '#ffffff', 
-                      color: '#00579F',
-                      borderColor: '#00579F',
-                      fontWeight: 600
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f0f8ff';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#ffffff';
-                    }}
-                  >
-                    <span>Tham gia ngay</span>
-                  </Button>
                 </div>
               </div>
             </motion.div>
@@ -338,7 +339,7 @@ export function MoodCardFlipCard({
       >
         <div className="relative w-full h-full min-h-[550px]">
           <Image
-            src="/nhipsong/card_content1.png"
+            src={contentImage}
             alt="Card Background"
             fill
             className="object-cover"
@@ -350,20 +351,36 @@ export function MoodCardFlipCard({
             <div className="flex flex-col items-center justify-center w-full max-w-xs relative z-10">
               {/* Whisper Section */}
               <div className="mb-4 text-center">
-                <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
+                <h3 className="font-bold mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)', color: textColor }}>
                   Whisper:
                 </h3>
-                <p className="text-white leading-relaxed text-xs md:text-sm" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
+                <p style={{ 
+                  fontFamily: 'Nunito',
+                  fontWeight: 400,
+                  fontStyle: 'normal',
+                  fontSize: '14px',
+                  lineHeight: '16px',
+                  textAlign: 'center',
+                  color: textColor
+                }}>
                   {whisper}
                 </p>
               </div>
 
               {/* Reminder Section */}
               <div className="mb-4 text-center">
-                <h3 className="font-bold text-white mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)' }}>
+                <h3 className="font-bold mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)', color: textColor }}>
                   Reminder:
                 </h3>
-                <p className="text-white leading-relaxed text-xs md:text-sm" style={{ fontSize: 'clamp(10px, 2.5vw, 14px)' }}>
+                <p style={{ 
+                  fontFamily: 'Nunito',
+                  fontWeight: 400,
+                  fontStyle: 'normal',
+                  fontSize: '14px',
+                  lineHeight: '16px',
+                  textAlign: 'center',
+                  color: textColor
+                }}>
                   {reminder}
                 </p>
               </div>
