@@ -9,9 +9,10 @@ import { useVideo } from '@/contexts/VideoContext';
 interface HomeVideoPlayerProps {
   onVideoEnded?: () => void;
   onSkip?: () => void;
+  videoUrl?: string;
 }
 
-export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) {
+export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl }: HomeVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [videoError, setVideoError] = useState<string | null>(null);
@@ -35,8 +36,9 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
     const loadVideoUrl = async () => {
       if (!videoRef.current) return;
 
-      // URL tạm thời
-      const videoUrl = 'https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2011.mp4';
+      // URL mặc định là Coner2.mp4, có thể override qua prop
+      const defaultVideoUrl = 'https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2011.mp4';
+      const finalVideoUrl = videoUrl || defaultVideoUrl;
 
       addDebugLog('🔄 Starting to load video URL...');
       addDebugLog(`🌐 User Agent: ${navigator.userAgent}`);
@@ -50,10 +52,10 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
       addDebugLog(`🎬 Browser H.264 support: ${h264Support || 'no'}`);
 
       try {
-        addDebugLog(`🔗 Fetching video via blob to avoid CORS: ${videoUrl}`);
+        addDebugLog(`🔗 Fetching video via blob to avoid CORS: ${finalVideoUrl}`);
         
         // Fetch video qua blob để tránh CORS
-        const response = await fetch(videoUrl, {
+        const response = await fetch(finalVideoUrl, {
           mode: 'cors',
           credentials: 'omit',
         });
@@ -80,7 +82,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
         // Fallback: thử set URL trực tiếp (không có crossOrigin)
         addDebugLog(`🔄 Trying direct URL without CORS...`);
         try {
-          videoRef.current.src = videoUrl;
+          videoRef.current.src = finalVideoUrl;
           addDebugLog('✅ Fallback: Using direct URL');
         } catch (fallbackError) {
           const fallbackMsg = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
@@ -92,7 +94,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip }: HomeVideoPlayerProps) 
     };
 
     loadVideoUrl();
-  }, []);
+  }, [videoUrl]);
 
   // OLD CODE: Fetch signed URL from backend - hardcode filename "tiger 11.mp4"
   // IMPORTANT: Only use presigned URL directly - NO fallback to proxy endpoint

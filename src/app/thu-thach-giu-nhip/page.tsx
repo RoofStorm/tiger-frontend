@@ -1,8 +1,13 @@
 'use client';
 
+import { VideoProvider } from '@/contexts/VideoContext';
 import { ThuThachGiuNhipPageContent } from './ThuThachGiuNhipPageContent';
 
 export default function ThuThachGiuNhipPage() {
-  return <ThuThachGiuNhipPageContent />;
+  return (
+    <VideoProvider>
+      <ThuThachGiuNhipPageContent />
+    </VideoProvider>
+  );
 }
 

@@ -393,9 +393,9 @@ export function NhipSongPageContent() {
     navigateWithLoading('/thu-thach-giu-nhip', 'Đang chuyển đến Thử thách giữ nhịp...');
   };
 
-  const handleExploreMore = () => {
-    navigateWithLoading('/thu-thach-giu-nhip', 'Đang chuyển đến Thử thách giữ nhịp...');
-  };
+  // const handleExploreMore = () => {
+  //   navigateWithLoading('/thu-thach-giu-nhip', 'Đang chuyển đến Thử thách giữ nhịp...');
+  // };
 
   return (
     <div>
@@ -427,7 +427,6 @@ export function NhipSongPageContent() {
                 onSave={handleSaveMoodCard}
                 onShare={handleShare}
                 onReset={handleReset}
-                onExploreMore={handleExploreMore}
                 cardNumber={moodCardData.cardNumber}
                 frontCardImage={moodCardData.frontCardImage}
                 contentCardImage={moodCardData.contentCardImage}

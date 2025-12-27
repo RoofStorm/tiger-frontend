@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useNextAuth } from '@/hooks/useNextAuth';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { Button } from '@/components/ui/button';
 import { HomeVideoPlayer } from '@/components/HomeVideoPlayer';
@@ -74,6 +73,7 @@ export function HomePageContent() {
           <HomeVideoPlayer
             onVideoEnded={handleVideoEnded}
             onSkip={handleSkipVideo}
+            videoUrl="https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2011.mp4"
           />
         )}
       </AnimatePresence>
