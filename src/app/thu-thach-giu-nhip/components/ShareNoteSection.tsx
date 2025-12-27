@@ -10,6 +10,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import html2canvas from 'html2canvas';
+import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
+import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
 
 // Wish type for highlighted wishes with user info
 interface Wish {
@@ -32,6 +34,8 @@ export function ShareNoteSection() {
   const { toast } = useToast();
   const { isAuthenticated, user } = useNextAuth();
   const queryClient = useQueryClient();
+  const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
+  const { showModal: showShareFacebookModal } = useShareFacebookModal();
   const [noteText, setNoteText] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sharedNoteText, setSharedNoteText] = useState('');
@@ -91,16 +95,27 @@ export function ShareNoteSection() {
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
     onSuccess: (result, content) => {
+      // Check response format: could be { data: {...} } or direct {...}
+      const responseData = result?.data || result;
+      const pointsAwarded = responseData?.pointsAwarded === true;
+
       // Lưu wish ID từ response
-      const wishId = result?.data?.id || result?.id || null;
+      const wishId = responseData?.id || result?.id || null;
       setCreatedWishId(wishId);
       // Lưu nội dung note để hiển thị trong modal
       setSharedNoteText(content);
+
+      // Show join challenge modal if pointsAwarded is true
+      if (pointsAwarded) {
+        setTimeout(() => {
+          showJoinChallengeModal();
+        }, 500);
+      }
       
       // Tạo wish object mới để thêm vào danh sách Highlighted Notes
       if (wishId && user) {
         // Ưu tiên sử dụng data từ response nếu có đầy đủ thông tin
-        const responseWish = result?.data || result;
+        const responseWish = responseData || result;
         // Luôn đặt isHighlighted: true để note mới xuất hiện ngay trong danh sách highlight
         const newWish: Wish = responseWish && 
           responseWish.id && 
@@ -277,17 +292,28 @@ export function ShareNoteSection() {
     mutationFn: ({ wishId, platform }: { wishId: string; platform?: string }) =>
       apiClient.shareWish(wishId, platform),
     onSuccess: result => {
+      // Check response format: could be { data: {...} } or direct {...}
+      const responseData = result?.data || result;
+      const pointsAwarded = responseData?.pointsAwarded === true;
+
       // Invalidate user details to refresh points
       queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
 
+      // Show share Facebook modal if pointsAwarded is true
+      if (pointsAwarded) {
+        setTimeout(() => {
+          showShareFacebookModal();
+        }, 500);
+      }
+
       // Show success message with points info
       toast({
         title: 'Chia sẻ thành công!',
         description:
-          result.pointsMessage || 'Lời chúc đã được chia sẻ thành công.',
-        variant: result.pointsAwarded ? 'success' : 'default',
+          responseData?.pointsMessage || result?.pointsMessage || 'Lời chúc đã được chia sẻ thành công.',
+        variant: pointsAwarded ? 'success' : 'default',
         duration: 4000,
       });
     },
@@ -619,6 +645,8 @@ export function ShareNoteSection() {
           variant: 'destructive',
           duration: 4000,
         });
+        // Vẫn đóng modal dù popup bị block
+        setShowSuccessModal(false);
         return;
       }
 
@@ -640,6 +668,8 @@ export function ShareNoteSection() {
         variant: 'destructive',
         duration: 4000,
       });
+      // Đóng modal khi có lỗi
+      setShowSuccessModal(false);
     }
   }, [createdWishId, sharedNoteText, shareWishMutation, toast, captureModalAndUpload]);
 

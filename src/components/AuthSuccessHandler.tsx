@@ -28,6 +28,9 @@ export function AuthSuccessHandler() {
       session?.user &&
       status === 'authenticated'
     ) {
+      // Clear the flag when OAuth login succeeds to allow modal to show if pointsAwarded is true
+      localStorage.removeItem('dailyLoginModalShown');
+      
       // Show success toast for OAuth login
       toast({
         title: 'Đăng nhập thành công!',

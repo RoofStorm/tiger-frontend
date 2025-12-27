@@ -19,12 +19,14 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useInputFix } from '@/hooks/useInputFix';
 import { EmojiPicker } from '@/components/EmojiPicker';
+import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 
 export function Corner2_2() {
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { onKeyDown: handleInputKeyDown } = useInputFix();
+  const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const captionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -174,6 +176,10 @@ export function Corner2_2() {
 
       const result = await apiClient.createPost(postData);
 
+      // Check response format: could be { data: {...} } or direct {...}
+      const responseData = result?.data || result;
+      const pointsAwarded = responseData?.pointsAwarded === true;
+
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts', user?.id],
       });
@@ -190,11 +196,18 @@ export function Corner2_2() {
         fileInputRef.current.value = '';
       }
 
+      // Show join challenge modal if pointsAwarded is true
+      if (pointsAwarded) {
+        setTimeout(() => {
+          showJoinChallengeModal();
+        }, 500);
+      }
+
       // Show success message with points info
       toast({
         title: 'Đăng bài thành công!',
         description:
-          result.pointsMessage || 'Bài viết của bạn đã được chia sẻ.',
+          responseData?.pointsMessage || result?.pointsMessage || 'Bài viết của bạn đã được chia sẻ.',
         variant: 'success',
         duration: 4000,
       });

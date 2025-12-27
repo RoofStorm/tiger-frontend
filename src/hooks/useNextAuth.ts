@@ -78,6 +78,10 @@ export function useNextAuth(): UseNextAuthReturn {
             if (refreshToken) {
               localStorage.setItem('refreshToken', refreshToken);
             }
+
+            // Clear the flag when user logs in to allow modal to show if pointsAwarded is true
+            // The DailyLoginModalProvider will check the session and show the modal
+            localStorage.removeItem('dailyLoginModalShown');
           }
 
           // Clear cache after session is updated
@@ -188,12 +192,14 @@ export function useNextAuth(): UseNextAuthReturn {
       localStorage.removeItem('userId');
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('dailyLoginModalShown');
 
       // Clear cache before logout to prevent stale data
       queryClient.clear();
 
       await signOut({ redirect: false });
-      router.push('/');
+      // Refresh router to update UI (header, etc.) but stay on current page
+      router.refresh();
     } catch (error) {
       console.error('Logout failed:', error);
     }

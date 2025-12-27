@@ -4,15 +4,21 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Send, Heart } from 'lucide-react';
 import apiClient from '@/lib/api';
+import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 
 export const WishForm = () => {
   const [content, setContent] = useState('');
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
 
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
     onSuccess: result => {
+      // Check response format: could be { data: {...} } or direct {...}
+      const responseData = result?.data || result;
+      const pointsAwarded = responseData?.pointsAwarded === true;
+
       setContent('');
       queryClient.invalidateQueries({ queryKey: ['highlighted-wishes'] });
       // Invalidate user details to refresh points
@@ -20,10 +26,17 @@ export const WishForm = () => {
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
 
+      // Show join challenge modal if pointsAwarded is true
+      if (pointsAwarded) {
+        setTimeout(() => {
+          showJoinChallengeModal();
+        }, 500);
+      }
+
       // Show success message with points info
       toast({
         title: 'Gửi lời chúc thành công!',
-        description: result.pointsMessage || 'Lời chúc của bạn đã được gửi!',
+        description: responseData?.pointsMessage || result?.pointsMessage || 'Lời chúc của bạn đã được gửi!',
         variant: 'success',
         duration: 4000,
       });

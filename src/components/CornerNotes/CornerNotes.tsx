@@ -6,6 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 import { Button } from '@/components/ui/button';
 
 const MAX_WORDS = 200;
@@ -14,6 +15,7 @@ export function CornerNotes() {
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
   const [content, setContent] = useState('');
 
   // Fetch highlighted wishes
@@ -34,7 +36,11 @@ export function CornerNotes() {
   // Create wish mutation
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
-    onSuccess: () => {
+    onSuccess: (result) => {
+      // Check response format: could be { data: {...} } or direct {...}
+      const responseData = result?.data || result;
+      const pointsAwarded = responseData?.pointsAwarded === true;
+
       queryClient.invalidateQueries({
         queryKey: ['highlighted-wishes-notes'],
       });
@@ -42,6 +48,14 @@ export function CornerNotes() {
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
       setContent('');
+
+      // Show join challenge modal if pointsAwarded is true
+      if (pointsAwarded) {
+        setTimeout(() => {
+          showJoinChallengeModal();
+        }, 500);
+      }
+
       toast({
         title: 'Chia sẻ thành công!',
         description: 'Câu chuyện của bạn đã được chia sẻ.',

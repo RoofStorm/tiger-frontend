@@ -10,12 +10,16 @@ import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@/components/ui/modal';
+import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
+import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
 
 
 export function LunchboxUploadSection() {
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
+  const { showModal: showShareFacebookModal } = useShareFacebookModal();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const captionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -172,8 +176,12 @@ export function LunchboxUploadSection() {
 
       const createPostResult = await apiClient.createPost(postData);
 
+      // Check response format: could be { data: {...} } or direct {...}
+      const responseData = createPostResult?.data || createPostResult;
+      const pointsAwarded = responseData?.pointsAwarded === true;
+
       // Save post ID for sharing
-      const postId = createPostResult?.data?.id || createPostResult?.id || null;
+      const postId = responseData?.id || createPostResult?.id || null;
       setCreatedPostId(postId);
 
       // Invalidate queries
@@ -182,6 +190,13 @@ export function LunchboxUploadSection() {
       });
       queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
+
+      // Show join challenge modal if pointsAwarded is true
+      if (pointsAwarded) {
+        setTimeout(() => {
+          showJoinChallengeModal();
+        }, 500);
+      }
 
       // Save uploaded image URL and caption for modal
       setUploadedImageUrl(uploadResult.data.url);
@@ -227,6 +242,10 @@ export function LunchboxUploadSection() {
     mutationFn: ({ postId, platform }: { postId: string; platform?: string }) =>
       apiClient.sharePost(postId, platform),
     onSuccess: result => {
+      // Check response format: could be { data: {...} } or direct {...}
+      const responseData = result?.data || result;
+      const pointsAwarded = responseData?.pointsAwarded === true;
+
       // Invalidate posts to refresh global counts
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts-challenge', user?.id],
@@ -236,12 +255,19 @@ export function LunchboxUploadSection() {
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
+      // Show share Facebook modal if pointsAwarded is true
+      if (pointsAwarded) {
+        setTimeout(() => {
+          showShareFacebookModal();
+        }, 500);
+      }
+
       // Show success message with points info
       toast({
         title: 'Chia sẻ thành công!',
         description:
-          result.pointsMessage || 'Bài viết đã được chia sẻ thành công.',
-        variant: result.pointsAwarded ? 'success' : 'default',
+          responseData?.pointsMessage || result?.pointsMessage || 'Bài viết đã được chia sẻ thành công.',
+        variant: pointsAwarded ? 'success' : 'default',
         duration: 4000,
       });
     },
@@ -289,6 +315,8 @@ export function LunchboxUploadSection() {
         variant: 'destructive',
         duration: 4000,
       });
+      // Vẫn đóng modal dù popup bị block
+      setShowSuccessModal(false);
       return;
     }
 

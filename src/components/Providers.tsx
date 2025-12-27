@@ -7,6 +7,9 @@ import { Toaster } from '@/components/ui/toaster';
 import { LoadingProvider } from '@/contexts/LoadingContext';
 import { HeaderDarkModeProvider } from '@/contexts/HeaderDarkModeContext';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
+import { DailyLoginModalProvider } from '@/components/DailyLoginModalProvider';
+import { JoinChallengeModalProvider } from '@/contexts/JoinChallengeModalContext';
+import { ShareFacebookModalProvider } from '@/contexts/ShareFacebookModalContext';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -43,9 +46,14 @@ export function Providers({ children }: { children: React.ReactNode }) {
       >
         <LoadingProvider>
           <HeaderDarkModeProvider>
-            {children}
-            <LoadingOverlay />
-            <Toaster />
+            <JoinChallengeModalProvider>
+              <ShareFacebookModalProvider>
+                {children}
+                <LoadingOverlay />
+                <Toaster />
+                <DailyLoginModalProvider />
+              </ShareFacebookModalProvider>
+            </JoinChallengeModalProvider>
           </HeaderDarkModeProvider>
         </LoadingProvider>
       </SessionProvider>

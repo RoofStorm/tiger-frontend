@@ -66,6 +66,7 @@ async function handleOAuthLogin(
     console.log(`✅ ${provider} OAuth login successful:`, {
       userId: responseData.user.id,
       email: responseData.user.email,
+      pointsAwarded: responseData.pointsAwarded,
     });
 
     return {
@@ -76,6 +77,8 @@ async function handleOAuthLogin(
       role: responseData.user.role || 'USER',
       accessToken: responseData.accessToken,
       refreshToken: responseData.refreshToken,
+      // Store pointsAwarded flag to show daily login modal
+      pointsAwarded: responseData.pointsAwarded || false,
     };
   } catch (error) {
     console.error(`❌ Error calling ${provider} OAuth API:`, error);
@@ -213,6 +216,7 @@ export const authOptions: NextAuthOptions = {
               id: responseData.user.id,
               email: responseData.user.email,
               hasAccessToken: !!responseData.accessToken,
+              pointsAwarded: responseData.pointsAwarded,
             });
 
             // Store tokens for later use in JWT callback
@@ -226,6 +230,8 @@ export const authOptions: NextAuthOptions = {
               // Store tokens for JWT callback
               accessToken: responseData.accessToken,
               refreshToken: responseData.refreshToken,
+              // Store pointsAwarded flag to show daily login modal
+              pointsAwarded: responseData.pointsAwarded || false,
             };
           } catch (fetchError: unknown) {
             clearTimeout(timeoutId);
@@ -294,14 +300,16 @@ export const authOptions: NextAuthOptions = {
           user.image = backendUser.image;
           user.role = backendUser.role;
 
-          // Store tokens for JWT callback
+          // Store tokens and pointsAwarded for JWT callback
           interface UserWithTokens {
             accessToken?: string;
             refreshToken?: string;
+            pointsAwarded?: boolean;
           }
           const userWithTokens = user as typeof user & UserWithTokens;
           userWithTokens.accessToken = backendUser.accessToken;
           userWithTokens.refreshToken = backendUser.refreshToken;
+          userWithTokens.pointsAwarded = backendUser.pointsAwarded;
 
           return true;
         } catch (error) {
@@ -341,14 +349,16 @@ export const authOptions: NextAuthOptions = {
           user.image = backendUser.image;
           user.role = backendUser.role;
 
-          // Store tokens for JWT callback
+          // Store tokens and pointsAwarded for JWT callback
           interface UserWithTokens {
             accessToken?: string;
             refreshToken?: string;
+            pointsAwarded?: boolean;
           }
           const userWithTokens = user as typeof user & UserWithTokens;
           userWithTokens.accessToken = backendUser.accessToken;
           userWithTokens.refreshToken = backendUser.refreshToken;
+          userWithTokens.pointsAwarded = backendUser.pointsAwarded;
 
           return true;
         } catch (error) {
@@ -368,12 +378,15 @@ export const authOptions: NextAuthOptions = {
         interface UserWithTokens {
           accessToken?: string;
           refreshToken?: string;
+          pointsAwarded?: boolean;
         }
         const userWithTokens = user as UserWithTokens;
         if (userWithTokens.accessToken) {
           // Use accessToken from backend API
           token.accessToken = userWithTokens.accessToken;
           token.refreshToken = userWithTokens.refreshToken;
+          // Store pointsAwarded flag
+          token.pointsAwarded = userWithTokens.pointsAwarded || false;
         } else {
           // For OAuth providers (Google/Facebook), tokens are already provided by backend API
           // AccessToken and refreshToken are attached to user object in signIn callback
@@ -381,6 +394,7 @@ export const authOptions: NextAuthOptions = {
             accessToken?: string;
             refreshToken?: string;
             image?: string;
+            pointsAwarded?: boolean;
           }
           const userWithTokens = user as UserWithTokens;
           
@@ -389,6 +403,8 @@ export const authOptions: NextAuthOptions = {
             token.accessToken = userWithTokens.accessToken;
             token.refreshToken = userWithTokens.refreshToken;
             token.avatarUrl = userWithTokens.image;
+            // Store pointsAwarded flag
+            token.pointsAwarded = userWithTokens.pointsAwarded || false;
           } else {
             // Fallback: Create JWT token if backend didn't provide one
             // This should not happen if backend API is working correctly
@@ -404,6 +420,7 @@ export const authOptions: NextAuthOptions = {
             );
             token.accessToken = accessToken;
             token.avatarUrl = user.image;
+            token.pointsAwarded = false;
           }
         }
       }
@@ -412,6 +429,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         const avatarUrl = (token as { avatarUrl?: string }).avatarUrl;
+        const pointsAwarded = (token as { pointsAwarded?: boolean }).pointsAwarded;
 
         session.user.id = (token as { userId?: string }).userId || token.sub!;
         session.user.role = token.role;
@@ -421,6 +439,8 @@ export const authOptions: NextAuthOptions = {
         (session as { refreshToken?: string }).refreshToken = (
           token as { refreshToken?: string }
         ).refreshToken;
+        // Store pointsAwarded flag in session
+        (session as { pointsAwarded?: boolean }).pointsAwarded = pointsAwarded || false;
       }
       return session;
     },
