@@ -5,14 +5,12 @@ import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Gift, Star, Leaf } from 'lucide-react';
 import Image from 'next/image';
-import { Button } from '@/components/ui/button';
 import { Reward, CreateRedeemData } from '@/types';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
-import { useInputFix } from '@/hooks/useInputFix';
-import { PhoneInput } from '@/components/ui/phone-input';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
+import { RedeemModal } from '@/components/RedeemModal';
 
 interface UserRedeem {
   id: string;
@@ -26,16 +24,10 @@ export function DoiQuaPageContent() {
   const { user, isAuthenticated } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { onKeyDown: handleInputKeyDown } = useInputFix();
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const [activeTab, setActiveTab] = useState<TabType>('doi-qua');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
-  const [redeemForm, setRedeemForm] = useState({
-    receiverName: '',
-    receiverPhone: '',
-    receiverAddress: '',
-  });
 
   // Fetch user details including points
   const { data: userDetails } = useQuery({
@@ -44,49 +36,15 @@ export function DoiQuaPageContent() {
     enabled: isAuthenticated,
   });
 
-  // Fixed reward cards data (no longer fetch from API)
-  const rewards: Reward[] = [
-    {
-      id: 'voucher-50k',
-      name: 'Voucher 50K',
-      description: 'Cho sản phẩm TIGER (giới hạn 3 lần/user)',
-      pointsRequired: 200,
-      imageUrl: '/uudai/card_voucher_background.svg',
-      isActive: true,
-      maxPerUser: 3,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'voucher-100k',
-      name: 'Voucher 100K',
-      description: 'Cho sản phẩm TIGER (giới hạn 3 lần/user)',
-      pointsRequired: 200,
-      imageUrl: '/uudai/card_voucher_background.svg',
-      isActive: true,
-      maxPerUser: 3,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'voucher-500k',
-      name: 'Voucher 500K',
-      description: 'Cho sản phẩm TIGER (giới hạn 3 lần/user)',
-      pointsRequired: 200,
-      imageUrl: '/uudai/card_voucher_background.svg',
-      isActive: true,
-      maxPerUser: 3,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'voucher-700k',
-      name: 'Voucher 700K',
-      description: 'Cho sản phẩm TIGER (giới hạn 3 lần/user)',
-      pointsRequired: 200,
-      imageUrl: '/uudai/card_voucher_background.svg',
-      isActive: true,
-      maxPerUser: 3,
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  // Fetch rewards from API
+  const { data: rewardsData, isLoading: isLoadingRewards } = useQuery({
+    queryKey: ['rewards'],
+    queryFn: () => apiClient.getRewards(1, 100), // Get first 100 rewards
+  });
+
+  // Filter active rewards and sort by pointsRequired (ascending)
+  const rewards: Reward[] = (rewardsData?.data?.data?.filter((reward: Reward) => reward.isActive) || [])
+    .sort((a: Reward, b: Reward) => (a.pointsRequired || 0) - (b.pointsRequired || 0));
 
   // Fetch user's redeem history
   const { data: redeemHistory } = useQuery({
@@ -129,11 +87,6 @@ export function DoiQuaPageContent() {
       queryClient.invalidateQueries({ queryKey: ['redeemHistory'] });
       setShowRedeemModal(false);
       setSelectedReward(null);
-      setRedeemForm({
-        receiverName: '',
-        receiverPhone: '',
-        receiverAddress: '',
-      });
       toast({
         title: 'Đã gửi yêu cầu đổi quà!',
         description: 'Yêu cầu của bạn đang được xử lý.',
@@ -191,12 +144,13 @@ export function DoiQuaPageContent() {
     setShowRedeemModal(true);
   };
 
-  const handleRedeemSubmit = () => {
+  const handleRedeemSubmit = (formData: { receiverPhone: string; receiverEmail: string }) => {
     if (!selectedReward) return;
 
-    const data: CreateRedeemData = {
+    const data: any = {
       rewardId: selectedReward.id,
-      ...redeemForm,
+      receiverPhone: formData.receiverPhone,
+      receiverEmail: formData.receiverEmail,
     };
 
     redeemMutation.mutate(data);
@@ -410,6 +364,15 @@ export function DoiQuaPageContent() {
             {/* Tab Content */}
             {activeTab === 'doi-qua' && (
               <div className="mb-16">
+                {isLoadingRewards ? (
+                  <div className="flex justify-center items-center py-12">
+                    <div className="text-gray-600">Đang tải danh sách quà...</div>
+                  </div>
+                ) : rewards.length === 0 ? (
+                  <div className="flex justify-center items-center py-12">
+                    <div className="text-gray-600">Không có quà nào khả dụng</div>
+                  </div>
+                ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-3 justify-items-center max-w-6xl mx-auto">
                   {rewards.map((reward: Reward, index: number) => {
                     // Extract voucher value from reward name (e.g., "50K", "100K")
@@ -519,7 +482,8 @@ export function DoiQuaPageContent() {
                       </motion.div>
                     );
                   })}
-                </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -750,132 +714,16 @@ export function DoiQuaPageContent() {
 
 
             {/* Redeem Modal */}
-            {showRedeemModal && selectedReward && (
-              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="bg-white rounded-3xl p-8 w-full max-w-lg shadow-2xl"
-                >
-                  <div className="text-center mb-8">
-                    <h3 className="text-3xl font-bold text-gray-900 mb-2">
-                      Đổi quà
-                    </h3>
-                    <p className="text-gray-600 text-lg">{selectedReward.name}</p>
-                    <div className="inline-flex items-center space-x-2 bg-yellow-100 px-4 py-2 rounded-full mt-4">
-                      <Star className="w-5 h-5 text-yellow-600 fill-current" />
-                      <span className="font-bold text-yellow-800">
-                        {selectedReward.lifeRequired
-                          ? `${selectedReward.lifeRequired} Nhịp sống`
-                          : `${selectedReward.pointsRequired} điểm năng lượng`}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-3">
-                        Tên người nhận
-                      </label>
-                      <input
-                        type="text"
-                        value={redeemForm.receiverName}
-                        onChange={e =>
-                          setRedeemForm(prev => ({
-                            ...prev,
-                            receiverName: e.target.value,
-                          }))
-                        }
-                        onKeyDown={handleInputKeyDown}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 text-lg"
-                        placeholder="Nhập tên người nhận"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-3">
-                        Số điện thoại
-                      </label>
-                      <PhoneInput
-                        value={redeemForm.receiverPhone}
-                        onChange={value =>
-                          setRedeemForm(prev => ({
-                            ...prev,
-                            receiverPhone: value,
-                          }))
-                        }
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 text-lg"
-                        placeholder="Nhập số điện thoại"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-3">
-                        Địa chỉ
-                      </label>
-                      <textarea
-                        value={redeemForm.receiverAddress}
-                        onChange={e => {
-                          // Không trim - giữ nguyên giá trị người dùng nhập
-                          setRedeemForm(prev => ({
-                            ...prev,
-                            receiverAddress: e.target.value,
-                          }));
-                        }}
-                        onKeyDown={(e) => {
-                          // Ngăn event bubbling lên parent để tránh bị ảnh hưởng
-                          e.stopPropagation();
-                        }}
-                        onKeyPress={(e) => {
-                          // Ngăn event bubbling lên parent
-                          e.stopPropagation();
-                        }}
-                        onKeyUp={(e) => {
-                          // Ngăn event bubbling lên parent
-                          e.stopPropagation();
-                        }}
-                        onDragOver={(e) => {
-                          // Ngăn drag events từ parent ảnh hưởng đến textarea
-                          e.stopPropagation();
-                        }}
-                        onDrop={(e) => {
-                          // Ngăn drop events từ parent ảnh hưởng đến textarea
-                          e.stopPropagation();
-                        }}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-300 resize-none text-lg"
-                        rows={3}
-                        placeholder="Nhập địa chỉ nhận quà"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-4 mt-8">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowRedeemModal(false)}
-                      className="flex-1 py-3 text-lg rounded-xl border-2 hover:bg-gray-50 transition-all duration-300"
-                    >
-                      Hủy
-                    </Button>
-                    <Button
-                      onClick={handleRedeemSubmit}
-                      disabled={
-                        !redeemForm.receiverName ||
-                        !redeemForm.receiverPhone ||
-                        !redeemForm.receiverAddress ||
-                        redeemMutation.isPending
-                      }
-                      className="flex-1 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-3 text-lg rounded-xl shadow-lg hover:shadow-green-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {redeemMutation.isPending
-                        ? '⏳ Đang xử lý...'
-                        : '🎁 Xác nhận đổi quà'}
-                    </Button>
-                  </div>
-                </motion.div>
-              </div>
-            )}
+            <RedeemModal
+              isOpen={showRedeemModal}
+              onClose={() => {
+                setShowRedeemModal(false);
+                setSelectedReward(null);
+              }}
+              selectedReward={selectedReward}
+              onSubmit={handleRedeemSubmit}
+              isPending={redeemMutation.isPending}
+            />
           </div>
         </div>
       </main>

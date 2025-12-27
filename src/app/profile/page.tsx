@@ -17,9 +17,8 @@ interface RedeemItem {
   pointsUsed: number;
   createdAt: string;
   updatedAt: string;
-  receiverName: string;
   receiverPhone: string;
-  receiverAddress: string;
+  receiverEmail: string;
   rejectionReason?: string;
   reward?: {
     id: string;
@@ -370,18 +369,10 @@ export default function ProfilePage() {
                         {redeem.reward?.name || 'Unknown Reward'}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Người nhận: {redeem.receiverName}
-                      </p>
-                      <p className="text-sm text-gray-500">
                         SĐT: {redeem.receiverPhone}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Địa chỉ:{' '}
-                        <Tooltip content={redeem.receiverAddress}>
-                          <span className="inline-block max-w-[300px] truncate cursor-help">
-                            {redeem.receiverAddress}
-                          </span>
-                        </Tooltip>
+                        Email: {redeem.receiverEmail}
                       </p>
                       <p className="text-sm text-gray-500">
                         <Calendar className="w-4 h-4 inline mr-1" />
