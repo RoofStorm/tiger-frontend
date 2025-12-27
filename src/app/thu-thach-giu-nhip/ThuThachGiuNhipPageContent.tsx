@@ -26,6 +26,7 @@ export function ThuThachGiuNhipPageContent() {
             onVideoEnded={handleVideoEnded}
             onSkip={handleSkipVideo}
             videoUrl="https://s3.tiger-corporation-vietnam.vn/tiger-videos/Coner2.mp4"
+            showMuteButton={false}
           />
         )}
       </AnimatePresence>

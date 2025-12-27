@@ -10,9 +10,10 @@ interface HomeVideoPlayerProps {
   onVideoEnded?: () => void;
   onSkip?: () => void;
   videoUrl?: string;
+  showMuteButton?: boolean;
 }
 
-export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl }: HomeVideoPlayerProps) {
+export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton = true }: HomeVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [videoError, setVideoError] = useState<string | null>(null);
@@ -330,21 +331,23 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl }: HomeVideoPla
       </AnimatePresence>
 
       {/* Top Controls - Mute Button */}
-      <div className="absolute top-6 right-6 z-40">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-white hover:bg-white/20"
-          onClick={toggleMute}
-          disabled={isLoading}
-        >
-          {isMuted ? (
-            <VolumeX className="w-5 h-5" />
-          ) : (
-            <Volume2 className="w-5 h-5" />
-          )}
-        </Button>
-      </div>
+      {showMuteButton && (
+        <div className="absolute top-6 right-6 z-40">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-white/20"
+            onClick={toggleMute}
+            disabled={isLoading}
+          >
+            {isMuted ? (
+              <VolumeX className="w-5 h-5" />
+            ) : (
+              <Volume2 className="w-5 h-5" />
+            )}
+          </Button>
+        </div>
+      )}
 
       {/* Skip Button - bottom-right over video */}
       <div className="absolute bottom-6 right-6 z-40">
