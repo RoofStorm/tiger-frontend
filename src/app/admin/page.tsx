@@ -4,6 +4,7 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
 import {
   Users,
   Gift,
@@ -42,6 +43,7 @@ export default function AdminPage() {
   const router = useRouter();
   const { closeConfirm, confirmState } = useConfirm();
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const { showModal: showRegistrationModal } = useShareRegistrationModal();
 
   // Redirect if not admin
   useEffect(() => {
@@ -118,7 +120,7 @@ export default function AdminPage() {
             Vui lòng đăng nhập
           </h1>
           <button
-            onClick={() => router.push('/auth/login')}
+            onClick={() => showRegistrationModal('login')}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             Đăng nhập

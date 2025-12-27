@@ -161,18 +161,8 @@ class ApiClient {
                 console.error('Error signing out from NextAuth:', signoutError);
               }
 
-              // Only redirect to login if user is on a protected page
-              const currentPath = window.location.pathname;
-              const protectedPaths = ['/profile', '/admin', '/wishes'];
-              const isProtectedPage = protectedPaths.some(path =>
-                currentPath.startsWith(path)
-              );
-
-              if (isProtectedPage) {
-                setTimeout(() => {
-                  window.location.href = '/auth/login';
-                }, 100);
-              }
+              // Note: Login is now handled via modal, no need to redirect
+              // Protected pages will show login prompt via modal when needed
             }
           }
         }

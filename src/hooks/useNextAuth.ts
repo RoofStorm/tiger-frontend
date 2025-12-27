@@ -90,14 +90,7 @@ export function useNextAuth(): UseNextAuthReturn {
           // Mark video as watched when user logs in
           localStorage.setItem('hasWatchedVideo', 'true');
 
-          // Prevent any redirect to /auth/login
-          // If we're on /auth/login, replace with current page or home
-          if (typeof window !== 'undefined' && window.location.pathname === '/auth/login') {
-            // Replace URL without navigation to prevent redirect
-            const currentUrl = window.location.href;
-            const newUrl = currentUrl.replace('/auth/login', '/');
-            window.history.replaceState({}, '', newUrl);
-          }
+          // Note: Login is now handled via modal, no redirect needed
 
           // Refresh router to ensure all components update (header, etc.)
           // Use setTimeout to ensure URL replacement happens first

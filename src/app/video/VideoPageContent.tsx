@@ -6,11 +6,13 @@ import { Corner0 } from '@/components/Corner0/Corner0';
 import { Button } from '@/components/ui/button';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { useRouter } from 'next/navigation';
+import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
 
 export function VideoPageContent() {
   const [showIntroModal, setShowIntroModal] = useState(false);
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const router = useRouter();
+  const { showModal: showRegistrationModal } = useShareRegistrationModal();
 
   const handleSkip = () => {
     localStorage.setItem('hasWatchedVideo', 'true');
@@ -93,7 +95,8 @@ export function VideoPageContent() {
                   <button
                     className="text-gray-900 underline underline-offset-2 hover:text-blue-700"
                     onClick={() => {
-                      navigateWithLoading('/auth/login', 'Đang chuyển đến đăng nhập...');
+                      setShowIntroModal(false);
+                      showRegistrationModal('login');
                     }}
                   >
                     Đăng nhập ngay

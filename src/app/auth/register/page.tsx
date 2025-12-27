@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, Suspense } from 'react';
-import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,6 +9,7 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
 
 const registerSchema = z
   .object({
@@ -31,6 +31,7 @@ function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register: registerUser, loading } = useNextAuth();
   const { toast } = useToast();
+  const { showModal: showRegistrationModal } = useShareRegistrationModal();
 
   const {
     register,
@@ -348,12 +349,12 @@ function RegisterForm() {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Đã có tài khoản?{' '}
-              <Link
-                href="/auth/login"
+              <button
+                onClick={() => showRegistrationModal('login')}
                 className="font-semibold text-purple-600 hover:text-purple-500"
               >
                 Đăng nhập ngay
-              </Link>
+              </button>
             </p>
           </div>
         </div>

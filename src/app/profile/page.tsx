@@ -9,6 +9,7 @@ import apiClient from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
+import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
 
 interface RedeemItem {
   id: string;
@@ -38,6 +39,7 @@ export default function ProfilePage() {
   const { user, isAuthenticated } = useNextAuth();
   const queryClient = useQueryClient();
   const { navigateWithLoading } = useGlobalNavigationLoading();
+  const { showModal: showRegistrationModal } = useShareRegistrationModal();
 
   // Refetch all queries when user enters profile page
   useEffect(() => {
@@ -126,9 +128,7 @@ export default function ProfilePage() {
           <p className="text-gray-600 mb-6">
             Vui lòng đăng nhập để xem thông tin cá nhân.
           </p>
-          <Link href="/auth/login">
-            <Button>Đăng nhập</Button>
-          </Link>
+          <Button onClick={() => showRegistrationModal('login')}>Đăng nhập</Button>
         </div>
       </div>
     );

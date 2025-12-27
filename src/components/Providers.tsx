@@ -10,6 +10,7 @@ import { LoadingOverlay } from '@/components/LoadingOverlay';
 import { DailyLoginModalProvider } from '@/components/DailyLoginModalProvider';
 import { JoinChallengeModalProvider } from '@/contexts/JoinChallengeModalContext';
 import { ShareFacebookModalProvider } from '@/contexts/ShareFacebookModalContext';
+import { ShareRegistrationModalProvider } from '@/contexts/ShareRegistrationModalContext';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -48,10 +49,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <HeaderDarkModeProvider>
             <JoinChallengeModalProvider>
               <ShareFacebookModalProvider>
-                {children}
-                <LoadingOverlay />
-                <Toaster />
-                <DailyLoginModalProvider />
+                <ShareRegistrationModalProvider>
+                  {children}
+                  <LoadingOverlay />
+                  <Toaster />
+                  <DailyLoginModalProvider />
+                </ShareRegistrationModalProvider>
               </ShareFacebookModalProvider>
             </JoinChallengeModalProvider>
           </HeaderDarkModeProvider>

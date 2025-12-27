@@ -7,12 +7,12 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { Button } from '@/components/ui/button';
 import { Send, Heart, Star } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import apiClient from '@/lib/api';
 import { WishSection } from '@/components/WishSection';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
+import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
 
 const suggestedWishes = [
   {
@@ -92,6 +92,7 @@ export default function WishesPage() {
   const { toast } = useToast();
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
+  const { showModal: showRegistrationModal } = useShareRegistrationModal();
 
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
@@ -155,9 +156,7 @@ export default function WishesPage() {
           <p className="text-gray-600 mb-6">
             Vui lòng đăng nhập để gửi lời chúc.
           </p>
-          <Link href="/auth/login">
-            <Button>Đăng nhập</Button>
-          </Link>
+          <Button onClick={() => showRegistrationModal('login')}>Đăng nhập</Button>
         </div>
       </div>
     );
