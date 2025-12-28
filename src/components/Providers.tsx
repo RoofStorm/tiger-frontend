@@ -43,7 +43,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <SessionProvider
         refetchInterval={0} // Disable automatic refetch
-        refetchOnWindowFocus={true} // Refetch on window focus to keep session updated
+        refetchOnWindowFocus={false} // Disable refetch on window focus to reduce API calls (session is cached)
         refetchWhenOffline={false} // Don't refetch when offline
       >
         <AnalyticsProvider>

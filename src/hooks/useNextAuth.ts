@@ -79,9 +79,10 @@ export function useNextAuth(): UseNextAuthReturn {
               localStorage.setItem('refreshToken', refreshToken);
             }
 
-            // Clear the flag when user logs in to allow modal to show if pointsAwarded is true
-            // The DailyLoginModalProvider will check the session and show the modal
+            // Clear the flags when user logs in to allow modal to show if pointsAwarded is true
+            // The DailyLoginModalProvider will check the session via /api/auth/session and show the modal
             localStorage.removeItem('dailyLoginModalShown');
+            localStorage.removeItem('dailyLoginModalShownDate');
           }
 
           // Clear cache after session is updated
@@ -156,6 +157,11 @@ export function useNextAuth(): UseNextAuthReturn {
           // Wait for session to update
           await new Promise(resolve => setTimeout(resolve, 200));
 
+          // Clear the flags when user registers/logs in to allow modal to show if pointsAwarded is true
+          // The DailyLoginModalProvider will check the session via /api/auth/session and show the modal
+          localStorage.removeItem('dailyLoginModalShown');
+          localStorage.removeItem('dailyLoginModalShownDate');
+
           // Clear cache and refresh router
           queryClient.clear();
           router.refresh();
@@ -186,6 +192,7 @@ export function useNextAuth(): UseNextAuthReturn {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('dailyLoginModalShown');
+      localStorage.removeItem('dailyLoginModalShownDate');
 
       // Clear cache before logout to prevent stale data
       queryClient.clear();

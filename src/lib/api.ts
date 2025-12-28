@@ -19,6 +19,8 @@ export function setGlobalLoadingState(state: {
 class ApiClient {
   private client: AxiosInstance;
   private refreshPromise: Promise<string> | null = null;
+  private sessionCache: { session: any; timestamp: number } | null = null;
+  private readonly SESSION_CACHE_TTL = 30 * 1000; // Cache session for 30 seconds
 
   constructor() {
     this.client = axios.create({
@@ -46,6 +48,7 @@ class ApiClient {
         // Add auth header for all protected endpoints
         const protectedEndpoints = [
           '/auth/me',
+          '/auth/session',
           '/posts',
           '/actions',
           '/redeems',
@@ -91,8 +94,21 @@ class ApiClient {
         if (shouldAddAuth) {
           // Only get session on client side
           if (typeof window !== 'undefined') {
-            // Use JWT access token from NextAuth session for all endpoints
-            const session = await getSession();
+            let session = null;
+            
+            // Check cache first to avoid unnecessary API calls
+            const now = Date.now();
+            if (
+              this.sessionCache &&
+              now - this.sessionCache.timestamp < this.SESSION_CACHE_TTL
+            ) {
+              session = this.sessionCache.session;
+            } else {
+              // Cache miss or expired - fetch fresh session
+              session = await getSession();
+              this.sessionCache = { session, timestamp: now };
+            }
+            
             if (session?.user) {
               // Get accessToken from session (JWT token)
               const accessToken = (session as any).accessToken;
@@ -150,6 +166,9 @@ class ApiClient {
             // Clear all tokens on refresh failure
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
+            
+            // Clear session cache to force fresh fetch
+            this.sessionCache = null;
 
             // If refresh fails, check if we have a session
             const session = await getSession();
@@ -236,23 +255,8 @@ class ApiClient {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', newRefreshToken);
 
-      // Update NextAuth session with new tokens
-      try {
-        const session = await getSession();
-        if (session) {
-          // Trigger session update to include new tokens
-          await fetch('/api/auth/update-session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              accessToken,
-              refreshToken: newRefreshToken,
-            }),
-          });
-        }
-      } catch (error) {
-        console.error('Error updating NextAuth session:', error);
-      }
+      // NextAuth will automatically use tokens from localStorage via interceptors
+      // No need to call update-session API
 
       return accessToken;
     } catch (error) {
@@ -277,6 +281,29 @@ class ApiClient {
   // User endpoints
   async getCurrentUser(): Promise<any> {
     const response = await this.client.get('/auth/me');
+    return response.data?.data || null;
+  }
+
+  // Session endpoint - Get current session with user info and tokens
+  async getSession(): Promise<{
+    user: {
+      id: string;
+      email: string;
+      name: string;
+      role: string;
+      username: string;
+      avatarUrl: string | null;
+      points: number;
+      referralCode: string;
+    };
+    expires: string;
+    accessToken: string;
+    refreshToken: string;
+    pointsAwarded: boolean;
+  } | null> {
+    const response = await this.client.get('/auth/session');
+    // Backend returns: { success: true, data: { user, expires, accessToken, refreshToken, pointsAwarded } }
+    // Return the data object from the response
     return response.data?.data || null;
   }
 

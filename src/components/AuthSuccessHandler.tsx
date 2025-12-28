@@ -28,8 +28,10 @@ export function AuthSuccessHandler() {
       session?.user &&
       status === 'authenticated'
     ) {
-      // Clear the flag when OAuth login succeeds to allow modal to show if pointsAwarded is true
+      // Clear the flags when OAuth login succeeds to allow modal to show if pointsAwarded is true
+      // The DailyLoginModalProvider will check the session via /api/auth/session and show the modal
       localStorage.removeItem('dailyLoginModalShown');
+      localStorage.removeItem('dailyLoginModalShownDate');
       
       // Show success toast for OAuth login
       toast({
