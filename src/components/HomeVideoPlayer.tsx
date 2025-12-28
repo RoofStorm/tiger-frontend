@@ -15,10 +15,12 @@ interface HomeVideoPlayerProps {
 
 export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton = true }: HomeVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isMuted, setIsMuted] = useState(true);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasShownIntro, setHasShownIntro] = useState(false);
+  const [hasUnmuted, setHasUnmuted] = useState(false);
 
   // Sử dụng context để chia sẻ trạng thái video
   const { setIsVideoPlaying } = useVideo();
@@ -285,8 +287,26 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
     setIsMuted(!isMuted);
   };
 
+  // Handle first tap anywhere on screen to unmute
+  const handleFirstTap = () => {
+    if (hasUnmuted || !isMuted) return; // Chỉ unmute nếu chưa unmute và đang muted
+    
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = false;
+    setIsMuted(false);
+    setHasUnmuted(true);
+    addDebugLog('🔊 Unmuted video on first tap');
+  };
+
   return (
-    <div className="fixed inset-0 z-[70] bg-black">
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 z-[70] bg-black"
+      onClick={handleFirstTap}
+      onTouchStart={handleFirstTap}
+    >
       {/* Background Video */}
       <div className="absolute inset-0 z-0">
         <video
@@ -337,7 +357,10 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
             variant="ghost"
             size="sm"
             className="text-white hover:bg-white/20"
-            onClick={toggleMute}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleMute();
+            }}
             disabled={isLoading}
           >
             {isMuted ? (
@@ -352,7 +375,10 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
       {/* Skip Button - bottom-right over video */}
       <div className="absolute bottom-6 right-6 z-40">
         <button
-          onClick={handleSkip}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleSkip();
+          }}
           className="px-3 py-1.5 text-xs md:text-sm rounded-full bg-black/60 hover:bg-black/75 text-white border border-white/20 transition-colors"
           disabled={isLoading}
           style={{ opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'wait' : 'pointer' }}
