@@ -39,8 +39,19 @@ class ApiClient {
     // Request interceptor to add auth token
     this.client.interceptors.request.use(
       async config => {
-        // Show loading for non-GET requests or important endpoints
-        if (config.method !== 'get' || config.url?.includes('/auth/')) {
+        // Silent endpoints that should not show loading (background API calls)
+        const silentEndpoints = [
+          '/auth/session', // Session check is a background call
+          '/analytics/events', // Analytics events are background calls
+          '/analytics/corners', // Corner analytics are background calls
+        ];
+
+        const isSilentEndpoint = silentEndpoints.some(endpoint =>
+          config.url?.includes(endpoint)
+        );
+
+        // Show loading for non-GET requests or important endpoints, but skip silent endpoints
+        if (!isSilentEndpoint && (config.method !== 'get' || config.url?.includes('/auth/'))) {
           globalLoadingState?.setLoading(true);
           globalLoadingState?.setLoadingMessage('Đang xử lý...');
         }
