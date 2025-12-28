@@ -70,14 +70,11 @@ export function ShareNoteSection() {
   const wishes = useMemo(() => {
     // Extract wishes from response
     // Normalized response structure: { success: true, data: [...], pagination: {...} }
-    console.log('📋 [ShareNoteSection] wishesData from query:', wishesData);
     const rawWishes: Wish[] = Array.isArray(wishesData)
       ? wishesData
       : Array.isArray(wishesData?.data)
         ? wishesData.data
         : [];
-
-    console.log('📋 [ShareNoteSection] Extracted rawWishes:', rawWishes);
 
     if (rawWishes.length === 0) return [];
     
@@ -173,8 +170,6 @@ export function ShareNoteSection() {
               ? oldData.data
               : [];
 
-          console.log('📋 [ShareNoteSection] Highlighted wishes BEFORE update:', oldWishes);
-
           // Thêm wish mới vào cuối danh sách
           const updatedWishes = [...oldWishes, newWish];
 
@@ -210,7 +205,6 @@ export function ShareNoteSection() {
                   },
                 };
           
-          console.log('📋 [ShareNoteSection] Highlighted wishes AFTER update:', updatedWishes);
           return newCacheData;
         });
 
@@ -225,8 +219,6 @@ export function ShareNoteSection() {
                 ? serverData.data
                 : [];
 
-            console.log('📋 [ShareNoteSection] Server data after refetch:', serverWishes);
-
             // Kiểm tra xem note mới đã có trong response từ server chưa
             const wishExists = serverWishes.some(wish => wish.id === wishId);
             
@@ -239,9 +231,6 @@ export function ShareNoteSection() {
                     : wish
                 )
               : [...serverWishes, newWish]; // Giữ isFromCache: true cho note mới
-
-            console.log('📋 [ShareNoteSection] Final wishes after merge:', finalWishes);
-            console.log('📋 [ShareNoteSection] Note already exists in server:', wishExists);
 
             // Update cache với data đã merge
             const cacheData = Array.isArray(serverData)
@@ -478,7 +467,6 @@ export function ShareNoteSection() {
 
     try {
       setIsGeneratingImage(true);
-      console.log('📸 [SHARE] Bắt đầu capture modal thành image');
 
       const element = modalRef.current;
       const originalStyle = {
@@ -491,29 +479,23 @@ export function ShareNoteSection() {
       element.style.opacity = '1';
       element.style.visibility = 'visible';
       element.style.pointerEvents = 'none';
-      console.log('🎨 [SHARE] Đã cập nhật style của element để capture');
 
       // Đợi một chút để đảm bảo render
       await new Promise(resolve => setTimeout(resolve, 100));
 
       // Đợi tất cả images trong element load xong
       const images = element.querySelectorAll('img');
-      console.log('🖼️ [SHARE] Tìm thấy', images.length, 'images trong element');
       await Promise.all(
         Array.from(images).map(
-          (img, index) =>
+          (img) =>
             new Promise((resolve, reject) => {
               if (img.complete) {
-                console.log(`✅ [SHARE] Image ${index + 1} đã load xong`);
                 resolve(null);
               } else {
-                console.log(`⏳ [SHARE] Đang đợi image ${index + 1} load...`);
                 img.onload = () => {
-                  console.log(`✅ [SHARE] Image ${index + 1} đã load xong`);
                   resolve(null);
                 };
                 img.onerror = (error) => {
-                  console.error(`❌ [SHARE] Image ${index + 1} load lỗi:`, error);
                   reject(error);
                 };
               }
@@ -524,7 +506,6 @@ export function ShareNoteSection() {
       // Đợi thêm một chút để đảm bảo mọi thứ đã render hoàn toàn
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      console.log('🎬 [SHARE] Bắt đầu html2canvas...');
       const canvas = await html2canvas(element, {
         backgroundColor: null,
         scale: 2,
@@ -534,19 +515,13 @@ export function ShareNoteSection() {
         width: element.offsetWidth,
         height: element.offsetHeight,
       });
-      console.log('✅ [SHARE] html2canvas thành công, canvas size:', {
-        width: canvas.width,
-        height: canvas.height,
-      });
 
       // Khôi phục style ban đầu
       element.style.opacity = originalStyle.opacity || '1';
       element.style.visibility = originalStyle.visibility || 'visible';
       element.style.pointerEvents = originalStyle.pointerEvents || 'auto';
-      console.log('🔄 [SHARE] Đã khôi phục style ban đầu của element');
 
       // Convert canvas thành blob
-      console.log('💾 [SHARE] Bắt đầu convert canvas thành blob...');
       return new Promise((resolve, reject) => {
         canvas.toBlob(async (blob) => {
           if (!blob) {
@@ -556,23 +531,14 @@ export function ShareNoteSection() {
             return;
           }
 
-          console.log('✅ [SHARE] Blob created, size:', blob.size, 'bytes');
-
           // Tạo File từ blob
           const file = new File([blob], `share-note-${Date.now()}.png`, {
             type: 'image/png',
           });
-          console.log('📁 [SHARE] File created:', {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-          });
 
           // Upload image lên server
-          console.log('☁️ [SHARE] Bắt đầu upload image lên server...');
           try {
             const uploadResult = await apiClient.uploadFile(file);
-            console.log('✅ [SHARE] Upload thành công, full response:', JSON.stringify(uploadResult, null, 2));
             
             // Parse URL từ response - API trả về { success: true, data: { url: "..." } }
             let imageUrl: string | null = null;
@@ -584,8 +550,6 @@ export function ShareNoteSection() {
               // Nếu data là string URL trực tiếp
               imageUrl = uploadResult.data;
             }
-            
-            console.log('🔗 [SHARE] Parsed Image URL:', imageUrl);
             
             if (!imageUrl) {
               console.error('❌ [SHARE] Không tìm thấy URL trong response:', uploadResult);
@@ -642,8 +606,6 @@ export function ShareNoteSection() {
         return;
       }
 
-      console.log('🖼️ [SHARE] Image URL từ upload:', imageUrl);
-
       // Tạo URL preview cho wish với share page để có meta tags và image
       const baseUrl =
         process.env.NEXT_PUBLIC_PUBLIC_URL ||
@@ -651,8 +613,6 @@ export function ShareNoteSection() {
         'https://tiger-corporation-vietnam.vn';
       const wishUrl = `${baseUrl}/wishes/share?wishId=${encodeURIComponent(createdWishId || '')}&content=${encodeURIComponent(sharedNoteText || '')}&imageUrl=${encodeURIComponent(imageUrl)}`;
       const wishTitle = sharedNoteText || 'Lời chúc từ Tiger Mood Corner';
-
-      console.log('🔗 [SHARE] Share URL với imageUrl:', wishUrl);
 
       // Tạo Facebook Share URL với quote parameter
       const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(wishUrl)}&quote=${encodeURIComponent(wishTitle)}`;

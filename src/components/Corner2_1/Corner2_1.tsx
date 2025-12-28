@@ -306,17 +306,8 @@ export function Corner2_1() {
       'https://tiger-corporation-vietnam.vn'; // Fallback to production URL
     const postUrl = `${baseUrl}/posts/${post.id}`;
 
-    // Console log để debug imageUrl
-    console.log('🖼️ [SHARE DEBUG] Image URL:', {
-      postId: post.id,
-      imageUrl: post.imageUrl,
-      postUrl: postUrl,
-      fullPost: post,
-    });
-
     // Tạo Facebook Share URL
     const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
-    console.log('📱 Facebook Share URL:', facebookShareUrl);
 
     // Mở popup Facebook Share Dialog
     const popup = window.open(

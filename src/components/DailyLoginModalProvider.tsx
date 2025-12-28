@@ -22,18 +22,9 @@ export function DailyLoginModalProvider() {
     const today = new Date().toDateString();
     const lastShownDate = localStorage.getItem('dailyLoginModalShownDate');
 
-    console.log('🔍 Modal check:', {
-      pointsAwarded,
-      hasShownModal,
-      lastShownDate,
-      today,
-      shouldShow: pointsAwarded === true && (!hasShownModal || lastShownDate !== today),
-    });
-
     // If pointsAwarded is true, update user points immediately
     // This ensures header shows the correct points after bonus is awarded
     if (pointsAwarded === true) {
-      console.log('✅ Points awarded - updating user points in UI');
       updateUserPoints(userId);
     }
 
@@ -44,20 +35,12 @@ export function DailyLoginModalProvider() {
       pointsAwarded === true &&
       (!hasShownModal || lastShownDate !== today)
     ) {
-      console.log('✅ Showing DailyLoginModal');
       // Small delay to ensure UI is ready
       setTimeout(() => {
         setShowModal(true);
         localStorage.setItem('dailyLoginModalShown', 'true');
         localStorage.setItem('dailyLoginModalShownDate', today);
       }, 500);
-    } else {
-      console.log('❌ Not showing modal:', {
-        pointsAwarded,
-        hasShownModal,
-        lastShownDate,
-        today,
-      });
     }
   }, [updateUserPoints]);
 
@@ -74,8 +57,6 @@ export function DailyLoginModalProvider() {
       // 3. Check latest pointsAwarded status
       const sessionData = await apiClient.getSession();
 
-      console.log('🔍 Session data from API:', sessionData);
-
       if (sessionData) {
         // Store userId for quick access (not sensitive)
         if (sessionData.user?.id) {
@@ -85,8 +66,8 @@ export function DailyLoginModalProvider() {
         // Check if tokens actually changed before updating NextAuth session
         // Get current tokens from session (not localStorage)
         const currentSession = await getSession();
-        const currentAccessToken = (currentSession as any)?.accessToken;
-        const currentRefreshToken = (currentSession as any)?.refreshToken;
+        const currentAccessToken = currentSession?.accessToken;
+        const currentRefreshToken = currentSession?.refreshToken;
         
         const tokensChanged = 
           (sessionData.accessToken && sessionData.accessToken !== currentAccessToken) ||
@@ -95,14 +76,11 @@ export function DailyLoginModalProvider() {
         // Tokens are stored in NextAuth session (JWT), not localStorage
         // Update NextAuth session to store new tokens in JWT
         if (tokensChanged) {
-          console.log('🔄 Tokens changed - updating NextAuth session');
           // Note: We need to update the session with new tokens
           // This will be handled by NextAuth when we call update()
           // But we need to ensure tokens are passed to NextAuth JWT callback
           // For now, just update the session - tokens should be in sessionData
           await update();
-        } else {
-          console.log('⏭️ Tokens unchanged - skipping NextAuth session update');
         }
 
         // Check pointsAwarded and show modal
@@ -162,10 +140,9 @@ export function DailyLoginModalProvider() {
         
         // First, check pointsAwarded from NextAuth session (already available from login)
         // This avoids unnecessary API call if we already have the data
-        const sessionPointsAwarded = (session as { pointsAwarded?: boolean }).pointsAwarded;
+        const sessionPointsAwarded = session.pointsAwarded;
         const userId = session?.user?.id;
         if (sessionPointsAwarded !== undefined) {
-          console.log('🔍 Using pointsAwarded from NextAuth session:', sessionPointsAwarded);
           checkAndShowModal(sessionPointsAwarded, userId);
         }
         
@@ -230,11 +207,7 @@ export function DailyLoginModalProvider() {
         // Use ref to persist across re-renders
         if (now - lastFocusCheckTimeRef.current >= THROTTLE_MS) {
           lastFocusCheckTimeRef.current = now;
-          console.log('✅ Window focused - checking session');
           checkBackendSession();
-        } else {
-          const timeRemaining = Math.ceil((THROTTLE_MS - (now - lastFocusCheckTimeRef.current)) / 1000);
-          console.log(`⏭️ Skipping session check - throttled (${timeRemaining}s remaining)`);
         }
       }
     };

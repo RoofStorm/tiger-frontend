@@ -63,12 +63,6 @@ async function handleOAuthLogin(
       return null;
     }
 
-    console.log(`✅ ${provider} OAuth login successful:`, {
-      userId: responseData.user.id,
-      email: responseData.user.email,
-      pointsAwarded: responseData.pointsAwarded,
-    });
-
     return {
       id: responseData.user.id,
       email: responseData.user.email,
@@ -133,12 +127,6 @@ export const authOptions: NextAuthOptions = {
             process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
           const loginUrl = `${apiBaseUrl}/auth/login`;
 
-          console.log('🔐 Attempting login:', {
-            username: credentials.username,
-            apiUrl: loginUrl,
-            timestamp: new Date().toISOString(),
-          });
-
           // Add timeout to prevent hanging
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
@@ -157,12 +145,6 @@ export const authOptions: NextAuthOptions = {
             });
 
             clearTimeout(timeoutId);
-
-            console.log('📡 Backend response:', {
-              status: response.status,
-              statusText: response.statusText,
-              ok: response.ok,
-            });
 
             if (!response.ok) {
               let errorData;
@@ -194,11 +176,6 @@ export const authOptions: NextAuthOptions = {
             }
 
             const data = await response.json();
-            console.log('✅ Login response received:', {
-              hasSuccess: !!data.success,
-              hasData: !!data.data,
-              hasUser: !!(data.success && data.data ? data.data.user : data.user),
-            });
 
             // Backend wraps response in { success: true, data: {...} } format via ResponseInterceptor
             // Handle both wrapped and unwrapped formats for flexibility
@@ -211,13 +188,6 @@ export const authOptions: NextAuthOptions = {
               );
               return null;
             }
-
-            console.log('✅ Login successful for user:', {
-              id: responseData.user.id,
-              email: responseData.user.email,
-              hasAccessToken: !!responseData.accessToken,
-              pointsAwarded: responseData.pointsAwarded,
-            });
 
             // Store tokens for later use in JWT callback
             // We'll attach these to the user object so they're available in JWT callback
@@ -266,15 +236,6 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === 'google') {
         try {
-          console.log('🔵 Google signIn callback:', {
-            hasEmail: !!user.email,
-            email: user.email,
-            hasName: !!user.name,
-            name: user.name,
-            hasImage: !!user.image,
-            userId: user.id,
-          });
-
           if (!user.email) {
             console.error('❌ No email provided by Google');
             return false;
@@ -320,14 +281,6 @@ export const authOptions: NextAuthOptions = {
 
       if (account?.provider === 'facebook') {
         try {
-          console.log('🔵 Facebook signIn callback:', {
-            hasEmail: !!user.email,
-            email: user.email,
-            hasName: !!user.name,
-            name: user.name,
-            hasImage: !!user.image,
-            userId: user.id,
-          });
 
           // Call backend API to handle OAuth login
           const backendUser = await handleOAuthLogin('facebook', {

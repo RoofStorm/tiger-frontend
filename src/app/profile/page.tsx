@@ -53,7 +53,6 @@ export default function ProfilePage() {
   // Refetch all queries when user enters profile page
   useEffect(() => {
     if (isAuthenticated && user?.id) {
-      console.log('🔄 Refetching all queries for profile page');
       queryClient.refetchQueries({ queryKey: ['userDetails', user.id] });
       queryClient.refetchQueries({ queryKey: ['pointHistory', user.id] });
       queryClient.refetchQueries({ queryKey: ['redeemHistory', user.id] });
@@ -86,7 +85,6 @@ export default function ProfilePage() {
 
   // Function to refresh redeem history
   const handleRefreshRedeemHistory = () => {
-    console.log('🔄 Refreshing redeem history...');
     refetchRedeemHistory();
   };
 
@@ -106,7 +104,6 @@ export default function ProfilePage() {
 
   // Function to refresh point history
   const handleRefreshPointHistory = () => {
-    console.log('🔄 Refreshing point history...');
     refetchPointHistory();
   };
 

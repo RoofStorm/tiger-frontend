@@ -25,13 +25,6 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
   // Sử dụng context để chia sẻ trạng thái video
   const { setIsVideoPlaying } = useVideo();
 
-  // Helper function để thêm debug log
-  const addDebugLog = (message: string) => {
-    const timestamp = new Date().toLocaleTimeString();
-    const logMessage = `[${timestamp}] ${message}`;
-    console.log(logMessage);
-  };
-
   // TEMPORARY: Sử dụng URL trực tiếp thay vì fetch từ API
   // TODO: Sau này sẽ quay lại fetch signed URL từ backend
   // Xử lý CORS bằng cách fetch video qua blob và tạo object URL
@@ -43,20 +36,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
       const defaultVideoUrl = 'https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2011.mp4';
       const finalVideoUrl = videoUrl || defaultVideoUrl;
 
-      addDebugLog('🔄 Starting to load video URL...');
-      addDebugLog(`🌐 User Agent: ${navigator.userAgent}`);
-      addDebugLog(`📱 Is Mobile: ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}`);
-      
-      // Check video format support before loading
-      const testVideoElement = document.createElement('video');
-      const mp4Support = testVideoElement.canPlayType('video/mp4');
-      const h264Support = testVideoElement.canPlayType('video/mp4; codecs="avc1.42E01E"');
-      addDebugLog(`🎬 Browser MP4 support: ${mp4Support || 'no'}`);
-      addDebugLog(`🎬 Browser H.264 support: ${h264Support || 'no'}`);
-
       try {
-        addDebugLog(`🔗 Fetching video via blob to avoid CORS: ${finalVideoUrl}`);
-        
         // Fetch video qua blob để tránh CORS
         const response = await fetch(finalVideoUrl, {
           mode: 'cors',
@@ -70,9 +50,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
         const blob = await response.blob();
         const blobUrl = URL.createObjectURL(blob);
         
-        addDebugLog(`✅ Created blob URL from video`);
         videoRef.current.src = blobUrl;
-        addDebugLog('✅ Loaded video with blob URL (CORS handled)');
         
         // Cleanup blob URL khi component unmount
         return () => {
@@ -80,16 +58,12 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
         };
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : String(error);
-        addDebugLog(`❌ Error fetching video: ${errorMsg}`);
         
         // Fallback: thử set URL trực tiếp (không có crossOrigin)
-        addDebugLog(`🔄 Trying direct URL without CORS...`);
         try {
           videoRef.current.src = finalVideoUrl;
-          addDebugLog('✅ Fallback: Using direct URL');
         } catch (fallbackError) {
-          const fallbackMsg = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
-          addDebugLog(`❌ Fallback also failed: ${fallbackMsg}`);
+          console.error('❌ [VIDEO] Error setting video source:', fallbackError);
           setVideoError(`Không thể tải video: ${errorMsg}. Vui lòng kiểm tra kết nối mạng hoặc CORS settings.`);
           setIsLoading(false);
         }
@@ -169,20 +143,12 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
 
     const handleLoadedMetadata = () => {
       setIsLoading(false);
-      addDebugLog('✅ Video metadata loaded successfully');
-      addDebugLog(`📹 Video source: ${video.currentSrc?.substring(0, 100)}...`);
-      addDebugLog(`⏱️ Video duration: ${video.duration} seconds`);
-      addDebugLog(`📐 Video dimensions: ${video.videoWidth}x${video.videoHeight}`);
     };
     const handleCanPlay = () => {
       setIsLoading(false);
-      addDebugLog('▶️ Video can play');
       // Auto play khi video ready
-      video.play().then(() => {
-        addDebugLog('✅ Auto play started');
-      }).catch((err) => {
-        const errorMsg = err instanceof Error ? err.message : String(err);
-        addDebugLog(`❌ Auto play failed: ${errorMsg}`);
+      video.play().catch(() => {
+        // Silent fail for autoplay
       });
     };
     const handlePlay = () => {
@@ -218,31 +184,15 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
       if (error) {
         const errorName = errorCodeNames[error.code] || `Unknown(${error.code})`;
         errorDetails = `Code: ${error.code} (${errorName}), Message: ${error.message || 'No message'}`;
-        addDebugLog(`❌ Video error: ${errorDetails}`);
-        addDebugLog(`📹 Current source: ${video.currentSrc?.substring(0, 100)}...`);
-        addDebugLog(`🔄 Network state: ${video.networkState} (0=EMPTY, 1=IDLE, 2=LOADING, 3=NO_SOURCE, 4=LOADED_METADATA)`);
-        addDebugLog(`📊 Ready state: ${video.readyState} (0=HAVE_NOTHING, 1=HAVE_METADATA, 2=HAVE_CURRENT_DATA, 3=HAVE_FUTURE_DATA, 4=HAVE_ENOUGH_DATA)`);
-        addDebugLog(`🌐 User Agent: ${navigator.userAgent}`);
-        addDebugLog(`📱 Is Mobile: ${/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)}`);
-        
-        // Check video format support
-        const errorTestVideo = document.createElement('video');
-        const mp4SupportError = errorTestVideo.canPlayType('video/mp4');
-        const h264SupportError = errorTestVideo.canPlayType('video/mp4; codecs="avc1.42E01E"');
-        addDebugLog(`🎬 Can play MP4: ${mp4SupportError || 'no'}`);
-        addDebugLog(`🎬 Can play H.264: ${h264SupportError || 'no'}`);
       }
       
       // Video error - show error message (no fallback)
-      addDebugLog('❌ Video loading failed');
       setVideoError(`Video loading failed: ${errorDetails}`);
       setIsLoading(false);
     };
     const handleLoadStart = () => {
       setVideoError(null);
       setIsLoading(true);
-      addDebugLog('🎬 Video loading started...');
-      addDebugLog(`📹 Video source: ${video.src?.substring(0, 100)}...`);
     };
 
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
@@ -297,7 +247,6 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
     video.muted = false;
     setIsMuted(false);
     setHasUnmuted(true);
-    addDebugLog('🔊 Unmuted video on first tap');
   };
 
   return (

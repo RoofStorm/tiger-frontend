@@ -111,7 +111,7 @@ class ApiClient {
             
             if (session?.user) {
               // Get accessToken from NextAuth session only (no localStorage)
-              const accessToken = (session as any).accessToken;
+              const accessToken = session.accessToken;
               if (accessToken) {
                 config.headers.Authorization = `Bearer ${accessToken}`;
               } else {
@@ -207,7 +207,7 @@ class ApiClient {
 
     // Get refresh token from NextAuth session only (no localStorage)
     const session = await getSession();
-    const refreshToken = (session as any)?.refreshToken;
+    const refreshToken = session?.refreshToken;
 
     if (!refreshToken) {
       throw new Error('No refresh token available in session');

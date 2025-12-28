@@ -50,10 +50,6 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
           const videoUrl = result.data?.url;
           if (videoUrl) {
             videoRef.current.src = videoUrl;
-            console.log(
-              '✅ Loaded video with Signed URL from Cloudflare R2:',
-              videoUrl
-            );
           } else {
             const errorMsg = 'No presigned URL in API response';
             console.error(`❌ ${errorMsg}`);
@@ -86,9 +82,6 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
       setDuration(video.duration);
       setIsVideoReady(true);
       setIsLoading(false);
-      console.log('✅ Video metadata loaded successfully');
-      console.log('📹 Video source:', video.currentSrc);
-      console.log('⏱️ Video duration:', video.duration, 'seconds');
     };
     const handleCanPlay = () => {
       setIsVideoReady(true);
@@ -148,7 +141,6 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
       setVideoError(null);
       setIsVideoReady(false);
       setIsLoading(true);
-      console.log('🎬 Video loading started...');
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);

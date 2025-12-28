@@ -19,10 +19,6 @@ export async function generateMetadata({
   // Parse imageUrl từ query params - chỉ dùng nếu có
   const imageUrl = params.imageUrl;
   
-  // Debug log (chỉ trong development)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔍 [WISHES/SHARE] generateMetadata - imageUrl:', imageUrl);
-  }
 
   // Tạo title từ content
   let title = 'Lời chúc từ Tiger Mood Corner';
@@ -102,10 +98,6 @@ export default async function WishSharePage({
   // Parse imageUrl từ query params - chỉ dùng nếu có
   const imageUrl = params.imageUrl;
   
-  // Debug log (chỉ trong development)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('🔍 [WISHES/SHARE] WishSharePage - imageUrl:', imageUrl);
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center p-4">

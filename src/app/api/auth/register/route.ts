@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
 
     // Call Backend API to create user with referral code
     // Backend will handle user existence check and validation
-    console.log(`🔄 Creating user via Backend API: ${email}`);
     try {
       const apiBaseUrl =
         process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
@@ -37,11 +36,6 @@ export async function POST(request: NextRequest) {
         const errorData = await response.json().catch(() => ({
           message: 'Registration failed',
         }));
-        console.log(
-          '⚠️ Backend API error response:',
-          response.status,
-          errorData
-        );
 
         // Extract error message from backend response
         const errorMessage =
@@ -57,7 +51,6 @@ export async function POST(request: NextRequest) {
       }
 
       const data = await response.json();
-      console.log('🔍 Backend response:', JSON.stringify(data, null, 2));
 
       // Handle backend response format: { success: true, data: { user, accessToken, ... } }
       // or direct format: { user, accessToken, ... }
@@ -67,15 +60,11 @@ export async function POST(request: NextRequest) {
           : data.user || data.data;
 
       if (userData) {
-        console.log(
-          `✅ User created successfully via Backend: ${userData.email}`
-        );
         return NextResponse.json({
           message: 'User created successfully',
           user: userData,
         });
       } else {
-        console.log('⚠️ Backend API returned unexpected format:', data);
         return NextResponse.json(
           {
             error: data.error || data.message || 'Đăng ký thất bại',

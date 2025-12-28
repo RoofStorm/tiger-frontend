@@ -20,6 +20,9 @@ declare module 'next-auth' {
       image?: string;
       role: 'USER' | 'ADMIN';
     };
+    accessToken?: string;
+    refreshToken?: string;
+    pointsAwarded?: boolean;
   }
 
   interface User {
