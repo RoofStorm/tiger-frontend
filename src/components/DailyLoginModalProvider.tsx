@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
+import { useSession, getSession } from 'next-auth/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { DailyLoginModal } from './DailyLoginModal';
 import { apiClient } from '@/lib/api';
@@ -14,6 +14,7 @@ export function DailyLoginModalProvider() {
   const [showModal, setShowModal] = useState(false);
   const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasCheckedSessionRef = useRef(false);
+  const lastFocusCheckTimeRef = useRef<number>(0);
 
   // Function to check and show modal based on pointsAwarded
   const checkAndShowModal = useCallback((pointsAwarded: boolean, userId?: string) => {
@@ -76,20 +77,33 @@ export function DailyLoginModalProvider() {
       console.log('🔍 Session data from API:', sessionData);
 
       if (sessionData) {
-        // Update tokens in localStorage
-        if (sessionData.accessToken) {
-          localStorage.setItem('accessToken', sessionData.accessToken);
-        }
-        if (sessionData.refreshToken) {
-          localStorage.setItem('refreshToken', sessionData.refreshToken);
-        }
+        // Store userId for quick access (not sensitive)
         if (sessionData.user?.id) {
           localStorage.setItem('userId', sessionData.user.id);
         }
 
-        // Trigger NextAuth session update to refresh session data
-        // NextAuth will automatically pick up tokens from localStorage via interceptors
-        await update();
+        // Check if tokens actually changed before updating NextAuth session
+        // Get current tokens from session (not localStorage)
+        const currentSession = await getSession();
+        const currentAccessToken = (currentSession as any)?.accessToken;
+        const currentRefreshToken = (currentSession as any)?.refreshToken;
+        
+        const tokensChanged = 
+          (sessionData.accessToken && sessionData.accessToken !== currentAccessToken) ||
+          (sessionData.refreshToken && sessionData.refreshToken !== currentRefreshToken);
+
+        // Tokens are stored in NextAuth session (JWT), not localStorage
+        // Update NextAuth session to store new tokens in JWT
+        if (tokensChanged) {
+          console.log('🔄 Tokens changed - updating NextAuth session');
+          // Note: We need to update the session with new tokens
+          // This will be handled by NextAuth when we call update()
+          // But we need to ensure tokens are passed to NextAuth JWT callback
+          // For now, just update the session - tokens should be in sessionData
+          await update();
+        } else {
+          console.log('⏭️ Tokens unchanged - skipping NextAuth session update');
+        }
 
         // Check pointsAwarded and show modal
         // Always check if pointsAwarded changed (e.g., user got daily bonus while app was open)
@@ -205,10 +219,23 @@ export function DailyLoginModalProvider() {
   }, [session, status, checkBackendSession]);
 
   // Check session on window focus (when user returns to app)
+  // Throttle to prevent too many API calls (max once per 30 seconds)
   useEffect(() => {
+    const THROTTLE_MS = 30 * 1000; // 30 seconds
+
     const handleFocus = () => {
       if (status === 'authenticated' && session) {
-        checkBackendSession();
+        const now = Date.now();
+        // Only check if at least 30 seconds have passed since last check
+        // Use ref to persist across re-renders
+        if (now - lastFocusCheckTimeRef.current >= THROTTLE_MS) {
+          lastFocusCheckTimeRef.current = now;
+          console.log('✅ Window focused - checking session');
+          checkBackendSession();
+        } else {
+          const timeRemaining = Math.ceil((THROTTLE_MS - (now - lastFocusCheckTimeRef.current)) / 1000);
+          console.log(`⏭️ Skipping session check - throttled (${timeRemaining}s remaining)`);
+        }
       }
     };
 

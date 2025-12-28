@@ -64,20 +64,11 @@ export function useNextAuth(): UseNextAuthReturn {
           const updatedSession = await getSession();
 
           if (updatedSession?.user?.id) {
+            // Store userId for quick access (not sensitive)
             localStorage.setItem('userId', updatedSession.user.id);
 
-            // Try to get tokens from session
-            const accessToken = (updatedSession as { accessToken?: string })
-              .accessToken;
-            const refreshToken = (updatedSession as { refreshToken?: string })
-              .refreshToken;
-
-            if (accessToken) {
-              localStorage.setItem('accessToken', accessToken);
-            }
-            if (refreshToken) {
-              localStorage.setItem('refreshToken', refreshToken);
-            }
+            // Tokens are stored in NextAuth session (JWT), not localStorage
+            // Access via: session.accessToken, session.refreshToken
 
             // Clear the flags when user logs in to allow modal to show if pointsAwarded is true
             // The DailyLoginModalProvider will check the session via /api/auth/session and show the modal
@@ -188,9 +179,8 @@ export function useNextAuth(): UseNextAuthReturn {
   const logout = useCallback(async () => {
     try {
       // Clear all auth-related data from localStorage
+      // Tokens are stored in NextAuth session, will be cleared by signOut()
       localStorage.removeItem('userId');
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
       localStorage.removeItem('dailyLoginModalShown');
       localStorage.removeItem('dailyLoginModalShownDate');
 

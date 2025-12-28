@@ -110,26 +110,16 @@ class ApiClient {
             }
             
             if (session?.user) {
-              // Get accessToken from session (JWT token)
+              // Get accessToken from NextAuth session only (no localStorage)
               const accessToken = (session as any).accessToken;
               if (accessToken) {
                 config.headers.Authorization = `Bearer ${accessToken}`;
               } else {
-                // Fallback to user ID if accessToken not available
+                // Fallback to user ID if accessToken not available (for backward compatibility)
                 config.headers.Authorization = `Bearer ${session.user.id}`;
               }
-            } else {
-              // Try to get from localStorage as fallback
-              const storedAccessToken = localStorage.getItem('accessToken');
-              const storedUserId = localStorage.getItem('userId');
-
-              if (storedAccessToken) {
-                config.headers.Authorization = `Bearer ${storedAccessToken}`;
-              } else if (storedUserId) {
-                config.headers.Authorization = `Bearer ${storedUserId}`;
-              }
-              // For optional auth endpoints, if no token found, continue without auth
             }
+            // For optional auth endpoints, if no session/token found, continue without auth
           }
         }
         return config;
@@ -163,10 +153,6 @@ class ApiClient {
             }
           } catch (refreshError) {
             console.error('Token refresh failed:', refreshError);
-            // Clear all tokens on refresh failure
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            
             // Clear session cache to force fresh fetch
             this.sessionCache = null;
 
@@ -219,26 +205,12 @@ class ApiClient {
       throw new Error('Refresh token only available on client side');
     }
 
-    // Try to get refresh token from localStorage first
-    let refreshToken = localStorage.getItem('refreshToken');
-
-    // If not in localStorage, try to get from NextAuth session
-    if (!refreshToken) {
-      try {
-        const session = await getSession();
-        const sessionRefreshToken = (session as any).refreshToken;
-        if (sessionRefreshToken) {
-          refreshToken = sessionRefreshToken;
-          // Store in localStorage for future use
-          localStorage.setItem('refreshToken', sessionRefreshToken);
-        }
-      } catch (error) {
-        console.error('Error getting refresh token from session:', error);
-      }
-    }
+    // Get refresh token from NextAuth session only (no localStorage)
+    const session = await getSession();
+    const refreshToken = (session as any)?.refreshToken;
 
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      throw new Error('No refresh token available in session');
     }
 
     try {
@@ -251,19 +223,24 @@ class ApiClient {
 
       const { accessToken, refreshToken: newRefreshToken } = response.data;
 
-      // Update tokens in storage
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', newRefreshToken);
+      // Update NextAuth session with new tokens
+      // Note: NextAuth JWT callback only runs on signIn, so we need to trigger
+      // a session update. The tokens will be used immediately for the retried request.
+      // For future requests, we'll get tokens from the session which should be updated
+      // by the backend session endpoint or on next signIn.
+      
+      // Clear session cache to force fresh fetch on next request
+      this.sessionCache = null;
 
-      // NextAuth will automatically use tokens from localStorage via interceptors
-      // No need to call update-session API
+      // Store new tokens temporarily in memory for immediate use
+      // These will be used by the retried request
+      // Note: This is a workaround - ideally tokens should be in NextAuth JWT
+      // but NextAuth doesn't provide a direct way to update JWT tokens after refresh
+      (this as any).tempAccessToken = accessToken;
+      (this as any).tempRefreshToken = newRefreshToken;
 
       return accessToken;
     } catch (error) {
-      // Clear invalid tokens
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-
       // Clear NextAuth session on refresh failure
       try {
         await fetch('/api/auth/signout', { method: 'POST' });

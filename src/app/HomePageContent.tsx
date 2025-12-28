@@ -98,7 +98,7 @@ export function HomePageContent() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }} 
             ref={mainRef}
-            className="min-h-[calc(100vh-80px)] relative flex flex-col md:block mt-[64px] md:mt-[80px]"
+            className="relative flex flex-col md:block mt-[64px] md:mt-[80px]"
           >
         {/* Mobile Layout: Product Image First, Content Second */}
         {/* Desktop Layout: Content Right, Product Image Bottom (absolute) */}
