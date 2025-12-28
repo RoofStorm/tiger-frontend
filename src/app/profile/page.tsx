@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNextAuth } from '@/hooks/useNextAuth';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Gift, Calendar, Star, Home, RefreshCw, ChefHat } from 'lucide-react';
 import apiClient from '@/lib/api';
@@ -10,6 +10,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 interface RedeemItem {
   id: string;
@@ -40,6 +42,14 @@ export default function ProfilePage() {
   const queryClient = useQueryClient();
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const { showModal: showRegistrationModal } = useShareRegistrationModal();
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  // Track time on Profile page
+  useZoneView(pageRef, {
+    page: 'profile',
+    zone: 'overview',
+    enabled: isAuthenticated, // Only track when user is authenticated
+  });
 
   // Refetch all queries when user enters profile page
   useEffect(() => {
@@ -136,6 +146,7 @@ export default function ProfilePage() {
 
   return (
     <div 
+      ref={pageRef}
       className="min-h-screen py-20"
       style={{
         backgroundImage: 'url(/uudai/traodoinhipsong_background.png)',

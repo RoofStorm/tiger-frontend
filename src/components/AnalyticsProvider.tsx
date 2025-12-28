@@ -1,0 +1,88 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
+import Analytics, { AnalyticsService } from '@/lib/analytics';
+
+/**
+ * AnalyticsProvider - Khởi tạo analytics khi app load
+ * Thêm vào Providers component
+ */
+export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
+  const { data: session } = useSession();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    // Chỉ init một lần khi component mount
+    if (typeof window === 'undefined') return;
+
+    const sessionId = AnalyticsService.getOrCreateSessionId();
+    const userId = session?.user?.id || null;
+
+    // Get device info
+    const device = typeof navigator !== 'undefined' 
+      ? `${navigator.userAgent} - ${navigator.platform}`
+      : 'unknown';
+
+    // Get referrer
+    const referrer = typeof document !== 'undefined' 
+      ? document.referrer || undefined
+      : undefined;
+
+    Analytics.init({
+      sessionId,
+      userId,
+      device,
+      referrer,
+    });
+  }, []); // Chỉ chạy một lần khi mount
+
+  // Update userId khi session thay đổi
+  useEffect(() => {
+    const userId = session?.user?.id || null;
+    Analytics.updateUserId(userId);
+  }, [session?.user?.id]);
+
+  // Track page view (Time on Page) khi route change
+  useEffect(() => {
+    if (!pathname) return;
+
+    const currentPage = getPageFromPathname(pathname);
+    if (!currentPage) return;
+
+    // 1. Bắt đầu đếm giờ cho trang mới
+    const timerKey = `page:${currentPage}`;
+    Analytics.startTimer(timerKey);
+
+    return () => {
+      // 2. Khi rời trang (unmount hoặc pathname change), gửi page_view kèm duration
+      const duration = Analytics.endTimer(timerKey);
+      
+      // Chỉ gửi nếu có thời gian hợp lệ (ví dụ > 1s)
+      if (duration !== null && duration >= 1) {
+        Analytics.track({
+          page: currentPage,
+          action: 'page_view',
+          value: duration,
+        });
+      }
+    };
+  }, [pathname]);
+
+  return <>{children}</>;
+}
+
+function getPageFromPathname(pathname: string): string | null {
+  const path = pathname.replace(/^\//, '');
+
+  if (path === '' || path === 'home') return 'welcome';
+  if (path === 'nhip-song' || path === 'emoji') return 'emoji';
+  if (path === 'thu-thach-giu-nhip' || path === 'challenge') return 'challenge';
+  if (path === 'nhip-bep') return 'nhip-bep';
+  if (path === 'doi-qua' || path === 'rewards') return 'doi-qua';
+  if (path === 'profile') return 'profile';
+
+  return path || null;
+}
+

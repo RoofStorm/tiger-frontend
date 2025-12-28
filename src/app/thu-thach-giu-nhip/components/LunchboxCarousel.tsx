@@ -8,6 +8,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { useNextAuth } from '@/hooks/useNextAuth';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 interface Post {
   id: string;
@@ -59,6 +61,8 @@ export function LunchboxCarousel() {
   const { isAuthenticated } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { trackClick } = useAnalytics();
+  const zoneB2Ref = useRef<HTMLDivElement>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -68,6 +72,12 @@ export function LunchboxCarousel() {
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [likeCounts, setLikeCounts] = useState<Map<string, number>>(new Map());
   const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Track time on Zone B.2
+  useZoneView(zoneB2Ref, {
+    page: 'challenge',
+    zone: 'zoneB2',
+  });
 
   // Detect mobile screen size with debounce
   useEffect(() => {
@@ -259,6 +269,30 @@ export function LunchboxCarousel() {
     setTimeout(() => setIsTransitioning(false), 500);
   }, [isTransitioning, highlightedPosts.length]);
 
+  const handleDotClick = useCallback((index: number) => {
+    if (!isTransitioning && index !== currentSlide) {
+      // Track navigation dot click
+      trackClick('challenge', {
+        zone: 'zoneB2',
+        component: 'navigation_dot',
+        metadata: { dotIndex: index, totalDots: highlightedPosts.length },
+      });
+
+      setIsTransitioning(true);
+      setCurrentSlide(index);
+      setTimeout(() => setIsTransitioning(false), 500);
+    }
+  }, [isTransitioning, currentSlide, highlightedPosts.length, trackClick]);
+
+  const handleImageClick = useCallback((postId: string, index: number) => {
+    // Track image click in showcase
+    trackClick('challenge', {
+      zone: 'zoneB2',
+      component: 'image',
+      metadata: { postId, imageIndex: index },
+    });
+  }, [trackClick]);
+
   // Auto-play logic
   useEffect(() => {
     if (!isAutoPlaying || highlightedPosts.length <= 1) return;
@@ -332,7 +366,7 @@ export function LunchboxCarousel() {
   }, [likeMutation, isAuthenticated, toast]);
 
   return (
-    <div className="mt-4 pt-6 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+    <div ref={zoneB2Ref} className="mt-4 pt-6 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
        
         {/* Carousel Section */}
@@ -423,6 +457,7 @@ export function LunchboxCarousel() {
                   // Optimized onClick handler - avoid creating new function on each render
                   const handleSlideClick = () => {
                     if (!isCenter && !isTransitioning) {
+                      handleImageClick(post.id, index);
                       setIsTransitioning(true);
                       setCurrentSlide(index);
                       setTimeout(() => setIsTransitioning(false), 500);
@@ -628,13 +663,7 @@ export function LunchboxCarousel() {
               {highlightedPosts.map((_: Post, index: number) => (
                 <button
                   key={index}
-                  onClick={() => {
-                    if (!isTransitioning && index !== currentSlide) {
-                      setIsTransitioning(true);
-                      setCurrentSlide(index);
-                      setTimeout(() => setIsTransitioning(false), 500);
-                    }
-                  }}
+                  onClick={() => handleDotClick(index)}
                   disabled={isTransitioning}
                   className={`transition-all duration-300 rounded-full ${
                     index === currentSlide

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EmojiSelectionSection } from './components/EmojiSelectionSection';
 import { MoodCardFlipCard } from './components/MoodCardFlipCard';
 import { ShareRegistrationModal } from './components/ShareRegistrationModal';
@@ -12,6 +12,8 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/lib/api';
 import html2canvas from 'html2canvas';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 const getBackgroundImage = (): string => {
   const now = new Date();
@@ -46,6 +48,15 @@ export function NhipSongPageContent() {
   const { setIsDarkMode } = useHeaderDarkMode();
   const { isAuthenticated } = useNextAuth();
   const { toast } = useToast();
+  const pageRef = useRef<HTMLDivElement>(null);
+  const { trackClick } = useAnalytics();
+
+  // Track time on Emoji page
+  useZoneView(pageRef, {
+    page: 'emoji',
+    zone: 'overview',
+    enabled: !showMoodCard, // Only track when showing emoji selection
+  });
 
   // Update header dark mode when showShareModal changes
   useEffect(() => {
@@ -106,6 +117,13 @@ export function NhipSongPageContent() {
   } = useMoodCard();
 
   const handleGenerateMoodCard = () => {
+    // Track CTA click "Tham gia ngay"
+    trackClick('emoji', {
+      zone: 'overview',
+      component: 'button',
+      metadata: { label: 'tham_gia_ngay' },
+    });
+    
     const data = generateMoodCard();
     if (data) {
       setShowMoodCard(true);
@@ -396,7 +414,7 @@ export function NhipSongPageContent() {
   // };
 
   return (
-    <div>
+    <div ref={pageRef}>
       <main 
         style={{
           backgroundImage: backgroundImage || 'url(/nhipsong/nhipsong_light_background.jpg)',

@@ -4,10 +4,20 @@ import { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { HomeVideoPlayer } from '@/components/HomeVideoPlayer';
 import { CornerChallenge } from './components/CornerChallenge';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 export function ThuThachGiuNhipPageContent() {
   const [showVideo, setShowVideo] = useState(true);
   const mainRef = useRef<HTMLElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  // Track time on Challenge page (Overview)
+  useZoneView(pageRef, {
+    page: 'challenge',
+    zone: 'overview',
+    enabled: !showVideo, // Only track when content is shown
+  });
 
   const handleVideoEnded = () => {
     setShowVideo(false);
@@ -18,7 +28,7 @@ export function ThuThachGiuNhipPageContent() {
   };
 
   return (
-    <div className="">
+    <div ref={pageRef} className="">
       {/* Video Player - hiển thị trước khi show content */}
       <AnimatePresence>
         {showVideo && (

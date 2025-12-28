@@ -65,6 +65,7 @@ class ApiClient {
           '/wishes/highlighted',
           '/rewards', // rewards is hybrid - works with or without auth
           '/storage/video', // video streaming endpoints are public
+          '/analytics/events', // analytics events endpoint is public
         ];
 
         // Optional auth endpoints - send token if authenticated, but allow without auth
@@ -482,6 +483,61 @@ class ApiClient {
 
   async getCornerAnalytics(): Promise<any> {
     const response = await this.client.get('/analytics/corners');
+    return response.data;
+  }
+
+  // New analytics endpoints
+  async trackAnalyticsEvents(payload: {
+    sessionId: string;
+    events: any[];
+  }): Promise<{ message: string; count: number }> {
+    const response = await this.client.post('/analytics/events', payload);
+    return response.data;
+  }
+
+  async getAnalyticsSummary(params: {
+    page?: string;
+    zone?: string;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.append('page', params.page);
+    if (params.zone) queryParams.append('zone', params.zone);
+
+    const response = await this.client.get(
+      `/analytics/summary?${queryParams.toString()}`
+    );
+    return response.data;
+  }
+
+  async getAnalyticsFunnel(params: {
+    page: string;
+    zone?: string;
+    steps: string[];
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    queryParams.append('page', params.page);
+    if (params.zone) queryParams.append('zone', params.zone);
+    params.steps.forEach((step) => {
+      queryParams.append('steps', step);
+    });
+
+    const response = await this.client.get(
+      `/analytics/funnel?${queryParams.toString()}`
+    );
+    return response.data;
+  }
+
+  async getUserAnalytics(params?: {
+    page?: number;
+    limit?: number;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+
+    const response = await this.client.get(
+      `/analytics/user?${queryParams.toString()}`
+    );
     return response.data;
   }
 

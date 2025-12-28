@@ -15,12 +15,11 @@ export function CornerChallenge() {
       <ChallengeContainer>
         {/* Header Section - Title and Introduction */}
         <ChallengeHeaderSection />
-
         {/* Hero Section - CHỈ VÀNG TRAO TAY */}
         <ChallengeHeroSection />
-
         {/* Challenge Cards Section - LunchBox and Note Giữ Nhịp */}
         <ChallengeCardsSection />
+        
       </ChallengeContainer>
       {/* Lunchbox Challenge Intro */}
       <LunchboxChallengeIntro />

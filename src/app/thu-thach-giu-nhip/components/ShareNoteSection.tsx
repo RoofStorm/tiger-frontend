@@ -12,6 +12,8 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import html2canvas from 'html2canvas';
 import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 // Wish type for highlighted wishes with user info
 interface Wish {
@@ -36,14 +38,23 @@ export function ShareNoteSection() {
   const queryClient = useQueryClient();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
   const { showModal: showShareFacebookModal } = useShareFacebookModal();
+  const { trackFunnelStep } = useAnalytics();
+  const zoneCRef = useRef<HTMLDivElement>(null);
   const [noteText, setNoteText] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [sharedNoteText, setSharedNoteText] = useState('');
   const [createdWishId, setCreatedWishId] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [hasStartedTyping, setHasStartedTyping] = useState(false);
   const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
   const notesScrollRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Track time on Zone C
+  useZoneView(zoneCRef, {
+    page: 'challenge',
+    zone: 'zoneC',
+  });
 
   // Fetch highlighted wishes
   const { data: wishesData, isLoading: isLoadingWishes } = useQuery({
@@ -268,10 +279,16 @@ export function ShareNoteSection() {
           });
       }
 
+      // Track note complete (funnel step 3)
+      trackFunnelStep('challenge', 'zoneC', 'note', 'complete', {
+        wishId: responseData?.id || undefined,
+      });
+
       // Hiển thị modal thành công
       setShowSuccessModal(true);
       // Reset textarea
       setNoteText('');
+      setHasStartedTyping(false); // Reset để track lại lần sau
       // Invalidate các query khác
       queryClient.invalidateQueries({ queryKey: ['highlighted-wishes'] });
       queryClient.invalidateQueries({ queryKey: ['userDetails'] });
@@ -438,9 +455,12 @@ export function ShareNoteSection() {
       return;
     }
 
+    // Track note submit (funnel step 2)
+    trackFunnelStep('challenge', 'zoneC', 'note', 'submit');
+
     // Gọi API tạo wish
     createWishMutation.mutate(noteText.trim());
-  }, [noteText, toast, scrollToTextarea, isAuthenticated, createWishMutation]);
+  }, [noteText, toast, scrollToTextarea, isAuthenticated, createWishMutation, trackFunnelStep]);
 
   // Function để capture modal và upload lên S3
   const captureModalAndUpload = useCallback(async (): Promise<string | null> => {
@@ -755,6 +775,7 @@ export function ShareNoteSection() {
      
         {/* Highlighted Notes Section */}
         <div 
+          ref={zoneCRef}
           id="highlighted-notes-section"
           className="mt-4 mb-8 mx-6 md:mx-24 min-h-fit bg-center md:bg-[top_right] rounded-3xl md:max-h-[650px] lg:max-h-[800px]  "
           style={{
@@ -793,6 +814,11 @@ export function ShareNoteSection() {
                 ref={noteTextareaRef}
                 value={noteText}
                 onChange={(e) => {
+                  // Track note start (funnel step 1) - chỉ track một lần
+                  if (!hasStartedTyping && e.target.value.length > 0) {
+                    setHasStartedTyping(true);
+                    trackFunnelStep('challenge', 'zoneC', 'note', 'start');
+                  }
                   // Không trim - giữ nguyên giá trị người dùng nhập
                   setNoteText(e.target.value);
                 }}

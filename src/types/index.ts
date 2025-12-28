@@ -50,6 +50,29 @@ export interface CornerAnalytics {
   timestamp: string;
 }
 
+// Analytics Event Types
+export interface AnalyticsEvent {
+  page: string; // welcome, emoji, challenge, nhip-bep, doi-qua, profile
+  zone?: string; // overview, zoneA, zoneB, zoneB1, zoneB2
+  component?: string; // button, card, image, showcase, upload, form
+  action: string; // view, click, submit, start, complete, page_view, zone_view, view_start, view_end
+  value?: number; // duration (sec), count, step index
+  metadata?: Record<string, any>; // productId, challengeId, imageId, etc.
+  ts?: number; // timestamp
+}
+
+export interface AnalyticsBatchPayload {
+  sessionId: string;
+  events: AnalyticsEvent[];
+}
+
+export interface AnalyticsInitOptions {
+  sessionId: string;
+  userId?: string | null;
+  device?: string;
+  referrer?: string;
+}
+
 export interface EmojiSelection {
   id: string;
   emoji: string;

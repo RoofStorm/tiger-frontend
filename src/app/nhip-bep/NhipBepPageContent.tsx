@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { TimelineInteractive } from '@/components/TimelineInteractive/TimelineInteractive';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 interface SlideContent {
   dates: string;
@@ -136,6 +138,28 @@ export function NhipBepPageContent() {
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const currentContent = slides[currentSlide];
+  const pageRef = useRef<HTMLDivElement>(null);
+  const zoneARef = useRef<HTMLDivElement>(null);
+  const zoneBRef = useRef<HTMLDivElement>(null);
+  const { trackClick } = useAnalytics();
+
+  // Track time on Nhip Bep page (Overview)
+  useZoneView(pageRef, {
+    page: 'nhip-bep',
+    zone: 'overview',
+  });
+
+  // Track time on Zone A (Image Container)
+  useZoneView(zoneARef, {
+    page: 'nhip-bep',
+    zone: 'zoneA',
+  });
+
+  // Track time on Zone B (Products Carousel)
+  useZoneView(zoneBRef, {
+    page: 'nhip-bep',
+    zone: 'zoneB',
+  });
 
   // Detect mobile screen size
   useEffect(() => {
@@ -187,14 +211,35 @@ export function NhipBepPageContent() {
   };
 
   const nextProductSlide = () => {
+    // Track next arrow click in Zone B
+    trackClick('nhip-bep', {
+      zone: 'zoneB',
+      component: 'navigation_arrow',
+      metadata: { direction: 'next' },
+    });
+
     setCurrentProductSlide((prev) => (prev + 1) % products.length);
   };
 
   const prevProductSlide = () => {
+    // Track prev arrow click in Zone B
+    trackClick('nhip-bep', {
+      zone: 'zoneB',
+      component: 'navigation_arrow',
+      metadata: { direction: 'prev' },
+    });
+
     setCurrentProductSlide((prev) => (prev - 1 + products.length) % products.length);
   };
 
   const goToProductSlide = (index: number) => {
+    // Track navigation dot click in Zone B
+    trackClick('nhip-bep', {
+      zone: 'zoneB',
+      component: 'navigation_dot',
+      metadata: { dotIndex: index, totalDots: products.length },
+    });
+
     setCurrentProductSlide(index);
   };
 
@@ -221,6 +266,13 @@ export function NhipBepPageContent() {
 
   // Functions to handle slide navigation with direction
   const goToSlide = (index: number) => {
+    // Track navigation dot click in Zone A
+    trackClick('nhip-bep', {
+      zone: 'zoneA',
+      component: 'navigation_dot',
+      metadata: { dotIndex: index, totalDots: slides.length },
+    });
+
     if (index > currentSlide) {
       setSlideDirection('right');
     } else if (index < currentSlide) {
@@ -230,11 +282,25 @@ export function NhipBepPageContent() {
   };
 
   const nextSlide = () => {
+    // Track next arrow click in Zone A
+    trackClick('nhip-bep', {
+      zone: 'zoneA',
+      component: 'navigation_arrow',
+      metadata: { direction: 'next' },
+    });
+
     setSlideDirection('right');
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
+    // Track prev arrow click in Zone A
+    trackClick('nhip-bep', {
+      zone: 'zoneA',
+      component: 'navigation_arrow',
+      metadata: { direction: 'prev' },
+    });
+
     setSlideDirection('left');
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
@@ -249,10 +315,10 @@ export function NhipBepPageContent() {
   }, [hoverTimeout]);
 
   return (
-    <div className="min-h-screen">
+    <div ref={pageRef} className="min-h-screen">
       <main className="min-h-[calc(100vh-80px)] bg-white mt-[64px] md:mt-[80px]">
         {/* Image Container - Relative for absolute text positioning */}
-        <div className="relative w-full min-h-[500px] md:min-h-0 max-h-[600px] md:max-h-[700px] overflow-hidden">
+        <div ref={zoneARef} className="relative w-full min-h-[500px] md:min-h-0 max-h-[600px] md:max-h-[700px] overflow-hidden">
           <AnimatePresence mode="wait" custom={slideDirection}>
             <motion.div
               key={currentSlide}
@@ -443,6 +509,7 @@ export function NhipBepPageContent() {
 
         {/* Products Carousel Section */}
         <div 
+          ref={zoneBRef}
           className="relative w-full py-16"
           style={{
             backgroundColor: '#00579F',
@@ -506,6 +573,16 @@ export function NhipBepPageContent() {
                               backgroundRepeat: 'no-repeat',
                             }}
                             onClick={() => {
+                              // Track product card click in Zone B
+                              trackClick('nhip-bep', {
+                                zone: 'zoneB',
+                                component: 'product_card',
+                                metadata: { 
+                                  productLabel: product.label,
+                                  productIndex: actualIndex,
+                                },
+                              });
+
                               setSelectedProduct(product);
                               setSelectedProductIndex(actualIndex);
                             }}
@@ -535,6 +612,18 @@ export function NhipBepPageContent() {
                         {/* Mua ngay Button - Outside card, below card */}
                         <div className="flex justify-center mt-3 md:mt-4 w-full flex-shrink-0">
                           <button
+                            onClick={() => {
+                              // Track "Mua ngay" button click in product card
+                              trackClick('nhip-bep', {
+                                zone: 'zoneB',
+                                component: 'button',
+                                metadata: { 
+                                  label: 'mua_ngay',
+                                  productLabel: product.label,
+                                  productIndex: actualIndex,
+                                },
+                              });
+                            }}
                             className="w-full px-4 md:px-6 py-1.5 md:py-2 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90 text-sm md:text-base"
                             style={{
                               backgroundColor: 'transparent',
@@ -757,6 +846,16 @@ export function NhipBepPageContent() {
                             fontSize: '15px',
                           }}
                           onClick={() => {
+                            // Track "Mua ngay" button click in product modal
+                            trackClick('nhip-bep', {
+                              zone: 'zoneB',
+                              component: 'button',
+                              metadata: { 
+                                label: 'mua_ngay',
+                                productLabel: selectedProduct.label,
+                              },
+                            });
+
                             // Handle buy now action
                             console.log('Mua ngay:', selectedProduct.label);
                           }}

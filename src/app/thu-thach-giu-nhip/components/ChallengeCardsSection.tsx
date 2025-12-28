@@ -1,25 +1,50 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 export function ChallengeCardsSection() {
+  const zoneARef = useRef<HTMLDivElement>(null);
+  const { trackClick } = useAnalytics();
+
+  // Track time on Zone A
+  useZoneView(zoneARef, {
+    page: 'challenge',
+    zone: 'zoneA',
+  });
+
   const handleLunchboxClick = useCallback(() => {
+    // Track click on Lunchbox Challenge card
+    trackClick('challenge', {
+      zone: 'zoneA',
+      component: 'card',
+      metadata: { label: 'lunchbox_challenge' },
+    });
+
     const element = document.getElementById('lunchbox-upload-section');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, []);
+  }, [trackClick]);
 
   const handleNoteClick = useCallback(() => {
+    // Track click on Note Giữ Nhịp card
+    trackClick('challenge', {
+      zone: 'zoneA',
+      component: 'card',
+      metadata: { label: 'note_giu_nhip_challenge' },
+    });
+
     const element = document.getElementById('highlighted-notes-section');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }, []);
+  }, [trackClick]);
 
   return (
-    <div className="w-screen relative left-1/2 -translate-x-1/2 grid grid-cols-1 lg:grid-cols-2 gap-0 md:mb-2 px-4 lg:top-[-100px]">
+    <div ref={zoneARef} className="w-screen relative left-1/2 -translate-x-1/2 grid grid-cols-1 lg:grid-cols-2 gap-0 md:mb-2 px-4 lg:top-[-100px]">
       {/* Left - LunchBox Challenge Image */}
       <motion.div 
         className="relative w-full h-[300px] lg:h-[450px] flex items-center justify-center cursor-pointer p-2"

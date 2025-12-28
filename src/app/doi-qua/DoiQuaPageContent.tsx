@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Gift, Star, Leaf } from 'lucide-react';
@@ -11,6 +11,8 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { RedeemModal } from '@/components/RedeemModal';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 interface UserRedeem {
   id: string;
@@ -25,9 +27,17 @@ export function DoiQuaPageContent() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { navigateWithLoading } = useGlobalNavigationLoading();
+  const { trackClick } = useAnalytics();
+  const pageRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<TabType>('doi-qua');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
+
+  // Track time on Đổi Quà page (Overview)
+  useZoneView(pageRef, {
+    page: 'doi-qua',
+    zone: 'overview',
+  });
 
   // Fetch user details including points
   const { data: userDetails } = useQuery({
@@ -185,7 +195,7 @@ export function DoiQuaPageContent() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div ref={pageRef} className="min-h-screen">
       <main 
         className="mt-[64px] md:mt-[80px]"
         style={{ 
@@ -313,8 +323,18 @@ export function DoiQuaPageContent() {
                       <button
                         onClick={() => {
                           if (tab.href) {
+                            // Navigate to other page - don't track as tab click
                             navigateWithLoading(tab.href, `Đang chuyển đến ${tab.label}...`);
                           } else {
+                            // Track tab click (only for tabs that change content on same page)
+                            trackClick('doi-qua', {
+                              zone: 'overview',
+                              component: 'tab',
+                              metadata: { 
+                                tabId: tab.id,
+                                tabLabel: tab.label,
+                              },
+                            });
                             setActiveTab(tab.id);
                           }
                         }}

@@ -6,11 +6,22 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { Button } from '@/components/ui/button';
 import { HomeVideoPlayer } from '@/components/HomeVideoPlayer';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 export function HomePageContent() {
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const mainRef = useRef<HTMLElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
   const [showVideo, setShowVideo] = useState(true);
+  const { trackClick } = useAnalytics();
+
+  // Track time on Welcome page
+  useZoneView(pageRef, {
+    page: 'welcome',
+    zone: 'overview',
+    enabled: !showVideo, // Only track when content is shown
+  });
 
   // Tạm thời tắt auto redirect đến /video
   // useEffect(() => {
@@ -66,7 +77,7 @@ export function HomePageContent() {
   }, [showVideo]);
 
   return (
-    <div className="">
+    <div ref={pageRef} className="">
       {/* Video Player - hiển thị trước khi show content */}
       <AnimatePresence>
         {showVideo && (
@@ -166,6 +177,11 @@ export function HomePageContent() {
             <div className="flex justify-center max-w-xl mx-auto w-full relative z-50">
               <Button
                 onClick={() => {
+                  trackClick('welcome', {
+                    zone: 'overview',
+                    component: 'button',
+                    metadata: { label: 'kham_pha_ngay' },
+                  });
                   navigateWithLoading('/nhip-song', 'Đang chuyển đến Nhịp sống...');
                 }}
                 className="px-8 py-3 rounded-lg text-white font-medium transition-all duration-300 w-full cursor-pointer hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg relative z-50"

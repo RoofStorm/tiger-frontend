@@ -12,6 +12,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Modal } from '@/components/ui/modal';
 import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
+import { useAnalytics } from '@/hooks/useAnalytics';
+import { useZoneView } from '@/hooks/useZoneView';
 
 
 export function LunchboxUploadSection() {
@@ -23,6 +25,8 @@ export function LunchboxUploadSection() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const captionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
+  const zoneB1Ref = useRef<HTMLDivElement>(null);
+  const { trackFunnelStep } = useAnalytics();
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [caption, setCaption] = useState('');
@@ -34,6 +38,12 @@ export function LunchboxUploadSection() {
   const [uploadedCaption, setUploadedCaption] = useState<string>('');
   const [createdPostId, setCreatedPostId] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
+
+  // Track time on Zone B.1
+  useZoneView(zoneB1Ref, {
+    page: 'challenge',
+    zone: 'zoneB1',
+  });
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -68,6 +78,9 @@ export function LunchboxUploadSection() {
       });
       return;
     }
+
+    // Track upload start (funnel step 1)
+    trackFunnelStep('challenge', 'zoneB1', 'upload', 'start');
 
     // Set selected file and create preview
     setSelectedFile(file);
@@ -148,6 +161,9 @@ export function LunchboxUploadSection() {
       return;
     }
 
+    // Track upload submit (funnel step 2)
+    trackFunnelStep('challenge', 'zoneB1', 'upload', 'submit');
+
     setUploading(true);
     setUploadProgress(0);
     try {
@@ -214,6 +230,11 @@ export function LunchboxUploadSection() {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+
+      // Track upload complete (funnel step 3)
+      trackFunnelStep('challenge', 'zoneB1', 'upload', 'complete', {
+        postId: postId || undefined,
+      });
 
       // Show success modal
       setShowSuccessModal(true);
@@ -359,6 +380,7 @@ export function LunchboxUploadSection() {
     <>
       {/* Bottom Section - Upload Section */}
       <motion.div
+        ref={zoneB1Ref}
         id="lunchbox-upload-section"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

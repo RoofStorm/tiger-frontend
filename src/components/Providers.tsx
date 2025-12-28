@@ -11,6 +11,7 @@ import { DailyLoginModalProvider } from '@/components/DailyLoginModalProvider';
 import { JoinChallengeModalProvider } from '@/contexts/JoinChallengeModalContext';
 import { ShareFacebookModalProvider } from '@/contexts/ShareFacebookModalContext';
 import { ShareRegistrationModalProvider } from '@/contexts/ShareRegistrationModalContext';
+import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -45,20 +46,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
         refetchOnWindowFocus={true} // Refetch on window focus to keep session updated
         refetchWhenOffline={false} // Don't refetch when offline
       >
-        <LoadingProvider>
-          <HeaderDarkModeProvider>
-            <JoinChallengeModalProvider>
-              <ShareFacebookModalProvider>
-                <ShareRegistrationModalProvider>
-                  {children}
-                  <LoadingOverlay />
-                  <Toaster />
-                  <DailyLoginModalProvider />
-                </ShareRegistrationModalProvider>
-              </ShareFacebookModalProvider>
-            </JoinChallengeModalProvider>
-          </HeaderDarkModeProvider>
-        </LoadingProvider>
+        <AnalyticsProvider>
+          <LoadingProvider>
+            <HeaderDarkModeProvider>
+              <JoinChallengeModalProvider>
+                <ShareFacebookModalProvider>
+                  <ShareRegistrationModalProvider>
+                    {children}
+                    <LoadingOverlay />
+                    <Toaster />
+                    <DailyLoginModalProvider />
+                  </ShareRegistrationModalProvider>
+                </ShareFacebookModalProvider>
+              </JoinChallengeModalProvider>
+            </HeaderDarkModeProvider>
+          </LoadingProvider>
+        </AnalyticsProvider>
       </SessionProvider>
     </QueryClientProvider>
   );
