@@ -10,7 +10,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
 
 interface RedeemItem {

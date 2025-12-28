@@ -4,7 +4,6 @@ import { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { HomeVideoPlayer } from '@/components/HomeVideoPlayer';
 import { CornerChallenge } from './components/CornerChallenge';
-import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
 
 export function ThuThachGiuNhipPageContent() {

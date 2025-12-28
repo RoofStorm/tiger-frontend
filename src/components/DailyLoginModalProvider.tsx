@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { DailyLoginModal } from './DailyLoginModal';
 import { apiClient } from '@/lib/api';
@@ -50,7 +50,7 @@ export function DailyLoginModalProvider() {
   };
 
   // Function to check session from backend (for refresh tokens and latest data)
-  const checkBackendSession = async (skipModalCheck = false) => {
+  const checkBackendSession = useCallback(async () => {
     if (status !== 'authenticated' || !session?.user) {
       return;
     }
@@ -81,8 +81,7 @@ export function DailyLoginModalProvider() {
         await update();
 
         // Check pointsAwarded and show modal
-        // Even if skipModalCheck is true, we should check if pointsAwarded changed
-        // (e.g., user got daily bonus while app was open)
+        // Always check if pointsAwarded changed (e.g., user got daily bonus while app was open)
         checkAndShowModal(sessionData.pointsAwarded || false);
       }
     } catch (error) {
@@ -104,7 +103,7 @@ export function DailyLoginModalProvider() {
         // So we just need to handle the final error state here
       }
     }
-  };
+  }, [status, session?.user, update]);
 
   // Check session when user becomes authenticated
   useEffect(() => {
@@ -141,7 +140,7 @@ export function DailyLoginModalProvider() {
         // Then call backend API to refresh tokens and get latest data
         // This ensures tokens are up-to-date and we have latest user info
         setTimeout(() => {
-          checkBackendSession(true); // Skip modal check since we already checked from session
+          checkBackendSession();
         }, 1000);
       }
       
@@ -163,7 +162,7 @@ export function DailyLoginModalProvider() {
         sessionCheckIntervalRef.current = null;
       }
     }
-  }, [session, status, update]);
+  }, [session, status, update, checkBackendSession]);
 
   // Set up periodic session check (every 5 minutes)
   useEffect(() => {
@@ -185,7 +184,7 @@ export function DailyLoginModalProvider() {
         }
       };
     }
-  }, [session, status]);
+  }, [session, status, checkBackendSession]);
 
   // Check session on window focus (when user returns to app)
   useEffect(() => {
@@ -199,7 +198,7 @@ export function DailyLoginModalProvider() {
     return () => {
       window.removeEventListener('focus', handleFocus);
     };
-  }, [session, status]);
+  }, [session, status, checkBackendSession]);
 
   const handleClose = () => {
     setShowModal(false);

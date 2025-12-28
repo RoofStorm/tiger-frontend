@@ -57,7 +57,7 @@ export interface AnalyticsEvent {
   component?: string; // button, card, image, showcase, upload, form
   action: string; // view, click, submit, start, complete, page_view, zone_view, view_start, view_end
   value?: number; // duration (sec), count, step index
-  metadata?: Record<string, any>; // productId, challengeId, imageId, etc.
+  metadata?: Record<string, unknown>; // productId, challengeId, imageId, etc.
   ts?: number; // timestamp
 }
 

@@ -36,7 +36,8 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
       device,
       referrer,
     });
-  }, []); // Chỉ chạy một lần khi mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Chỉ chạy một lần khi mount - session?.user?.id không cần thiết vì init chỉ chạy 1 lần
 
   // Update userId khi session thay đổi
   useEffect(() => {

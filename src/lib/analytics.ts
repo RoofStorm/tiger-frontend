@@ -1,4 +1,4 @@
-import { AnalyticsEvent, AnalyticsBatchPayload, AnalyticsInitOptions } from '@/types';
+import { AnalyticsEvent, AnalyticsInitOptions } from '@/types';
 import apiClient from './api';
 
 // Constants
@@ -133,13 +133,14 @@ class AnalyticsService {
           console.log(`Analytics: ${response.message}, ${response.count} events sent`);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to send analytics batch:', error);
       
       // Handle specific error cases
-      if (error?.response?.status === 400) {
+      const errorWithResponse = error as { response?: { status?: number; data?: unknown } };
+      if (errorWithResponse?.response?.status === 400) {
         // Bad request - don't retry, log and discard
-        console.error('Analytics validation error:', error.response.data);
+        console.error('Analytics validation error:', errorWithResponse.response.data);
       } else {
         // Network or server error - put events back to queue for retry
         // Limit to prevent memory issues

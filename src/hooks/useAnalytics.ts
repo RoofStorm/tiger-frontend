@@ -43,7 +43,7 @@ export function useAnalytics() {
       options: {
         zone?: string;
         component?: string;
-        metadata?: Record<string, any>;
+        metadata?: Record<string, unknown>;
       }
     ) => {
       Analytics.track({
@@ -66,7 +66,7 @@ export function useAnalytics() {
       zone: string,
       component: string,
       action: 'start' | 'submit' | 'complete',
-      metadata?: Record<string, any>
+      metadata?: Record<string, unknown>
     ) => {
       Analytics.track({
         page,
