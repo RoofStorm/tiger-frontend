@@ -13,6 +13,7 @@ import { WishSection } from '@/components/WishSection';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
+import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 
 const suggestedWishes = [
   {
@@ -93,6 +94,7 @@ export default function WishesPage() {
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
   const { showModal: showRegistrationModal } = useShareRegistrationModal();
+  const { updateUserPoints } = useUpdateUserPoints();
 
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
@@ -104,16 +106,19 @@ export default function WishesPage() {
       setContent('');
       setSelectedSuggestion(null);
       queryClient.invalidateQueries({ queryKey: ['highlighted-wishes'] });
-      // Invalidate user details to refresh points
-      queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
 
-      // Show join challenge modal if pointsAwarded is true
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
       if (pointsAwarded) {
+        updateUserPoints(user?.id);
         setTimeout(() => {
           showJoinChallengeModal();
         }, 500);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       }
 
       // Show success message with points info

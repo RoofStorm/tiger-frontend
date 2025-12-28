@@ -14,6 +14,7 @@ import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
+import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 
 // Wish type for highlighted wishes with user info
 interface Wish {
@@ -38,6 +39,7 @@ export function ShareNoteSection() {
   const queryClient = useQueryClient();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
   const { showModal: showShareFacebookModal } = useShareFacebookModal();
+  const { updateUserPoints } = useUpdateUserPoints();
   const { trackFunnelStep } = useAnalytics();
   const zoneCRef = useRef<HTMLDivElement>(null);
   const [noteText, setNoteText] = useState('');
@@ -116,8 +118,10 @@ export function ShareNoteSection() {
       // Lưu nội dung note để hiển thị trong modal
       setSharedNoteText(content);
 
-      // Show join challenge modal if pointsAwarded is true
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
       if (pointsAwarded) {
+        updateUserPoints(user?.id);
         setTimeout(() => {
           showJoinChallengeModal();
         }, 500);
@@ -313,16 +317,19 @@ export function ShareNoteSection() {
       const responseData = result?.data || result;
       const pointsAwarded = responseData?.pointsAwarded === true;
 
-      // Invalidate user details to refresh points
-      queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
 
-      // Show share Facebook modal if pointsAwarded is true
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
       if (pointsAwarded) {
+        updateUserPoints(user?.id);
         setTimeout(() => {
           showShareFacebookModal();
         }, 500);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       }
 
       // Show success message with points info

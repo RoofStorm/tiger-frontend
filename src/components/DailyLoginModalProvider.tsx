@@ -2,17 +2,21 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
+import { useQueryClient } from '@tanstack/react-query';
 import { DailyLoginModal } from './DailyLoginModal';
 import { apiClient } from '@/lib/api';
+import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 
 export function DailyLoginModalProvider() {
   const { data: session, status, update } = useSession();
+  const queryClient = useQueryClient();
+  const { updateUserPoints } = useUpdateUserPoints();
   const [showModal, setShowModal] = useState(false);
   const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasCheckedSessionRef = useRef(false);
 
   // Function to check and show modal based on pointsAwarded
-  const checkAndShowModal = (pointsAwarded: boolean) => {
+  const checkAndShowModal = useCallback((pointsAwarded: boolean, userId?: string) => {
     const hasShownModal = localStorage.getItem('dailyLoginModalShown');
     const today = new Date().toDateString();
     const lastShownDate = localStorage.getItem('dailyLoginModalShownDate');
@@ -24,6 +28,13 @@ export function DailyLoginModalProvider() {
       today,
       shouldShow: pointsAwarded === true && (!hasShownModal || lastShownDate !== today),
     });
+
+    // If pointsAwarded is true, update user points immediately
+    // This ensures header shows the correct points after bonus is awarded
+    if (pointsAwarded === true) {
+      console.log('✅ Points awarded - updating user points in UI');
+      updateUserPoints(userId);
+    }
 
     // Show modal if:
     // 1. pointsAwarded is true
@@ -47,7 +58,7 @@ export function DailyLoginModalProvider() {
         today,
       });
     }
-  };
+  }, [updateUserPoints]);
 
   // Function to check session from backend (for refresh tokens and latest data)
   const checkBackendSession = useCallback(async () => {
@@ -82,7 +93,13 @@ export function DailyLoginModalProvider() {
 
         // Check pointsAwarded and show modal
         // Always check if pointsAwarded changed (e.g., user got daily bonus while app was open)
-        checkAndShowModal(sessionData.pointsAwarded || false);
+        // This will also update user points in header if pointsAwarded is true
+        const pointsAwarded = sessionData.pointsAwarded || false;
+        checkAndShowModal(pointsAwarded, sessionData.user?.id);
+
+        // Always invalidate userDetails query to ensure UI is in sync
+        // This is a fallback to ensure points are updated even if pointsAwarded is false
+        queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       }
     } catch (error) {
       console.error('Error checking backend session:', error);
@@ -103,7 +120,7 @@ export function DailyLoginModalProvider() {
         // So we just need to handle the final error state here
       }
     }
-  }, [status, session?.user, update]);
+  }, [status, session?.user, update, queryClient, checkAndShowModal]);
 
   // Check session when user becomes authenticated
   useEffect(() => {
@@ -132,9 +149,10 @@ export function DailyLoginModalProvider() {
         // First, check pointsAwarded from NextAuth session (already available from login)
         // This avoids unnecessary API call if we already have the data
         const sessionPointsAwarded = (session as { pointsAwarded?: boolean }).pointsAwarded;
+        const userId = session?.user?.id;
         if (sessionPointsAwarded !== undefined) {
           console.log('🔍 Using pointsAwarded from NextAuth session:', sessionPointsAwarded);
-          checkAndShowModal(sessionPointsAwarded);
+          checkAndShowModal(sessionPointsAwarded, userId);
         }
         
         // Then call backend API to refresh tokens and get latest data
@@ -162,7 +180,7 @@ export function DailyLoginModalProvider() {
         sessionCheckIntervalRef.current = null;
       }
     }
-  }, [session, status, update, checkBackendSession]);
+  }, [session, status, update, checkBackendSession, checkAndShowModal]);
 
   // Set up periodic session check (every 5 minutes)
   useEffect(() => {

@@ -5,12 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Send, Heart } from 'lucide-react';
 import apiClient from '@/lib/api';
 import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
+import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
+import { useNextAuth } from '@/hooks/useNextAuth';
 
 export const WishForm = () => {
   const [content, setContent] = useState('');
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
+  const { updateUserPoints } = useUpdateUserPoints();
+  const { user } = useNextAuth();
 
   const createWishMutation = useMutation({
     mutationFn: (content: string) => apiClient.createWish(content),
@@ -21,16 +25,19 @@ export const WishForm = () => {
 
       setContent('');
       queryClient.invalidateQueries({ queryKey: ['highlighted-wishes'] });
-      // Invalidate user details to refresh points
-      queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
 
-      // Show join challenge modal if pointsAwarded is true
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
       if (pointsAwarded) {
+        updateUserPoints(user?.id);
         setTimeout(() => {
           showJoinChallengeModal();
         }, 500);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       }
 
       // Show success message with points info

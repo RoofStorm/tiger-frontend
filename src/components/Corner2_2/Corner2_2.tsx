@@ -19,12 +19,14 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { EmojiPicker } from '@/components/EmojiPicker';
 import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
+import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 
 export function Corner2_2() {
   const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
+  const { updateUserPoints } = useUpdateUserPoints();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const captionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -104,10 +106,16 @@ export function Corner2_2() {
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts', user?.id],
       });
-      // Invalidate user details to refresh points
-      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
+      
+      // Update user points if pointsAwarded is true
+      if (result.pointsAwarded) {
+        updateUserPoints(user?.id);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      }
 
       // Show success message with points info
       toast({
@@ -181,8 +189,6 @@ export function Corner2_2() {
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts', user?.id],
       });
-      // Invalidate user details to refresh points
-      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
@@ -194,11 +200,16 @@ export function Corner2_2() {
         fileInputRef.current.value = '';
       }
 
-      // Show join challenge modal if pointsAwarded is true
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
       if (pointsAwarded) {
+        updateUserPoints(user?.id);
         setTimeout(() => {
           showJoinChallengeModal();
         }, 500);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       }
 
       // Show success message with points info

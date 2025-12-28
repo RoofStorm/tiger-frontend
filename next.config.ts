@@ -2,7 +2,10 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
-  output: 'standalone',
+  // Only use standalone output in production (for Docker builds)
+  ...(process.env.NODE_ENV === 'production' ? { output: 'standalone' as const } : {}),
+  // Fix warning about multiple lockfiles by explicitly setting the workspace root
+  outputFileTracingRoot: process.cwd(),
   images: {
     qualities: [75, 90, 100],
     remotePatterns: [

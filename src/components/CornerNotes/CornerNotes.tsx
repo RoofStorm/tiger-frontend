@@ -8,6 +8,7 @@ import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 import { Button } from '@/components/ui/button';
+import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 
 const MAX_WORDS = 200;
 
@@ -16,6 +17,7 @@ export function CornerNotes() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
+  const { updateUserPoints } = useUpdateUserPoints();
   const [content, setContent] = useState('');
 
   // Fetch highlighted wishes
@@ -44,16 +46,20 @@ export function CornerNotes() {
       queryClient.invalidateQueries({
         queryKey: ['highlighted-wishes-notes'],
       });
-      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
       setContent('');
 
-      // Show join challenge modal if pointsAwarded is true
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
       if (pointsAwarded) {
+        updateUserPoints(user?.id);
         setTimeout(() => {
           showJoinChallengeModal();
         }, 500);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       }
 
       toast({

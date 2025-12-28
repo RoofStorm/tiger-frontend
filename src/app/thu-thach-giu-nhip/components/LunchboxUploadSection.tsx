@@ -14,6 +14,7 @@ import { useJoinChallengeModal } from '@/contexts/JoinChallengeModalContext';
 import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
+import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 
 
 export function LunchboxUploadSection() {
@@ -22,6 +23,7 @@ export function LunchboxUploadSection() {
   const queryClient = useQueryClient();
   const { showModal: showJoinChallengeModal } = useJoinChallengeModal();
   const { showModal: showShareFacebookModal } = useShareFacebookModal();
+  const { updateUserPoints } = useUpdateUserPoints();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const captionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -204,14 +206,18 @@ export function LunchboxUploadSection() {
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts-challenge', user?.id],
       });
-      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
-      // Show join challenge modal if pointsAwarded is true
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
       if (pointsAwarded) {
+        updateUserPoints(user?.id);
         setTimeout(() => {
           showJoinChallengeModal();
         }, 500);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       }
 
       // Save uploaded image URL and caption for modal
@@ -271,16 +277,19 @@ export function LunchboxUploadSection() {
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts-challenge', user?.id],
       });
-      // Invalidate user details to refresh points
-      queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       // Invalidate point logs to refresh point history
       queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
 
-      // Show share Facebook modal if pointsAwarded is true
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
       if (pointsAwarded) {
+        updateUserPoints(user?.id);
         setTimeout(() => {
           showShareFacebookModal();
         }, 500);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       }
 
       // Show success message with points info
