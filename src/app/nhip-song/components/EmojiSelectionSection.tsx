@@ -29,10 +29,10 @@ export function EmojiSelectionSection({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="space-y-2 sm:space-y-4 text-center"
+      className={`text-center`}
     >
-      {/* Intro Text */}
-      <p className={`font-nunito text-[14px] md:text-[18px] leading-relaxed px-4 mt-2 md:mt-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
+{/* Intro Text */}
+<p className={`font-nunito text-[14px] md:text-[18px] leading-relaxed px-4 mt-2 md:mt-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
         Giữa muôn vàn hối hả,
         <br />
         hãy giữ cho mình một nhịp riêng mà bạn muốn.
@@ -60,7 +60,7 @@ export function EmojiSelectionSection({
       </div>
 
       {/* Action Button */}
-      <div className="pt-2">
+      <div className={`${isDarkMode ? 'pt-0 mt-0' : 'pt-2'}`}>
         <Button
           onClick={onGenerateMoodCard}
           disabled={selectedEmojis.length !== requiredEmojiCount}

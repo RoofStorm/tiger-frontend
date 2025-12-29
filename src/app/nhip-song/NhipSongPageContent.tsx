@@ -335,10 +335,11 @@ export function NhipSongPageContent() {
           backgroundSize: 'cover',
           backgroundPosition: isDark ? 'center' : 'bottom',
           backgroundRepeat: 'no-repeat',
-          height: 'calc(100vh)',
+          minHeight:'calc(100vh - 80px)'
         }}
+        className="mt-64px md:mt-80px flex flex-col md:block"
       >
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-[64px] md:mt-[80px] ${isDark ? 'py-6' : 'py-12'}`}>
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-[64px] md:mt-[80px] flex-1 flex flex-col ${isDark ? 'justify-start py-6' : 'justify-center md:justify-start py-6 2xl:py-12'}`}>
           {!showMoodCard ? (
             <EmojiSelectionSection
               selectedEmojis={selectedEmojis}

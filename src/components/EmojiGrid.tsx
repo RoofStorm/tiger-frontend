@@ -45,7 +45,7 @@ export function EmojiGrid({
   return (
     <div>
       {/* Emoji Grid - 4 columns for 12 emojis */}
-      <div className="grid grid-cols-4 max-w-2xl mx-auto items-stretch">
+      <div className="grid grid-cols-4 max-w-xl mx-auto items-stretch">
         {emojis.map((emoji, index) => {
           const selected = isSelected(emoji.id);
           const disabled = !canSelect && !selected;
@@ -63,7 +63,7 @@ export function EmojiGrid({
                 ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >
-              <div className="flex items-center justify-center mb-1 pl-[15px] h-[4.5rem] sm:h-[5rem]">
+              <div className={`flex items-center justify-center pl-[15px] 2xl:h-[5rem]`}>
                 {emoji.imageUrl ? (
                   <motion.img
                     src={emoji.imageUrl}

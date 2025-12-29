@@ -130,7 +130,7 @@ export function HomePageContent() {
           <div className="hidden md:block w-1/2"></div>
           
           {/* Content - Mobile: Full width, Desktop: 1/3 right */}
-          <div className="w-full md:w-1/2 px-6 md:px-12 py-8 md:py-12 md:mr-38 flex flex-col justify-center">
+          <div className="w-full lg:w-1/2 px-6 ld:px-12 py-4 sm:py-6 lg:py-8 lg:mr-38 flex flex-col justify-center">
             {/* Title */}
             <h1 
               className="font-prata font-normal mb-6 md:mb-8 text-center" 
