@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { DailyLoginModal } from './DailyLoginModal';
 import { apiClient } from '@/lib/api';
 import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
+import { useVideoOptional } from '@/contexts/VideoContext';
 
 export function DailyLoginModalProvider() {
   const { data: session, status, update } = useSession();
@@ -15,6 +16,8 @@ export function DailyLoginModalProvider() {
   const sessionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const hasCheckedSessionRef = useRef(false);
   const lastFocusCheckTimeRef = useRef<number>(0);
+  const videoContext = useVideoOptional(); // Optional: có thể null nếu không có VideoProvider
+  const pendingPointsAwardedRef = useRef<{ pointsAwarded: boolean; userId?: string } | null>(null);
 
   // Function to check and show modal based on pointsAwarded
   const checkAndShowModal = useCallback((pointsAwarded: boolean, userId?: string) => {
@@ -28,9 +31,30 @@ export function DailyLoginModalProvider() {
       updateUserPoints(userId);
     }
 
+    // Kiểm tra xem content đã sẵn sàng chưa
+    // Nếu có VideoContext, chỉ hiển thị modal khi content đã sẵn sàng (không đang load video)
+    // Nếu không có VideoContext (trang khác), cho phép hiển thị modal ngay
+    const isContentReady = videoContext ? videoContext.isContentReady : true;
+    const isVideoPlaying = videoContext ? videoContext.isVideoPlaying : false;
+    
+    // Không hiển thị modal nếu:
+    // 1. Video đang phát (isVideoPlaying = true)
+    // 2. Content chưa sẵn sàng (isContentReady = false)
+    if (isVideoPlaying || !isContentReady) {
+      // Lưu lại thông tin để kiểm tra lại sau khi content sẵn sàng
+      if (pointsAwarded === true) {
+        pendingPointsAwardedRef.current = { pointsAwarded: true, userId };
+      }
+      return; // Không hiển thị modal khi đang load/phát video
+    }
+    
+    // Clear pending nếu content đã sẵn sàng
+    pendingPointsAwardedRef.current = null;
+
     // Show modal if:
     // 1. pointsAwarded is true
     // 2. Modal hasn't been shown today
+    // 3. Content đã sẵn sàng (không đang load video)
     if (
       pointsAwarded === true &&
       (!hasShownModal || lastShownDate !== today)
@@ -42,7 +66,7 @@ export function DailyLoginModalProvider() {
         localStorage.setItem('dailyLoginModalShownDate', today);
       }, 500);
     }
-  }, [updateUserPoints]);
+  }, [updateUserPoints, videoContext]);
 
   // Function to check session from backend (for refresh tokens and latest data)
   const checkBackendSession = useCallback(async () => {
@@ -217,6 +241,24 @@ export function DailyLoginModalProvider() {
       window.removeEventListener('focus', handleFocus);
     };
   }, [session, status, checkBackendSession]);
+
+  // Kiểm tra lại modal khi content đã sẵn sàng (từ false sang true)
+  useEffect(() => {
+    if (!videoContext) return; // Không có VideoContext, không cần kiểm tra
+    
+    const isContentReady = videoContext.isContentReady;
+    const isVideoPlaying = videoContext.isVideoPlaying;
+    
+    // Chỉ kiểm tra lại khi content đã sẵn sàng và video không đang phát
+    if (isContentReady && !isVideoPlaying && pendingPointsAwardedRef.current) {
+      const { pointsAwarded, userId } = pendingPointsAwardedRef.current;
+      if (pointsAwarded) {
+        // Kiểm tra lại modal với thông tin đã lưu
+        checkAndShowModal(pointsAwarded, userId);
+        pendingPointsAwardedRef.current = null; // Clear sau khi đã kiểm tra
+      }
+    }
+  }, [videoContext, checkAndShowModal]);
 
   const handleClose = () => {
     setShowModal(false);

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { HomeVideoPlayer } from '@/components/HomeVideoPlayer';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
+import { useVideo } from '@/contexts/VideoContext';
 
 export function HomePageContent() {
   const { navigateWithLoading } = useGlobalNavigationLoading();
@@ -15,6 +16,7 @@ export function HomePageContent() {
   const pageRef = useRef<HTMLDivElement>(null);
   const [showVideo, setShowVideo] = useState(true);
   const { trackClick } = useAnalytics();
+  const { setIsContentReady } = useVideo();
 
   // Track time on Welcome page
   useZoneView(pageRef, {
@@ -35,10 +37,12 @@ export function HomePageContent() {
 
   const handleVideoEnded = () => {
     setShowVideo(false);
+    setIsContentReady(true); // Content đã sẵn sàng sau khi video kết thúc
   };
 
   const handleSkipVideo = () => {
     setShowVideo(false);
+    setIsContentReady(true); // Content đã sẵn sàng sau khi skip video
   };
 
   useEffect(() => {
@@ -110,7 +114,7 @@ export function HomePageContent() {
         >
           <div className="w-full max-w-md px-4" style={{ marginTop: '30%' }}>
             <Image
-              src="/trangchu/sanpham.svg"
+              src="/trangchu/sanpham.png"
               alt="Sản phẩm"
               width={1000}
               height={800}

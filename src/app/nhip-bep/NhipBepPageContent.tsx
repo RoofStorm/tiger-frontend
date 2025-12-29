@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { TimelineInteractive } from '@/components/TimelineInteractive/TimelineInteractive';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Pause, Play } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
 
@@ -137,6 +137,7 @@ export function NhipBepPageContent() {
   const [selectedProductIndex, setSelectedProductIndex] = useState<number | null>(null);
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isHistoryAutoPlaying, setIsHistoryAutoPlaying] = useState(true);
   const currentContent = slides[currentSlide];
   const pageRef = useRef<HTMLDivElement>(null);
   const zoneARef = useRef<HTMLDivElement>(null);
@@ -254,7 +255,7 @@ export function NhipBepPageContent() {
 
   // Auto-loop for history slides
   useEffect(() => {
-    if (slides.length <= 1) return;
+    if (slides.length <= 1 || !isHistoryAutoPlaying) return;
 
     const interval = setInterval(() => {
       setSlideDirection('right');
@@ -262,7 +263,7 @@ export function NhipBepPageContent() {
     }, 4000); // Change slide every 4 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isHistoryAutoPlaying]);
 
   // Functions to handle slide navigation with direction
   const goToSlide = (index: number) => {
@@ -390,21 +391,20 @@ export function NhipBepPageContent() {
                 className="text-center"
               >
                 {/* Dates */}
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif text-white mb-3 md:mb-4">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-nunito text-white mb-3 md:mb-4">
                   {currentContent.dates}
                 </h2>
 
                 {/* Subtitle */}
-                <h3 className="text-lg md:text-xl lg:text-2xl font-serif text-white mb-2">
+                <h3 className="text-lg md:text-xl lg:text-2xl font-nunito text-white mb-2">
                   {currentContent.subtitle}
                 </h3>
 
                 {/* Body Text */}
-                <div className="text-white space-y-1 font-nunito px-2">
+                <div className="text-white space-y-1 px-2">
                   {currentContent.paragraphs.map((paragraph, index) => (
                     <p 
                       key={index}
-                      className="text-center"
                       style={{
                         fontFamily: 'Nunito',
                         fontWeight: 400,
@@ -456,6 +456,29 @@ export function NhipBepPageContent() {
                 aria-label="Next slide"
               >
                 <ChevronRight className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
+              </button>
+
+              {/* Pause/Play Button */}
+              <button
+                onClick={() => {
+                  setIsHistoryAutoPlaying(!isHistoryAutoPlaying);
+                  // Track pause/play button click in Zone A
+                  trackClick('nhip-bep', {
+                    zone: 'zoneA',
+                    component: 'pause_play_button',
+                    metadata: { 
+                      action: isHistoryAutoPlaying ? 'pause' : 'play',
+                    },
+                  });
+                }}
+                className="bg-white/80 hover:bg-white rounded-full p-1.5 shadow-lg transition-all duration-300"
+                aria-label={isHistoryAutoPlaying ? 'Pause' : 'Play'}
+              >
+                {isHistoryAutoPlaying ? (
+                  <Pause className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
+                ) : (
+                  <Play className="w-4 h-4 md:w-5 md:h-5 text-gray-700" />
+                )}
               </button>
             </div>
           </div>
