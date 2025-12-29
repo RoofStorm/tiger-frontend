@@ -84,7 +84,7 @@ export function HomePageContent() {
           <HomeVideoPlayer
             onVideoEnded={handleVideoEnded}
             onSkip={handleSkipVideo}
-            videoUrl="https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2011.mp4"
+            videoUrl="https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2016.mp4"
           />
         )}
       </AnimatePresence>
