@@ -1,336 +1,413 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-// import { BarChart3, Users, Clock, TrendingUp } from 'lucide-react';
 import apiClient from '@/lib/api';
-import { Pagination } from '../Pagination';
-
-interface AnalyticsItem {
-  id: string;
-  corner: number;
-  duration: number;
-  createdAt: string;
-  userId?: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-  };
-}
-
-interface CornerStats {
-  corner: number;
-  totalVisits: number;
-  totalDuration: number;
-  avgDuration: number;
-  cornerName: string;
-}
-
-interface UserDateStats {
-  userId: string;
-  userName: string;
-  userEmail?: string;
-  date: string;
-  corners: Record<number, { visits: number; totalDuration: number }>;
-  totalVisits: number;
-  totalDuration: number;
-}
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  AnalyticsFilterBar,
+  AnalyticsFilterState,
+} from './AnalyticsFilterBar';
 
 interface AnalyticsTabProps {
   isAdmin: boolean;
 }
 
-export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
-  const [analyticsPage, setAnalyticsPage] = useState(1);
-  const [analyticsPerPage] = useState(20);
+interface SummaryResponse {
+  dateRange: {
+    from: string;
+    to: string;
+  };
+  totalViews: number;
+  totalClicks: number;
+  avgDuration: number;
+  uniqueSessions: number;
+  totalDurations:number;
+}
 
-  // Fetch analytics data
-  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['admin-analytics'],
-    queryFn: () => apiClient.getCornerAnalytics(),
+interface AnalysisRow {
+  date: string;
+  page: string;
+  zone: string | null;
+  action: string;
+  component: string | null;
+  value: number;
+  unit: string;
+  metadata?: Record<string, unknown>;
+}
+
+interface AnalysisResponse {
+  columns: string[];
+  rows: AnalysisRow[];
+  nextCursor?: string;
+  count: number;
+  hasMore: boolean;
+}
+
+export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
+  const [filters, setFilters] = useState<AnalyticsFilterState>({
+    from: '',
+    to: '',
+  });
+  const [debouncedFilters, setDebouncedFilters] =
+    useState<AnalyticsFilterState>(filters);
+  const [analysisLimit, setAnalysisLimit] = useState(50);
+  const [analysisCursor, setAnalysisCursor] = useState<string | undefined>(
+    undefined
+  );
+  const [cursorHistory, setCursorHistory] = useState<string[]>([]); // For back navigation
+
+  // Debounce filter changes (300-500ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFilters(filters);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [filters]);
+
+  // Reset cursor when filters change
+  useEffect(() => {
+    setAnalysisCursor(undefined);
+    setCursorHistory([]);
+  }, [debouncedFilters.page, debouncedFilters.zone, debouncedFilters.from, debouncedFilters.to]);
+
+  // Fetch available data on mount
+  const { data: availableData, isLoading: availableDataLoading } = useQuery({
+    queryKey: ['analytics-available-data'],
+    queryFn: () => apiClient.getAnalyticsAvailableData(),
     enabled: isAdmin,
-    staleTime: 0,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
-  const analytics: AnalyticsItem[] = analyticsData?.data || [];
 
-  const getCornerName = (corner: number) => {
-    const names = {
-      0: 'Trang chủ (Video)',
-      1: 'Mục lục (Emoji Grid)',
-      2: 'Made in Vietnam',
-      3: 'Chia sẻ (Gallery)',
-      4: 'Flip Card',
-      5: 'Phần thưởng',
-    };
-    return names[corner as keyof typeof names] || `Corner ${corner}`;
+  // Fetch Summary Data
+  const { data: summaryData, isLoading: summaryLoading } = useQuery({
+    queryKey: [
+      'analytics-summary',
+      debouncedFilters.page,
+      debouncedFilters.zone,
+      debouncedFilters.from,
+      debouncedFilters.to,
+    ],
+    queryFn: () =>
+      apiClient.getAnalyticsSummary({
+        page: debouncedFilters.page,
+        zone: debouncedFilters.zone,
+        from: debouncedFilters.from,
+        to: debouncedFilters.to,
+      }),
+    enabled:
+      isAdmin &&
+      !!debouncedFilters.from &&
+      !!debouncedFilters.to &&
+      new Date(debouncedFilters.from) <= new Date(debouncedFilters.to),
+  });
+
+  // Fetch Analysis Data
+  const canFetchAnalysis =
+    isAdmin &&
+    !!debouncedFilters.from &&
+    !!debouncedFilters.to &&
+    new Date(debouncedFilters.from) <= new Date(debouncedFilters.to);
+
+  const { data: analysisData, isLoading: analysisLoading } = useQuery({
+    queryKey: [
+      'analytics-analysis',
+      debouncedFilters.page,
+      debouncedFilters.zone,
+      debouncedFilters.from,
+      debouncedFilters.to,
+      analysisLimit,
+      analysisCursor,
+    ],
+    queryFn: () =>
+      apiClient.getAnalyticsAnalysis({
+        from: debouncedFilters.from!,
+        to: debouncedFilters.to!,
+        page: debouncedFilters.page,
+        zone: debouncedFilters.zone,
+        limit: analysisLimit,
+        cursor: analysisCursor,
+      }),
+    enabled: canFetchAnalysis,
+  });
+
+  const summary: SummaryResponse | undefined = summaryData;
+  const analysis: AnalysisResponse | undefined = analysisData;
+
+  // Handle next page
+  const handleNextPage = () => {
+    if (analysis?.nextCursor) {
+      setCursorHistory([...cursorHistory, analysisCursor || '']);
+      setAnalysisCursor(analysis.nextCursor);
+    }
   };
 
-  // Group analytics by corner for overview
-  const cornerStats = analytics.reduce(
-    (acc: Record<number, CornerStats>, item: AnalyticsItem) => {
-      const corner = item.corner;
-      if (!acc[corner]) {
-        acc[corner] = {
-          corner,
-          totalVisits: 0,
-          totalDuration: 0,
-          avgDuration: 0,
-          cornerName: getCornerName(corner),
-        };
-      }
-      acc[corner].totalVisits += 1;
-      acc[corner].totalDuration += item.duration;
-      acc[corner].avgDuration = Math.round(
-        acc[corner].totalDuration / acc[corner].totalVisits
-      );
-      return acc;
-    },
-    {}
-  );
+  // Handle previous page
+  const handlePreviousPage = () => {
+    if (cursorHistory.length > 0) {
+      const previousCursor = cursorHistory[cursorHistory.length - 1];
+      setCursorHistory(cursorHistory.slice(0, -1));
+      setAnalysisCursor(previousCursor || undefined);
+    } else {
+      setAnalysisCursor(undefined);
+    }
+  };
 
-  // Group analytics by user and date for detailed table
-  const userDateStats = analytics.reduce(
-    (acc: Record<string, UserDateStats>, item: AnalyticsItem) => {
-      const userId = item.userId || 'Anonymous';
-      const userName = item.user?.name || 'Anonymous User';
-      const userEmail = item.user?.email;
-      const date = new Date(item.createdAt).toLocaleDateString('vi-VN');
-      const key = `${userId}-${date}`;
+  // Format seconds
+  const formatSeconds = (seconds: number): string => {
+    if (seconds < 60) return `${seconds.toFixed(1)}s`;
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}m ${secs}s`;
+  };
 
-      if (!acc[key]) {
-        acc[key] = {
-          userId,
-          userName,
-          userEmail,
-          date,
-          corners: {} as Record<
-            number,
-            { visits: number; totalDuration: number }
-          >,
-          totalVisits: 0,
-          totalDuration: 0,
-        };
-      }
-
-      const corner = item.corner;
-      if (!acc[key].corners[corner]) {
-        acc[key].corners[corner] = { visits: 0, totalDuration: 0 };
-      }
-
-      acc[key].corners[corner].visits += 1;
-      acc[key].corners[corner].totalDuration += item.duration;
-      acc[key].totalVisits += 1;
-      acc[key].totalDuration += item.duration;
-
-      return acc;
-    },
-    {}
-  );
-
-  const userDateArray = Object.values(userDateStats).sort(
-    (a: UserDateStats, b: UserDateStats) =>
-      new Date(b.date.split('/').reverse().join('-')).getTime() -
-      new Date(a.date.split('/').reverse().join('-')).getTime()
-  );
-
-  if (analyticsLoading) {
-    return <div className="text-center py-8">Đang tải analytics...</div>;
+  if (availableDataLoading) {
+    return <div className="text-center py-8">Đang tải dữ liệu...</div>;
   }
 
   return (
     <div className="space-y-6">
-      {/* Analytics Overview */}
+      {/* Filter Bar */}
+      <AnalyticsFilterBar
+        filters={filters}
+        setFilters={setFilters}
+        availableData={availableData}
+      />
+
+      {/* TABLE 1 - SUMMARY TABLE */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-6">
-          Corner Analytics Overview
+          Summary Table
         </h2>
 
-        {analytics.length === 0 ? (
+        {summaryLoading ? (
           <div className="text-center py-8 text-gray-500">
-            Chưa có dữ liệu analytics
+            Đang tải dữ liệu summary...
+          </div>
+        ) : !summary ? (
+          <div className="text-center py-8 text-gray-500">
+            Chưa có dữ liệu summary. Vui lòng chọn khoảng thời gian.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Object.values(cornerStats).map((stat: CornerStats) => (
-              <div
-                key={stat.corner}
-                className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg p-6"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {stat.cornerName}
-                  </h3>
-                  <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      {stat.corner}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">
-                      Tổng lượt truy cập:
-                    </span>
-                    <span className="font-semibold text-blue-600">
-                      {stat.totalVisits}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">
-                      Tổng thời gian:
-                    </span>
-                    <span className="font-semibold text-green-600">
-                      {stat.totalDuration}s
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Thời gian TB:</span>
-                    <span className="font-semibold text-purple-600">
-                      {stat.avgDuration}s
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date Range
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Views
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Clicks
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total Durations (s)
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Avg Duration (s)
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Unique Sessions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {summary.dateRange.from} to {summary.dateRange.to}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                    {summary.totalViews.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                    {summary.totalClicks.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                    {formatSeconds(summary.totalDurations)}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                    {formatSeconds(summary.avgDuration)}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                    {summary.uniqueSessions.toLocaleString()}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         )}
       </div>
 
-      {/* Detailed Analytics Table */}
+      {/* TABLE 2 - ANALYSIS TABLE */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Chi tiết Analytics theo User & Ngày
-          </h3>
-          <div className="text-sm text-gray-600">
-            Hiển thị{' '}
-            {Math.min(
-              (analyticsPage - 1) * analyticsPerPage + 1,
-              userDateArray.length
-            )}{' '}
-            đến{' '}
-            {Math.min(analyticsPage * analyticsPerPage, userDateArray.length)}{' '}
-            trong tổng số {userDateArray.length} records
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900">
+            Analysis Table
+          </h2>
+          <div className="flex items-center gap-4">
+            {/* Limit Selector */}
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-700">Limit:</label>
+              <Select
+                value={analysisLimit.toString()}
+                onValueChange={value => setAnalysisLimit(Number(value))}
+              >
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                  <SelectItem value="200">200</SelectItem>
+                  <SelectItem value="500">500</SelectItem>
+                  <SelectItem value="1000">1000</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Count Display */}
+            {analysis && (
+              <div className="text-sm text-gray-600">
+                Hiển thị {analysis.rows.length} / {analysis.count} records
+              </div>
+            )}
           </div>
         </div>
 
-        {userDateArray.length === 0 ? (
+        {!canFetchAnalysis ? (
           <div className="text-center py-8 text-gray-500">
-            Chưa có dữ liệu analytics
+            Vui lòng chọn khoảng thời gian để xem dữ liệu analysis.
+          </div>
+        ) : analysisLoading ? (
+          <div className="text-center py-8 text-gray-500">
+            Đang tải dữ liệu analysis...
+          </div>
+        ) : !analysis || !analysis.rows || analysis.rows.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Chưa có dữ liệu analysis cho điều kiện đã chọn.
           </div>
         ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ngày
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Corner 0
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Corner 1
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Corner 2
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Corner 3
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Corner 4
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Corner 5
-                    </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tổng
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {userDateArray
-                    .slice(
-                      (analyticsPage - 1) * analyticsPerPage,
-                      analyticsPage * analyticsPerPage
-                    )
-                    .map((userDate: UserDateStats) => (
-                      <tr key={`${userDate.userId}-${userDate.date}`}>
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3">
-                              <span className="text-white font-bold text-sm">
-                                {userDate.userName.charAt(0).toUpperCase()}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Page
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Zone
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Action
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Component
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Value
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Unit
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Metadata
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {analysis.rows.map((row, index) => (
+                  <tr key={`${row.date}-${row.page}-${row.zone || 'null'}-${row.action}-${row.component || 'null'}-${index}`}>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {row.date}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {row.page}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {row.zone || '-'}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {row.action}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {row.component || '-'}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      {row.unit === 'seconds' 
+                        ? formatSeconds(row.value)
+                        : row.value.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {row.unit}
+                    </td>
+                    <td className="px-4 py-4 text-sm text-gray-600">
+                      {row.metadata ? (
+                        <div className="space-y-1">
+                          {Object.entries(row.metadata).map(([key, value]) => (
+                            <div key={key} className="text-xs">
+                              <span className="font-medium text-gray-700">{key}:</span>{' '}
+                              <span className="text-gray-600">
+                                {typeof value === 'object'
+                                  ? JSON.stringify(value)
+                                  : String(value)}
                               </span>
                             </div>
-                            <div className="text-sm font-medium text-gray-900">
-                              <div className="font-semibold">
-                                {userDate.userName}
-                              </div>
-                              {userDate.userEmail && (
-                                <div className="text-xs text-gray-500">
-                                  {userDate.userEmail}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {userDate.date}
-                        </td>
-                        {[0, 1, 2, 3, 4, 5].map(corner => {
-                          const cornerData = userDate.corners[corner];
-                          return (
-                            <td
-                              key={corner}
-                              className="px-2 py-4 text-center text-sm"
-                            >
-                              {cornerData ? (
-                                <div className="space-y-1">
-                                  <div className="font-semibold text-blue-600">
-                                    {cornerData.visits}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {cornerData.totalDuration}s
-                                  </div>
-                                </div>
-                              ) : (
-                                <span className="text-gray-300">-</span>
-                              )}
-                            </td>
-                          );
-                        })}
-                        <td className="px-4 py-4 text-center text-sm font-semibold text-gray-900">
-                          <div className="space-y-1">
-                            <div className="text-blue-600">
-                              {userDate.totalVisits}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {userDate.totalDuration}s
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        '-'
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-            {/* Analytics Pagination */}
-            <Pagination
-              total={userDateArray.length}
-              currentPage={analyticsPage}
-              onPageChange={setAnalyticsPage}
-              itemsPerPage={analyticsPerPage}
-            />
-          </>
+        {/* Pagination Controls */}
+        {analysis && analysis.rows.length > 0 && (
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              {analysis.count > 0 && (
+                <span>
+                  Hiển thị {analysis.rows.length} trong tổng số {analysis.count} records
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePreviousPage}
+                disabled={cursorHistory.length === 0 && !analysisCursor}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNextPage}
+                disabled={!analysis.hasMore || !analysis.nextCursor}
+              >
+                Next
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </div>

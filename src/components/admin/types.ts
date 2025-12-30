@@ -67,6 +67,7 @@ export interface CornerStats {
   totalDuration: number;
   avgDuration: number;
   cornerName: string;
+  totalDurations:number;
 }
 
 export interface UserDateStats {

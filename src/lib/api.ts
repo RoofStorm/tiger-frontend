@@ -510,50 +510,87 @@ class ApiClient {
     return response.data;
   }
 
+  async getAnalyticsAvailableData(): Promise<{
+    pages: string[];
+    zonesByPage: Record<string, string[]>; // page -> zones[]
+    commonFunnelSteps?: string[];
+    actions?: Array<{ action: string; count: number }>;
+    components?: string[];
+    totalRecords?: number;
+    dateRange?: {
+      from: string;
+      to: string;
+    };
+  }> {
+    const response = await this.client.get('/analytics/available-data');
+    return response.data?.data || response.data;
+  }
+
   async getAnalyticsSummary(params: {
     page?: string;
     zone?: string;
-  }): Promise<any> {
+    from?: string;
+    to?: string;
+  }): Promise<{
+    dateRange: {
+      from: string;
+      to: string;
+    };
+    totalViews: number;
+    totalClicks: number;
+    avgDuration: number;
+    uniqueSessions: number;
+    totalDurations:number;
+  }> {
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.append('page', params.page);
     if (params.zone) queryParams.append('zone', params.zone);
+    if (params.from) queryParams.append('from', params.from);
+    if (params.to) queryParams.append('to', params.to);
 
     const response = await this.client.get(
       `/analytics/summary?${queryParams.toString()}`
     );
-    return response.data;
+    return response.data?.data || response.data;
   }
 
-  async getAnalyticsFunnel(params: {
-    page: string;
+  async getAnalyticsAnalysis(params: {
+    from: string;
+    to: string;
+    page?: string;
     zone?: string;
-    steps: string[];
-  }): Promise<any> {
-    const queryParams = new URLSearchParams();
-    queryParams.append('page', params.page);
-    if (params.zone) queryParams.append('zone', params.zone);
-    params.steps.forEach((step) => {
-      queryParams.append('steps', step);
-    });
-
-    const response = await this.client.get(
-      `/analytics/funnel?${queryParams.toString()}`
-    );
-    return response.data;
-  }
-
-  async getUserAnalytics(params?: {
-    page?: number;
+    action?: string;
     limit?: number;
-  }): Promise<any> {
+    cursor?: string;
+  }): Promise<{
+    columns: string[];
+    rows: Array<{
+      date: string;
+      page: string;
+      zone: string | null;
+      action: string;
+      component: string | null;
+      value: number;
+      unit: string;
+      metadata?: Record<string, unknown>;
+    }>;
+    nextCursor?: string;
+    count: number;
+    hasMore: boolean;
+  }> {
     const queryParams = new URLSearchParams();
-    if (params?.page) queryParams.append('page', params.page.toString());
-    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    queryParams.append('from', params.from);
+    queryParams.append('to', params.to);
+    if (params.page) queryParams.append('page', params.page);
+    if (params.zone) queryParams.append('zone', params.zone);
+    if (params.action) queryParams.append('action', params.action);
+    if (params.limit) queryParams.append('limit', params.limit.toString());
+    if (params.cursor) queryParams.append('cursor', params.cursor);
 
     const response = await this.client.get(
-      `/analytics/user?${queryParams.toString()}`
+      `/analytics/analysis?${queryParams.toString()}`
     );
-    return response.data;
+    return response.data?.data || response.data;
   }
 
   async getAdminStats(): Promise<any> {
