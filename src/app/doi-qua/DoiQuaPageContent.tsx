@@ -197,7 +197,7 @@ export function DoiQuaPageContent() {
   return (
     <div ref={pageRef} className="min-h-screen">
       <main 
-        className="mt-[64px] md:mt-[80px]"
+        className="mt-[64px] xl:mt-[80px]"
         style={{ 
           backgroundImage: 'url(/uudai/traodoinhipsong_background.svg)',
           backgroundSize: 'cover',

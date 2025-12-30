@@ -139,7 +139,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
         }}
       >
         <div className="max-w-8xl mx-auto px-8 lg:px-12">
-          <div className="flex items-center justify-between h-16 sm:h-20">
+          <div className="flex items-center justify-between h-16 xl:h-20">
             {/* Logo - Left side */}
             <motion.div
               whileHover={{ scale: 1.05 }}

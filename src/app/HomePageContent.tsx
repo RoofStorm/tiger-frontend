@@ -112,7 +112,7 @@ export function HomePageContent() {
             animate={{ y: 0 }}
             transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
             ref={mainRef}
-            className="relative flex flex-col md:block mt-[64px] md:mt-[80px]"
+            className="relative flex flex-col md:block mt-[64px] xl:mt-[80px]"
           >
         {/* Mobile Layout: Product Image First, Content Second */}
         {/* Desktop Layout: Content Right, Product Image Bottom (absolute) */}
