@@ -31,23 +31,27 @@ export function ThuThachGiuNhipPageContent() {
       {/* Video Player - hiển thị trước khi show content */}
       <AnimatePresence>
         {showVideo && (
-          <HomeVideoPlayer
-            onVideoEnded={handleVideoEnded}
-            onSkip={handleSkipVideo}
-            videoUrl="https://s3.tiger-corporation-vietnam.vn/tiger-videos/Coner2.mp4"
-            showMuteButton={false}
-          />
+          <motion.div
+            key="video-player"
+            exit={{ y: '-100%' }}
+            transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+            className="fixed inset-0 z-[70]"
+          >
+            <HomeVideoPlayer
+              onVideoEnded={handleVideoEnded}
+              onSkip={handleSkipVideo}
+              videoUrl="https://s3.tiger-corporation-vietnam.vn/tiger-videos/Coner2.mp4"
+              showMuteButton={false}
+            />
+          </motion.div>
         )}
-      </AnimatePresence>
 
-      {/* Main Content - chỉ hiển thị sau khi video kết thúc */}
-      <AnimatePresence>
         {!showVideo && (
           <motion.main
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
+            key="main-content"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
             ref={mainRef}
             className="min-h-screen"
             style={{ backgroundColor: '#FFFDF5', minHeight: 'calc(100vh - 80px)' }}
