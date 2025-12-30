@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Pause, Play } from 'lucide-react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import { useNextAuth } from '@/hooks/useNextAuth';
@@ -21,6 +21,20 @@ interface Post {
     name?: string;
     avatarUrl?: string;
   };
+}
+
+interface ApiResponse {
+  success: boolean;
+  data: {
+    posts: Post[];
+    pagination: {
+      hasNext: boolean;
+      hasPrev: boolean;
+      nextCursor?: string;
+      prevCursor?: string;
+    };
+  };
+  message: string;
 }
 
 // Mock data để fallback nếu không có đủ posts
@@ -63,7 +77,9 @@ export function LunchboxCarousel() {
   const queryClient = useQueryClient();
   const { trackClick } = useAnalytics();
   const zoneB2Ref = useRef<HTMLDivElement>(null);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // State management
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -72,12 +88,113 @@ export function LunchboxCarousel() {
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [likeCounts, setLikeCounts] = useState<Map<string, number>>(new Map());
   const carouselRef = useRef<HTMLDivElement>(null);
+  const lastPrependCountRef = useRef(0);
 
   // Track time on Zone B.2
   useZoneView(zoneB2Ref, {
     page: 'challenge',
     zone: 'zoneB2',
   });
+
+  // Infinite Query for highlighted posts
+  const {
+    data,
+    fetchNextPage,
+    fetchPreviousPage,
+    hasNextPage,
+    hasPreviousPage,
+    isFetchingNextPage,
+    isFetchingPreviousPage,
+    isLoading,
+  } = useInfiniteQuery({
+    queryKey: ['highlighted-posts-carousel'],
+    queryFn: ({ pageParam }) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (apiClient as any).getPostsFeed({
+        cursor: pageParam?.cursor,
+        direction: pageParam?.direction,
+        limit: 10,
+        type: 'IMAGE', // Filter by IMAGE type as per requirement
+      }),
+    initialPageParam: { cursor: undefined, direction: 'next' } as { cursor: string | undefined, direction: 'next' | 'prev' },
+    getNextPageParam: (lastPage: ApiResponse) =>
+      lastPage?.data?.pagination?.hasNext
+        ? { cursor: lastPage.data.pagination.nextCursor, direction: 'next' }
+        : undefined,
+    getPreviousPageParam: (firstPage: ApiResponse) =>
+      firstPage?.data?.pagination?.hasPrev
+        ? { cursor: firstPage.data.pagination.prevCursor, direction: 'prev' }
+        : undefined,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Flatten and deduplicate posts
+  const highlightedPosts = useMemo(() => {
+    if (!data?.pages) return mockPosts;
+    
+    const allPosts: Post[] = [];
+    const seenIds = new Set<string>();
+    
+    data.pages.forEach((page: ApiResponse) => {
+      const pagePosts = Array.isArray(page?.data?.posts) ? page.data.posts : [];
+      pagePosts.forEach((post: Post) => {
+        if (!seenIds.has(post.id)) {
+          allPosts.push(post);
+          seenIds.add(post.id);
+        }
+      });
+    });
+
+    if (allPosts.length === 0) return mockPosts;
+    
+    // If we have fewer than 5 posts, pad with mock data if necessary
+    if (allPosts.length < 5) {
+      const needed = 5 - allPosts.length;
+      return [...allPosts, ...mockPosts.slice(0, needed)];
+    }
+
+    return allPosts;
+  }, [data]);
+
+  // Adjust currentIndex when prepending data
+  useEffect(() => {
+    if (!data?.pages) return;
+    
+    // Calculate total posts in the first page (to detect prepending)
+    const firstPagePosts = (data.pages[0] as ApiResponse)?.data?.posts || [];
+    const currentFirstPageCount = firstPagePosts.length;
+    
+    if (lastPrependCountRef.current > 0 && currentFirstPageCount > lastPrependCountRef.current) {
+      const addedCount = currentFirstPageCount - lastPrependCountRef.current;
+      setCurrentIndex(prev => prev + addedCount);
+    }
+    
+    lastPrependCountRef.current = currentFirstPageCount;
+  }, [data?.pages]);
+
+  // Fetch thresholds
+  useEffect(() => {
+    const VISIBLE = isMobile ? 1 : 2;
+    const BUFFER = 3;
+
+    // Fetch Next
+    if (
+      hasNextPage &&
+      !isFetchingNextPage &&
+      currentIndex >= highlightedPosts.length - (VISIBLE + BUFFER)
+    ) {
+      fetchNextPage();
+    }
+
+    // Fetch Prev
+    if (
+      hasPreviousPage &&
+      !isFetchingPreviousPage &&
+      currentIndex <= BUFFER
+    ) {
+      fetchPreviousPage();
+    }
+  }, [currentIndex, highlightedPosts.length, hasNextPage, hasPreviousPage, isFetchingNextPage, isFetchingPreviousPage, isMobile, fetchNextPage, fetchPreviousPage]);
 
   // Detect mobile screen size with debounce
   useEffect(() => {
@@ -98,34 +215,6 @@ export function LunchboxCarousel() {
       clearTimeout(timeoutId);
     };
   }, []);
-
-  // Fetch highlighted posts for carousel
-  const { data: postsData, isLoading } = useQuery({
-    queryKey: ['highlighted-posts-lunchbox-carousel'],
-    queryFn: () => apiClient.getHighlightedPosts(1, 20), // Get up to 20 posts
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchOnWindowFocus: false,
-  });
-
-  // Xử lý posts: lấy từ API, nếu không đủ thì bổ sung bằng mock data
-  const highlightedPosts = useMemo(() => {
-    const apiPosts = Array.isArray(postsData?.data?.posts)
-      ? postsData.data.posts
-      : [];
-
-    // Nếu có posts từ API, dùng posts đó
-    if (apiPosts.length > 0) {
-      // Nếu không đủ 5 posts, bổ sung bằng mock data
-      if (apiPosts.length < 5) {
-        const needed = 5 - apiPosts.length;
-        return [...apiPosts, ...mockPosts.slice(0, needed)];
-      }
-      return apiPosts;
-    }
-
-    // Nếu không có posts từ API, dùng mock data
-    return mockPosts;
-  }, [postsData]);
 
   // Khởi tạo và cập nhật likeCounts và likedPosts từ posts khi data thay đổi
   useEffect(() => {
@@ -200,30 +289,31 @@ export function LunchboxCarousel() {
 
       // Cập nhật cache trực tiếp để sync với server
       queryClient.setQueryData(
-        ['highlighted-posts-lunchbox-carousel'],
-        (oldData: { data?: { posts?: Post[] } } | undefined) => {
-          if (!oldData?.data?.posts) return oldData;
+        ['highlighted-posts-carousel'],
+        (oldData: { pages: ApiResponse[]; pageParams: unknown[] } | undefined) => {
+          if (!oldData?.pages) return oldData;
           
-          const updatedPosts = oldData.data.posts.map((post: Post) => {
-            if (post.id === postId) {
-              const currentLikeCount = post.likeCount ?? 0;
-              return {
-                ...post,
-                likeCount: action === 'liked' 
-                  ? currentLikeCount + 1 
-                  : Math.max(0, currentLikeCount - 1),
-                isLiked: action === 'liked',
-              };
-            }
-            return post;
-          });
-
           return {
             ...oldData,
-            data: {
-              ...oldData.data,
-              posts: updatedPosts,
-            },
+            pages: oldData.pages.map((page: ApiResponse) => ({
+              ...page,
+              data: {
+                ...page.data,
+                posts: page.data?.posts?.map((post: Post) => {
+                  if (post.id === postId) {
+                    const currentLikeCount = post.likeCount ?? 0;
+                    return {
+                      ...post,
+                      likeCount: action === 'liked' 
+                        ? currentLikeCount + 1 
+                        : Math.max(0, currentLikeCount - 1),
+                      isLiked: action === 'liked',
+                    };
+                  }
+                  return post;
+                }),
+              },
+            })),
           };
         }
       );
@@ -255,22 +345,24 @@ export function LunchboxCarousel() {
   // Navigation functions
   const nextSlide = useCallback(() => {
     if (isTransitioning || highlightedPosts.length === 0) return;
+    if (currentIndex >= highlightedPosts.length - 1) return;
+    
     setIsTransitioning(true);
-    setCurrentSlide(prev => (prev + 1) % highlightedPosts.length);
+    setCurrentIndex(prev => prev + 1);
     setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning, highlightedPosts.length]);
+  }, [isTransitioning, highlightedPosts.length, currentIndex]);
 
   const prevSlide = useCallback(() => {
     if (isTransitioning || highlightedPosts.length === 0) return;
+    if (currentIndex <= 0) return;
+    
     setIsTransitioning(true);
-    setCurrentSlide(
-      prev => (prev - 1 + highlightedPosts.length) % highlightedPosts.length
-    );
+    setCurrentIndex(prev => prev - 1);
     setTimeout(() => setIsTransitioning(false), 500);
-  }, [isTransitioning, highlightedPosts.length]);
+  }, [isTransitioning, currentIndex, highlightedPosts.length]);
 
   const handleDotClick = useCallback((index: number) => {
-    if (!isTransitioning && index !== currentSlide) {
+    if (!isTransitioning && index !== currentIndex) {
       // Track navigation dot click
       trackClick('challenge', {
         zone: 'zoneB2',
@@ -279,10 +371,10 @@ export function LunchboxCarousel() {
       });
 
       setIsTransitioning(true);
-      setCurrentSlide(index);
+      setCurrentIndex(index);
       setTimeout(() => setIsTransitioning(false), 500);
     }
-  }, [isTransitioning, currentSlide, highlightedPosts.length, trackClick]);
+  }, [isTransitioning, currentIndex, highlightedPosts.length, trackClick]);
 
   const handleImageClick = useCallback((postId: string, index: number) => {
     // Track image click in showcase
@@ -298,11 +390,17 @@ export function LunchboxCarousel() {
     if (!isAutoPlaying || highlightedPosts.length <= 1) return;
 
     const interval = setInterval(() => {
-      nextSlide();
+      if (currentIndex < highlightedPosts.length - 1) {
+        nextSlide();
+      } else {
+        // If at the end, maybe pause or reset (though reset is not desired for infinite feed)
+        // For infinite feed, we just stop auto-playing if we can't fetch more
+        if (!hasNextPage) setIsAutoPlaying(false);
+      }
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying, nextSlide, highlightedPosts.length]);
+  }, [isAutoPlaying, nextSlide, highlightedPosts.length, currentIndex, hasNextPage]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -385,7 +483,7 @@ export function LunchboxCarousel() {
             {/* Left Arrow - Outside carousel */}
             <button
               onClick={prevSlide}
-              disabled={isTransitioning || highlightedPosts.length <= 1}
+              disabled={isTransitioning || currentIndex === 0}
               className="flex-shrink-0 z-40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mr-2 md:mr-4"
               aria-label="Previous slide"
             >
@@ -402,27 +500,16 @@ export function LunchboxCarousel() {
             >
               <div className="relative h-full w-full flex items-center justify-center overflow-hidden">
                 {highlightedPosts.map((post: Post, index: number) => {
-                  // Tính relative position so với currentSlide
-                  const diff =
-                    (index - currentSlide + highlightedPosts.length) %
-                    highlightedPosts.length;
-
-                  // Trên mobile: chỉ hiển thị 3 slides (-1, 0, 1)
-                  // Trên desktop: hiển thị 5 slides (-2, -1, 0, 1, 2)
-                  const maxPos = isMobile ? 1 : 2;
-                  let pos = diff;
-                  const total = highlightedPosts.length;
-
-                  // Wrap-around logic
-                  if (diff > maxPos) {
-                    pos = diff - total; // Negative position
-                  }
-
+                  // Virtualization logic: only render slides within range
+                  const maxVisibleRange = isMobile ? 1 : 2;
+                  const diff = index - currentIndex;
+                  
                   // Chỉ hiển thị slides trong range
-                  if (Math.abs(pos) > maxPos) {
+                  if (Math.abs(diff) > maxVisibleRange) {
                     return null;
                   }
 
+                  const pos = diff;
                   const isCenter = pos === 0;
 
                   // Tính toán khoảng cách - mobile gần hơn và đảm bảo không overflow
@@ -440,26 +527,25 @@ export function LunchboxCarousel() {
                   const scale = isMobile
                     ? pos === 0 ? 1.0 : 0.85
                     : pos === 0 ? 1.12 : Math.abs(pos) === 1 ? 0.94 : 0.8;
-                  const zIndex = pos === 0 ? 30 : Math.abs(pos) === 1 ? 20 : 10;
+                  const zIndex = 30 - Math.abs(pos) * 10;
 
                   // Kích thước responsive - đảm bảo tỉ lệ 3:4
-                  // Tính height dựa trên width với tỉ lệ 3:4 (height = width * 4/3)
                   const widthValue = isMobile
-                    ? pos === 0 ? 256 : 224 // 16rem = 256px, 14rem = 224px
-                    : pos === 0 ? 320 : Math.abs(pos) === 1 ? 288 : 224; // 20rem = 320px, 18rem = 288px, 14rem = 224px
+                    ? pos === 0 ? 256 : 224
+                    : pos === 0 ? 320 : Math.abs(pos) === 1 ? 288 : 224;
                   
-                  const height = Math.round(widthValue * 4 / 3); // Tỉ lệ 3:4
+                  const height = Math.round(widthValue * 4 / 3);
 
                   const width = isMobile
                     ? pos === 0 ? 'w-[16rem]' : 'w-[14rem]'
                     : pos === 0 ? 'w-[20rem]' : Math.abs(pos) === 1 ? 'w-[18rem]' : 'w-[14rem]';
 
-                  // Optimized onClick handler - avoid creating new function on each render
+                  // Optimized onClick handler
                   const handleSlideClick = () => {
                     if (!isCenter && !isTransitioning) {
                       handleImageClick(post.id, index);
                       setIsTransitioning(true);
-                      setCurrentSlide(index);
+                      setCurrentIndex(index);
                       setTimeout(() => setIsTransitioning(false), 500);
                     }
                   };
@@ -636,7 +722,7 @@ export function LunchboxCarousel() {
             {/* Right Arrow - Outside carousel */}
             <button
               onClick={nextSlide}
-              disabled={isTransitioning || highlightedPosts.length <= 1}
+              disabled={isTransitioning || currentIndex === highlightedPosts.length - 1}
               className="flex-shrink-0 z-40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ml-2 md:ml-4"
               aria-label="Next slide"
             >
@@ -658,22 +744,41 @@ export function LunchboxCarousel() {
             </button>
           </div>
         )}
-        {/* Navigation Dots */}
-        <div className="flex justify-center items-center gap-1.5 md:gap-2 mt-4 md:mt-8">
-              {highlightedPosts.map((_: Post, index: number) => (
+        {/* Navigation Dots - Sliding Window Logic */}
+        {/* <div className="flex justify-center items-center gap-1.5 md:gap-2 mt-4 md:mt-8">
+          {(() => {
+            const MAX_VISIBLE_DOTS = 7;
+            const totalPosts = highlightedPosts.length;
+            
+            if (totalPosts <= 1) return null;
+
+            // Tính toán range của dots cần hiển thị
+            let start = Math.max(0, currentIndex - Math.floor(MAX_VISIBLE_DOTS / 2));
+            const end = Math.min(totalPosts - 1, start + MAX_VISIBLE_DOTS - 1);
+
+            // Điều chỉnh lại start nếu đang ở gần cuối danh sách
+            if (end - start + 1 < MAX_VISIBLE_DOTS) {
+              start = Math.max(0, end - MAX_VISIBLE_DOTS + 1);
+            }
+
+            return highlightedPosts.slice(start, end + 1).map((_: Post, i: number) => {
+              const actualIndex = start + i;
+              return (
                 <button
-                  key={index}
-                  onClick={() => handleDotClick(index)}
+                  key={actualIndex}
+                  onClick={() => handleDotClick(actualIndex)}
                   disabled={isTransitioning}
                   className={`transition-all duration-300 rounded-full ${
-                    index === currentSlide
+                    actualIndex === currentIndex
                       ? 'w-3 h-3 md:w-4 md:h-4 bg-blue-600'
                       : 'w-2 h-2 md:w-3 md:h-3 bg-gray-300 hover:bg-gray-400'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  aria-label={`Go to slide ${index + 1}`}
+                  aria-label={`Go to slide ${actualIndex + 1}`}
                 />
-              ))}
-            </div>
+              );
+            });
+          })()}
+        </div> */}
       </div>
     </div>
   );

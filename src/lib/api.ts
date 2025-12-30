@@ -314,6 +314,24 @@ class ApiClient {
     return response.data;
   }
 
+  async getPostsFeed(params: {
+    cursor?: string;
+    direction?: 'next' | 'prev';
+    limit?: number;
+    type?: string;
+  }): Promise<any> {
+    const queryParams = new URLSearchParams();
+    if (params.cursor) queryParams.append('cursor', params.cursor);
+    if (params.direction) queryParams.append('direction', params.direction);
+    if (params.limit) queryParams.append('limit', params.limit.toString());
+    if (params.type) queryParams.append('type', params.type);
+
+    const response = await this.client.get(
+      `/posts/feed?${queryParams.toString()}`
+    );
+    return response.data;
+  }
+
   async getPost(id: string): Promise<any> {
     const response = await this.client.get(`/posts/${id}`);
     return response.data;
