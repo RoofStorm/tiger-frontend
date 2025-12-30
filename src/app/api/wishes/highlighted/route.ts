@@ -5,18 +5,21 @@ export async function GET(request: NextRequest) {
     const apiBaseUrl =
       process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
 
-    // Get query parameters for pagination if needed
+    // Get query parameters for cursor-based pagination
     const { searchParams } = new URL(request.url);
-    const page = searchParams.get('page') || '1';
-    const limit = searchParams.get('limit') || '20';
+    const cursor = searchParams.get('cursor');
+    const limit = searchParams.get('limit') || '15';
 
     // Build query string
     const queryParams = new URLSearchParams({
-      page,
       limit,
     });
+    
+    if (cursor) {
+      queryParams.append('cursor', cursor);
+    }
 
-    console.log(`🔄 Fetching highlighted wishes from Backend API`);
+    console.log(`🔄 Fetching highlighted wishes from Backend API (Cursor-based)`);
 
     const response = await fetch(
       `${apiBaseUrl}/wishes/highlighted?${queryParams.toString()}`,
@@ -54,45 +57,14 @@ export async function GET(request: NextRequest) {
     const backendData = await response.json();
     console.log('✅ Successfully fetched highlighted wishes');
 
-    // Normalize response structure: separate data and pagination
-    // Backend returns: { success: true, data: { data: [...], total: 6, page: 1, ... }, message: "Success" }
-    // We return: { success: true, data: [...], pagination: { total: 6, page: 1, ... }, message: "Success" }
-    if (backendData.success && backendData.data) {
-      const innerData = backendData.data;
-      
-      // Check if data is nested (data.data exists)
-      if (innerData.data && Array.isArray(innerData.data)) {
-        return NextResponse.json({
-          success: true,
-          data: innerData.data,
-          pagination: {
-            total: innerData.total || 0,
-            page: innerData.page || 1,
-            limit: innerData.limit || 20,
-            totalPages: innerData.totalPages || 1,
-          },
-          message: backendData.message || 'Success',
-        });
-      }
-      
-      // If data is already an array, return as is with pagination
-      if (Array.isArray(innerData)) {
-        return NextResponse.json({
-          success: true,
-          data: innerData,
-          pagination: {
-            total: innerData.length,
-            page: 1,
-            limit: innerData.length,
-            totalPages: 1,
-          },
-          message: backendData.message || 'Success',
-        });
-      }
-    }
-    
-    // Fallback: return backend response as is
-    return NextResponse.json(backendData);
+    // Return structure: { success, data, nextCursor }
+    // Backend now returns this directly or in a consistent way
+    return NextResponse.json({
+      success: backendData.success !== false,
+      data: backendData.data?.data || backendData.data || [],
+      nextCursor: backendData.nextCursor || backendData.data?.nextCursor || null,
+      message: backendData.message || 'Success',
+    });
   } catch (error) {
     console.error('❌ Error calling backend API:', error);
     return NextResponse.json(

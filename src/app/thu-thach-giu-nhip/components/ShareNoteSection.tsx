@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -17,14 +16,14 @@ import { useZoneView } from '@/hooks/useZoneView';
 import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
-// Wish type for highlighted wishes with user info
-interface Wish {
+// Re-define types locally to avoid module resolution issues during refactor
+export interface Wish {
   id: string;
   content: string;
   isHighlighted: boolean;
   createdAt: string;
   updatedAt: string;
-  isFromCache?: boolean; // Field để phân biệt note mới tạo từ cache
+  isFromCache?: boolean;
   user?: {
     id: string;
     name?: string;
@@ -33,77 +32,16 @@ interface Wish {
   };
 }
 
-// Type for pagination response from API
-interface WishPage {
+// Type for cursor-based pagination response from API
+export interface WishPage {
   success: boolean;
   data: Wish[];
-  pagination: {
-    page: number;
-    totalPages: number;
-    total: number;
-    limit: number;
-  };
+  nextCursor: string | null;
   message?: string;
 }
 
-// Sub-component for individual wish card to optimize performance
-const WishCard = ({ wish, index }: { wish: Wish; index: number }) => {
-  return (
-    <div className="pb-8 pr-4">
-      <div
-        className={`backdrop-blur-sm rounded-lg p-6 border border-white/30 relative w-[80%] ${
-          index % 2 === 0 ? 'ml-[20%]' : ''
-        }`}
-        style={{ backgroundColor: '#FFFFFF1A' }}
-      >
-        {/* Quote Mark - Top Left */}
-        <div className="absolute top-[-10px] md:top-[-20px] left-3">
-          <Image
-            src="/icons/quotemark_white.svg"
-            alt="Quote mark"
-            width={40}
-            height={40}
-            className="object-contain w-6 h-6 md:w-10 md:h-10"
-          />
-        </div>
-        <div className="flex items-center gap-3 mb-3 pt-4">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-300">
-            {wish.user?.avatarUrl ? (
-              <Image
-                src={wish.user.avatarUrl}
-                alt={wish.user?.name || 'User avatar'}
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
-            ) : (
-              <Image
-                src="/thuthachnhipsong/slide_example.png"
-                alt="Default avatar"
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
-            )}
-          </div>
-          <span
-            className="font-medium text-sm"
-            style={{
-              color: wish.isFromCache
-                ? '#FFD700' // Màu vàng cho note mới tạo từ cache
-                : '#FFFFFF', // Màu trắng cho note từ server
-            }}
-          >
-            {wish.user?.name || 'Người dùng ẩn danh'}
-          </span>
-        </div>
-        <div className="text-sm leading-relaxed" style={{ color: '#FFFFFF' }}>
-          {wish.content}
-        </div>
-      </div>
-    </div>
-  );
-};
+import { WishCard } from './WishCard';
+import { ShareNoteSuccessModal } from './ShareNoteSuccessModal';
 
 export function ShareNoteSection() {
   const router = useRouter();
@@ -135,7 +73,7 @@ export function ShareNoteSection() {
     zone: 'zoneC',
   });
 
-  // Fetch highlighted wishes with useInfiniteQuery
+  // Fetch highlighted wishes with useInfiniteQuery (Cursor-based)
   const { 
     data: infiniteWishesData, 
     isLoading: isLoadingWishes,
@@ -144,60 +82,24 @@ export function ShareNoteSection() {
     isFetchingNextPage
   } = useInfiniteQuery({
     queryKey: ['highlighted-wishes-share-note-infinite'],
-    queryFn: ({ pageParam = 1 }) => apiClient.getHighlightedWishes(pageParam, 15),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      // Backend returns structure like { success: true, data: [...], pagination: { page, totalPages, ... } }
-      // but based on api.ts, it might be { success, data, pagination }
-      const pagination = lastPage?.pagination;
-      if (pagination && pagination.page < pagination.totalPages) {
-        return pagination.page + 1;
-      }
-      return undefined;
-    },
+    queryFn: ({ pageParam }) => apiClient.getHighlightedWishes(pageParam as string | null, 15),
+    initialPageParam: null,
+    getNextPageParam: (lastPage: WishPage) => lastPage.nextCursor,
     staleTime: 60 * 1000,
   });
 
-  // Flatten the wishes from pages
+  // Flatten the wishes from pages and limit to 150 items for performance
   const wishes = useMemo(() => {
     if (!infiniteWishesData) return [];
     
-    return infiniteWishesData.pages.flatMap(page => {
-      // Check if data is directly in page or in page.data
+    const allWishes = infiniteWishesData.pages.flatMap(page => {
       const pageData = Array.isArray(page) ? page : (page?.data || []);
       return Array.isArray(pageData) ? pageData : [];
     });
+
+    // Keep only the last 150 items to prevent memory issues with long auto-scroll
+    return allWishes.slice(-150);
   }, [infiniteWishesData]);
-
-  // Logic auto scroll "như cũ" - mượt và tự động lặp lại (loop)
-  useEffect(() => {
-    if (!isAutoScrolling || !wishes.length) return;
-
-    const interval = setInterval(() => {
-      if (!virtuosoRef.current) return;
-
-      // Sử dụng scrollBy với giá trị nhỏ để cực kỳ mượt mà
-      // Tăng lên 0.8px mỗi 16ms để tốc độ vừa phải và mượt như bản cũ
-      virtuosoRef.current.scrollBy({
-        top: 0.6,
-        behavior: 'auto',
-      });
-    }, 25);
-
-    return () => clearInterval(interval);
-  }, [isAutoScrolling, wishes.length]);
-
-  // Resume auto scroll sau idle
-  useEffect(() => {
-    if (!userInteracted) return;
-
-    const timeout = setTimeout(() => {
-      setIsAutoScrolling(true);
-      setUserInteracted(false);
-    }, 3000);
-
-    return () => clearTimeout(timeout);
-  }, [userInteracted]);
 
   // Handle user manual interaction to pause auto-scroll
   const handleUserInteraction = useCallback(() => {
@@ -206,6 +108,11 @@ export function ShareNoteSection() {
       setUserInteracted(true);
     }
   }, [isAutoScrolling]);
+
+  // Extract hooks for clarity - added isFetchingNextPage to pause auto-scroll during load
+  useAutoScroll(virtuosoRef, isAutoScrolling, wishes.length, isFetchingNextPage);
+  useAutoScrollResume(userInteracted, setIsAutoScrolling, setUserInteracted);
+  useModalBackgroundUpdate(showSuccessModal, modalRef);
 
   // Create wish mutation
   const createWishMutation = useMutation({
@@ -281,10 +188,6 @@ export function ShareNoteSection() {
           newPages[lastPageIndex] = {
             ...lastPage,
             data: [...lastPage.data, newWish],
-            pagination: {
-              ...lastPage.pagination,
-              total: (lastPage.pagination?.total || 0) + 1
-            }
           };
           
           return {
@@ -310,6 +213,7 @@ export function ShareNoteSection() {
       setNoteText('');
       setHasStartedTyping(false); // Reset để track lại lần sau
       // Invalidate các query khác
+      queryClient.invalidateQueries({ queryKey: ['highlighted-wishes-share-note-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['highlighted-wishes'] });
       queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       queryClient.invalidateQueries({ queryKey: ['pointHistory'] });
@@ -367,38 +271,6 @@ export function ShareNoteSection() {
     },
   });
 
-
-  // Update modal background size for mobile with debounce
-  useEffect(() => {
-    if (!showSuccessModal) return;
-
-    let timeoutId: NodeJS.Timeout;
-    const updateModalBackground = () => {
-      if (modalRef.current) {
-        const isMobile = window.matchMedia('(max-width: 767px)').matches;
-        modalRef.current.style.backgroundSize = isMobile ? 'cover' : 'contain';
-        modalRef.current.style.minHeight = isMobile ? 'auto' : 'auto';
-      }
-    };
-
-    const debouncedUpdate = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        requestAnimationFrame(updateModalBackground);
-      }, 150);
-    };
-
-    // Use requestAnimationFrame to ensure DOM is ready
-    requestAnimationFrame(() => {
-      updateModalBackground();
-    });
-
-    window.addEventListener('resize', debouncedUpdate);
-    return () => {
-      window.removeEventListener('resize', debouncedUpdate);
-      clearTimeout(timeoutId);
-    };
-  }, [showSuccessModal]);
 
   const scrollToTextarea = useCallback(() => {
     setTimeout(() => {
@@ -834,6 +706,13 @@ export function ShareNoteSection() {
               <Virtuoso
                 ref={virtuosoRef}
                 data={wishes}
+                overscan={400} // Render trước 400px để mượt hơn
+                rangeChanged={({ endIndex }) => {
+                  const total = wishes.length;
+                  if (total > 0 && total - endIndex < 8 && hasNextPage && !isFetchingNextPage) {
+                    fetchNextPage();
+                  }
+                }}
                 endReached={() => {
                   if (hasNextPage && !isFetchingNextPage) {
                     fetchNextPage();
@@ -848,205 +727,102 @@ export function ShareNoteSection() {
                   Footer: () => isFetchingNextPage ? (
                     <div className="flex items-center justify-center py-4">
                       <div className="text-white text-xs">Đang tải thêm...</div>
-                    </div>
+          </div>
                   ) : null
                 }}
               />
             )}
-          </div>
-        </div>
-      </div>
-
-      {/* Success Modal */}
-      <AnimatePresence>
-        {showSuccessModal && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50"
-              onClick={() => setShowSuccessModal(false)}
-            />
-            
-            {/* Modal Content */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
-            >
-              <div 
-                ref={modalRef}
-                className="rounded-2xl shadow-xl max-w-2xl w-full overflow-y-auto pointer-events-auto"
-                style={{
-                  backgroundImage: 'url(/thuthachnhipsong/popup_share_note_background.svg)',
-                  backgroundSize: 'contain',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                }}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="p-8">
-                  {/* Tiger Logo - Centered Top */}
-                  <div className="flex justify-center mb-6">
-                    <Image
-                      src="/icons/tiger_logo.svg"
-                      alt="TIGER Logo"
-                      width={120}
-                      height={40}
-                      className="object-contain"
-                      style={{ width: "auto", height: "auto" }}
-                    />
                   </div>
-
-                  {/* Thank You Message */}
-                  <h2 
-                    className="text-center mb-8 font-prata"
-                    style={{
-                      fontFamily: 'Prata',
-                      fontWeight: 400,
-                      fontStyle: 'normal',
-                      fontSize: '16px',
-                      lineHeight: '20px',
-                      letterSpacing: '0.03em',
-                      color: '#00579F'
-                    }}
-                  >
-                    Nhịp sống của bạn đã được gửi đi!
-                  </h2>
-
-                  {/* Content Box - Wraps both text and image */}
-                  <div 
-                    className="mb-8 p-3 rounded-lg mx-auto" 
-                    style={{ 
-                      border: '1px solid',
-                      borderImageSource: 'linear-gradient(180deg, #CCF5FF 0%, #B2DCFF 100%)',
-                      borderImageSlice: 1,
-                      maxWidth: '80%',
-                      width: '100%'
-                    }}
-                  >
-                    {/* Text Content - Blue background, white text */}
-                    <div 
-                      className="mb-6 p-6 rounded-lg"
-                      style={{ 
-                        backgroundColor: '#00579F',
-                        color: '#ffffff'
-                      }}
-                    >
-                      <p 
-                        className="font-nunito leading-relaxed"
-                        style={{
-                          fontFamily: 'Nunito',
-                          fontWeight: 500,
-                          fontStyle: 'italic',
-                          fontSize: '14px',
-                          lineHeight: '24px',
-                          letterSpacing: '-0.02em',
-                          color: '#ffffff'
-                        }}
-                      >
-                        &quot;{sharedNoteText}&quot;
-                      </p>
-                    </div>
-
-                    {/* TRĂM NĂM GIỮ TRỌN nhịp sống */}
-                    <div className="flex justify-center">
-                      <Image
-                        src="/thuthachnhipsong/tramnamgiunhipsong.png"
-                        alt="Trăm năm giữ trọn nhịp sống"
-                        width={240}
-                        height={72}
-                        className="max-w-[100px] md:max-w-[140px]"
-                        sizes="(max-width: 768px) 100px, 140px"
-                        quality={90}
-                      />
                     </div>
                   </div>
 
-                  {/* Info Text */}
-                  <p 
-                    className="text-left md:text-center mb-8 font-nunito mx-auto"
-                    style={{
-                      fontFamily: 'Nunito',
-                      fontWeight: 400,
-                      fontStyle: 'normal',
-                      fontSize: '14px',
-                      lineHeight: '14px',
-                      letterSpacing: '-0.05em',
-                      color: '#00579F',
-                      maxWidth: '70%'
-                    }}
-                  >
-                    TIGER đã giữ nhịp cho hàng triệu gia đình suốt trăm năm qua. Hãy cùng khám phá hành trình của TIGER
-                  </p>
-
-                  {/* Buttons */}
-                  <div className="flex gap-4 justify-center mx-auto" style={{ maxWidth: '70%' }}>
-                    <Button
-                      onClick={() => {
+      <ShareNoteSuccessModal
+        show={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        modalRef={modalRef}
+        sharedNoteText={sharedNoteText}
+        isGeneratingImage={isGeneratingImage}
+        onShare={handleFacebookShare}
+        isSharePending={shareWishMutation.isPending}
+        hasCreatedWishId={!!createdWishId}
+        onExplore={() => {
                         setShowSuccessModal(false);
                         router.push('/nhip-bep');
                       }}
-                      className="font-nunito transition-all duration-300 flex-1"
-                      style={{ 
-                        height: '40px',
-                        borderRadius: '8px',
-                        paddingTop: '8px',
-                        paddingRight: '16px',
-                        paddingBottom: '8px',
-                        paddingLeft: '16px',
-                        backgroundColor: '#00579F',
-                        color: '#ffffff',
-                        fontFamily: 'Nunito',
-                        fontWeight: 700,
-                        fontSize: '16px',
-                        lineHeight: '24px'
-                      }}
-                    >
-                      Khám phá về TIGER
-                    </Button>
-                    <Button
-                      onClick={handleFacebookShare}
-                      disabled={shareWishMutation.isPending || !createdWishId || isGeneratingImage}
-                      className="font-nunito transition-all duration-300 flex items-center justify-center gap-2 flex-1 disabled:opacity-50"
-                      style={{ 
-                        backgroundColor: '#ffffff',
-                        color: '#00579F',
-                        border: '1px solid #00579F',
-                        fontFamily: 'Nunito',
-                        fontWeight: 700,
-                        fontSize: '16px',
-                        lineHeight: '24px',
-                        height: '40px',
-                        borderRadius: '8px',
-                        paddingTop: '8px',
-                        paddingRight: '16px',
-                        paddingBottom: '8px',
-                        paddingLeft: '16px'
-                      }}
-                    >
-                      {isGeneratingImage ? 'Đang tạo ảnh...' : 'Chia sẻ'}
-                      <Image
-                        src="/icons/facebook.svg"
-                        alt="Facebook"
-                        width={20}
-                        height={20}
-                        className="object-contain"
-                      />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      />
     </>
   );
+}
+
+// --- Custom Hooks ---
+
+function useAutoScroll(
+  virtuosoRef: React.RefObject<VirtuosoHandle | null>, 
+  isAutoScrolling: boolean, 
+  wishesCount: number,
+  isFetchingNextPage: boolean
+) {
+  useEffect(() => {
+    // Pause auto-scroll while fetching more data to avoid reaching the end too early
+    if (!isAutoScrolling || !wishesCount || isFetchingNextPage) return;
+
+    const interval = setInterval(() => {
+      if (virtuosoRef.current) {
+        virtuosoRef.current.scrollBy({
+          top: 0.7,
+          behavior: 'auto',
+        });
+      }
+    }, 25);
+
+    return () => clearInterval(interval);
+  }, [isAutoScrolling, wishesCount, virtuosoRef, isFetchingNextPage]);
+}
+
+function useAutoScrollResume(
+  userInteracted: boolean,
+  setIsAutoScrolling: (val: boolean) => void,
+  setUserInteracted: (val: boolean) => void
+) {
+  useEffect(() => {
+    if (!userInteracted) return;
+
+    const timeout = setTimeout(() => {
+      setIsAutoScrolling(true);
+      setUserInteracted(false);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [userInteracted, setIsAutoScrolling, setUserInteracted]);
+}
+
+function useModalBackgroundUpdate(showSuccessModal: boolean, modalRef: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    if (!showSuccessModal) return;
+
+    let timeoutId: NodeJS.Timeout;
+    const updateModalBackground = () => {
+      if (modalRef.current) {
+        const isMobile = window.matchMedia('(max-width: 767px)').matches;
+        modalRef.current.style.backgroundSize = isMobile ? 'cover' : 'contain';
+        modalRef.current.style.minHeight = isMobile ? 'auto' : 'auto';
+      }
+    };
+
+    const debouncedUpdate = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        requestAnimationFrame(updateModalBackground);
+      }, 150);
+    };
+
+    requestAnimationFrame(updateModalBackground);
+
+    window.addEventListener('resize', debouncedUpdate);
+    return () => {
+      window.removeEventListener('resize', debouncedUpdate);
+      clearTimeout(timeoutId);
+    };
+  }, [showSuccessModal, modalRef]);
 }
 

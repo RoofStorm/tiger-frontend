@@ -440,12 +440,15 @@ class ApiClient {
     return response.data;
   }
 
-  async getHighlightedWishes(page = 1, limit = 20): Promise<any> {
+  async getHighlightedWishes(cursor: string | null = null, limit = 15): Promise<any> {
     // Use Next.js API route instead of direct backend call
     const queryParams = new URLSearchParams({
-      page: page.toString(),
       limit: limit.toString(),
     });
+    
+    if (cursor) {
+      queryParams.append('cursor', cursor);
+    }
     
     // Call Next.js API route (works on both client and server)
     const apiUrl = typeof window !== 'undefined' 

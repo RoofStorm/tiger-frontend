@@ -189,6 +189,29 @@ export interface SignedUrlResponse {
   fields: Record<string, string>;
 }
 
+// Wish Types - Refactored
+export interface Wish {
+  id: string;
+  content: string;
+  isHighlighted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  isFromCache?: boolean;
+  user?: {
+    id: string;
+    name?: string;
+    email?: string;
+    avatarUrl?: string;
+  };
+}
+
+export interface WishPage {
+  success: boolean;
+  data: Wish[];
+  nextCursor: string | null;
+  message?: string;
+}
+
 // Share Types
 export interface ShareData {
   type: 'mood_card' | 'post';
