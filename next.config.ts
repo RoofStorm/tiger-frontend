@@ -58,7 +58,15 @@ const nextConfig: NextConfig = {
         hostname: 'storage.tiger-corporation-vietnam.vn',
       },
       {
+        protocol: 'http',
+        hostname: 'storage.tiger-corporation-vietnam.vn',
+      },
+      {
         protocol: 'https',
+        hostname: 's3.tiger-corporation-vietnam.vn',
+      },
+      {
+        protocol: 'http',
         hostname: 's3.tiger-corporation-vietnam.vn',
       },
       {

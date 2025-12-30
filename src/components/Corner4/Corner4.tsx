@@ -219,7 +219,7 @@ export function Corner4() {
               Trao đổi nhịp sống
             </h2>
             <p className="text-gray-700 max-w-3xl mx-auto text-center leading-relaxed font-noto-sans" style={{ fontSize: '16px' }}>
-              Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. Đổi điểm để nhận về những món quà từ Tiger – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
+              Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. Đổi điểm để nhận về những món quà từ TIGER – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
             </p>
 
             {/* Temporarily hidden */}
@@ -397,7 +397,7 @@ export function Corner4() {
                               color: '#FFFFFF',
                             }}
                           >
-                            Cho sản phẩm Tiger (giới hạn 3 lần/user)
+                            Cho sản phẩm TIGER (giới hạn 3 lần/user)
                           </p>
                         </div>
                       </div>

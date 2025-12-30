@@ -612,7 +612,7 @@ export function ShareNoteSection() {
         process.env.NEXTAUTH_URL ||
         'https://tiger-corporation-vietnam.vn';
       const wishUrl = `${baseUrl}/wishes/share?wishId=${encodeURIComponent(createdWishId || '')}&content=${encodeURIComponent(sharedNoteText || '')}&imageUrl=${encodeURIComponent(imageUrl)}`;
-      const wishTitle = sharedNoteText || 'Lời chúc từ Tiger Mood Corner';
+      const wishTitle = sharedNoteText || 'Lời chúc từ TIGER';
 
       // Tạo Facebook Share URL với quote parameter
       const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(wishUrl)}&quote=${encodeURIComponent(wishTitle)}`;
@@ -948,7 +948,7 @@ export function ShareNoteSection() {
                   <div className="flex justify-center mb-6">
                     <Image
                       src="/icons/tiger_logo.svg"
-                      alt="Tiger Logo"
+                      alt="TIGER Logo"
                       width={120}
                       height={40}
                       className="object-contain"

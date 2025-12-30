@@ -17,7 +17,6 @@ const loginSchema = z.object({
 });
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Tên phải có ít nhất 2 ký tự'),
   username: z.string().min(3, 'Tên đăng nhập phải có ít nhất 3 ký tự').regex(/^[a-zA-Z0-9_]+$/, 'Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới'),
   password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 });
@@ -115,7 +114,7 @@ export function ShareRegistrationModal({
       // Don't call router.push here - login() already handles redirect
       toast({
         title: 'Đăng nhập thành công!',
-        description: 'Chào mừng bạn trở lại với Tiger.',
+        description: 'Chào mừng bạn trở lại với TIGER.',
         duration: 3000,
       });
       onLogin();
@@ -146,12 +145,12 @@ export function ShareRegistrationModal({
     }
 
     try {
-      // Generate email from name if email is not provided
-      const email = `${data.name.toLowerCase().replace(/\s+/g, '')}@tiger.local`;
+      // Generate email from username if name is not provided
+      const email = `${data.username.toLowerCase()}@tiger.local`;
       await registerUser(
         email,
         data.password,
-        data.name,
+        data.username,
         undefined, // referralCode
         data.username
       );
@@ -291,40 +290,6 @@ export function ShareRegistrationModal({
                 <>
                 {/* Registration Form */}
                 <form onSubmit={registerForm.handleSubmit(handleFormRegister)} className="space-y-4">
-                  {/* Name Field */}
-                  <div>
-                    <label 
-                      htmlFor="register-name"
-                      className="block font-nunito mb-2"
-                      style={{
-                        fontFamily: 'Nunito',
-                        fontWeight: 500,
-                        fontSize: '14px',
-                        lineHeight: '20px',
-                        color: '#333435',
-                      }}
-                    >
-                      Họ và tên
-                    </label>
-                    <input
-                      {...registerForm.register('name')}
-                      type="text"
-                      id="register-name"
-                      placeholder="Nhập họ và tên"
-                      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      style={{ 
-                        backgroundColor: '#FFFFFF',
-                        borderColor: registerForm.formState.errors.name ? '#EF4444' : '#E0E0E0',
-                        fontSize: '14px',
-                      }}
-                    />
-                    {registerForm.formState.errors.name && (
-                      <p className="mt-1 text-sm" style={{ color: '#EF4444' }}>
-                        {registerForm.formState.errors.name.message}
-                      </p>
-                    )}
-                  </div>
-
                   {/* Username Field */}
                   <div>
                     <label 
@@ -448,7 +413,7 @@ export function ShareRegistrationModal({
                           color: '#333435',
                         }}
                       >
-                        Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies của Tiger, Thể lệ chương trình Yên một chút cùng Tiger như được đăng tải tại website
+                        Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies của TIGER, Thể lệ chương trình Yên một chút cùng TIGER như được đăng tải tại website
                       </span>
                     </label>
                   </div>

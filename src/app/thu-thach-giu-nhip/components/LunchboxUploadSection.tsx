@@ -717,7 +717,7 @@ export function LunchboxUploadSection() {
                     <div className="flex justify-center mb-4 md:mb-6">
                       <Image
                         src="/icons/tiger_logo.svg"
-                        alt="Tiger Logo"
+                        alt="TIGER Logo"
                         width={120}
                         height={40}
                         className="object-contain"

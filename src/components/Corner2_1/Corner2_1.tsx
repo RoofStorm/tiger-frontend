@@ -173,7 +173,7 @@ export function Corner2_1() {
         'from-orange-500 to-orange-700',
       ][index % 5],
       icon: post.user?.avatarUrl,
-      brand: 'Tiger Highlight Posts',
+      brand: 'TIGER Highlight Posts',
     }));
   })();
 

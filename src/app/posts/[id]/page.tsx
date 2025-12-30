@@ -85,13 +85,13 @@ export async function generateMetadata({
   const postUrl = `${baseUrl}/posts/${id}`;
   const ogImage = generatePostOGImage({
     imageUrl: post.imageUrl,
-    title: post.caption || 'Bài viết nổi bật từ Tiger Mood Corner',
+    title: post.caption || 'Bài viết nổi bật từ TIGER Nhịp Sống',
   });
 
   // Format title với prefix "Tiger - "
   const postTitle = post.caption 
-    ? `Tiger - ${post.caption}` 
-    : 'Tiger - Bài viết nổi bật từ Tiger Mood Corner';
+    ? `TIGER - ${post.caption}` 
+    : 'TIGER - Bài viết nổi bật từ TIGER Nhịp Sống';
 
   return {
     title: postTitle,
@@ -104,7 +104,7 @@ export async function generateMetadata({
         ? `${post.caption.substring(0, 160)}...`
         : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.',
       url: postUrl,
-      siteName: 'Tiger Mood Corner',
+      siteName: 'TIGER Nhịp Sống',
       images: [ogImage],
       locale: 'vi_VN',
       type: 'article',

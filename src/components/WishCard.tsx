@@ -63,7 +63,7 @@ export const WishCard = ({ wish }: WishCardProps) => {
       process.env.NEXTAUTH_URL ||
       'https://tiger-corporation-vietnam.vn';
     const wishUrl = `${baseUrl}/wishes`;
-    const wishTitle = wish.content || 'Lời chúc từ Tiger Mood Corner';
+    const wishTitle = wish.content || 'Lời chúc từ TIGER';
 
     // Tạo Facebook Share URL
     const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(wishUrl)}&quote=${encodeURIComponent(wishTitle)}`;

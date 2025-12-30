@@ -15,7 +15,7 @@ export function ChallengeHeroSection() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/thuthachnhipsong/tiger_giu_nhip.svg"
-          alt="Tiger giữ nhịp"
+          alt="TIGER giữ nhịp"
           width={600}
           height={200}
           className="w-full max-w-md md:max-w-[27rem] h-auto object-contain"

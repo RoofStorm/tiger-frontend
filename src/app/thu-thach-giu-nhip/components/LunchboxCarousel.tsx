@@ -514,7 +514,7 @@ export function LunchboxCarousel() {
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                   src="/thuthachnhipsong/tiger_logo.svg"
-                                  alt="Tiger Logo"
+                                  alt="TIGER Logo"
                                   width={80}
                                   height={80}
                                   className="object-contain"
@@ -565,7 +565,7 @@ export function LunchboxCarousel() {
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                   src="/thuthachnhipsong/tiger_logo.svg"
-                                  alt="Tiger Logo"
+                                  alt="TIGER Logo"
                                   width={80}
                                   height={80}
                                   className="object-contain"

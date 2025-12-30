@@ -6,6 +6,13 @@ import { Star, StarOff, Trash2 } from 'lucide-react';
 import apiClient from '@/lib/api';
 import { Wish } from '../types';
 import { ActionButton } from '../ActionButton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export const WishesTab = () => {
   const queryClient = useQueryClient();
@@ -121,23 +128,26 @@ export const WishesTab = () => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Quản lý lời chúc</h2>
+        <h2 className="text-xl font-bold text-gray-900">Quản lý note giữ nhịp</h2>
         <div className="flex items-center space-x-4">
-          <select
+          <Select
             value={
-              highlightFilter === undefined ? '' : highlightFilter.toString()
+              highlightFilter === undefined ? 'all' : highlightFilter.toString()
             }
-            onChange={e => {
-              const value = e.target.value;
-              setHighlightFilter(value === '' ? undefined : value === 'true');
+            onValueChange={value => {
+              setHighlightFilter(value === 'all' ? undefined : value === 'true');
               setPage(1);
             }}
-            className="px-3 py-2 border border-gray-300 rounded-md"
           >
-            <option value="">Tất cả</option>
-            <option value="true">Đã highlight</option>
-            <option value="false">Chưa highlight</option>
-          </select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Tất cả" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tất cả</SelectItem>
+              <SelectItem value="true">Đã highlight</SelectItem>
+              <SelectItem value="false">Chưa highlight</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

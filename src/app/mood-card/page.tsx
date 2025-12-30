@@ -34,15 +34,15 @@ export async function generateMetadata({
     // Cắt reminder nếu quá dài (tối đa 50 ký tự)
     const shortReminder =
       reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
-    title = `${shortReminder} - Tiger Mood Corner`;
+    title = `${shortReminder} - TIGER Nhịp Sống`;
   } else if (whisper) {
     // Fallback về whisper nếu không có reminder
     const shortWhisper =
       whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
-    title = `"${shortWhisper}" - Tiger Mood Corner`;
+    title = `"${shortWhisper}" - TIGER Nhịp Sống`;
   } else {
     // Fallback về emoji labels nếu không có cả reminder và whisper
-    title = `Mood Card: ${emojiLabels} - Tiger Mood Corner`;
+    title = `Mood Card: ${emojiLabels} - TIGER Nhịp Sống`;
   }
 
   // Tạo caption ngắn gọn cho Facebook preview
@@ -70,7 +70,7 @@ export async function generateMetadata({
       title,
       description,
       url: `${baseUrl}/mood-card?emojis=${emojiIds.join(',')}&whisper=${encodeURIComponent(whisper)}&reminder=${encodeURIComponent(reminder)}`,
-      siteName: 'Tiger Mood Corner',
+      siteName: 'TIGER Nhịp Sống',
       images: [
         {
           url: imageUrl,
@@ -103,7 +103,7 @@ export default function MoodCardPage() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent mb-4">
-            Tiger Mood Corner
+            TIGER Nhịp Sống
           </h1>
           <p className="text-lg text-gray-600">
             Khám phá cảm xúc của bạn qua emoji

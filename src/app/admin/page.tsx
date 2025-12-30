@@ -72,12 +72,12 @@ export default function AdminPage() {
   const tabs = [
     { id: 'overview', label: 'Tổng quan', icon: Home },
     { id: 'users', label: 'Người dùng', icon: Users },
-    { id: 'rewards', label: 'Phần thưởng', icon: Gift },
+    // { id: 'rewards', label: 'Phần thưởng', icon: Gift },
     { id: 'posts', label: 'Bài viết', icon: MessageSquare },
     { id: 'redeems', label: 'Đổi thưởng', icon: CreditCard },
-    { id: 'wishes', label: 'Lời chúc', icon: MessageSquare },
-    { id: 'analytics', label: 'Corner Analytics', icon: BarChart3 },
-    { id: 'settings', label: 'Cài đặt', icon: Settings },
+    { id: 'wishes', label: 'Note giữ nhịp', icon: MessageSquare },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    // { id: 'settings', label: 'Cài đặt', icon: Settings },
   ];
 
   const renderContent = () => {

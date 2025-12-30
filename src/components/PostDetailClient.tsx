@@ -72,7 +72,7 @@ export default function PostDetailClient({ post }: PostDetailClientProps) {
             {/* Post Content */}
             <div className="mb-8">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                {post.caption || 'Bài viết nổi bật từ Tiger Mood Corner'}
+                {post.caption || 'Bài viết nổi bật từ TIGER'}
               </h1>
 
               <p className="text-gray-700 text-lg leading-relaxed">

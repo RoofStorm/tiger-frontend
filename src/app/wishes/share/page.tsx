@@ -21,10 +21,10 @@ export async function generateMetadata({
   
 
   // Tạo title từ content
-  let title = 'Lời chúc từ Tiger Mood Corner';
+  let title = 'Lời chúc từ TIGER Mood Corner';
   if (content) {
     const shortContent = content.length > 50 ? content.substring(0, 50) + '...' : content;
-    title = `${shortContent} - Tiger Mood Corner`;
+    title = `${shortContent} - TIGER Mood Corner`;
   }
 
   // Tạo description
@@ -54,7 +54,7 @@ export async function generateMetadata({
       title,
       description,
       url: shareUrl,
-      siteName: 'Tiger Mood Corner',
+      siteName: 'TIGER Mood Corner',
       type: 'website',
       locale: 'vi_VN',
       ...(imageUrl && {
@@ -104,7 +104,7 @@ export default async function WishSharePage({
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8 md:p-12">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Lời chúc từ Tiger Mood Corner
+            Lời chúc từ TIGER Mood Corner
           </h1>
           <div className="w-20 h-20 bg-gradient-to-r from-red-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-4xl">💝</span>
@@ -133,7 +133,7 @@ export default async function WishSharePage({
             <div className="flex justify-center">
               <Image
                 src={imageUrl}
-                alt="Tiger Mood Corner"
+                alt="TIGER Mood Corner"
                 width={400}
                 height={300}
                 className="rounded-lg"

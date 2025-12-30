@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Chính sách quyền riêng tư - Tiger',
-  description: 'Chính sách quyền riêng tư của ứng dụng Tiger - Social Mood & Rewards',
+  title: 'Chính sách quyền riêng tư - TIGER',
+  description: 'Chính sách quyền riêng tư của ứng dụng TIGER - Social Mood & Rewards',
   robots: 'index, follow',
 };
 
@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
             <p className="text-gray-700">
               <strong>Tóm tắt:</strong> Chúng tôi cam kết bảo vệ quyền riêng tư của bạn. 
               Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin cá nhân 
-              của bạn khi sử dụng ứng dụng <strong>Tiger - Social Mood & Rewards</strong>.
+              của bạn khi sử dụng ứng dụng <strong>TIGER - Social Mood & Rewards</strong>.
             </p>
           </div>
 
@@ -32,7 +32,7 @@ export default function PrivacyPolicyPage() {
               1. Giới thiệu về ứng dụng
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              <strong>Tiger - Social Mood & Rewards</strong> là một nền tảng mạng xã hội cho phép người dùng 
+              <strong>TIGER - Social Mood & Rewards</strong> là một nền tảng mạng xã hội cho phép người dùng 
               chia sẻ cảm xúc, tạo mood cards, và nhận phần thưởng. Ứng dụng hỗ trợ đăng nhập bằng Facebook 
               để cung cấp trải nghiệm đăng nhập nhanh chóng và tiện lợi.
             </p>
@@ -83,7 +83,7 @@ export default function PrivacyPolicyPage() {
               </p>
               <ul className="list-disc list-inside space-y-2 text-gray-700">
                 <li><strong>Xác thực đăng nhập:</strong> Để xác minh danh tính và cho phép bạn đăng nhập vào ứng dụng</li>
-                <li><strong>Cung cấp dịch vụ:</strong> Để cung cấp các tính năng và dịch vụ của ứng dụng Tiger</li>
+                <li><strong>Cung cấp dịch vụ:</strong> Để cung cấp các tính năng và dịch vụ của ứng dụng TIGER</li>
                 <li><strong>Quản lý tài khoản:</strong> Để tạo và quản lý tài khoản của bạn trong hệ thống</li>
                 <li><strong>Hệ thống phần thưởng:</strong> Để theo dõi điểm số và xử lý các phần thưởng</li>
                 <li><strong>Cải thiện dịch vụ:</strong> Để phân tích và cải thiện trải nghiệm người dùng</li>
@@ -102,7 +102,7 @@ export default function PrivacyPolicyPage() {
               </h3>
               <p className="text-gray-700 mb-3">
                 Chúng tôi <strong>KHÔNG</strong> bán, cho thuê hoặc chia sẻ thông tin cá nhân của bạn với bên thứ ba 
-                trái phép. Dữ liệu của bạn chỉ được sử dụng cho mục đích cung cấp dịch vụ của ứng dụng Tiger.
+                trái phép. Dữ liệu của bạn chỉ được sử dụng cho mục đích cung cấp dịch vụ của ứng dụng TIGER.
               </p>
 
               <h3 className="text-lg font-semibold text-gray-900 mb-3 mt-4">
@@ -162,7 +162,7 @@ export default function PrivacyPolicyPage() {
                 <ol className="list-decimal list-inside space-y-1 text-gray-700 ml-2">
                   <li>Đăng nhập vào tài khoản Facebook của bạn</li>
                   <li>Vào <strong>Cài đặt</strong> → <strong>Ứng dụng và trang web</strong></li>
-                  <li>Tìm ứng dụng <strong>Tiger</strong> trong danh sách</li>
+                  <li>Tìm ứng dụng <strong>TIGER</strong> trong danh sách</li>
                   <li>Nhấp vào ứng dụng và chọn <strong>Gỡ</strong> hoặc <strong>Xóa</strong></li>
                 </ol>
               </div>
@@ -213,7 +213,7 @@ export default function PrivacyPolicyPage() {
             </h2>
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
               <p className="text-gray-700">
-                Ứng dụng Tiger không dành cho trẻ em dưới 13 tuổi. Chúng tôi không cố ý thu thập 
+                Ứng dụng TIGER không dành cho trẻ em dưới 13 tuổi. Chúng tôi không cố ý thu thập 
                 thông tin từ trẻ em dưới 13 tuổi. Nếu bạn phát hiện chúng tôi đã thu thập thông tin 
                 từ trẻ em dưới 13 tuổi, vui lòng liên hệ với chúng tôi ngay lập tức.
               </p>
@@ -257,7 +257,7 @@ export default function PrivacyPolicyPage() {
 
           <div className="border-t border-gray-200 pt-6 mt-8">
             <p className="text-sm text-gray-500 text-center">
-              © {new Date().getFullYear()} Tiger - Social Mood & Rewards. Tất cả quyền được bảo lưu.
+              © {new Date().getFullYear()} TIGER - Social Mood & Rewards. Tất cả quyền được bảo lưu.
             </p>
           </div>
         </div>

@@ -100,6 +100,7 @@ export interface AdminRedeemItem {
   updatedAt: string;
   receiverName: string;
   receiverPhone: string;
+  receiverEmail?: string;
   receiverAddress: string;
   user: {
     id: string;

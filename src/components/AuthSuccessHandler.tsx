@@ -36,7 +36,7 @@ export function AuthSuccessHandler() {
       // Show success toast for OAuth login
       toast({
         title: 'Đăng nhập thành công!',
-        description: 'Chào mừng bạn trở lại với Tiger.',
+        description: 'Chào mừng bạn trở lại với TIGER.',
         duration: 3000,
       });
 

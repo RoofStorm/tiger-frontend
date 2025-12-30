@@ -5,6 +5,13 @@ import apiClient from '@/lib/api';
 import { Pagination } from '../Pagination';
 import { ActionButton } from '../ActionButton';
 import { Tooltip } from '@/components/ui/tooltip';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface AdminRedeemItem {
   id: string;
@@ -14,6 +21,7 @@ interface AdminRedeemItem {
   updatedAt: string;
   receiverName: string;
   receiverPhone: string;
+  receiverEmail?: string;
   receiverAddress: string;
   rejectionReason?: string;
   user: {
@@ -170,20 +178,24 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
             Quản lý đổi thưởng
           </h2>
           <div className="flex items-center space-x-4">
-            <select
-              value={redeemStatusFilter}
-              onChange={e => {
-                setRedeemStatusFilter(e.target.value);
+            <Select
+              value={redeemStatusFilter || 'all'}
+              onValueChange={value => {
+                setRedeemStatusFilter(value === 'all' ? '' : value);
                 setRedeemPage(1);
               }}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Tất cả trạng thái</option>
-              <option value="PENDING">Chờ duyệt</option>
-              <option value="APPROVED">Đã duyệt</option>
-              <option value="DELIVERED">Đã giao</option>
-              <option value="REJECTED">Từ chối</option>
-            </select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Tất cả trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="PENDING">Chờ duyệt</SelectItem>
+                <SelectItem value="APPROVED">Đã duyệt</SelectItem>
+                <SelectItem value="DELIVERED">Đã giao</SelectItem>
+                <SelectItem value="REJECTED">Từ chối</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -204,13 +216,10 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
                       Phần thưởng
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tên người nhận
+                      Email nhận
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Số điện thoại
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-64">
-                      Địa chỉ
                     </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Điểm sử dụng
@@ -260,24 +269,14 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
                         )}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {redeem.receiverName}
+                        <div className="text-sm text-gray-900">
+                          {redeem.receiverEmail || '-'}
                         </div>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
                           {redeem.receiverPhone}
                         </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <Tooltip
-                          content={redeem.receiverAddress}
-                          maxWidth="400px"
-                        >
-                          <div className="text-sm text-gray-900 max-w-[350px] truncate cursor-help">
-                            {redeem.receiverAddress}
-                          </div>
-                        </Tooltip>
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                         {redeem.pointsUsed} điểm

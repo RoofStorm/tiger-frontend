@@ -18,7 +18,7 @@ export const AdminHeader = ({ userName, onLogout }: AdminHeaderProps) => {
             Quản lý CMS
           </h1>
           <p className="text-gray-600">
-            Chào mừng {userName}, quản lý hệ thống Tiger
+            Chào mừng {userName}, quản lý hệ thống TIGER
           </p>
         </div>
         <div className="flex items-center space-x-2 sm:space-x-3">

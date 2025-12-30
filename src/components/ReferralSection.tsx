@@ -63,7 +63,7 @@ export default function ReferralSection() {
     if (!referralData?.referralLink) return;
 
     const shareData = {
-      title: 'Tham gia Tiger Mood Corner!',
+      title: 'Tham gia Nhịp Sống cùng TIGER!',
       text: 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.',
       url: referralData.referralLink,
     };

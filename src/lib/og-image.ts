@@ -26,7 +26,7 @@ export function createOGImage(
     url: finalImageUrl,
     width: 1200,
     height: 630,
-    alt: 'Tiger Mood Corner - Bài viết nổi bật',
+    alt: 'TIGER Mood Corner - Bài viết nổi bật',
   };
 }
 

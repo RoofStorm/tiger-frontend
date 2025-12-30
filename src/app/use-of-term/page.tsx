@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Điều khoản sử dụng - Tiger',
-  description: 'Điều khoản sử dụng của ứng dụng tiger-corporation-2',
+  title: 'Điều khoản sử dụng - TIGER',
+  description: 'Điều khoản sử dụng của ứng dụng TIGER',
   robots: 'index, follow',
 };
 
@@ -31,7 +31,7 @@ export default function TermsOfUsePage() {
             </h2>
             <div className="bg-green-50 border-l-4 border-green-500 p-4 my-4 rounded">
               <p className="text-gray-700 leading-relaxed">
-                Chào mừng bạn đến với <strong>tiger-corporation-2</strong> (&quot;Ứng dụng&quot;).
+                Chào mừng bạn đến với <strong>TIGER</strong> (&quot;Ứng dụng&quot;).
               </p>
               <p className="text-gray-700 leading-relaxed mt-2">
                 Bằng việc truy cập hoặc sử dụng Ứng dụng, bạn đồng ý tuân thủ các Điều khoản sử dụng này. 
@@ -159,7 +159,7 @@ export default function TermsOfUsePage() {
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
               <p className="text-gray-700 mb-3">
                 Toàn bộ nội dung, mã nguồn, hình ảnh, logo, tên thương hiệu, và các tài nguyên khác thuộc quyền sở hữu của 
-                <strong> tiger-corporation-2</strong> và các bên cấp phép, trừ khi có ghi chú khác.
+                <strong> TIGER</strong> và các bên cấp phép, trừ khi có ghi chú khác.
               </p>
               <p className="text-gray-700 mb-3">
                 Bạn không được phép:
@@ -242,7 +242,7 @@ export default function TermsOfUsePage() {
 
           <div className="border-t border-gray-200 pt-6 mt-8">
             <p className="text-sm text-gray-500 text-center">
-              © {new Date().getFullYear()} tiger-corporation-2. Tất cả quyền được bảo lưu.
+              © {new Date().getFullYear()} TIGER. Tất cả quyền được bảo lưu.
             </p>
           </div>
         </div>

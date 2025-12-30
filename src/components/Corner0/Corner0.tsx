@@ -353,7 +353,7 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
               className="flex justify-between items-center p-6 lg:p-8"
             >
               <div className="text-white">
-                <h1 className="text-2xl lg:text-3xl font-bold">Tiger</h1>
+                <h1 className="text-2xl lg:text-3xl font-bold">TIGER</h1>
               </div>
               <div className="flex items-center space-x-4">
                 <Button

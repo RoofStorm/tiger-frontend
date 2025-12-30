@@ -162,7 +162,7 @@ export function useNextAuth(): UseNextAuthReturn {
         const { toast } = await import('@/hooks/use-toast');
         toast({
           title: 'Đăng ký thành công!',
-          description: 'Chào mừng bạn đến với Tiger.',
+          description: 'Chào mừng bạn đến với TIGER.',
           duration: 3000,
         });
 
