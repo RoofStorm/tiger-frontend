@@ -61,7 +61,7 @@ export function RedeemModal({
       onClick={onClose}
     >
       {/* Backdrop layer - only this has opacity */}
-      <div className="absolute inset-0 bg-black opacity-90"></div>
+      <div className="absolute inset-0 bg-black"></div>
       {/* Content layer - not affected by backdrop opacity */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}

@@ -291,6 +291,32 @@ export function Footer() {
               className="w-12 h-12"
             />
           </Link>
+          <Link
+            href="www.tiktok.com/@tigervietnamofficial"
+            className="hover:opacity-80 transition-opacity"
+            aria-label="Tiktok"
+          >
+            <Image
+              src="/icons/tiktok_circle_icon.svg"
+              alt="Tiktok"
+              width={48}
+              height={48}
+              className="w-12 h-12"
+            />
+          </Link>
+          <Link
+            href="https://shopee.vn/tigervn_officialstore"
+            className="hover:opacity-80 transition-opacity"
+            aria-label="Shopee"
+          >
+            <Image
+              src="/icons/shopee_icon.svg"
+              alt="Shopee"
+              width={48}
+              height={48}
+              className="w-13 h-13"
+            />
+          </Link>
         </div>
       </div>
     </footer>

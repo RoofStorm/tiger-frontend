@@ -44,6 +44,7 @@ class ApiClient {
           '/auth/session', // Session check is a background call
           '/analytics/events', // Analytics events are background calls
           '/analytics/corners', // Corner analytics are background calls
+          '/like', // Liking a post is a background action
         ];
 
         const isSilentEndpoint = silentEndpoints.some(endpoint =>
