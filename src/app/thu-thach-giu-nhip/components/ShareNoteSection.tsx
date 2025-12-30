@@ -110,7 +110,8 @@ export function ShareNoteSection() {
   }, [isAutoScrolling]);
 
   // Extract hooks for clarity - added isFetchingNextPage to pause auto-scroll during load
-  useAutoScroll(virtuosoRef, isAutoScrolling, wishes.length, isFetchingNextPage);
+  // Added hasNextPage to support looping when reached end of data
+  const { handleAtBottom } = useAutoScroll(virtuosoRef, isAutoScrolling, wishes.length, isFetchingNextPage, hasNextPage);
   useAutoScrollResume(userInteracted, setIsAutoScrolling, setUserInteracted);
   useModalBackgroundUpdate(showSuccessModal, modalRef);
 
@@ -707,6 +708,7 @@ export function ShareNoteSection() {
                 ref={virtuosoRef}
                 data={wishes}
                 overscan={400} // Render trước 400px để mượt hơn
+                atBottomStateChange={handleAtBottom}
                 rangeChanged={({ endIndex }) => {
                   const total = wishes.length;
                   if (total > 0 && total - endIndex < 8 && hasNextPage && !isFetchingNextPage) {
@@ -760,11 +762,14 @@ function useAutoScroll(
   virtuosoRef: React.RefObject<VirtuosoHandle | null>, 
   isAutoScrolling: boolean, 
   wishesCount: number,
-  isFetchingNextPage: boolean
+  isFetchingNextPage: boolean,
+  hasNextPage: boolean
 ) {
+  const [isResettingToHead, setIsResettingToHead] = useState(false);
+
   useEffect(() => {
-    // Pause auto-scroll while fetching more data to avoid reaching the end too early
-    if (!isAutoScrolling || !wishesCount || isFetchingNextPage) return;
+    // Pause auto-scroll while fetching more data or while resetting to head
+    if (!isAutoScrolling || !wishesCount || isFetchingNextPage || isResettingToHead) return;
 
     const interval = setInterval(() => {
       if (virtuosoRef.current) {
@@ -776,7 +781,32 @@ function useAutoScroll(
     }, 25);
 
     return () => clearInterval(interval);
-  }, [isAutoScrolling, wishesCount, virtuosoRef, isFetchingNextPage]);
+  }, [isAutoScrolling, wishesCount, virtuosoRef, isFetchingNextPage, isResettingToHead]);
+
+  // Handle looping logic: when reaching the end and no more pages
+  const handleAtBottom = useCallback((atBottom: boolean) => {
+    if (atBottom && !hasNextPage && !isFetchingNextPage && !isResettingToHead && wishesCount > 0) {
+      setIsResettingToHead(true);
+      
+      // Pause a bit before scrolling back
+      setTimeout(() => {
+        if (virtuosoRef.current) {
+          virtuosoRef.current.scrollToIndex({
+            index: 0,
+            behavior: 'smooth',
+            align: 'start'
+          });
+
+          // Wait for smooth scroll to finish before resuming auto-scroll
+          setTimeout(() => {
+            setIsResettingToHead(false);
+          }, 1500); // Approximate time for smooth scroll
+        }
+      }, 1000);
+    }
+  }, [hasNextPage, isFetchingNextPage, isResettingToHead, wishesCount, virtuosoRef]);
+
+  return { handleAtBottom };
 }
 
 function useAutoScrollResume(
