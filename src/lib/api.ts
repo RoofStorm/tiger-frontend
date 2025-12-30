@@ -20,6 +20,8 @@ class ApiClient {
   private client: AxiosInstance;
   private refreshPromise: Promise<string> | null = null;
   private sessionCache: { session: any; timestamp: number } | null = null;
+  private tempAccessToken: string | null = null;
+  private tempRefreshToken: string | null = null;
   private readonly SESSION_CACHE_TTL = 30 * 1000; // Cache session for 30 seconds
 
   constructor() {
@@ -123,7 +125,8 @@ class ApiClient {
             
             if (session?.user) {
               // Get accessToken from NextAuth session only (no localStorage)
-              const accessToken = session.accessToken;
+              // Prefer tempAccessToken if available (set after a token refresh)
+              const accessToken = this.tempAccessToken || session.accessToken;
               if (accessToken) {
                 config.headers.Authorization = `Bearer ${accessToken}`;
               } else {
@@ -219,7 +222,7 @@ class ApiClient {
 
     // Get refresh token from NextAuth session only (no localStorage)
     const session = await getSession();
-    const refreshToken = session?.refreshToken;
+    const refreshToken = this.tempRefreshToken || session?.refreshToken;
 
     if (!refreshToken) {
       throw new Error('No refresh token available in session');
@@ -248,8 +251,8 @@ class ApiClient {
       // These will be used by the retried request
       // Note: This is a workaround - ideally tokens should be in NextAuth JWT
       // but NextAuth doesn't provide a direct way to update JWT tokens after refresh
-      (this as any).tempAccessToken = accessToken;
-      (this as any).tempRefreshToken = newRefreshToken;
+      this.tempAccessToken = accessToken;
+      this.tempRefreshToken = newRefreshToken;
 
       return accessToken;
     } catch (error) {
@@ -747,6 +750,13 @@ class ApiClient {
   // Utility method for direct API calls
   async request<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     return this.client.request<T>(config);
+  }
+
+  // Clear session cache and temporary tokens
+  clearSessionCache() {
+    this.sessionCache = null;
+    this.tempAccessToken = null;
+    this.tempRefreshToken = null;
   }
 }
 

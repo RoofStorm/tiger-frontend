@@ -236,6 +236,25 @@ class AnalyticsService {
 
     return sessionId;
   }
+
+  /**
+   * Clear session ID from localStorage and reset in-memory ID
+   */
+  static clearSessionId(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(SESSION_ID_KEY);
+    }
+  }
+
+  /**
+   * Reset session ID to a new one
+   */
+  resetSession(): void {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(SESSION_ID_KEY);
+      this.sessionId = AnalyticsService.getOrCreateSessionId();
+    }
+  }
 }
 
 // Export singleton instance

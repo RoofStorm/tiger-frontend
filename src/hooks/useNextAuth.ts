@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useOptimizedSession } from './useOptimizedSession';
+import { apiClient } from '@/lib/api';
 
 interface UseNextAuthReturn {
   user: {
@@ -78,6 +79,7 @@ export function useNextAuth(): UseNextAuthReturn {
 
           // Clear cache after session is updated
           queryClient.clear();
+          apiClient.clearSessionCache();
 
           // Mark video as watched when user logs in
           localStorage.setItem('hasWatchedVideo', 'true');
@@ -155,6 +157,7 @@ export function useNextAuth(): UseNextAuthReturn {
 
           // Clear cache and refresh router
           queryClient.clear();
+          apiClient.clearSessionCache();
           router.refresh();
         }
 
@@ -183,9 +186,18 @@ export function useNextAuth(): UseNextAuthReturn {
       localStorage.removeItem('userId');
       localStorage.removeItem('dailyLoginModalShown');
       localStorage.removeItem('dailyLoginModalShownDate');
+      localStorage.removeItem('hasWatchedVideo');
+      
+      // Clear session-related data
+      sessionStorage.removeItem('previousAuthStatus');
+
+      // Reset analytics session
+      const { Analytics } = await import('@/lib/analytics');
+      Analytics.resetSession();
 
       // Clear cache before logout to prevent stale data
       queryClient.clear();
+      apiClient.clearSessionCache();
 
       await signOut({ redirect: false });
       // Refresh router to update UI (header, etc.) but stay on current page
