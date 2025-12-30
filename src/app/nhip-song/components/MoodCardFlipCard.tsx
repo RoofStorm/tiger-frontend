@@ -201,18 +201,18 @@ export function MoodCardFlipCard({
                 </div>
               </div>
 
-              {/* Front of Card (Content) */}
-              <div
-                ref={cardContentRef}
-                className="absolute inset-0 w-full h-full flex flex-col bg-contain md:bg-cover"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  transform: 'rotateY(180deg)',
-                  backgroundImage: `url(${contentImage})`,
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                }}
-              >
+            {/* Front of Card (Content) */}
+            <div
+              ref={cardContentRef}
+              className="absolute inset-0 w-full h-full flex flex-col bg-contain md:bg-cover"
+              style={{
+                backfaceVisibility: 'hidden',
+                transform: 'rotateY(180deg)',
+                backgroundImage: `url(${contentImage})`,
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+              }}
+            >
                 {/* Main Content Section - 80% height */}
                 <div className="flex-1 p-4 md:p-8 flex flex-col items-center justify-center overflow-hidden mt-[140px] md:mt-[100px] 2xl:mt-[140px]">
                   {/* Content wrapper */}
@@ -277,7 +277,7 @@ export function MoodCardFlipCard({
                         <Button
                           onClick={(e) => {
                             e.stopPropagation();
-                            onShare(cardContentRef);
+                            onShare(frontCardRef);
                           }}
                           className="w-full py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                           style={{ fontSize: '14px' }}

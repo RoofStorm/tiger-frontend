@@ -414,7 +414,7 @@ export function LunchboxUploadSection() {
             ref={backgroundRef}
             className="space-y-6 p-8 lg:p-8 lg:space-y-4"
             style={{ 
-              backgroundImage: 'url(/thuthachnhipsong/upload_background.svg)',
+              backgroundImage: 'url(/thuthachnhipsong/upload_background.png)',
               backgroundSize: '200%',
               backgroundPosition: 'center right',
               backgroundRepeat: 'no-repeat',
