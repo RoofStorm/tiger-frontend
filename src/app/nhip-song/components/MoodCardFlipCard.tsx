@@ -204,7 +204,7 @@ export function MoodCardFlipCard({
             {/* Front of Card (Content) */}
             <div
               ref={cardContentRef}
-              className="absolute inset-0 w-full h-full flex flex-col bg-contain md:bg-cover"
+              className="absolute inset-0 w-full h-full flex flex-col bg-contain"
               style={{
                 backfaceVisibility: 'hidden',
                 transform: 'rotateY(180deg)',
