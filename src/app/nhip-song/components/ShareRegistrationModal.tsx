@@ -232,7 +232,7 @@ export function ShareRegistrationModal({
               </p>
 
               {/* Social Login Buttons */}
-              <div className="flex gap-3 mb-6">
+              <div className="flex gap-3 mb-4">
                 {/* Facebook Button */}
                 <button
                   onClick={handleFacebookLogin}
@@ -243,7 +243,7 @@ export function ShareRegistrationModal({
                   }}
                 >
                   <Image
-                    src="/icons/white_facebook_logo.png"
+                    src="/icons/white_facebook_logo.svg"
                     alt="Facebook"
                     width={20}
                     height={20}
@@ -264,7 +264,7 @@ export function ShareRegistrationModal({
                   }}
                 >
                   <Image
-                    src="/icons/google_logo.png"
+                    src="/icons/google_logo.svg"
                     alt="Google"
                     width={20}
                     height={20}
@@ -275,7 +275,7 @@ export function ShareRegistrationModal({
               </div>
 
               {/* Separator */}
-              <div className="relative mb-6">
+              <div className="relative mb-4">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t" style={{ borderColor: '#E0E0E0' }} />
                 </div>
@@ -413,7 +413,7 @@ export function ShareRegistrationModal({
                           color: '#333435',
                         }}
                       >
-                        Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies của TIGER, Thể lệ chương trình Yên một chút cùng TIGER như được đăng tải tại website
+                        Tôi đã đọc, hiểu và đồng ý với Điều Khoản Sử Dụng, Thông Báo Về Quyền Riêng Tư, Thông Báo Về Cookies của TIGER, Thể lệ chương trình cùng TIGER giữ nhịp sống như được đăng tải tại website
                       </span>
                     </label>
                   </div>

@@ -17,11 +17,13 @@ export function LunchboxChallengeIntro() {
         </h3>
         
         {/* Text box */}
-        <div className="px-6 sm:px-8 md:px-0 max-w-2xl mx-auto">
-          <p className="text-[14px] text-gray-700 leading-relaxed font-nunito text-left md:text-center">
+        <div className="px-6 sm:px-8 md:px-0 max-w-4xl mx-auto">
+        <p className="text-[14px] text-gray-700 leading-relaxed font-nunito text-left md:text-center">
             Một hộp cơm giản dị, một bình nước bên bàn làm việc, hay nụ cười bên đồng nghiệp cũng đủ
-            trở thành &quot;nhịp giữ&quot; trong ngày bận rộn. Hãy lưu giữ và chia sẻ khoảnh khắc trưa nay – để
-            thấy nhịp sống của mình cũng đang hòa chung cùng mọi người.
+            trở thành &quot;nhịp giữ&quot; trong ngày bận rộn.
+          </p>
+          <p className="text-[14px] text-gray-700 leading-relaxed font-nunito text-left md:text-center">
+            Hãy lưu giữ và chia sẻ khoảnh khắc trưa nay – để thấy nhịp sống của mình cũng đang hòa chung cùng mọi người.
           </p>
         </div>
       </div>

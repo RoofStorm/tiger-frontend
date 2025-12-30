@@ -13,13 +13,13 @@ const notoSans = Noto_Sans({ subsets: ['latin', 'vietnamese'], variable: '--font
 const prata = Prata({ subsets: ['latin'], weight: '400', variable: '--font-prata' });
 
 export const metadata: Metadata = {
-  title: 'TIGER - Social Mood & Rewards',
+  title: 'Cùng TIGER giữ trọn nhịp sống',
   description:
     'Chia sẻ cảm xúc, nhận phần thưởng - Nền tảng kết nối cộng đồng qua những khoảnh khắc ý nghĩa',
   keywords: 'mood, social, rewards, community, vietnam, cảm xúc, cộng đồng',
   authors: [{ name: 'TIGER Team' }],
   openGraph: {
-    title: 'TIGER - Social Mood & Rewards',
+    title: 'Cùng TIGER giữ trọn nhịp sống',
     description:
       'Chia sẻ cảm xúc, nhận phần thưởng - Nền tảng kết nối cộng đồng qua những khoảnh khắc ý nghĩa',
     type: 'website',
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TIGER - Social Mood & Rewards',
+    title: 'Cùng TIGER giữ trọn nhịp sống',
     description:
       'Chia sẻ cảm xúc, nhận phần thưởng - Nền tảng kết nối cộng đồng qua những khoảnh khắc ý nghĩa',
   },

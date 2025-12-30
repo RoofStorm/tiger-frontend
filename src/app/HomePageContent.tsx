@@ -169,12 +169,12 @@ export function HomePageContent() {
                 giữ trọn vẹn.
               </p>
               <p>
-                Năm 1923, những chiếc bình Tiger vẫn đứng vững sau trận động
+                Năm 1923, những chiếc bình TIGER vẫn đứng vững sau trận động
                 đất Kanto, trở mang lại niềm tin cho hàng ngàn gia đình Nhật
                 Bản.
               </p>
               <p>
-                Từ di sản ấy, Tiger tiếp tục sáng tạo nồi cơm điện, hộp cơm,
+                Từ di sản ấy, TIGER tiếp tục sáng tạo nồi cơm điện, hộp cơm,
                 bình nước...
               </p>
               <p>

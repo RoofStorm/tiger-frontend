@@ -20,7 +20,7 @@ const slides: SlideContent[] = [
     dates: '1923 – 1959',
     subtitle: 'Khởi đầu và Chứng nhận',
     paragraphs: [
-      'Tiger bắt đầu sản xuất và kinh doanh bình chân không tại Nhật Bản.',
+      'TIGER bắt đầu sản xuất và kinh doanh bình chân không tại Nhật Bản.',
       'Trở thành nhà máy đầu tiên trong ngành được MITI (nay là METI) chứng nhận đạt chuẩn JIS.'
     ],
     image: '/nhipbep/history_1923_1959_background.jpg'
@@ -30,7 +30,7 @@ const slides: SlideContent[] = [
     subtitle: 'Mở rộng và Phát triển',
     paragraphs: [
       'Kỷ niệm 45 năm thành lập, ông Takenori Kikuchi được bổ nhiệm làm Chủ tịch HĐQT, ông Yoshito Kikuchi giữ vai trò Chủ tịch Điều hành.',
-      'Thành lập Tiger Bussan Co., Ltd. tại Hiroshima.',
+      'Thành lập TIGER Bussan Co., Ltd. tại Hiroshima.',
       'Hoàn thành mở rộng Trụ sở chính (Tòa nhà thứ ba).'
     ],
     image: '/nhipbep/history_1960_1970_background.jpg'
@@ -40,7 +40,7 @@ const slides: SlideContent[] = [
     subtitle: 'Đổi mới và Tái cấu trúc',
     paragraphs: [
       'Ra mắt ấm đun nước điện "Wakitate" đầu tiên.',
-      'Kỷ niệm 60 năm thành lập và chính thức đổi tên thành Tiger Corporation.',
+      'Kỷ niệm 60 năm thành lập và chính thức đổi tên thành TIGER Corporation.',
       'Hoàn thành Trung tâm Bình chân không Kadoma và xây dựng nhà xưởng đúc.'
     ],
     image: '/nhipbep/history_1980_1999_background.jpg'
@@ -51,7 +51,7 @@ const slides: SlideContent[] = [
     paragraphs: [
       'Trụ sở chính đạt chứng nhận ISO 9001.',
       'Thành lập Công ty TNHH TIGER Việt Nam.',
-      'Tiger Corporation nhận Giải thưởng Bộ trưởng Bộ Giáo dục, Văn hóa, Thể thao, Khoa học & Công nghệ Nhật Bản tại Giải thưởng Công nghệ Công nghiệp Nhật Bản lần thứ 48.'
+      'TIGER Corporation nhận Giải thưởng Bộ trưởng Bộ Giáo dục, Văn hóa, Thể thao, Khoa học & Công nghệ Nhật Bản tại Giải thưởng Công nghệ Công nghiệp Nhật Bản lần thứ 48.'
     ],
     image: '/nhipbep/history_2000_2019_background.jpg'
   },
@@ -60,7 +60,7 @@ const slides: SlideContent[] = [
     subtitle: '100 Năm Thành tựu',
     paragraphs: [
       'Thành lập Công ty TNHH TIGER MARKETING Việt Nam.',
-      'Tập đoàn Tiger kỷ niệm 100 năm hoạt động, khẳng định vị thế thương hiệu gia dụng hàng đầu Nhật Bản.'
+      'Tập đoàn TIGER kỷ niệm 100 năm hoạt động, khẳng định vị thế thương hiệu gia dụng hàng đầu Nhật Bản.'
     ],
     image: '/nhipbep/history_2020_nay_background.jpg'
   }
@@ -77,19 +77,19 @@ const baseProducts: Product[] = [
   {
     image: '/nhipbep/noicom.png',
     label: 'Nồi cơm điện',
-    fullName: 'Nồi cơm điện Tiger',
+    fullName: 'Nồi cơm điện TIGER',
     benefits: [
-      '"Xới cơm ngay khi cơm vừa chín – hạt tơi, không khô cả ngày. Với nồi Tiger, hạt cơm được giữ ấm đều, thơm như mới nấu."',
-      '"Cho vài giọt dầu ăn vào gạo – cơm bóng và tơi hơn. Nồi Tiger giữ trọn hương thơm và độ dẻo."',
-      '"Nấu cháo nhanh bằng nước sôi – chỉ 30 phút đã nhừ. Công nghệ kiểm soát nhiệt Tiger giúp hạt gạo bung đều, không khê."'
+      '"Xới cơm ngay khi cơm vừa chín – hạt tơi, không khô cả ngày. Với nồi TIGER, hạt cơm được giữ ấm đều, thơm như mới nấu."',
+      '"Cho vài giọt dầu ăn vào gạo – cơm bóng và tơi hơn. Nồi TIGER giữ trọn hương thơm và độ dẻo."',
+      '"Nấu cháo nhanh bằng nước sôi – chỉ 30 phút đã nhừ. Công nghệ kiểm soát nhiệt TIGER giúp hạt gạo bung đều, không khê."'
     ]
   },
   {
     image: '/nhipbep/binhgiunhiet.png',
     label: 'Bình giữ nhiệt',
-    fullName: 'Bình giữ nhiệt Tiger',
+    fullName: 'Bình giữ nhiệt TIGER',
     benefits: [
-      '"Giữ nhiệt độ lâu dài – đồ uống nóng vẫn nóng, đồ lạnh vẫn lạnh suốt nhiều giờ. Công nghệ chân không của Tiger đảm bảo nhiệt độ được bảo toàn tối đa."',
+      '"Giữ nhiệt độ lâu dài – đồ uống nóng vẫn nóng, đồ lạnh vẫn lạnh suốt nhiều giờ. Công nghệ chân không của TIGER đảm bảo nhiệt độ được bảo toàn tối đa."',
       '"Thiết kế tiện lợi – dễ dàng mang theo mọi nơi, phù hợp cho công việc, du lịch hay hoạt động ngoài trời."',
       '"An toàn và bền bỉ – chất liệu cao cấp, không chứa chất độc hại, đảm bảo sức khỏe cho người sử dụng."'
     ]
@@ -97,7 +97,7 @@ const baseProducts: Product[] = [
   {
     image: '/nhipbep/hopcom.png',
     label: 'Hộp cơm',
-    fullName: 'Hộp cơm Tiger',
+    fullName: 'Hộp cơm TIGER',
     benefits: [
       '"Giữ thức ăn nóng lâu – công nghệ cách nhiệt hiện đại giúp thức ăn giữ được độ nóng và hương vị như mới nấu."',
       '"Thiết kế gọn nhẹ – dễ dàng mang theo, phù hợp cho bữa trưa tại văn phòng hay các chuyến đi chơi."',
@@ -107,7 +107,7 @@ const baseProducts: Product[] = [
   {
     image: '/nhipbep/mayxay.png',
     label: 'Máy xay',
-    fullName: 'Máy xay Tiger',
+    fullName: 'Máy xay TIGER',
     benefits: [
       '"Xay nhuyễn mịn – công suất mạnh mẽ, xay được nhiều loại thực phẩm từ rau củ đến đá viên một cách dễ dàng."',
       '"An toàn và tiện lợi – thiết kế chống trượt, dễ sử dụng và vệ sinh, phù hợp cho mọi gia đình."',
@@ -505,7 +505,7 @@ export function NhipBepPageContent() {
               {/* Body Text */}
               <div className="text-center max-w-3xl mx-auto">
                 <p className="text-base md:text-lg text-gray-800 font-sans leading-relaxed">
-                  &quot;“Từ chiếc bình giữ nhiệt đầu tiên năm 1923, Tiger đã không ngừng sáng tạo – để giữ ấm, giữ trọn, giữ nhịp sống qua từng sản phẩm.“Từ chiếc bình giữ nhiệt đầu tiên năm 1923, Tiger đã không ngừng sáng tạo – để giữ ấm, giữ trọn, giữ nhịp sống qua từng sản phẩm.&quot;
+                  &quot;“Từ chiếc bình giữ nhiệt đầu tiên năm 1923, TIGER đã không ngừng sáng tạo – để giữ ấm, giữ trọn, giữ nhịp sống qua từng sản phẩm.“Từ chiếc bình giữ nhiệt đầu tiên năm 1923, TIGER đã không ngừng sáng tạo – để giữ ấm, giữ trọn, giữ nhịp sống qua từng sản phẩm.&quot;
                 </p>
               </div>
             </div>
@@ -565,7 +565,7 @@ export function NhipBepPageContent() {
                     color: '#FFFFFF'
                   }}
                 >
-                  Gian bếp là nơi nhịp sống được nuôi dưỡng. Ở đó, một mẹo nhỏ, một thói quen đơn giản có thể giữ nhịp cả ngày cho bạn. Tiger đồng hành với bạn trong từng nhịp ấy – bởi Tiger bắt đầu bằng công nghệ giữ nhiệt, rồi phát triển để giữ trọn hương vị, độ ẩm và sự an toàn.
+                  Gian bếp là nơi nhịp sống được nuôi dưỡng. Ở đó, một mẹo nhỏ, một thói quen đơn giản có thể giữ nhịp cả ngày cho bạn. TIGER đồng hành với bạn trong từng nhịp ấy – bởi TIGER bắt đầu bằng công nghệ giữ nhiệt, rồi phát triển để giữ trọn hương vị, độ ẩm và sự an toàn.
                 </p>
               </div>
             </div>
