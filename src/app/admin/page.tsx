@@ -7,9 +7,7 @@ import { useEffect, useState } from 'react';
 import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
 import {
   Users,
-  Gift,
   BarChart3,
-  Settings,
   Home,
   MessageSquare,
   CreditCard,
