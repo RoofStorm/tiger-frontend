@@ -12,6 +12,7 @@ import { JoinChallengeModalProvider } from '@/contexts/JoinChallengeModalContext
 import { ShareFacebookModalProvider } from '@/contexts/ShareFacebookModalContext';
 import { ShareRegistrationModalProvider } from '@/contexts/ShareRegistrationModalContext';
 import { AnalyticsProvider } from '@/components/AnalyticsProvider';
+import { VideoProvider } from '@/contexts/VideoContext';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -46,22 +47,24 @@ export function Providers({ children }: { children: React.ReactNode }) {
         refetchOnWindowFocus={false} // Disable refetch on window focus to reduce API calls (session is cached)
         refetchWhenOffline={false} // Don't refetch when offline
       >
-        <AnalyticsProvider>
-          <LoadingProvider>
-            <HeaderDarkModeProvider>
-              <JoinChallengeModalProvider>
-                <ShareFacebookModalProvider>
-                  <ShareRegistrationModalProvider>
-                    {children}
-                    <LoadingOverlay />
-                    <Toaster />
-                    <DailyLoginModalProvider />
-                  </ShareRegistrationModalProvider>
-                </ShareFacebookModalProvider>
-              </JoinChallengeModalProvider>
-            </HeaderDarkModeProvider>
-          </LoadingProvider>
-        </AnalyticsProvider>
+        <VideoProvider>
+          <AnalyticsProvider>
+            <LoadingProvider>
+              <HeaderDarkModeProvider>
+                <JoinChallengeModalProvider>
+                  <ShareFacebookModalProvider>
+                    <ShareRegistrationModalProvider>
+                      {children}
+                      <LoadingOverlay />
+                      <Toaster />
+                      <DailyLoginModalProvider />
+                    </ShareRegistrationModalProvider>
+                  </ShareFacebookModalProvider>
+                </JoinChallengeModalProvider>
+              </HeaderDarkModeProvider>
+            </LoadingProvider>
+          </AnalyticsProvider>
+        </VideoProvider>
       </SessionProvider>
     </QueryClientProvider>
   );

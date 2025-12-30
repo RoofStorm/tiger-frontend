@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSession, getSession } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { DailyLoginModal } from './DailyLoginModal';
 import { apiClient } from '@/lib/api';
@@ -10,6 +11,7 @@ import { useVideoOptional } from '@/contexts/VideoContext';
 
 export function DailyLoginModalProvider() {
   const { data: session, status, update } = useSession();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const { updateUserPoints } = useUpdateUserPoints();
   const [showModal, setShowModal] = useState(false);
@@ -32,10 +34,12 @@ export function DailyLoginModalProvider() {
     }
 
     // Kiểm tra xem content đã sẵn sàng chưa
-    // Nếu có VideoContext, chỉ hiển thị modal khi content đã sẵn sàng (không đang load video)
-    // Nếu không có VideoContext (trang khác), cho phép hiển thị modal ngay
-    const isContentReady = videoContext ? videoContext.isContentReady : true;
-    const isVideoPlaying = videoContext ? videoContext.isVideoPlaying : false;
+    // Chỉ chặn hiển thị modal trên các trang có clip (Trang chủ và Thử thách)
+    const isBlockingPage = pathname === '/' || pathname === '/thu-thach-giu-nhip' || pathname === '/video';
+    
+    // Nếu là trang không có clip, coi như content luôn sẵn sàng
+    const isContentReady = isBlockingPage ? (videoContext ? videoContext.isContentReady : true) : true;
+    const isVideoPlaying = isBlockingPage ? (videoContext ? videoContext.isVideoPlaying : false) : false;
     
     // Không hiển thị modal nếu:
     // 1. Video đang phát (isVideoPlaying = true)
@@ -66,7 +70,7 @@ export function DailyLoginModalProvider() {
         localStorage.setItem('dailyLoginModalShownDate', today);
       }, 500);
     }
-  }, [updateUserPoints, videoContext]);
+  }, [updateUserPoints, videoContext, pathname]);
 
   // Function to check session from backend (for refresh tokens and latest data)
   const checkBackendSession = useCallback(async () => {
@@ -242,15 +246,29 @@ export function DailyLoginModalProvider() {
     };
   }, [session, status, checkBackendSession]);
 
+  // Kiểm tra lại modal khi chuyển từ trang chặn sang trang không chặn
+  useEffect(() => {
+    const isBlockingPage = pathname === '/' || pathname === '/thu-thach-giu-nhip' || pathname === '/video';
+    
+    if (!isBlockingPage && pendingPointsAwardedRef.current) {
+      const { pointsAwarded, userId } = pendingPointsAwardedRef.current;
+      checkAndShowModal(pointsAwarded, userId);
+      pendingPointsAwardedRef.current = null;
+    }
+  }, [pathname, checkAndShowModal]);
+
   // Kiểm tra lại modal khi content đã sẵn sàng (từ false sang true)
   useEffect(() => {
-    if (!videoContext) return; // Không có VideoContext, không cần kiểm tra
+    const isBlockingPage = pathname === '/' || pathname === '/thu-thach-giu-nhip' || pathname === '/video';
     
-    const isContentReady = videoContext.isContentReady;
-    const isVideoPlaying = videoContext.isVideoPlaying;
+    // Nếu không phải trang chặn, hoặc không có pending, không cần làm gì
+    if (!isBlockingPage || !pendingPointsAwardedRef.current) return;
+    
+    const isContentReady = videoContext?.isContentReady;
+    const isVideoPlaying = videoContext?.isVideoPlaying;
     
     // Chỉ kiểm tra lại khi content đã sẵn sàng và video không đang phát
-    if (isContentReady && !isVideoPlaying && pendingPointsAwardedRef.current) {
+    if (isContentReady && !isVideoPlaying) {
       const { pointsAwarded, userId } = pendingPointsAwardedRef.current;
       if (pointsAwarded) {
         // Kiểm tra lại modal với thông tin đã lưu
@@ -258,7 +276,7 @@ export function DailyLoginModalProvider() {
         pendingPointsAwardedRef.current = null; // Clear sau khi đã kiểm tra
       }
     }
-  }, [videoContext, checkAndShowModal]);
+  }, [videoContext, checkAndShowModal, pathname]);
 
   const handleClose = () => {
     setShowModal(false);

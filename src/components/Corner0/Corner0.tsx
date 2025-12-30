@@ -153,6 +153,7 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
     video.addEventListener('loadstart', handleLoadStart);
 
     return () => {
+      setIsVideoPlaying(false);
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('canplay', handleCanPlay);
@@ -195,6 +196,7 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
 
   // Skip button: stop video and trigger intro modal immediately
   const handleSkipIntro = () => {
+    setIsVideoPlaying(false);
     if (onSkip) {
       onSkip();
       return;
@@ -205,7 +207,6 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
       video.pause();
     } catch {}
     setIsPlaying(false);
-    setIsVideoPlaying(false);
     setIsVideoEnded(true);
     setShowControls(true);
     if (onVideoEnded) onVideoEnded();

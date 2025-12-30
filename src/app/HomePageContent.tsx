@@ -18,6 +18,12 @@ export function HomePageContent() {
   const { trackClick } = useAnalytics();
   const { setIsContentReady } = useVideo();
 
+  // Reset video context state when home page mounts
+  useEffect(() => {
+    setIsContentReady(false);
+    // Note: isVideoPlaying will be set by HomeVideoPlayer
+  }, [setIsContentReady]);
+
   // Track time on Welcome page
   useZoneView(pageRef, {
     page: 'welcome',

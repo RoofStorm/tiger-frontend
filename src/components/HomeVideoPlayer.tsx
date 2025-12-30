@@ -204,6 +204,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
     video.addEventListener('loadstart', handleLoadStart);
 
       return () => {
+      setIsVideoPlaying(false); // Đảm bảo trạng thái video được reset khi unmount
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('canplay', handleCanPlay);
       video.removeEventListener('play', handlePlay);
@@ -216,6 +217,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
 
   // Skip button: stop video and trigger callback immediately
   const handleSkip = () => {
+    setIsVideoPlaying(false);
     if (onSkip) {
       onSkip();
       return;
@@ -225,7 +227,6 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
     try {
       video.pause();
     } catch {}
-    setIsVideoPlaying(false);
     if (onVideoEnded) onVideoEnded();
   };
 
