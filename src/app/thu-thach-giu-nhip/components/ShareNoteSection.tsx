@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useInfiniteQuery, InfiniteData } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import html2canvas from 'html2canvas';
@@ -15,6 +15,7 @@ import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
 import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
+import { Virtuoso, VirtuosoHandle } from 'react-virtuoso';
 
 // Wish type for highlighted wishes with user info
 interface Wish {
@@ -31,6 +32,78 @@ interface Wish {
     avatarUrl?: string;
   };
 }
+
+// Type for pagination response from API
+interface WishPage {
+  success: boolean;
+  data: Wish[];
+  pagination: {
+    page: number;
+    totalPages: number;
+    total: number;
+    limit: number;
+  };
+  message?: string;
+}
+
+// Sub-component for individual wish card to optimize performance
+const WishCard = ({ wish, index }: { wish: Wish; index: number }) => {
+  return (
+    <div className="pb-8 pr-4">
+      <div
+        className={`backdrop-blur-sm rounded-lg p-6 border border-white/30 relative w-[80%] ${
+          index % 2 === 0 ? 'ml-[20%]' : ''
+        }`}
+        style={{ backgroundColor: '#FFFFFF1A' }}
+      >
+        {/* Quote Mark - Top Left */}
+        <div className="absolute top-[-10px] md:top-[-20px] left-3">
+          <Image
+            src="/icons/quotemark_white.svg"
+            alt="Quote mark"
+            width={40}
+            height={40}
+            className="object-contain w-6 h-6 md:w-10 md:h-10"
+          />
+        </div>
+        <div className="flex items-center gap-3 mb-3 pt-4">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-300">
+            {wish.user?.avatarUrl ? (
+              <Image
+                src={wish.user.avatarUrl}
+                alt={wish.user?.name || 'User avatar'}
+                fill
+                className="object-cover"
+                sizes="40px"
+              />
+            ) : (
+              <Image
+                src="/thuthachnhipsong/slide_example.png"
+                alt="Default avatar"
+                fill
+                className="object-cover"
+                sizes="40px"
+              />
+            )}
+          </div>
+          <span
+            className="font-medium text-sm"
+            style={{
+              color: wish.isFromCache
+                ? '#FFD700' // Màu vàng cho note mới tạo từ cache
+                : '#FFFFFF', // Màu trắng cho note từ server
+            }}
+          >
+            {wish.user?.name || 'Người dùng ẩn danh'}
+          </span>
+        </div>
+        <div className="text-sm leading-relaxed" style={{ color: '#FFFFFF' }}>
+          {wish.content}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export function ShareNoteSection() {
   const router = useRouter();
@@ -49,8 +122,12 @@ export function ShareNoteSection() {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [hasStartedTyping, setHasStartedTyping] = useState(false);
   const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
-  const notesScrollRef = useRef<HTMLDivElement>(null);
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll states
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const [userInteracted, setUserInteracted] = useState(false);
 
   // Track time on Zone C
   useZoneView(zoneCRef, {
@@ -58,48 +135,77 @@ export function ShareNoteSection() {
     zone: 'zoneC',
   });
 
-  // Fetch highlighted wishes
-  const { data: wishesData, isLoading: isLoadingWishes } = useQuery({
-    queryKey: ['highlighted-wishes-share-note'],
-    queryFn: () => apiClient.getHighlightedWishes(),
-    staleTime: 60 * 1000, // 1 minute
-    refetchOnWindowFocus: true,
+  // Fetch highlighted wishes with useInfiniteQuery
+  const { 
+    data: infiniteWishesData, 
+    isLoading: isLoadingWishes,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ['highlighted-wishes-share-note-infinite'],
+    queryFn: ({ pageParam = 1 }) => apiClient.getHighlightedWishes(pageParam, 15),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      // Backend returns structure like { success: true, data: [...], pagination: { page, totalPages, ... } }
+      // but based on api.ts, it might be { success, data, pagination }
+      const pagination = lastPage?.pagination;
+      if (pagination && pagination.page < pagination.totalPages) {
+        return pagination.page + 1;
+      }
+      return undefined;
+    },
+    staleTime: 60 * 1000,
   });
 
-  // Extract and duplicate wishes if less than 15 to enable smooth auto scroll
+  // Flatten the wishes from pages
   const wishes = useMemo(() => {
-    // Extract wishes from response
-    // Normalized response structure: { success: true, data: [...], pagination: {...} }
-    const rawWishes: Wish[] = Array.isArray(wishesData)
-      ? wishesData
-      : Array.isArray(wishesData?.data)
-        ? wishesData.data
-        : [];
+    if (!infiniteWishesData) return [];
+    
+    return infiniteWishesData.pages.flatMap(page => {
+      // Check if data is directly in page or in page.data
+      const pageData = Array.isArray(page) ? page : (page?.data || []);
+      return Array.isArray(pageData) ? pageData : [];
+    });
+  }, [infiniteWishesData]);
 
-    if (rawWishes.length === 0) return [];
-    
-    const MIN_ITEMS = 15;
-    if (rawWishes.length >= MIN_ITEMS) {
-      return rawWishes;
-    }
-    
-    // Calculate how many times we need to duplicate
-    const timesToDuplicate = Math.ceil(MIN_ITEMS / rawWishes.length);
-    const duplicated: Wish[] = [];
-    
-    for (let i = 0; i < timesToDuplicate; i++) {
-      rawWishes.forEach((wish: Wish, index: number) => {
-        duplicated.push({
-          ...wish,
-          // Add unique key by combining id with duplicate index
-          id: `${wish.id}-dup-${i}-${index}`,
-        });
+  // Logic auto scroll "như cũ" - mượt và tự động lặp lại (loop)
+  useEffect(() => {
+    if (!isAutoScrolling || !wishes.length) return;
+
+    const interval = setInterval(() => {
+      if (!virtuosoRef.current) return;
+
+      // Sử dụng scrollBy với giá trị nhỏ để cực kỳ mượt mà
+      // Tăng lên 0.8px mỗi 16ms để tốc độ vừa phải và mượt như bản cũ
+      virtuosoRef.current.scrollBy({
+        top: 0.6,
+        behavior: 'auto',
       });
+    }, 25);
+
+    return () => clearInterval(interval);
+  }, [isAutoScrolling, wishes.length]);
+
+  // Resume auto scroll sau idle
+  useEffect(() => {
+    if (!userInteracted) return;
+
+    const timeout = setTimeout(() => {
+      setIsAutoScrolling(true);
+      setUserInteracted(false);
+    }, 3000);
+
+    return () => clearTimeout(timeout);
+  }, [userInteracted]);
+
+  // Handle user manual interaction to pause auto-scroll
+  const handleUserInteraction = useCallback(() => {
+    if (isAutoScrolling) {
+      setIsAutoScrolling(false);
+      setUserInteracted(true);
     }
-    
-    // Return exactly 15 items (or more if needed for smooth scroll)
-    return duplicated.slice(0, MIN_ITEMS);
-  }, [wishesData]);
+  }, [isAutoScrolling]);
 
   // Create wish mutation
   const createWishMutation = useMutation({
@@ -161,115 +267,36 @@ export function ShareNoteSection() {
               },
             };
 
-        // Thêm wish mới vào đầu danh sách trong cache ngay lập tức để hiển thị
-        queryClient.setQueryData(['highlighted-wishes-share-note'], (oldData: Wish[] | { success?: boolean; data: Wish[]; pagination?: { total?: number; page?: number; limit?: number; totalPages?: number } } | undefined) => {
-          // Normalize old data structure - API trả về { success: true, data: [...], pagination: {...} }
-          const oldWishes: Wish[] = Array.isArray(oldData)
-            ? oldData
-            : Array.isArray(oldData?.data)
-              ? oldData.data
-              : [];
-
-          // Thêm wish mới vào cuối danh sách
-          const updatedWishes = [...oldWishes, newWish];
-
-          // Trả về cấu trúc giống với response từ API: { success: true, data: [...], pagination: {...} }
-          const newCacheData = Array.isArray(oldData)
-            ? {
-                success: true,
-                data: updatedWishes,
-                pagination: {
-                  total: updatedWishes.length,
-                  page: 1,
-                  limit: updatedWishes.length,
-                  totalPages: 1,
-                },
-              }
-            : oldData && 'data' in oldData
-              ? {
-                  ...oldData,
-                  data: updatedWishes,
-                  pagination: {
-                    ...oldData.pagination,
-                    total: updatedWishes.length,
-                  },
-                }
-              : {
-                  success: true,
-                  data: updatedWishes,
-                  pagination: {
-                    total: updatedWishes.length,
-                    page: 1,
-                    limit: updatedWishes.length,
-                    totalPages: 1,
-                  },
-                };
+        // Thêm wish mới vào cuối danh sách trong cache ngay lập tức để hiển thị
+        // Cho useInfiniteQuery, chúng ta thêm vào cuối trang cuối cùng
+        queryClient.setQueryData(['highlighted-wishes-share-note-infinite'], (oldData: InfiniteData<WishPage> | undefined) => {
+          if (!oldData) return oldData;
           
-          return newCacheData;
+          const newPages = [...oldData.pages];
+          const lastPageIndex = newPages.length - 1;
+          const lastPage = newPages[lastPageIndex];
+          
+          if (!lastPage) return oldData;
+          
+          newPages[lastPageIndex] = {
+            ...lastPage,
+            data: [...lastPage.data, newWish],
+            pagination: {
+              ...lastPage.pagination,
+              total: (lastPage.pagination?.total || 0) + 1
+            }
+          };
+          
+          return {
+            ...oldData,
+            pages: newPages,
+          };
         });
 
-        // Fetch data từ server và merge note mới nếu chưa có trong response
-        // Sử dụng fetchQuery để có thể xử lý response trước khi update cache
-        apiClient.getHighlightedWishes()
-          .then((serverData: Wish[] | { success?: boolean; data: Wish[]; pagination?: { total?: number; page?: number; limit?: number; totalPages?: number } } | undefined) => {
-            // Normalize server response structure
-            const serverWishes: Wish[] = Array.isArray(serverData)
-              ? serverData
-              : Array.isArray(serverData?.data)
-                ? serverData.data
-                : [];
-
-            // Kiểm tra xem note mới đã có trong response từ server chưa
-            const wishExists = serverWishes.some(wish => wish.id === wishId);
-            
-            // Nếu note đã có trong server, xóa isFromCache vì nó đã được lấy từ server
-            // Nếu chưa có, merge note mới với isFromCache: true vào cuối
-            const finalWishes = wishExists 
-              ? serverWishes.map(wish => 
-                  wish.id === wishId 
-                    ? { ...wish, isFromCache: false } // Xóa flag isFromCache vì đã có từ server
-                    : wish
-                )
-              : [...serverWishes, newWish]; // Giữ isFromCache: true cho note mới
-
-            // Update cache với data đã merge
-            const cacheData = Array.isArray(serverData)
-              ? {
-                  success: true,
-                  data: finalWishes,
-                  pagination: {
-                    total: finalWishes.length,
-                    page: 1,
-                    limit: finalWishes.length,
-                    totalPages: 1,
-                  },
-                }
-              : serverData && 'data' in serverData
-                ? {
-                    ...serverData,
-                    data: finalWishes,
-                    pagination: {
-                      ...serverData.pagination,
-                      total: finalWishes.length,
-                    },
-                  }
-                : {
-                    success: true,
-                    data: finalWishes,
-                    pagination: {
-                      total: finalWishes.length,
-                      page: 1,
-                      limit: finalWishes.length,
-                      totalPages: 1,
-                    },
-                  };
-
-            queryClient.setQueryData(['highlighted-wishes-share-note'], cacheData);
-          })
-          .catch((error) => {
-            console.error('❌ [ShareNoteSection] Error fetching highlighted wishes:', error);
-            // Nếu lỗi, vẫn giữ note mới trong cache
-          });
+        // Invalidate để đảm bảo data từ server đồng bộ, nhưng cho phép UI cập nhật ngay
+        setTimeout(() => {
+          queryClient.invalidateQueries({ queryKey: ['highlighted-wishes-share-note-infinite'] });
+        }, 2000);
       }
 
       // Track note complete (funnel step 3)
@@ -340,50 +367,6 @@ export function ShareNoteSection() {
     },
   });
 
-
-  // Auto scroll notes loop
-  useEffect(() => {
-    const scrollContainer = notesScrollRef.current;
-    if (!scrollContainer) return;
-
-    let scrollInterval: NodeJS.Timeout;
-    let isResetting = false;
-
-    const startAutoScroll = () => {
-      scrollInterval = setInterval(() => {
-        if (!scrollContainer || isResetting) return;
-
-        const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
-        const currentScroll = scrollContainer.scrollTop;
-        const scrollStep = 0.5; // Pixels to scroll per interval
-
-        if (currentScroll >= maxScroll - 5) {
-          // Reset to top for loop
-          isResetting = true;
-          scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-          setTimeout(() => {
-            isResetting = false;
-          }, 500);
-        } else {
-          scrollContainer.scrollTop += scrollStep;
-        }
-      }, 16); // Scroll every 16ms (~60fps)
-    };
-
-    // Start scrolling after a short delay
-    const timeout = setTimeout(() => {
-      startAutoScroll();
-    }, 1000);
-
-    return () => {
-      if (scrollInterval) {
-        clearInterval(scrollInterval);
-      }
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, []);
 
   // Update modal background size for mobile with debounce
   useEffect(() => {
@@ -830,15 +813,12 @@ export function ShareNoteSection() {
             </div>
           </div>
 
-          {/* Right: Highlighted Notes - Scrollable */}
+          {/* Right: Highlighted Notes - Scrollable with Virtuoso */}
           <div 
-            ref={notesScrollRef}
-            className="space-y-8 h-full max-h-[600px] lg:max-h-[700px] 2xl:max-h-[900px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:hidden"
-            style={{ 
-              scrollBehavior: 'smooth',
-              scrollbarWidth: 'none', /* Firefox */
-              msOverflowStyle: 'none', /* IE and Edge */
-            }}
+            className="h-[600px] lg:h-[700px] 2xl:h-[900px] w-full pr-2"
+            onWheel={handleUserInteraction}
+            onTouchStart={handleUserInteraction}
+            onMouseDown={handleUserInteraction}
           >
             {isLoadingWishes ? (
               <div className="flex items-center justify-center py-12">
@@ -851,60 +831,27 @@ export function ShareNoteSection() {
                 </div>
               </div>
             ) : (
-              wishes.map((wish: Wish, index: number) => (
-                <div
-                  key={wish.id || index}
-                  className={`backdrop-blur-sm rounded-lg p-6 border border-white/30 relative w-[80%] ${
-                    index % 2 === 0 ? 'ml-[20%]' : ''
-                  }`}
-                  style={{ backgroundColor: '#FFFFFF1A' }}
-                >
-                  {/* Quote Mark - Top Left */}
-                  <div className="absolute top-[-10px] md:top-[-20px] left-3">
-                    <Image
-                      src="/icons/quotemark_white.svg"
-                      alt="Quote mark"
-                      width={40}
-                      height={40}
-                      className="object-contain w-6 h-6 md:w-10 md:h-10"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3 mb-3 pt-4">
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-300">
-                      {wish.user?.avatarUrl ? (
-                        <Image
-                          src={wish.user.avatarUrl}
-                          alt={wish.user?.name || 'User avatar'}
-                          fill
-                          className="object-cover"
-                          sizes="40px"
-                        />
-                      ) : (
-                        <Image
-                          src="/thuthachnhipsong/slide_example.png"
-                          alt="Default avatar"
-                          fill
-                          className="object-cover"
-                          sizes="40px"
-                        />
-                      )}
+              <Virtuoso
+                ref={virtuosoRef}
+                data={wishes}
+                endReached={() => {
+                  if (hasNextPage && !isFetchingNextPage) {
+                    fetchNextPage();
+                  }
+                }}
+                className="[&::-webkit-scrollbar]:hidden"
+                style={{ height: '100%', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                itemContent={(index, wish) => (
+                  <WishCard wish={wish} index={index} />
+                )}
+                components={{
+                  Footer: () => isFetchingNextPage ? (
+                    <div className="flex items-center justify-center py-4">
+                      <div className="text-white text-xs">Đang tải thêm...</div>
                     </div>
-                    <span 
-                      className="font-medium text-sm" 
-                      style={{ 
-                        color: wish.isFromCache
-                          ? '#FFD700' // Màu vàng cho note mới tạo từ cache
-                          : '#FFFFFF' // Màu trắng cho note từ server
-                      }}
-                    >
-                      {wish.user?.name || 'Người dùng ẩn danh'}
-                    </span>
-                  </div>
-                  <div className="text-sm leading-relaxed" style={{ color: '#FFFFFF' }}>
-                    {wish.content}
-                  </div>
-                </div>
-              ))
+                  ) : null
+                }}
+              />
             )}
           </div>
         </div>
