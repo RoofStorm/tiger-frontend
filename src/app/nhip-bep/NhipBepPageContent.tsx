@@ -115,6 +115,7 @@ const baseProducts: Product[] = [
     image: '/nhipbep/binhthuydien.png',
     label: 'Bình thủy điện',
     fullName: 'Bình thủy điện TIGER',
+    branding: '4 mức nhiệt linh hoạt giúp bình thủy điện TIGER đáp ứng trọn vẹn nhu cầu nước nóng trong sinh hoạt gia đình hằng ngày.',
     tips: [
       'Dùng đúng mức nhiệt cho từng nhu cầu như 70°C pha sữa, 80°C pha trà, 90°C pha cà phê, 98°C nấu mì giúp đồ uống giữ trọn hương vị.',
       'Hẹn giờ đun nước từ tối để sáng có sẵn nước nóng dùng ngay, tiết kiệm thời gian cho sinh hoạt buổi sáng bận rộn.',
@@ -150,6 +151,7 @@ const baseProducts: Product[] = [
     image: '/nhipbep/binhthuychua.png',
     label: 'Bình thủy chứa',
     fullName: 'Bình thủy chứa TIGER',
+    branding: 'Cấu trúc chân không bền bỉ giúp phích nước TIGER giữ nhiệt ổn định, đáp ứng nhu cầu nước nóng sinh hoạt gia đình mỗi ngày.',
     tips: [
       'Tráng ruột phích bằng nước sôi rồi lắc nhẹ trước khi dùng giúp làm nóng thành phích, giữ nhiệt tốt hơn và hạn chế sốc nhiệt khi rót nước nóng.',
       'Kiểm tra định kỳ khả năng giữ nhiệt bằng cách sờ vào thân phích sau khi đổ nước sôi; nếu vỏ ngoài nóng bất thường, ruột phích có thể đã hỏng.',
@@ -161,6 +163,7 @@ const baseProducts: Product[] = [
     image: '/nhipbep/hopcom.png',
     label: 'Hộp cơm',
     fullName: 'Hộp đựng cơm TIGER',
+    branding: 'Hộp giữ nhiệt TIGER với cấu trúc chân không giúp bữa trưa mang theo luôn ấm nóng và tròn vị khi dùng.',
     tips: [
       'Tráng hộp bằng nước nóng trước khi cho cơm vào giúp thành hộp ổn nhiệt nhanh, cơm giữ ấm lâu hơn trong suốt buổi trưa.',
       'Để món có nước sốt ở ngăn riêng giúp cơm không bị nhão, hạt vẫn tơi và dễ ăn khi mở hộp.',
