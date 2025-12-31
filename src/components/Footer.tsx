@@ -279,7 +279,7 @@ export function Footer() {
             />
           </Link>
           <Link
-            href="https://www.youtube.com/playlist?list=PLWZD9SRMWifAhasnLWwID_8f-JYDcD5tZ"
+            href="https://www.youtube.com/@TIGERCorporationVietNam"
             className="hover:opacity-80 transition-opacity"
             aria-label="YouTube"
           >
@@ -317,6 +317,11 @@ export function Footer() {
               className="w-13 h-13"
             />
           </Link>
+        </div>
+
+        {/* Copyright */}
+        <div className="text-center mt-8" style={{ ...footerLinkStyle, fontSize: '14px', color: '#DCDCDC' }}>
+          Bản quyền © TIGER CORPORATION
         </div>
       </div>
     </footer>
