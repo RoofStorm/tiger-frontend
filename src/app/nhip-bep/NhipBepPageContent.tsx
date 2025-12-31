@@ -108,7 +108,7 @@ const baseProducts: Product[] = [
     ]
   },
   {
-    image: '/nhipbep/binhthuydien.jpg',
+    image: '/nhipbep/binhthuydien.png',
     label: 'Bình thủy điện',
     fullName: 'Bình thủy điện TIGER',
     tips: [
@@ -118,7 +118,7 @@ const baseProducts: Product[] = [
     ]
   },
   {
-    image: '/nhipbep/chaodien.jpg',
+    image: '/nhipbep/chaodien.png',
     label: 'Chảo điện',
     fullName: 'Chảo điện TIGER',
     branding: 'Thanh nhiệt chữ M và bề mặt khay chống dính của chảo điện TIGER giúp bạn làm chủ nhiệt độ, cho món ăn chín đều và trọn vị ngon.',
