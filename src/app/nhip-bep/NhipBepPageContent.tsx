@@ -71,6 +71,7 @@ interface Product {
   fullName: string;
   branding?: string;
   tips: string[];
+  buyLink: string;
 }
 
 const baseProducts: Product[] = [
@@ -83,7 +84,8 @@ const baseProducts: Product[] = [
       'Cho vài giọt dầu ăn vào gạo trước khi nấu giúp hạt cơm bóng, tơi và ít dính hơn, đặc biệt khi nấu cơm để ăn trong ngày.',
       'Nấu cháo bằng nước sôi thay vì nước lạnh giúp hạt gạo nở đều, cháo nhừ nhanh hơn và hạn chế tình trạng khét đáy nồi.',
       'Nấu cơm lười nên giảm nhẹ lượng nước so với cơm trắng vì topping tiết nước khi chín, giúp cơm dẻo vừa, không bị bở.'
-    ]
+    ],
+    buyLink: 'https://shopee.vn/tigervn_officialstore?shopCollection=110341445#product_list'
   },
   {
     image: '/nhipbep/binhgiunhiet.png',
@@ -94,7 +96,8 @@ const baseProducts: Product[] = [
       'Tráng bình bằng nước nóng hoặc lạnh trước khi dùng giúp nhiệt độ bên trong ổn định sớm, hạn chế thất thoát nhiệt khi mới rót đồ uống.',
       'Ngâm nước chanh loãng khoảng 15 phút rồi rửa lại giúp khử mùi cà phê, trà bám lâu sau nhiều lần sử dụng.',
       'Tháo gioăng nắp phơi khô riêng sau khi rửa giúp hạn chế tích mùi ẩm, giữ bình sạch mùi khi dùng hằng ngày.'
-    ]
+    ],
+    buyLink: 'https://shopee.vn/tigervn_officialstore?shopCollection=104377220#product_list'
   },
   {
     image: '/nhipbep/amdunsieutoc.png',
@@ -105,7 +108,8 @@ const baseProducts: Product[] = [
       'Không mở nắp ngay khi nước vừa sôi để tránh hơi nước phả ngược, an toàn hơn khi sử dụng trong bếp gia đình.',
       'Sau khi đun, nên đổ hết nước còn dư giúp hạn chế cặn trắng tích tụ dưới đáy khi dùng ấm thường xuyên.',
       'Định kỳ đun nước với chút giấm hoặc chanh rồi đổ đi giúp cặn canxi bong nhanh, việc vệ sinh nhẹ nhàng hơn.'
-    ]
+    ],
+    buyLink: 'https://shopee.vn/tigervn_officialstore?shopCollection=252707774#product_list'
   },
   {
     image: '/nhipbep/binhthuydien.png',
@@ -115,7 +119,8 @@ const baseProducts: Product[] = [
       'Dùng đúng mức nhiệt cho từng nhu cầu như 70°C pha sữa, 80°C pha trà, 90°C pha cà phê, 98°C nấu mì giúp đồ uống giữ trọn hương vị.',
       'Hẹn giờ đun nước từ tối để sáng có sẵn nước nóng dùng ngay, tiết kiệm thời gian cho sinh hoạt buổi sáng bận rộn.',
       'Giữ nước ở 70°C trong ngày giúp luôn có nước ấm uống liền, hạn chế phải đun lại nhiều lần khi sử dụng thường xuyên.'
-    ]
+    ],
+    buyLink: 'https://shopee.vn/tigervn_officialstore?shopCollection=252707787#product_list'
   },
   {
     image: '/nhipbep/chaodien.png',
@@ -126,7 +131,8 @@ const baseProducts: Product[] = [
       'Áp chảo thịt ở nhiệt cao rồi hạ dần giúp thịt xém mặt đẹp mà bên trong vẫn mềm, không bị khô khi nấu lâu.',
       'Chia nguyên liệu thành từng mẻ nhỏ khi nướng giúp bề mặt chín vàng đều, tránh tình trạng nguội khay khi cho quá nhiều thực phẩm cùng lúc.',
       'Cho rau củ vào sau cùng và đảo nhanh tay để giữ độ giòn và màu sắc tự nhiên, món ăn trông ngon mắt hơn khi dọn bàn.'
-    ]
+    ],
+    buyLink: 'https://shopee.vn/tigervn_officialstore?shopCollection=264796608#product_list'
   },
   {
     image: '/nhipbep/mayxay.png',
@@ -137,7 +143,8 @@ const baseProducts: Product[] = [
       'Cho đá viên nhỏ vào xay cùng trái cây giúp sinh tố mát và mịn hơn, tránh tình trạng đá to làm hỗn hợp bị lợn cợn.',
       'Xay sốt hoặc bơ hạt theo kiểu ngắt quãng giúp hỗn hợp mịn đều, hạn chế tách dầu khi xay liên tục trong thời gian dài.',
       'Giảm tốc độ ở 5-10 giây cuối khi xay giúp sinh tố đặc hơn, ít bọt khí, thành phẩm mịn và sánh hơn khi rót ra ly.'
-    ]
+    ],
+    buyLink: 'https://shopee.vn/tigervn_officialstore?shopCollection=264796598#product_list'
   },
   {
     image: '/nhipbep/binhthuychua.png',
@@ -147,7 +154,8 @@ const baseProducts: Product[] = [
       'Tráng ruột phích bằng nước sôi rồi lắc nhẹ trước khi dùng giúp làm nóng thành phích, giữ nhiệt tốt hơn và hạn chế sốc nhiệt khi rót nước nóng.',
       'Kiểm tra định kỳ khả năng giữ nhiệt bằng cách sờ vào thân phích sau khi đổ nước sôi; nếu vỏ ngoài nóng bất thường, ruột phích có thể đã hỏng.',
       'Không đổ nước quá đầy, nên chừa lại khoảng 2–3 cm dưới miệng phích để khi đậy nắp, hơi nước không trào ra ngoài.'
-    ]
+    ],
+    buyLink: 'https://shopee.vn/tigervn_officialstore?shopCollection=253124252#product_list'
   },
   {
     image: '/nhipbep/hopcom.png',
@@ -157,7 +165,8 @@ const baseProducts: Product[] = [
       'Tráng hộp bằng nước nóng trước khi cho cơm vào giúp thành hộp ổn nhiệt nhanh, cơm giữ ấm lâu hơn trong suốt buổi trưa.',
       'Để món có nước sốt ở ngăn riêng giúp cơm không bị nhão, hạt vẫn tơi và dễ ăn khi mở hộp.',
       'Thêm vài cọng hành lá tươi lên mặt cơm trước khi đóng hộp giúp hương thơm giữ lại tốt hơn, bữa trưa mở ra vẫn hấp dẫn.'
-    ]
+    ],
+    buyLink: 'https://shopee.vn/tigervn_officialstore?shopCollection=252427252#product_list'
   }
 ];
 
@@ -686,6 +695,9 @@ export function NhipBepPageContent() {
                                   productIndex: actualIndex,
                                 },
                               });
+
+                              // Open shopee link in new tab
+                              window.open(product.buyLink, '_blank');
                             }}
                             className="w-full px-4 md:px-6 py-1.5 md:py-2 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90 text-sm md:text-base"
                             style={{
@@ -932,8 +944,8 @@ export function NhipBepPageContent() {
                               },
                             });
 
-                            // Handle buy now action
-                            console.log('Mua ngay:', selectedProduct.label);
+                            // Open shopee link in new tab
+                            window.open(selectedProduct.buyLink, '_blank');
                           }}
                         >
                           Mua ngay
