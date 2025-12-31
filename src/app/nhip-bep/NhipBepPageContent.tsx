@@ -18,7 +18,7 @@ interface SlideContent {
 const slides: SlideContent[] = [
   {
     dates: '1923 – 1959',
-    subtitle: 'Khởi đầu và chứng nhận',
+    subtitle: 'Khởi đầu và Chứng nhận',
     paragraphs: [
       'Tiger bắt đầu sản xuất và kinh doanh bình chân không tại Nhật Bản.',
       'Trở thành nhà máy đầu tiên trong ngành được MITI (nay là METI) chứng nhận đạt chuẩn JIS.'
@@ -27,7 +27,7 @@ const slides: SlideContent[] = [
   },
   {
     dates: '1960 – 1970',
-    subtitle: 'Mở rộng và phát triển',
+    subtitle: 'Mở rộng và Phát triển',
     paragraphs: [
       'Kỷ niệm 45 năm thành lập, ông Takenori Kikuchi được bổ nhiệm làm Chủ tịch HĐQT, ông Yoshito Kikuchi giữ vai trò Chủ tịch Điều hành.',
       'Thành lập Tiger Bussan Co., Ltd. tại Hiroshima.',
@@ -37,7 +37,7 @@ const slides: SlideContent[] = [
   },
   {
     dates: '1980 – 1999',
-    subtitle: 'Đổi mới và tái cấu trúc',
+    subtitle: 'Đổi mới và Tái cấu trúc',
     paragraphs: [
       'Ra mắt ấm đun nước điện "Wakitate" đầu tiên.',
       'Kỷ niệm 60 năm thành lập và chính thức đổi tên thành Tiger Corporation.',
