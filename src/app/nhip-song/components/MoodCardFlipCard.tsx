@@ -15,6 +15,7 @@ interface MoodCardFlipCardProps {
   onSave: () => void;
   onShare: (cardElementRef?: React.RefObject<HTMLDivElement | null>) => void;
   onReset: () => void;
+  onClose?: () => void;
   cardNumber?: 1 | 2 | 3 | 4;
   frontCardImage?: string;
   contentCardImage?: string;
@@ -29,6 +30,7 @@ export function MoodCardFlipCard({
   onSave: _onSave, // Không sử dụng để tránh đóng modal khi download
   onShare,
   onReset,
+  onClose,
   cardNumber = 1,
   frontCardImage,
   contentCardImage,
@@ -150,7 +152,13 @@ export function MoodCardFlipCard({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
-          onClick={() => onCardFlip(false)}
+          onClick={() => {
+            if (onClose) {
+              onClose();
+            } else {
+              onCardFlip(false);
+            }
+          }}
         />
       </AnimatePresence>
 

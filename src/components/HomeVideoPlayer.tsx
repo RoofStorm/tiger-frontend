@@ -33,7 +33,7 @@ export function HomeVideoPlayer({ onVideoEnded, onSkip, videoUrl, showMuteButton
       if (!videoRef.current) return;
 
       // URL mặc định là Coner2.mp4, có thể override qua prop
-      const defaultVideoUrl = 'https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2011.mp4';
+      const defaultVideoUrl = 'https://s3.tiger-corporation-vietnam.vn/tiger-videos/tiger%2021.mp4';
       const finalVideoUrl = videoUrl || defaultVideoUrl;
 
       try {

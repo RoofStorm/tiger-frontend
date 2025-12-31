@@ -13,6 +13,7 @@ interface RewardImageModalProps {
   buttonText?: string;
   onButtonClick?: () => void;
   closeOnContentClick?: boolean;
+  contentClickTriggerButtonClick?: boolean;
   buttonClassName?: string;
 }
 
@@ -25,6 +26,7 @@ export function RewardImageModal({
   buttonText,
   onButtonClick,
   closeOnContentClick = false,
+  contentClickTriggerButtonClick = false,
   buttonClassName = '',
 }: RewardImageModalProps) {
   if (!isOpen) return null;
@@ -38,7 +40,11 @@ export function RewardImageModal({
 
   const handleContentClick = () => {
     if (closeOnContentClick) {
-      onClose();
+      if (contentClickTriggerButtonClick && onButtonClick) {
+        handleButtonClick();
+      } else {
+        onClose();
+      }
     }
   };
 
@@ -56,8 +62,9 @@ export function RewardImageModal({
           initial={{ scale: 0.95, y: 20, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.95, y: 20, opacity: 0 }}
+          whileHover={contentClickTriggerButtonClick ? { scale: 1.02, filter: 'brightness(1.05)' } : {}}
           transition={{ duration: 0.25 }}
-          className="relative max-w-xl w-full bg-transparent flex flex-col items-center"
+          className={`relative max-w-xl w-full bg-transparent flex flex-col items-center ${closeOnContentClick ? 'cursor-pointer' : ''}`}
           onClick={closeOnContentClick ? handleContentClick : (e => e.stopPropagation())}
         >
           {/* Background Image */}

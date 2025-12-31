@@ -5,6 +5,7 @@ import { EmojiSelectionSection } from './components/EmojiSelectionSection';
 import { MoodCardFlipCard } from './components/MoodCardFlipCard';
 import { ShareRegistrationModal } from './components/ShareRegistrationModal';
 import { RewardModal } from './components/RewardModal';
+import { RewardImageModal } from '@/components/RewardImageModal';
 import { useMoodCard } from '@/hooks/useMoodCard';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { useHeaderDarkMode } from '@/contexts/HeaderDarkModeContext';
@@ -40,6 +41,7 @@ export function NhipSongPageContent() {
   const [showMoodCard, setShowMoodCard] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
+  const [showChallengePopup, setShowChallengePopup] = useState(false);
   // Không set initial value từ function để tránh SSR/hydration mismatch trong production
   // Sẽ được set trong useEffect sau khi component mount trên client
   const [backgroundImage, setBackgroundImage] = useState<string>('');
@@ -126,6 +128,11 @@ export function NhipSongPageContent() {
   const handleReset = () => {
     reset();
     setShowMoodCard(false);
+  };
+
+  const handleMoodCardClose = () => {
+    setShowMoodCard(false);
+    setShowChallengePopup(true);
   };
 
   const handleSaveMoodCard = async () => {
@@ -339,7 +346,7 @@ export function NhipSongPageContent() {
         }}
         className="mt-[64px] xl:mt-[80px] flex flex-col md:block"
       >
-        <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-[64px] xl:mt-[80px] flex-1 flex flex-col ${isDark ? 'justify-start py-6' : 'justify-center md:justify-start py-6 2xl:py-12'}`}>
+        <div className={`max-w-xl mx-auto px-4 sm:px-6 lg:px-8 mt-[64px] xl:mt-[80px] flex-1 flex flex-col ${isDark ? 'justify-start py-6' : 'justify-center md:justify-start py-6 2xl:py-12'}`}>
           {!showMoodCard ? (
             <EmojiSelectionSection
               selectedEmojis={selectedEmojis}
@@ -358,6 +365,7 @@ export function NhipSongPageContent() {
                 onSave={handleSaveMoodCard}
                 onShare={handleShare}
                 onReset={handleReset}
+                onClose={handleMoodCardClose}
                 cardNumber={moodCardData.cardNumber}
                 frontCardImage={moodCardData.frontCardImage}
                 contentCardImage={moodCardData.contentCardImage}
@@ -380,6 +388,22 @@ export function NhipSongPageContent() {
         isOpen={showRewardModal}
         onClose={() => setShowRewardModal(false)}
         onNextPage={handleNextPage}
+      />
+
+      {/* Challenge Popup */}
+      <RewardImageModal
+        isOpen={showChallengePopup}
+        onClose={() => setShowChallengePopup(false)}
+        imagePath="/popup/thamgia_thuthachgiunhip.png"
+        alt="Tham gia thử thách giữ nhịp"
+        showCloseButton={false}
+        buttonText=""
+        closeOnContentClick={true}
+        contentClickTriggerButtonClick={true}
+        onButtonClick={() => {
+          setShowChallengePopup(false);
+          navigateWithLoading('/thu-thach-giu-nhip', 'Đang chuyển đến Thử thách giữ nhịp...');
+        }}
       />
     </div>
   );

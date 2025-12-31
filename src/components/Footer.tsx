@@ -292,7 +292,7 @@ export function Footer() {
             />
           </Link>
           <Link
-            href="www.tiktok.com/@tigervietnamofficial"
+            href="https://www.tiktok.com/@tigervietnamofficial"
             className="hover:opacity-80 transition-opacity"
             aria-label="Tiktok"
           >

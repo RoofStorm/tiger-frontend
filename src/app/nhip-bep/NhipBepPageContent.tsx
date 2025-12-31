@@ -69,7 +69,8 @@ interface Product {
   image: string;
   label: string;
   fullName: string;
-  benefits: string[];
+  branding?: string;
+  tips: string[];
 }
 
 const baseProducts: Product[] = [
@@ -77,50 +78,90 @@ const baseProducts: Product[] = [
     image: '/nhipbep/noicom.png',
     label: 'Nồi cơm điện',
     fullName: 'Nồi cơm điện TIGER',
-    benefits: [
-      '"Xới cơm ngay khi cơm vừa chín – hạt tơi, không khô cả ngày. Với nồi TIGER, hạt cơm được giữ ấm đều, thơm như mới nấu."',
-      '"Cho vài giọt dầu ăn vào gạo – cơm bóng và tơi hơn. Nồi TIGER giữ trọn hương thơm và độ dẻo."',
-      '"Nấu cháo nhanh bằng nước sôi – chỉ 30 phút đã nhừ. Công nghệ kiểm soát nhiệt TIGER giúp hạt gạo bung đều, không khê."'
+    branding: 'Nồi cơm điện TIGER, với áp suất kép linh hoạt và lòng nồi 9 lớp giúp bữa cơm luôn dẻo ngon, tròn vị mỗi ngày.',
+    tips: [
+      'Cho vài giọt dầu ăn vào gạo trước khi nấu giúp hạt cơm bóng, tơi và ít dính hơn, đặc biệt khi nấu cơm để ăn trong ngày.',
+      'Nấu cháo bằng nước sôi thay vì nước lạnh giúp hạt gạo nở đều, cháo nhừ nhanh hơn và hạn chế tình trạng khét đáy nồi.',
+      'Nấu cơm lười nên giảm nhẹ lượng nước so với cơm trắng vì topping tiết nước khi chín, giúp cơm dẻo vừa, không bị bở.'
     ]
   },
   {
     image: '/nhipbep/binhgiunhiet.png',
     label: 'Bình giữ nhiệt',
     fullName: 'Bình giữ nhiệt TIGER',
-    benefits: [
-      '"Giữ nhiệt độ lâu dài – đồ uống nóng vẫn nóng, đồ lạnh vẫn lạnh suốt nhiều giờ. Công nghệ chân không của TIGER đảm bảo nhiệt độ được bảo toàn tối đa."',
-      '"Thiết kế tiện lợi – dễ dàng mang theo mọi nơi, phù hợp cho công việc, du lịch hay hoạt động ngoài trời."',
-      '"An toàn và bền bỉ – chất liệu cao cấp, không chứa chất độc hại, đảm bảo sức khỏe cho người sử dụng."'
+    branding: 'Bình giữ nhiệt TIGER với cấu trúc chân không giúp đồ uống giữ nóng lạnh ổn định, trọn vị suốt cả ngày dài.',
+    tips: [
+      'Tráng bình bằng nước nóng hoặc lạnh trước khi dùng giúp nhiệt độ bên trong ổn định sớm, hạn chế thất thoát nhiệt khi mới rót đồ uống.',
+      'Ngâm nước chanh loãng khoảng 15 phút rồi rửa lại giúp khử mùi cà phê, trà bám lâu sau nhiều lần sử dụng.',
+      'Tháo gioăng nắp phơi khô riêng sau khi rửa giúp hạn chế tích mùi ẩm, giữ bình sạch mùi khi dùng hằng ngày.'
+    ]
+  },
+  {
+    image: '/nhipbep/amdunsieutoc.png',
+    label: 'Ấm đun siêu tốc',
+    fullName: 'Ấm đun siêu tốc TIGER',
+    branding: 'Thiết kế miệng rộng và cơ chế tự ngắt an toàn giúp ấm đun siêu tốc TIGER dễ vệ sinh và an tâm sử dụng trong sinh hoạt hằng ngày.',
+    tips: [
+      'Không mở nắp ngay khi nước vừa sôi để tránh hơi nước phả ngược, an toàn hơn khi sử dụng trong bếp gia đình.',
+      'Sau khi đun, nên đổ hết nước còn dư giúp hạn chế cặn trắng tích tụ dưới đáy khi dùng ấm thường xuyên.',
+      'Định kỳ đun nước với chút giấm hoặc chanh rồi đổ đi giúp cặn canxi bong nhanh, việc vệ sinh nhẹ nhàng hơn.'
+    ]
+  },
+  {
+    image: '/nhipbep/binhthuydien.jpg',
+    label: 'Bình thủy điện',
+    fullName: 'Bình thủy điện TIGER',
+    tips: [
+      'Dùng đúng mức nhiệt cho từng nhu cầu như 70°C pha sữa, 80°C pha trà, 90°C pha cà phê, 98°C nấu mì giúp đồ uống giữ trọn hương vị.',
+      'Hẹn giờ đun nước từ tối để sáng có sẵn nước nóng dùng ngay, tiết kiệm thời gian cho sinh hoạt buổi sáng bận rộn.',
+      'Giữ nước ở 70°C trong ngày giúp luôn có nước ấm uống liền, hạn chế phải đun lại nhiều lần khi sử dụng thường xuyên.'
+    ]
+  },
+  {
+    image: '/nhipbep/chaodien.jpg',
+    label: 'Chảo điện',
+    fullName: 'Chảo điện TIGER',
+    branding: 'Thanh nhiệt chữ M và bề mặt khay chống dính của chảo điện TIGER giúp bạn làm chủ nhiệt độ, cho món ăn chín đều và trọn vị ngon.',
+    tips: [
+      'Áp chảo thịt ở nhiệt cao rồi hạ dần giúp thịt xém mặt đẹp mà bên trong vẫn mềm, không bị khô khi nấu lâu.',
+      'Chia nguyên liệu thành từng mẻ nhỏ khi nướng giúp bề mặt chín vàng đều, tránh tình trạng nguội khay khi cho quá nhiều thực phẩm cùng lúc.',
+      'Cho rau củ vào sau cùng và đảo nhanh tay để giữ độ giòn và màu sắc tự nhiên, món ăn trông ngon mắt hơn khi dọn bàn.'
+    ]
+  },
+  {
+    image: '/nhipbep/mayxay.png',
+    label: 'Máy xay sinh tố',
+    fullName: 'Máy xay sinh tố TIGER',
+    branding: 'Lưỡi xay 6 cạnh và dải tốc độ linh hoạt của máy xay sinh tố TIGER giúp bạn kiểm soát độ mịn, cho thành phẩm sánh đều và trọn vị.',
+    tips: [
+      'Cho đá viên nhỏ vào xay cùng trái cây giúp sinh tố mát và mịn hơn, tránh tình trạng đá to làm hỗn hợp bị lợn cợn.',
+      'Xay sốt hoặc bơ hạt theo kiểu ngắt quãng giúp hỗn hợp mịn đều, hạn chế tách dầu khi xay liên tục trong thời gian dài.',
+      'Giảm tốc độ ở 5-10 giây cuối khi xay giúp sinh tố đặc hơn, ít bọt khí, thành phẩm mịn và sánh hơn khi rót ra ly.'
+    ]
+  },
+  {
+    image: '/nhipbep/binhthuychua.png',
+    label: 'Bình thủy chứa',
+    fullName: 'Bình thủy chứa TIGER',
+    tips: [
+      'Tráng ruột phích bằng nước sôi rồi lắc nhẹ trước khi dùng giúp làm nóng thành phích, giữ nhiệt tốt hơn và hạn chế sốc nhiệt khi rót nước nóng.',
+      'Kiểm tra định kỳ khả năng giữ nhiệt bằng cách sờ vào thân phích sau khi đổ nước sôi; nếu vỏ ngoài nóng bất thường, ruột phích có thể đã hỏng.',
+      'Không đổ nước quá đầy, nên chừa lại khoảng 2–3 cm dưới miệng phích để khi đậy nắp, hơi nước không trào ra ngoài.'
     ]
   },
   {
     image: '/nhipbep/hopcom.png',
     label: 'Hộp cơm',
-    fullName: 'Hộp cơm TIGER',
-    benefits: [
-      '"Giữ thức ăn nóng lâu – công nghệ cách nhiệt hiện đại giúp thức ăn giữ được độ nóng và hương vị như mới nấu."',
-      '"Thiết kế gọn nhẹ – dễ dàng mang theo, phù hợp cho bữa trưa tại văn phòng hay các chuyến đi chơi."',
-      '"Dễ dàng vệ sinh – chất liệu chống dính, không bám mùi, dễ dàng làm sạch sau khi sử dụng."'
-    ]
-  },
-  {
-    image: '/nhipbep/mayxay.png',
-    label: 'Máy xay',
-    fullName: 'Máy xay TIGER',
-    benefits: [
-      '"Xay nhuyễn mịn – công suất mạnh mẽ, xay được nhiều loại thực phẩm từ rau củ đến đá viên một cách dễ dàng."',
-      '"An toàn và tiện lợi – thiết kế chống trượt, dễ sử dụng và vệ sinh, phù hợp cho mọi gia đình."',
-      '"Bền bỉ và hiệu quả – động cơ mạnh mẽ, lưỡi dao sắc bén, đảm bảo hiệu suất làm việc lâu dài."'
+    fullName: 'Hộp đựng cơm TIGER',
+    tips: [
+      'Tráng hộp bằng nước nóng trước khi cho cơm vào giúp thành hộp ổn nhiệt nhanh, cơm giữ ấm lâu hơn trong suốt buổi trưa.',
+      'Để món có nước sốt ở ngăn riêng giúp cơm không bị nhão, hạt vẫn tơi và dễ ăn khi mở hộp.',
+      'Thêm vài cọng hành lá tươi lên mặt cơm trước khi đóng hộp giúp hương thơm giữ lại tốt hơn, bữa trưa mở ra vẫn hấp dẫn.'
     ]
   }
 ];
 
-// Duplicate to have 9 products
-const products: Product[] = [
-  ...baseProducts,
-  ...baseProducts,
-  baseProducts[0] // Add one more to make 9 total
-];
+const products: Product[] = baseProducts;
 
 // Helper function to get background image for product card based on index
 const getProductBackgroundImage = (index: number): string => {
@@ -504,8 +545,9 @@ export function NhipBepPageContent() {
               {/* Body Text */}
               <div className="text-center max-w-3xl mx-auto">
                 <p className="text-base md:text-lg text-gray-800 font-sans leading-relaxed">
-                  &quot;Từ chiếc bình giữ nhiệt đầu tiên năm 1923, TIGER đã không ngừng sáng tạo – để giữ ấm, giữ trọn, giữ nhịp sống qua từng sản phẩm.“Từ chiếc bình giữ nhiệt đầu tiên năm 1923, TIGER đã không ngừng sáng tạo – để giữ ấm, giữ trọn, giữ nhịp sống qua từng sản phẩm.&quot;
+                  &quot;Từ chiếc bình giữ nhiệt đầu tiên năm 1923, TIGER đã không ngừng sáng tạo
                 </p>
+                <p>để giữ ấm, giữ trọn, giữ nhịp sống qua từng sản phẩm.&quot;</p>
               </div>
             </div>
           </div>
@@ -574,8 +616,7 @@ export function NhipBepPageContent() {
               {/* Carousel Container */}
               <div className="relative overflow-hidden">
                 <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentProductSlide * (100 / (isMobile ? 1 : 4))}%)` }}>
-                  {/* Duplicate products for seamless infinite scroll */}
-                  {[...products, ...products.slice(0, 4)].map((product, index) => {
+                  {products.map((product, index) => {
                     // Calculate the actual product index (for background selection)
                     const actualIndex = index % products.length;
                     const backgroundImage = getProductBackgroundImage(actualIndex);
@@ -782,7 +823,7 @@ export function NhipBepPageContent() {
                       transition={{ delay: 1.2, duration: 0.6, ease: 'easeOut' }}
                     >
                       {/* Product Image Section */}
-                      <div className="relative px-6 pt-8 pb-4 flex justify-center items-center">
+                      <div className="relative px-6 pt-6 pb-1 flex justify-center items-center">
                         <motion.div 
                           className="relative w-full max-w-[180px] aspect-square"
                           initial={{ scale: 0.8, opacity: 0 }}
@@ -811,26 +852,39 @@ export function NhipBepPageContent() {
                         >
                           {selectedProduct.fullName}
                         </motion.h2>
+
+                        {/* Product Branding */}
+                        {selectedProduct.branding && (
+                          <motion.p
+                            className="mt-1 text-center font-nunito text-xs md:text-sm font-medium leading-relaxed"
+                            style={{ color: '#00579F' }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1.5, duration: 0.5, ease: 'easeOut' }}
+                          >
+                            {selectedProduct.branding}
+                          </motion.p>
+                        )}
                       </div>
                     </motion.div>
 
-                    {/* Bottom Section - Benefits and Button */}
+                    {/* Bottom Section - Tips and Button */}
                     <motion.div 
                       className="flex-shrink-0"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.5, duration: 0.6, ease: 'easeOut' }}
+                      transition={{ delay: 1.6, duration: 0.6, ease: 'easeOut' }}
                     >
-                      {/* Product Benefits */}
+                      {/* Product Tips */}
                       <div className="px-6 pt-2 pb-4 space-y-3">
-                        {selectedProduct.benefits.map((benefit, index) => (
+                        {selectedProduct.tips.map((tip, index) => (
                           <motion.div 
                             key={index} 
-                            className="flex items-start gap-4"
+                            className="flex items-start justify-center gap-3 text-center"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ 
-                              delay: 1.6 + index * 0.1, 
+                              delay: 1.7 + index * 0.1, 
                               duration: 0.5, 
                               ease: 'easeOut' 
                             }}
@@ -840,17 +894,17 @@ export function NhipBepPageContent() {
                               <Image
                                 src="/icons/check_circle.svg"
                                 alt="Check"
-                                width={20}
-                                height={20}
+                                width={18}
+                                height={18}
                                 className="object-contain"
                               />
                             </div>
-                            {/* Benefit Text */}
+                            {/* Tip Text */}
                             <p 
-                              className="flex-1 font-nunito text-sm leading-relaxed"
+                              className="font-nunito text-sm leading-relaxed"
                               style={{ color: '#00579F' }}
                             >
-                              {benefit}
+                              {tip}
                             </p>
                           </motion.div>
                         ))}
