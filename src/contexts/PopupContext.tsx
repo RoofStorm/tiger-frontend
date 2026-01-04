@@ -14,6 +14,7 @@ export interface MonthlyRankWinPayload extends Notification {
 
 export interface DailyLoginPayload {
   points: number;
+  notificationId?: string;
 }
 
 export type PopupItem = 

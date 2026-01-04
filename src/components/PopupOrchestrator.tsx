@@ -14,6 +14,8 @@ export function PopupOrchestrator() {
   const handleClose = async () => {
     if (currentPopup.type === 'MONTHLY_RANK_WIN' && currentPopup.payload.id) {
       await markAsRead(currentPopup.payload.id);
+    } else if (currentPopup.type === 'DAILY_LOGIN' && currentPopup.payload.notificationId) {
+      await markAsRead(currentPopup.payload.notificationId);
     }
     closeCurrent();
   };

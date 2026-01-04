@@ -16,6 +16,7 @@ import { NotificationProvider } from '@/contexts/NotificationContext';
 import { PopupProvider } from '@/contexts/PopupContext';
 import { PopupOrchestrator } from '@/components/PopupOrchestrator';
 import { NotificationPopupManager } from '@/components/NotificationPopupManager';
+import { DailyLoginModalProvider } from '@/components/DailyLoginModalProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -63,6 +64,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                           <LoadingOverlay />
                           <Toaster />
                           <NotificationPopupManager />
+                          <DailyLoginModalProvider />
                           <PopupOrchestrator />
                         </ShareRegistrationModalProvider>
                       </ShareFacebookModalProvider>

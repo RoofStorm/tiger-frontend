@@ -183,7 +183,10 @@ export function useNextAuth(): UseNextAuthReturn {
     try {
       // Clear all auth-related data from localStorage
       // Tokens are stored in NextAuth session, will be cleared by signOut()
+      // We also clear them from localStorage in case they were set by older versions
       localStorage.removeItem('userId');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       localStorage.removeItem('dailyLoginModalShown');
       localStorage.removeItem('dailyLoginModalShownDate');
       localStorage.removeItem('hasWatchedVideo');
@@ -191,7 +194,7 @@ export function useNextAuth(): UseNextAuthReturn {
       // Clear session-related data
       sessionStorage.removeItem('previousAuthStatus');
 
-      // Reset analytics session
+      // Reset analytics session (this will clear the old ID and generate a new anonymous one)
       const { Analytics } = await import('@/lib/analytics');
       Analytics.resetSession();
 
