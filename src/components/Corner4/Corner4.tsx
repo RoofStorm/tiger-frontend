@@ -7,11 +7,6 @@ import { Gift, Star, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Reward, CreateRedeemData } from '@/types';
 
-interface UserRedeem {
-  id: string;
-  rewardId: string;
-  status: string;
-}
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -50,55 +45,22 @@ export function Corner4() {
   const rewards = Array.isArray(rewardsData?.data?.data)
     ? rewardsData.data.data.sort((a: Reward, b: Reward) => {
         // Sort by points required (smallest to largest)
-        const aPoints = a.lifeRequired
-          ? a.lifeRequired * 1000
-          : a.pointsRequired;
-        const bPoints = b.lifeRequired
-          ? b.lifeRequired * 1000
-          : b.pointsRequired;
-        return aPoints - bPoints;
+        return a.pointsRequired - b.pointsRequired;
       })
     : [];
-
-  // Fetch user's redeem history
-  const { data: redeemHistory } = useQuery({
-    queryKey: ['redeemHistory', user?.id],
-    queryFn: () => apiClient.getRedeemHistory(),
-    enabled: isAuthenticated,
-  });
-
-  const userRedeems = Array.isArray(redeemHistory?.data?.redeems)
-    ? redeemHistory.data.redeems
-    : [];
-
-  // Function to calculate remaining redeem count for a reward
-  const getRemainingRedeems = (reward: Reward) => {
-    if (!reward.maxPerUser) {
-      return null; // No limit
-    }
-
-    const redeemedCount = userRedeems.filter(
-      (redeem: UserRedeem) =>
-        redeem.rewardId === reward.id &&
-        (redeem.status === 'PENDING' ||
-          redeem.status === 'APPROVED' ||
-          redeem.status === 'DELIVERED')
-    ).length;
-
-    return {
-      used: redeemedCount,
-      max: reward.maxPerUser,
-      remaining: Math.max(0, reward.maxPerUser - redeemedCount),
-    };
-  };
 
   // Redeem mutation
   const redeemMutation = useMutation({
     mutationFn: (data: CreateRedeemData) => apiClient.createRedeemRequest(data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      const reward = rewards.find((r: Reward) => r.id === variables.rewardId);
+      const isMonthlyRank = reward?.rewardCategory === 'MONTHLY_RANK';
+
       queryClient.invalidateQueries({ queryKey: ['auth'] });
       queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
       queryClient.invalidateQueries({ queryKey: ['redeemHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['rewards'] });
+      
       setShowRedeemModal(false);
       setSelectedReward(null);
       setRedeemForm({
@@ -106,16 +68,22 @@ export function Corner4() {
         receiverPhone: '',
         receiverAddress: '',
       });
+      
       toast({
-        title: 'Đã gửi yêu cầu đổi quà!',
-        description: 'Yêu cầu của bạn đang được xử lý.',
+        title: isMonthlyRank
+          ? 'Bạn đã nhận giải thành công 🎉'
+          : 'Đã gửi yêu cầu đổi quà!',
+        description: isMonthlyRank
+          ? 'Phần thưởng sẽ được gửi sau khi chúng tôi xác nhận thông tin.'
+          : 'Yêu cầu của bạn đang được xử lý.',
         duration: 3000,
       });
     },
-    onError: () => {
+    onError: (error: unknown) => {
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Không thể gửi yêu cầu. Vui lòng thử lại.';      
       toast({
         title: 'Lỗi',
-        description: 'Không thể gửi yêu cầu. Vui lòng thử lại.',
+        description: errorMessage,
         variant: 'destructive',
         duration: 4000,
       });
@@ -126,37 +94,21 @@ export function Corner4() {
     if (!isAuthenticated) {
       toast({
         title: 'Cần đăng nhập',
-        description: 'Vui lòng đăng nhập để đổi quà.',
+        description: 'Vui lòng đăng nhập để thực hiện.',
         variant: 'destructive',
         duration: 4000,
       });
       return;
     }
 
-    const userPoints = userDetails?.points || 0;
-
-    // Kiểm tra đủ điểm/nhịp sống
-    if (reward.lifeRequired && reward.lifeRequired > 0) {
-      const userLife = Math.floor(userPoints / 1000);
-      if (userLife < reward.lifeRequired) {
-        toast({
-          title: 'Không đủ Nhịp sống',
-          description: `Bạn cần ${reward.lifeRequired} Nhịp sống để đổi quà này. (Hiện tại: ${userLife} Nhịp sống)`,
-          variant: 'destructive',
-          duration: 4000,
-        });
-        return;
-      }
-    } else if (reward.pointsRequired > 0) {
-      if (userPoints < reward.pointsRequired) {
-        toast({
-          title: 'Không đủ điểm',
-          description: `Bạn cần ${reward.pointsRequired} điểm năng lượng để đổi quà này. (Hiện tại: ${userPoints} điểm)`,
-          variant: 'destructive',
-          duration: 4000,
-        });
-        return;
-      }
+    if (!reward.canRedeem) {
+      toast({
+        title: 'Không khả dụng',
+        description: 'Bạn không đủ điều kiện để nhận phần quà này.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
     }
 
     setSelectedReward(reward);
@@ -176,27 +128,7 @@ export function Corner4() {
 
   const canRedeem = (reward: Reward) => {
     if (!isAuthenticated) return false;
-
-    const userPoints = userDetails?.points || 0;
-
-    // Kiểm tra giới hạn số lần đổi
-    const remainingRedeems = getRemainingRedeems(reward);
-    if (remainingRedeems && remainingRedeems.remaining <= 0) {
-      return false;
-    }
-
-    // Nếu cần Nhịp sống
-    if (reward.lifeRequired && reward.lifeRequired > 0) {
-      const userLife = Math.floor(userPoints / 1000);
-      return userLife >= reward.lifeRequired;
-    }
-
-    // Nếu cần điểm năng lượng
-    if (reward.pointsRequired > 0) {
-      return userPoints >= reward.pointsRequired;
-    }
-
-    return false;
+    return reward.isActive && reward.canRedeem;
   };
 
   return (
@@ -216,10 +148,10 @@ export function Corner4() {
             className="space-y-6"
           >
             <h2 className="font-prata text-4xl md:text-5xl mb-6" style={{ color: '#00579F' }}>
-              Trao đổi nhịp sống
+              Trao đổi điểm năng lượng
             </h2>
             <p className="text-gray-700 max-w-3xl mx-auto text-center leading-relaxed font-noto-sans" style={{ fontSize: '16px' }}>
-              Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình giữ nhịp sống. Đổi điểm để nhận về những món quà từ TIGER – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
+              Điểm &quot;năng lượng&quot; bạn tích lũy chính là những dấu mốc nhỏ trong hành trình của mình. Đổi điểm để nhận về những món quà từ TIGER – như một lời nhắc: bạn xứng đáng được chăm sóc mỗi ngày.
             </p>
 
             {/* Temporarily hidden */}
@@ -228,18 +160,12 @@ export function Corner4() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.4 }}
-                className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6"
+                className="flex items-center justify-center"
               >
                 <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-yellow-100 to-amber-100 px-8 py-4 rounded-full shadow-lg">
                   <Gift className="w-8 h-8 text-yellow-600" />
                   <span className="text-2xl font-bold text-yellow-800">
                     {userDetails?.points || 0} điểm năng lượng
-                  </span>
-                </div>
-                <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-green-100 to-emerald-100 px-8 py-4 rounded-full shadow-lg">
-                  <Star className="w-8 h-8 text-green-600" />
-                  <span className="text-2xl font-bold text-green-800">
-                    {Math.floor((userDetails?.points || 0) / 1000)} Nhịp sống
                   </span>
                 </div>
               </motion.div>
@@ -328,9 +254,7 @@ export function Corner4() {
                 // Extract voucher value from reward name (e.g., "50K", "100K")
                 const voucherMatch = reward.name.match(/(\d+K|\d+k)/i);
                 const voucherValue = voucherMatch ? voucherMatch[1].toUpperCase() : 'VOUCHER';
-                const pointsRequired = reward.lifeRequired 
-                  ? reward.lifeRequired * 1000 
-                  : reward.pointsRequired;
+                const pointsRequired = reward.pointsRequired;
 
                 return (
                   <motion.div
@@ -400,9 +324,9 @@ export function Corner4() {
                             }}
                           >
                             {reward.id === 'voucher-1000k' 
-                              ? 'Dành cho Top 1 nhịp sống được lan toả nhất (giới hạn 1 lần/user)'
+                              ? 'Dành cho Top 1 Thử thách được lan toả nhất (giới hạn 1 lần/user)'
                               : reward.id === 'voucher-500k'
-                              ? 'Dành cho Top 2 nhịp sống được lan toả nhất (giới hạn 1 lần/user)'
+                              ? 'Dành cho Top 2 Thử thách được lan toả nhất (giới hạn 1 lần/user)'
                               : 'Cho sản phẩm TIGER (giới hạn 3 lần/user)'
                             }
                           </p>
@@ -542,7 +466,7 @@ export function Corner4() {
                 </ul>
               </motion.div>
 
-              {/* Section 2: Đổi Nhịp sống -> Quà tặng đến từ TIGER */}
+              {/* Section 2: Đổi Điểm năng lượng -> Quà tặng đến từ TIGER */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -559,7 +483,7 @@ export function Corner4() {
                     marginBottom: '16px',
                   }}
                 >
-                  2. Đổi Nhịp sống → Quà tặng đến từ TIGER
+                  2. Đổi Điểm năng lượng → Quà tặng đến từ TIGER
                 </h3>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
@@ -577,7 +501,7 @@ export function Corner4() {
                 </ul>
               </motion.div>
 
-              {/* Section 3: Phần thưởng cho nhịp sống được lan toả nhất tại Lunchbox Challenge */}
+              {/* Section 3: Phần thưởng cho Thử thách giữ nhịp được lan toả nhất tại Lunchbox Challenge */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -594,7 +518,7 @@ export function Corner4() {
                     marginBottom: '16px',
                   }}
                 >
-                  3. Phần thưởng cho nhịp sống được lan toả nhất tại Lunchbox Challenge
+                  3. Phần thưởng cho Thử thách giữ nhịp được lan toả nhất tại Lunchbox Challenge
                 </h3>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
@@ -658,17 +582,21 @@ export function Corner4() {
             >
               <div className="text-center mb-8">
                 <h3 className="text-3xl font-bold text-gray-900 mb-2">
-                  Đổi quà
+                  {selectedReward.rewardCategory === 'MONTHLY_RANK' ? 'Nhận giải thưởng' : 'Đổi quà'}
                 </h3>
                 <p className="text-gray-600 text-lg">{selectedReward.name}</p>
-                <div className="inline-flex items-center space-x-2 bg-yellow-100 px-4 py-2 rounded-full mt-4">
-                  <Star className="w-5 h-5 text-yellow-600 fill-current" />
-                  <span className="font-bold text-yellow-800">
-                    {selectedReward.lifeRequired
-                      ? `${selectedReward.lifeRequired} Nhịp sống`
-                      : `${selectedReward.pointsRequired} điểm năng lượng`}
-                  </span>
-                </div>
+                {selectedReward.rewardCategory === 'MONTHLY_RANK' ? (
+                  <p className="text-blue-600 font-medium mt-2">
+                    Bạn là người thắng giải tháng này. Phần thưởng sẽ được gửi sau khi bạn xác nhận thông tin.
+                  </p>
+                ) : (
+                  <div className="inline-flex items-center space-x-2 bg-yellow-100 px-4 py-2 rounded-full mt-4">
+                    <Star className="w-5 h-5 text-yellow-600 fill-current" />
+                    <span className="font-bold text-yellow-800">
+                      {`${selectedReward.pointsRequired} điểm năng lượng`}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-6">

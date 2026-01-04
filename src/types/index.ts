@@ -128,14 +128,21 @@ export interface CreatePostData {
 }
 
 // Reward Types
+export type RewardCategory = 'POINT' | 'MONTHLY_RANK';
+
 export interface Reward {
   id: string;
   name: string;
   description: string;
+  rewardCategory: RewardCategory;
+  rewardType?: 'POINT_REDEEM' | 'MONTHLY_RANK';
+  rank?: 1 | 2;
+  month?: string;
   pointsRequired: number;
   lifeRequired?: number;
   imageUrl: string;
   isActive: boolean;
+  canRedeem: boolean;
   maxPerUser?: number;
   createdAt: string;
 }
@@ -232,4 +239,39 @@ export interface AdminStats {
     description: string;
     timestamp: string;
   }>;
+}
+
+// Notification Types
+export type NotificationType = 'MONTHLY_RANK_WIN' | 'DAILY_LOGIN';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  metadata: unknown;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export interface MonthlyPostRanking {
+  id: string;
+  month: string;
+  rank: number;
+  userId: string;
+  postId: string;
+  likeCount: number;
+  createdAt: string;
+  user: {
+    id: string;
+    name: string;
+    avatarUrl: string;
+  };
+  post: {
+    id: string;
+    type: 'EMOJI_CARD' | 'IMAGE' | 'CONFESSION' | 'CLIP';
+    url: string;
+    caption: string;
+    likeCount: number;
+  };
 }

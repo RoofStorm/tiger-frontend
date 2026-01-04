@@ -93,8 +93,17 @@ export function RedeemModal({
               color: '#ffffff',
             }}
           >
-            Bạn vui lòng để lại số điện thoại và email,<br />
-            để TIGER gửi mã đến bạn nhé!
+            {selectedReward.rewardCategory === 'MONTHLY_RANK' ? (
+              <>
+                Bạn là người thắng giải tháng này.<br />
+                Phần thưởng sẽ được gửi sau khi bạn xác nhận thông tin.
+              </>
+            ) : (
+              <>
+                Bạn vui lòng để lại số điện thoại và email,<br />
+                để TIGER gửi mã đến bạn nhé!
+              </>
+            )}
           </p>
         </div>
 

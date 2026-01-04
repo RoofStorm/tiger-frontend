@@ -47,6 +47,7 @@ class ApiClient {
           '/analytics/events', // Analytics events are background calls
           '/analytics/corners', // Corner analytics are background calls
           '/like', // Liking a post is a background action
+          '/notifications', // Notifications are background calls
         ];
 
         const isSilentEndpoint = silentEndpoints.some(endpoint =>
@@ -76,12 +77,12 @@ class ApiClient {
           '/rewards',
           '/storage',
           '/mood-cards',
+          '/notifications',
         ];
 
         // Public endpoints that don't need authentication
         const publicEndpoints = [
           '/wishes/highlighted',
-          '/rewards', // rewards is hybrid - works with or without auth
           '/storage/video', // video streaming endpoints are public
           '/analytics/events', // analytics events endpoint is public
         ];
@@ -89,6 +90,7 @@ class ApiClient {
         // Optional auth endpoints - send token if authenticated, but allow without auth
         const optionalAuthEndpoints = [
           '/posts/highlighted',
+          '/rewards', // rewards is hybrid - works with or without auth
         ];
 
         const isPublicEndpoint = publicEndpoints.some(endpoint =>
@@ -660,6 +662,18 @@ class ApiClient {
     return response.data;
   }
 
+  async getMonthlyRankings(page = 1, limit = 20): Promise<any> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    const response = await this.client.get(
+      `/analytics/monthly-rankings?${params.toString()}`
+    );
+    return response.data;
+  }
+
   async getAdminPosts(
     page = 1,
     limit = 10,
@@ -771,6 +785,17 @@ class ApiClient {
       userId,
       referralCode,
     });
+    return response.data;
+  }
+
+  // Notification endpoints
+  async getNotifications(): Promise<any> {
+    const response = await this.client.get('/notifications');
+    return response.data;
+  }
+
+  async markNotificationAsRead(id: string): Promise<any> {
+    const response = await this.client.patch(`/notifications/${id}/read`);
     return response.data;
   }
 

@@ -7,12 +7,15 @@ import { Toaster } from '@/components/ui/toaster';
 import { LoadingProvider } from '@/contexts/LoadingContext';
 import { HeaderDarkModeProvider } from '@/contexts/HeaderDarkModeContext';
 import { LoadingOverlay } from '@/components/LoadingOverlay';
-import { DailyLoginModalProvider } from '@/components/DailyLoginModalProvider';
 import { JoinChallengeModalProvider } from '@/contexts/JoinChallengeModalContext';
 import { ShareFacebookModalProvider } from '@/contexts/ShareFacebookModalContext';
 import { ShareRegistrationModalProvider } from '@/contexts/ShareRegistrationModalContext';
 import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import { VideoProvider } from '@/contexts/VideoContext';
+import { NotificationProvider } from '@/contexts/NotificationContext';
+import { PopupProvider } from '@/contexts/PopupContext';
+import { PopupOrchestrator } from '@/components/PopupOrchestrator';
+import { NotificationPopupManager } from '@/components/NotificationPopupManager';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -49,20 +52,25 @@ export function Providers({ children }: { children: React.ReactNode }) {
       >
         <VideoProvider>
           <AnalyticsProvider>
-            <LoadingProvider>
-              <HeaderDarkModeProvider>
-                <JoinChallengeModalProvider>
-                  <ShareFacebookModalProvider>
-                    <ShareRegistrationModalProvider>
-                      {children}
-                      <LoadingOverlay />
-                      <Toaster />
-                      <DailyLoginModalProvider />
-                    </ShareRegistrationModalProvider>
-                  </ShareFacebookModalProvider>
-                </JoinChallengeModalProvider>
-              </HeaderDarkModeProvider>
-            </LoadingProvider>
+            <NotificationProvider>
+              <PopupProvider>
+                <LoadingProvider>
+                  <HeaderDarkModeProvider>
+                    <JoinChallengeModalProvider>
+                      <ShareFacebookModalProvider>
+                        <ShareRegistrationModalProvider>
+                          {children}
+                          <LoadingOverlay />
+                          <Toaster />
+                          <NotificationPopupManager />
+                          <PopupOrchestrator />
+                        </ShareRegistrationModalProvider>
+                      </ShareFacebookModalProvider>
+                    </JoinChallengeModalProvider>
+                  </HeaderDarkModeProvider>
+                </LoadingProvider>
+              </PopupProvider>
+            </NotificationProvider>
           </AnalyticsProvider>
         </VideoProvider>
       </SessionProvider>

@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { MonthlyPostRanking } from '@/types';
+import { Trophy, User, ExternalLink } from 'lucide-react';
 
 interface AdminRedeemItem {
   id: string;
@@ -49,6 +51,9 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [selectedRedeemId, setSelectedRedeemId] = useState<string>('');
   const [rejectionReason, setRejectionReason] = useState<string>('');
+  
+  const [rankingPage, setRankingPage] = useState(1);
+  const [rankingPerPage] = useState(20);
 
   // Fetch redeem data
   const {
@@ -67,6 +72,14 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
     staleTime: 0,
     refetchOnMount: true,
     refetchOnWindowFocus: true,
+  });
+
+  // Fetch monthly rankings data
+  const { data: rankingData, isLoading: rankingLoading } = useQuery({
+    queryKey: ['admin-monthly-rankings', rankingPage],
+    queryFn: () => apiClient.getMonthlyRankings(rankingPage, rankingPerPage),
+    enabled: isAdmin,
+    staleTime: 5 * 60 * 1000,
   });
 
   // Update redeem status mutation
@@ -171,6 +184,130 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
 
   return (
     <div className="space-y-6">
+      {/* Monthly Winners Section */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-2">
+            <Trophy className="w-6 h-6 text-yellow-500" />
+            <h2 className="text-xl font-bold text-gray-900">
+              Danh sách người thắng giải (Bảng xếp hạng tháng)
+            </h2>
+          </div>
+        </div>
+
+        {rankingLoading ? (
+          <div className="text-center py-8 text-gray-500">
+            Đang tải bảng xếp hạng...
+          </div>
+        ) : !rankingData?.data?.data || rankingData.data.data.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            Chưa có dữ liệu bảng xếp hạng
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tháng
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Hạng
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Người thắng
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Bài viết
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Lượt thích
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Ngày tạo
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {rankingData.data.data.map((ranking: MonthlyPostRanking) => (
+                    <tr key={ranking.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {new Date(ranking.month).toLocaleDateString('vi-VN', {
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {ranking.rank === 1 ? (
+                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-yellow-100 text-yellow-700 font-bold border border-yellow-200">
+                              1
+                            </span>
+                          ) : ranking.rank === 2 ? (
+                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-bold border border-gray-200">
+                              2
+                            </span>
+                          ) : (
+                            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-50 text-orange-700 font-bold border border-orange-100">
+                              {ranking.rank}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {ranking.user.avatarUrl ? (
+                            <img
+                              src={ranking.user.avatarUrl}
+                              alt={ranking.user.name}
+                              className="w-8 h-8 rounded-full mr-3 object-cover border border-gray-200"
+                            />
+                          ) : (
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3 border border-blue-200">
+                              <User className="w-4 h-4 text-blue-600" />
+                            </div>
+                          )}
+                          <div className="text-sm font-medium text-gray-900">
+                            {ranking.user.name}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <a
+                          href={`/posts/${ranking.postId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          <span className="truncate max-w-[150px] mr-1">
+                            {ranking.post.caption || 'Xem bài viết'}
+                          </span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
+                        {ranking.likeCount.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(ranking.createdAt).toLocaleDateString('vi-VN')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <Pagination
+              total={rankingData.data.total}
+              currentPage={rankingPage}
+              onPageChange={setRankingPage}
+              itemsPerPage={rankingPerPage}
+            />
+          </>
+        )}
+      </div>
+
       {/* Filter Controls */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex items-center justify-between mb-4">
