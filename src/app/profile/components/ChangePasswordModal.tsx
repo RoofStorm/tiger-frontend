@@ -58,8 +58,8 @@ export function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProp
       
       reset();
       onClose();
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi đổi mật khẩu.';
+    } catch (error: unknown) {
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Có lỗi xảy ra khi đổi mật khẩu.';
       toast({
         title: 'Lỗi',
         description: errorMessage,

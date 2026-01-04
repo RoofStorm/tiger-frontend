@@ -363,6 +363,7 @@ export function LunchboxCarousel() {
     setTimeout(() => setIsTransitioning(false), 500);
   }, [isTransitioning, currentIndex, highlightedPosts.length]);
 
+  /* 
   const handleDotClick = useCallback((index: number) => {
     if (!isTransitioning && index !== currentIndex) {
       // Track navigation dot click
@@ -377,6 +378,7 @@ export function LunchboxCarousel() {
       setTimeout(() => setIsTransitioning(false), 500);
     }
   }, [isTransitioning, currentIndex, highlightedPosts.length, trackClick]);
+  */
 
   const handleImageClick = useCallback((postId: string, index: number) => {
     // Track image click in showcase
