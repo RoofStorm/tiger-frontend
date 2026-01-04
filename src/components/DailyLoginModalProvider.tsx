@@ -106,15 +106,12 @@ export function DailyLoginModalProvider() {
           localStorage.removeItem('dailyLoginModalShownDate');
         }
         
-        const sessionPointsAwarded = session.pointsAwarded;
-        const userId = session?.user?.id;
-        if (sessionPointsAwarded !== undefined) {
-          checkAndEnqueueModal(sessionPointsAwarded, userId);
-        }
-        
-        setTimeout(() => {
-          checkBackendSession();
-        }, 1000);
+        // Don't use session.pointsAwarded from NextAuth - it may be stale
+        // Only use pointsAwarded from fresh backend call
+        // const userId = session?.user?.id;
+
+        // Immediately check backend session for fresh pointsAwarded data
+        checkBackendSession();
       }
       
       sessionStorage.setItem('previousAuthStatus', 'authenticated');
