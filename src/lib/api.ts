@@ -63,6 +63,7 @@ class ApiClient {
         const protectedEndpoints = [
           '/auth/me',
           '/auth/session',
+          '/auth/change-password',
           '/posts',
           '/actions',
           '/redeems',
@@ -415,6 +416,11 @@ class ApiClient {
 
   async getPointHistory(): Promise<any> {
     const response = await this.client.get('/points/history');
+    return response.data;
+  }
+
+  async changePassword(data: any): Promise<any> {
+    const response = await this.client.post('/auth/change-password', data);
     return response.data;
   }
 

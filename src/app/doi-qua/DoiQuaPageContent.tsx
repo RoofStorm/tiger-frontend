@@ -430,11 +430,13 @@ export function DoiQuaPageContent() {
                           {/* Dashed Border Section */}
                           <div className="mt-auto mb-4">
                             {/* Points Requirement */}
-                            <div className="text-center mb-2">
-                              <p className="text-white font-nunito font-medium" style={{ fontSize: '18px' }}>
-                                {pointsRequired} Điểm năng lượng
-                              </p>
-                            </div>
+                            {reward.id !== 'voucher-1000k' && reward.id !== 'voucher-500k' && (
+                              <div className="text-center mb-2">
+                                <p className="text-white font-nunito font-medium" style={{ fontSize: '18px' }}>
+                                  {pointsRequired} Điểm năng lượng
+                                </p>
+                              </div>
+                            )}
 
                             <div 
                               className="border-[2px] border-dashed rounded-lg px-2 py-2 mb-3 flex flex-col justify-center"
@@ -480,7 +482,12 @@ export function DoiQuaPageContent() {
                                   color: '#FFFFFF',
                                 }}
                               >
-                                Cho sản phẩm TIGER (giới hạn 3 lần/user)
+                                {reward.id === 'voucher-1000k' 
+                                  ? 'Dành cho Top 1 nhịp sống được lan toả nhất (giới hạn 1 lần/user)'
+                                  : reward.id === 'voucher-500k'
+                                  ? 'Dành cho Top 2 nhịp sống được lan toả nhất (giới hạn 1 lần/user)'
+                                  : 'Cho sản phẩm TIGER (giới hạn 3 lần/user)'
+                                }
                               </p>
                             </div>
                           </div>
@@ -516,7 +523,7 @@ export function DoiQuaPageContent() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="mb-16 max-w-4xl mx-auto"
+                className="mb-16 max-w-4xl mx-auto gap-2"
               >
                 {/* Title */}
                 <div className="text-center mb-8">
@@ -608,7 +615,13 @@ export function DoiQuaPageContent() {
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          Chia sẻ quote/lunchbox challenge/note giữ nhịp: <strong>+50 điểm</strong> (Tối đa 1 lần/user/tuần)
+                          Tương tác với Card sản phẩm TIGER tại Nhịp bếp: <strong>+10 điểm</strong> mỗi lần click vào card (Tối đa 8 lần/user)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Chia sẻ quote/lunchboxchallenge/note giữ nhịp: <strong>+50 điểm</strong> (Tối đa 1 lần/user)
                         </span>
                       </li>
                     </ul>
@@ -637,7 +650,7 @@ export function DoiQuaPageContent() {
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>300 điểm năng lượng</strong> → Voucher 50k Got It
+                          <strong>400 điểm năng lượng</strong> → Voucher 50k Got It
                         </span>
                       </li>
                       <li className="flex items-start gap-3">

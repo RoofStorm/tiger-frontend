@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Gift, Star } from 'lucide-react';
+import { Gift, Star, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Reward, CreateRedeemData } from '@/types';
 
@@ -346,11 +346,13 @@ export function Corner4() {
                     {/* Voucher Card Content */}
                     <div className="p-6 flex flex-col h-full">
                       {/* Points Requirement */}
+                      {reward.id !== 'voucher-1000k' && reward.id !== 'voucher-500k' && (
                       <div className="text-center mb-4">
                         <p className="text-white font-nunito font-medium" style={{ fontSize: '14px' }}>
                           {pointsRequired} Điểm năng lượng
                         </p>
                       </div>
+                      )}
 
                       {/* Dashed Border Section */}
                       <div 
@@ -397,7 +399,12 @@ export function Corner4() {
                               color: '#FFFFFF',
                             }}
                           >
-                            Cho sản phẩm TIGER (giới hạn 3 lần/user)
+                            {reward.id === 'voucher-1000k' 
+                              ? 'Dành cho Top 1 nhịp sống được lan toả nhất (giới hạn 1 lần/user)'
+                              : reward.id === 'voucher-500k'
+                              ? 'Dành cho Top 2 nhịp sống được lan toả nhất (giới hạn 1 lần/user)'
+                              : 'Cho sản phẩm TIGER (giới hạn 3 lần/user)'
+                            }
                           </p>
                         </div>
                       </div>
@@ -427,9 +434,205 @@ export function Corner4() {
         )}
 
         {activeTab === 'the-le' && (
-          <div className="mb-16 text-center py-16">
-            <p className="text-gray-600 text-lg">Nội dung thể lệ sẽ được cập nhật...</p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-16 max-w-4xl mx-auto px-4"
+          >
+            {/* Title */}
+            <div className="text-center mb-8">
+              <h2 
+                className="font-prata mb-4"
+                style={{ 
+                  color: '#00579F',
+                  fontFamily: 'Prata',
+                  fontWeight: 400,
+                  fontStyle: 'normal',
+                  fontSize: '36px',
+                  lineHeight: '40px',
+                  letterSpacing: '0.03em',
+                  textAlign: 'center',
+                }}
+              >
+                Thể lệ
+              </h2>
+              
+              {/* Subtitle with leaf icon */}
+              <div className="flex items-center justify-center gap-2 mb-8">
+                <Leaf className="w-5 h-5" style={{ color: '#22c55e' }} />
+                <p 
+                  className="font-noto-sans"
+                  style={{
+                    fontFamily: 'var(--font-noto-sans)',
+                    fontSize: '18px',
+                    fontWeight: 400,
+                    color: '#333',
+                    textAlign: 'center',
+                  }}
+                >
+                  Cơ chế &quot;Điểm năng lượng&quot;
+                </p>
+              </div>
+            </div>
+
+            {/* Content Sections */}
+            <div className="space-y-8 text-left">
+              {/* Section 1: Tích Điểm Năng Lượng */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="bg-transparent"
+              >
+                <h3 
+                  className="font-prata mb-4"
+                  style={{
+                    fontFamily: 'Prata',
+                    fontWeight: 400,
+                    fontSize: '24px',
+                    color: '#00579F',
+                    marginBottom: '16px',
+                  }}
+                >
+                  1. Tích Điểm Năng Lượng
+                </h3>
+                <p 
+                  className="font-noto-sans mb-4"
+                  style={{
+                    fontFamily: 'var(--font-noto-sans)',
+                    fontSize: '16px',
+                    color: '#333',
+                    marginBottom: '16px',
+                  }}
+                >
+                  Mỗi hoạt động nhỏ giúp bạn nạp thêm năng lượng:
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      Đăng nhập mỗi ngày: <strong>+10 điểm</strong>
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      Tham gia My lunchbox challenge: <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      Tham gia viết Note giữ nhịp: <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      Tương tác với Card sản phẩm TIGER tại Nhịp bếp: <strong>+10 điểm</strong> mỗi lần click vào card (Tối đa 8 lần/user)
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      Chia sẻ quote/lunchboxchallenge/note giữ nhịp: <strong>+50 điểm</strong> (Tối đa 1 lần/user)
+                    </span>
+                  </li>
+                </ul>
+              </motion.div>
+
+              {/* Section 2: Đổi Nhịp sống -> Quà tặng đến từ TIGER */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="bg-transparent"
+              >
+                <h3 
+                  className="font-prata mb-4"
+                  style={{
+                    fontFamily: 'Prata',
+                    fontWeight: 400,
+                    fontSize: '24px',
+                    color: '#00579F',
+                    marginBottom: '16px',
+                  }}
+                >
+                  2. Đổi Nhịp sống → Quà tặng đến từ TIGER
+                </h3>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      <strong>400 điểm năng lượng</strong> → Voucher 50k Got It
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      <strong>500 điểm năng lượng</strong> → Voucher 100k Got It
+                    </span>
+                  </li>
+                </ul>
+              </motion.div>
+
+              {/* Section 3: Phần thưởng cho nhịp sống được lan toả nhất tại Lunchbox Challenge */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="bg-transparent"
+              >
+                <h3 
+                  className="font-prata mb-4"
+                  style={{
+                    fontFamily: 'Prata',
+                    fontWeight: 400,
+                    fontSize: '24px',
+                    color: '#00579F',
+                    marginBottom: '16px',
+                  }}
+                >
+                  3. Phần thưởng cho nhịp sống được lan toả nhất tại Lunchbox Challenge
+                </h3>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      Số lượt tym cao nhất mỗi tháng sẽ nhận được voucher Got It trị giá <strong>1,000,000 VND</strong>
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="text-[#00579F] font-bold mt-1">•</span>
+                    <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                      Số lượt tym cao thứ hai mỗi tháng sẽ nhận được voucher Got It trị giá <strong>500,000 VND</strong>
+                    </span>
+                  </li>
+                </ul>
+              </motion.div>
           </div>
+
+            {/* Disclaimer */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mt-8 text-center"
+            >
+              <p 
+                className="font-noto-sans"
+                style={{
+                  fontFamily: 'var(--font-noto-sans)',
+                  fontSize: '14px',
+                  color: '#60A5FA',
+                  fontStyle: 'italic',
+                }}
+              >
+                *Mỗi user có thể nhận được tối đa một giải thưởng trên mỗi hạng mục giải thưởng xuyên suốt thời gian diễn ra chương trình
+              </p>
+            </motion.div>
+          </motion.div>
         )}
 
         {activeTab === 'nhip-song' && (

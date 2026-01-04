@@ -2,15 +2,16 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNextAuth } from '@/hooks/useNextAuth';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Gift, Calendar, Star, Home, RefreshCw, ChefHat } from 'lucide-react';
+import { Gift, Calendar, Star, Home, RefreshCw, ChefHat, Lock } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { useShareRegistrationModal } from '@/contexts/ShareRegistrationModalContext';
 import { useZoneView } from '@/hooks/useZoneView';
+import { ChangePasswordModal } from './components/ChangePasswordModal';
 
 interface RedeemItem {
   id: string;
@@ -42,6 +43,7 @@ export default function ProfilePage() {
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const { showModal: showRegistrationModal } = useShareRegistrationModal();
   const pageRef = useRef<HTMLDivElement>(null);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
   // Track time on Profile page
   useZoneView(pageRef, {
@@ -202,6 +204,19 @@ export default function ProfilePage() {
             <div className="flex flex-col items-end space-y-6">
               {/* Action Buttons */}
               <div className="flex items-center space-x-3">
+                {userDetails?.loginMethod === 'LOCAL' && (
+                  <Button
+                    onClick={() => setIsChangePasswordModalOpen(true)}
+                    className="flex items-center space-x-2 border-0 transition-colors"
+                    style={{
+                      backgroundColor: 'rgba(251, 249, 243, 1)',
+                      color: 'black',
+                    }}
+                  >
+                    <Lock className="w-4 h-4" />
+                    <span>Đổi mật khẩu</span>
+                  </Button>
+                )}
                 <Link href="/">
                   <Button className="flex items-center space-x-2 border-0 transition-colors" style={{ backgroundColor: 'rgba(251, 249, 243, 1)', color: 'black' }}>
                     <Home className="w-4 h-4" />
@@ -533,6 +548,11 @@ export default function ProfilePage() {
           <ReferralSection />
         </div> */}
       </div>
+
+      <ChangePasswordModal
+        isOpen={isChangePasswordModalOpen}
+        onClose={() => setIsChangePasswordModalOpen(false)}
+      />
     </div>
   );
 }
