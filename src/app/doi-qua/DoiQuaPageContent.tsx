@@ -20,7 +20,7 @@ interface UserRedeem {
   status: string;
 }
 
-type TabType = 'doi-qua' | 'the-le' | 'nhip-song' | 'thu-thach' | 'nhip-bep';
+type TabType = 'doi-qua' | 'the-le' | 'nhip-song' | 'thu-thach' | 'nhip-bep' | 'tc';
 
 export function DoiQuaPageContent() {
   const { user, isAuthenticated } = useNextAuth();
@@ -318,6 +318,7 @@ export function DoiQuaPageContent() {
                     { id: 'nhip-song' as TabType, label: 'Nhịp sống', href: '/nhip-song' },
                     { id: 'thu-thach' as TabType, label: 'Thử thách giữ nhịp', href: '/thu-thach-giu-nhip' },
                     { id: 'nhip-bep' as TabType, label: 'Nhịp bếp', href: '/nhip-bep' },
+                    { id: 'tc' as TabType, label: 'T&C', href: null },
                   ].map((tab, index, array) => (
                     <div key={tab.id} className="flex items-center flex-shrink-0">
                       <button
@@ -732,6 +733,237 @@ export function DoiQuaPageContent() {
                     *Mỗi user có thể nhận được tối đa một giải thưởng trên mỗi hạng mục giải thưởng xuyên suốt thời gian diễn ra chương trình
                   </p>
                 </motion.div>
+              </motion.div>
+            )}
+
+            {activeTab === 'tc' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="mb-16 max-w-4xl mx-auto"
+              >
+                {/* Title */}
+                <div className="text-center mb-8">
+                  <h2 
+                    className="font-prata mb-8"
+                    style={{ 
+                      color: '#00579F',
+                      fontFamily: 'Prata',
+                      fontWeight: 400,
+                      fontStyle: 'normal',
+                      fontSize: '36px',
+                      lineHeight: '40px',
+                      letterSpacing: '0.03em',
+                      textAlign: 'center',
+                    }}
+                  >
+                    Điều khoản sử dụng
+                  </h2>
+                </div>
+
+                <div className="bg-green-50 border-l-4 border-green-500 p-6 mb-10 rounded-r-lg text-left">
+                  <p className="text-gray-800 leading-relaxed font-medium font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px' }}>
+                    Chào mừng bạn đến với trang web của TIGER Việt Nam (&quot;trang web&quot;)! Chúng tôi hy vọng bạn sẽ thích thú với trải nghiệm trực tuyến của bạn.
+                  </p>
+                  <p className="text-gray-700 leading-relaxed mt-4 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px' }}>
+                    Công ty trách nhiệm hữu hạn (TNHH) TIGER Marketing Việt Nam (&quot;TIGER Việt Nam&quot;) cam kết duy trì niềm tin với người sử dụng về trang web của mình. Các quy định dưới đây chi phối việc sử dụng trang web này của bạn.
+                  </p>
+                </div>
+
+                {/* Content Sections */}
+                <div className="space-y-10 text-left">
+                  <section>
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      1. Những hình thức sử dụng có thể được chấp nhận
+                    </h3>
+                    <div className="pl-6 space-y-4">
+                      <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                        Hãy tự do khám phá trang web của chúng tôi và nếu có thể, hãy đóng góp tài liệu cho trang web, chẳng hạn như câu hỏi, thông báo và nội dung đa phương tiện (ví dụ như hình ảnh, video).
+                      </p>
+                      <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                        Tuy nhiên, việc sử dụng trang web và các tài liệu được đưa lên không được bất hợp pháp hoặc phản cảm theo bất kỳ phương diện nào. Bạn cần lưu tâm để không:
+                      </p>
+                      <ul className="space-y-3">
+                        <li className="flex items-start gap-3 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <span className="text-[#00579F] font-bold mt-1">(a)</span>
+                          <span>xâm phạm quyền riêng tư của người khác;</span>
+                        </li>
+                        <li className="flex items-start gap-3 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <span className="text-[#00579F] font-bold mt-1">(b)</span>
+                          <span>vi phạm các quyền sở hữu trí tuệ;</span>
+                        </li>
+                        <li className="flex items-start gap-3 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <span className="text-[#00579F] font-bold mt-1">(c)</span>
+                          <span>đưa ra những tuyên bổ phỉ báng (kể cả đối với TIGER Việt Nam), liên quan đến nội dung khiêu dâm, có tính phân biệt chủng tộc hoặc bài ngoại, xúi bẩy căm ghét hoặc kích động bạo lực hoặc hỗn loạn;</span>
+                        </li>
+                        <li className="flex items-start gap-3 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <span className="text-[#00579F] font-bold mt-1">(d)</span>
+                          <span>tải lên các tập tin chứa virus hoặc dẫn đến các vấn đề về an ninh; hoặc bằng cách nào đó gây nguy hiểm cho tính trọn vẹn của trang web.</span>
+                        </li>
+                      </ul>
+                      <p className="italic text-gray-600 bg-gray-100/50 p-4 border-l-2 border-gray-300 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '15px' }}>
+                        Hãy lưu ý rằng TIGER Việt Nam có quyền loại bỏ nội dung bất kỳ mà mình tin là bất hợp pháp hoặc phản cảm ra khỏi trang web.
+                      </p>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      2. Bảo vệ dữ liệu
+                    </h3>
+                    <div className="pl-6">
+                      <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                        Thông báo về Quyền Riêng tư của chúng tôi áp dụng với dữ liệu hoặc tư liệu cá nhân bất kỳ được chia sẻ trên trang web này.
+                      </p>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      3. Sở Hữu Trí Tuệ
+                    </h3>
+                    <div className="pl-6 space-y-8">
+                      <div>
+                        <h4 className="font-bold text-[#00579F] mb-3 font-noto-sans" style={{ fontSize: '18px' }}>3.1. Nội dung do TIGER Việt Nam cung cấp</h4>
+                        <p className="font-noto-sans mb-4" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Mọi quyền sở hữu trí tuệ, bao gồm quyền tác giả và nhãn hiệu, trong các tài liệu được TIGER Việt Nam hoặc nhân danh TIGER Việt Nam công bố trên trang web (ví dụ như văn bản và hình ảnh) thuộc sở hữu của TIGER Việt Nam hoặc những đơn vị được TIGER Việt Nam cấp phép sử dụng.
+                        </p>
+                        <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Bạn có quyền sao các trích đoạn của trang web để sử dụng riêng cho chính mình (ví dụ, sử dụng vì mục đích phi thương mại) với điều kiện là bạn giữ nguyên và tôn trọng mọi quyền sở hữu trí tuệ, bao gồm thông báo bản quyền bất kỳ xuất hiện trong nội dung đó (ví dụ © 2016 TIGER Việt Nam).
+                        </p>
+                      </div>
+
+                      <div>
+                        <h4 className="font-bold text-[#00579F] mb-3 font-noto-sans" style={{ fontSize: '18px' }}>3.2. Nội dung do Bạn cung cấp</h4>
+                        <p className="font-noto-sans mb-4" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Bạn tuyên bố với TIGER Việt Nam rằng bạn là tác giả của nội dung mà bạn đóng góp cho trang web này, hoặc bạn có các quyền (ví dụ, được người có quyền cho phép) và có thể đóng góp nội dung đó (ví dụ, hình ảnh, video, nhạc) cho trang web.
+                        </p>
+                        <p className="font-noto-sans mb-4" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Bạn đồng ý rằng nội dung đó sẽ được xử lý như không phải thông tin mật và bạn cho TIGER Việt Nam quyền sử dụng miễn phí, vĩnh viễn trên toàn thế giới (bao gồm tiết lộ, sao chép, truyền đạt, công bố hoặc phổ biến) nội dung mà bạn cung cấp cho các mục đích liên quan đến việc kinh doanh của TIGER Việt Nam.
+                        </p>
+                        <p className="italic text-gray-600 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '15px' }}>
+                          Hãy lưu ý rằng TIGER Việt Nam tự do quyết định có hay không sử dụng nội dung đó và TIGER Việt Nam có thể đã triển khai nội dung tương tự hoặc đã có nội dung đó từ các nguồn khác, khi đó mọi quyền sở hữu trí tuệ từ nội dung đó sẽ vẫn thuộc TIGER Việt Nam và những đơn vị được TIGER Việt Nam cấp phép sử dụng.
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      4. Trách nhiệm pháp lý
+                    </h3>
+                    <div className="pl-6 space-y-4">
+                      <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                        Mặc dù TIGER Việt Nam vận dụng mọi nỗ lực để bảo đảm tính chính xác của tư liệu trên trang web của mình và tránh thiếu sót, chúng tôi không chịu trách nhiệm về thông tin không chính xác, những thiếu sót, gián đoạn hoặc sự kiện khác có thể gây tổn hại cho bạn, bất kể là trực tiếp (như hỏng máy tính) hay gián tiếp (như giảm lợi nhuận). Bạn phải chịu mọi rủi ro khi tin hay không vào các tư liệu trên trang web này.
+                      </p>
+                      <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                        Trang web này có thể chứa các đường dẫn ra ngoài TIGER Việt Nam. TIGER Việt Nam không kiểm soát các trang web của bên thứ ba, không nhất thiết xác nhận chúng và cũng không nhận trách nhiệm bất kỳ về chúng, kể cả nội dung, tính chính xác hoặc chức năng của chúng. Do đó, chúng tôi đề nghị bạn xem xét kỹ các thông báo pháp lý về các trang web của bên thứ ba như vậy, kể cả việc khiến bạn được cập nhật về những thay đổi bất kỳ của chúng.
+                      </p>
+                      <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                        Bạn có thể điều hành một trang web của bên thứ ba và muốn liên kết đến trang web này. Khi đó, TIGER Việt Nam không phản đối liên kết đó, với điều kiện là bản sử dụng url trang chủ chính xác của trang web này (ví dụ như không liên kết sâu) và không gợi ý theo cách bất kỳ rằng bạn là công ty con của TIGER Việt Nam hay được TIGER Việt Nam xác nhận. Bạn không được dùng “framing” hoặc kỹ thuật tương tự, và phải bảo đảm đường dẫn đến trang web mở trong cửa sổ mới.
+                      </p>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      5. Liên hệ
+                    </h3>
+                    <div className="pl-6 space-y-6">
+                      <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                        Trang web này do Công ty TNHH TIGER Marketing Việt Nam vận hành. Nếu bạn có câu hỏi hoặc bình luận bất kỳ về trang web, xin đừng ngần ngại liên hệ với chúng tôi:
+                      </p>
+                      <ul className="space-y-3">
+                        <li className="flex items-center gap-3 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <span className="font-bold text-[#00579F]">(i)</span>
+                          <span>Gửi thư điện tử đến địa chỉ: <a href="mailto:hello@tigermarketing.vn" className="text-[#00579F] font-semibold hover:underline">hello@tigermarketing.vn</a></span>
+                        </li>
+                        <li className="flex items-center gap-3 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <span className="font-bold text-[#00579F]">(ii)</span>
+                          <span>Gọi điện thoại số: <a href="tel:02836221281" className="text-[#00579F] font-semibold hover:underline">(028) 3622 1281</a></span>
+                        </li>
+                        <li className="flex items-start gap-3 font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          <span className="font-bold text-[#00579F]">(iii)</span>
+                          <span>Gửi thư thường đến:</span>
+                        </li>
+                      </ul>
+
+                      <div className="bg-white/50 p-6 rounded-xl border border-gray-200 ml-6">
+                        <p className="font-bold text-gray-900 mb-1 font-noto-sans">Phòng Chăm Sóc Khách Hàng</p>
+                        <p className="font-bold text-gray-900 mb-3 font-noto-sans">Công ty TNHH TIGER Marketing Việt Nam</p>
+                        <p className="mb-2 font-noto-sans text-gray-700">Phòng 1006, Tầng 10, Tòa nhà Saigon Riverside Office Center, 2A-4A Tôn Đức Thắng, Phường Sài Gòn, TP. Hồ Chí Minh, Việt Nam</p>
+                        <p className="font-noto-sans text-gray-700">Điện thoại: (028) 3622 1281</p>
+                        <p className="font-noto-sans text-gray-700">Email: <a href="mailto:hello@tigermarketing.vn" className="text-[#00579F] font-semibold hover:underline">hello@tigermarketing.vn</a></p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 
+                      className="font-prata mb-4"
+                      style={{
+                        fontFamily: 'Prata',
+                        fontWeight: 400,
+                        fontSize: '24px',
+                        color: '#00579F',
+                        marginBottom: '16px',
+                      }}
+                    >
+                      6. Thay đổi
+                    </h3>
+                    <div className="pl-6">
+                      <p className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                        TIGER Việt Nam bảo lưu quyền thay đổi các điều khoản sử dụng này. Thỉnh thoảng hãy trở lại trang này để xem lại các điều khoản và thông tin mới bất kỳ.
+                      </p>
+                    </div>
+                  </section>
+                </div>
               </motion.div>
             )}
 
