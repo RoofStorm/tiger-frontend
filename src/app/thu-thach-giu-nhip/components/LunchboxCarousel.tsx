@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
+import { PostDetailModal } from './PostDetailModal';
 
 interface Post {
   id: string;
@@ -85,6 +86,7 @@ export function LunchboxCarousel() {
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [likeCounts, setLikeCounts] = useState<Map<string, number>>(new Map());
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -383,6 +385,10 @@ export function LunchboxCarousel() {
       component: 'image',
       metadata: { postId, imageIndex: index },
     });
+
+    // Open detail modal
+    setIsModalOpen(true);
+    setCurrentIndex(index);
   }, [trackClick]);
 
   // Auto-play logic
@@ -542,8 +548,9 @@ export function LunchboxCarousel() {
 
                   // Optimized onClick handler
                   const handleSlideClick = () => {
-                    if (!isCenter && !isTransitioning) {
+                    if (isCenter) {
                       handleImageClick(post.id, index);
+                    } else if (!isTransitioning) {
                       setIsTransitioning(true);
                       setCurrentIndex(index);
                       setTimeout(() => setIsTransitioning(false), 500);
@@ -779,6 +786,16 @@ export function LunchboxCarousel() {
             });
           })()}
         </div> */}
+        <PostDetailModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          posts={highlightedPosts}
+          currentIndex={currentIndex}
+          onNavigate={(index) => setCurrentIndex(index)}
+          onLike={toggleLike}
+          likedPosts={likedPosts}
+          likeCounts={likeCounts}
+        />
       </div>
     </div>
   );
