@@ -262,7 +262,7 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-bold text-white">
               Lịch sử cộng điểm
             </h2>
-            <Button
+            {/* <Button
               variant="outline"
               size="sm"
               onClick={handleRefreshPointHistory}
@@ -273,7 +273,7 @@ export default function ProfilePage() {
                 className={`w-4 h-4 ${pointHistoryLoading ? 'animate-spin' : ''}`}
               />
               <span>Làm mới</span>
-            </Button>
+            </Button> */}
           </div>
 
           {pointHistoryLoading ? (
@@ -328,7 +328,7 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-bold text-white lg:mb-0 mb-3">
               Lịch sử đổi quà
             </h2>
-            <div className="flex items-center space-x-3">
+            {/* <div className="flex items-center space-x-3">
               <Button
                 variant="outline"
                 size="sm"
@@ -347,7 +347,7 @@ export default function ProfilePage() {
                   <span>Đổi quà mới</span>
                 </Button>
               </Link>
-            </div>
+            </div> */}
           </div>
 
           {redeemHistoryLoading ? (
