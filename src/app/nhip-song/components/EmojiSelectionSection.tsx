@@ -67,7 +67,7 @@ export function EmojiSelectionSection({
           className="w-full max-w-md mx-auto py-6 text-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
         >
           {selectedEmojis.length === requiredEmojiCount
-            ? 'Tham gia ngay'
+            ? 'Khám phá ngay'
             : `Chọn thêm ${remainingCount} emoji`}
         </Button>
       </div>

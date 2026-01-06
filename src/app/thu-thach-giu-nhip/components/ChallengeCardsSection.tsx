@@ -58,7 +58,7 @@ export function ChallengeCardsSection() {
           <img
             src="/thuthachnhipsong/lunchbox_challenge_mobile.svg"
             alt="LunchBox Challenge"
-            className="object-contain md:hidden"
+            className="object-contain md:hidden w-full h-full"
             fetchPriority="high"
           />
           {/* Desktop Image */}

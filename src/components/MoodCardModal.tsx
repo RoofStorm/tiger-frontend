@@ -295,7 +295,7 @@ export function MoodCardModal({
                       className="w-full py-6 text-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       {selectedEmojis.length === 3
-                        ? 'Tham gia ngay'
+                        ? 'Khám phá ngay'
                         : `Chọn thêm ${3 - selectedEmojis.length} emoji`}
                     </Button>
                   </div>

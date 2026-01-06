@@ -27,10 +27,10 @@ export function ChallengeHeaderSection() {
         Thử thách giữ nhịp sống
       </h1>
       <div className="px-6 sm:px-8 md:px-0">
-        <p className="text-[16px] text-gray-700 leading-relaxed max-w-4xl mx-auto font-noto-sans text-left md:text-center">
+        <p className="text-[16px] text-gray-700 leading-relaxed max-w-4xl mx-auto font-noto-sans text-justify md:text-center">
           Đôi khi, nhịp sống nằm trong hơi nóng từ bữa cơm giản dị. Đôi khi, nó gói gọn trong vài dòng chữ nhỏ.
         </p>
-        <p className="text-[16px] text-gray-700 leading-relaxed max-w-[82rem] mx-auto font-noto-sans text-left md:text-center" style={{ marginTop: 0 }}>
+        <p className="text-[16px] text-gray-700 leading-relaxed max-w-[82rem] mx-auto font-noto-sans text-justify md:text-center" style={{ marginTop: 0 }}>
         TIGER mời bạn tham gia Thử thách Giữ Nhịp – nơi những điều nhỏ bé trở thành khoảnh khắc đáng nhớ – để cùng nhau tạo nên một dòng chảy bình yên, đầy đủ sắc màu.
         </p>
       </div>

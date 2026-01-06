@@ -871,7 +871,7 @@ export function NhipBepPageContent() {
                         {/* Product Branding */}
                         {selectedProduct.branding && (
                           <motion.p
-                            className="mt-1 text-center font-nunito text-xs md:text-sm font-medium leading-relaxed"
+                            className="mt-1 text-justify font-nunito text-sm font-medium leading-relaxed"
                             style={{ color: '#00579F' }}
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -895,7 +895,7 @@ export function NhipBepPageContent() {
                         {selectedProduct.tips.map((tip, index) => (
                           <motion.div 
                             key={index} 
-                            className="flex items-start justify-center gap-3 text-center"
+                            className="flex gap-3 text-justify"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ 

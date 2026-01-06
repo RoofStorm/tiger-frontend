@@ -10,7 +10,7 @@ export const WishCard = ({ wish, index }: WishCardProps) => {
   return (
     <div className="pb-8 pr-4">
       <div
-        className={`backdrop-blur-sm rounded-lg p-6 border border-white/30 relative w-[80%] ${
+        className={`backdrop-blur-sm rounded-lg p-6 border border-white/30 relative w-[85%] lg:w-[80%] ${
           index % 2 === 0 ? 'ml-[20%]' : ''
         }`}
         style={{ backgroundColor: '#FFFFFF1A' }}

@@ -39,10 +39,10 @@ export async function generateMetadata({
     // Fallback về whisper nếu không có reminder
     const shortWhisper =
       whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
-    title = `"${shortWhisper}" - TIGER Nhịp Sống`;
+    title = `Hôm nay nhịp sống của bạn như thế nào? - Cùng TIGER giữ trọn nhịp sống`;
   } else {
     // Fallback về emoji labels nếu không có cả reminder và whisper
-    title = `Mood Card: ${emojiLabels} - TIGER Nhịp Sống`;
+    title = `Cùng TIGER giữ trọn nhịp sống`;
   }
 
   // Tạo caption ngắn gọn cho Facebook preview
@@ -70,7 +70,7 @@ export async function generateMetadata({
       title,
       description,
       url: `${baseUrl}/mood-card?emojis=${emojiIds.join(',')}&whisper=${encodeURIComponent(whisper)}&reminder=${encodeURIComponent(reminder)}`,
-      siteName: 'TIGER Nhịp Sống',
+      siteName: 'Cùng TIGER giữ trọn nhịp sống',
       images: [
         {
           url: imageUrl,

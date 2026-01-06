@@ -143,9 +143,9 @@ export function HomePageContent() {
           <div className="w-full lg:w-1/2 px-6 ld:px-12 py-4 sm:py-6 lg:py-8 lg:mr-38 flex flex-col justify-center">
             {/* Title */}
             <h1 
-              className="font-prata font-normal mb-6 md:mb-8 text-center" 
+              className="font-prata font-normal mb-6 md:mb-8 text-center lg:text-[36px] text-[28px]" 
               style={{ 
-                fontSize: '36px',
+                // fontSize: '36px',
                 lineHeight: '40px',
                 letterSpacing: '0.03em',
                 color: '#0B4386'

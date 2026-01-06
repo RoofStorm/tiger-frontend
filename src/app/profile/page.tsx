@@ -201,7 +201,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Stats */}
-            <div className="flex flex-col items-end space-y-6">
+            <div className="flex flex-col items-center lg:items-end space-y-6">
               {/* Action Buttons */}
               <div className="flex items-center space-x-3">
                 {userDetails?.loginMethod === 'LOCAL' && (
@@ -324,8 +324,8 @@ export default function ProfilePage() {
 
         {/* Redeem History */}
         <div className="rounded-2xl shadow-lg p-8 mt-6" style={{ backgroundColor: 'rgb(0, 87, 159)' }}>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">
+          <div className="lg:flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white lg:mb-0 mb-3">
               Lịch sử đổi quà
             </h2>
             <div className="flex items-center space-x-3">

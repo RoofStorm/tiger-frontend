@@ -98,7 +98,7 @@ export function EmojiGrid({
                   </motion.div>
                 )}
               </div>
-              <div className="flex items-center justify-center gap-1.5 h-[2rem]">
+              <div className="flex items-center justify-start lg:pl-4 gap-1.5 h-[2rem]">
                 <input
                   type="checkbox"
                   checked={selected}

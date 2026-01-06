@@ -519,7 +519,7 @@ export function ShareNoteSection() {
   return (
     <>
       {/* Share Section */}
-      <div className="mt-16 rounded-[30px] border-2 border-gray-200 overflow-hidden bg-white mx-8 md:mx-8 lg:mx-32 max-w-full md:max-w-none min-h-[200px] md:min-h-[180px]">
+      <div className="mt-16 rounded-[30px] border-2 border-gray-200 overflow-hidden bg-white mx-6 lg:mx-32 max-w-full md:max-w-none min-h-[200px] md:min-h-[180px]">
         <div className="grid grid-cols-1 md:grid-cols-5 h-full">
           {/* Left Part: Text - 20% width */}
           <div 
@@ -588,7 +588,7 @@ export function ShareNoteSection() {
         <h2 className="font-prata text-3xl sm:text-4xl lg:text-5xl mb-6" style={{ color: '#00579F' }}>
           Viết note giữ nhịp!
         </h2>
-        <p className="text-gray-700 max-w-7xl mx-auto text-left md:text-center leading-relaxed" style={{ fontSize: '16px' }}>
+        <p className="text-gray-700 max-w-7xl mx-auto text-justify md:text-center leading-relaxed" style={{ fontSize: '16px' }}>
           Giữ nhịp đâu chỉ dừng lại ở bữa trưa. Bạn có lời nhắc nào muốn gửi đến chính mình, hay gửi
           đến một người quan trong. Đôi khi chỉ cần vài đôi điều ngắn gọn - cũng đủ trở thành nhịp
           sống dịu dàng cho cả bạn và người khác
@@ -612,7 +612,7 @@ export function ShareNoteSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-8 min-h-[500px]">
           {/* Left: Image, TextArea, Button */}
           <div className="space-y-4 flex flex-col items-center">
-            <div className="space-y-4 flex flex-col w-[80%]">
+            <div className="space-y-4 flex flex-col w-[90%] lg:w-[80%]">
               {/* Image - LCP element, preload with priority */}
               <div className="relative w-full overflow-visible mt-6">
                   <Image

@@ -148,7 +148,7 @@ export function DoiQuaPageContent() {
         <div
           data-corner="4"
           id="corner-4"
-          className="min-h-screen py-12 lg:py-5"
+          className="min-h-screen pt-8 lg:py-5"
         >
           <div className="max-w-[90%] mx-auto px-0.5 sm:px-1 lg:px-2">
             {/* Header Section */}
@@ -329,7 +329,7 @@ export function DoiQuaPageContent() {
                     <div className="text-gray-600">Không có quà nào khả dụng</div>
                   </div>
                 ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-3 justify-items-center max-w-6xl mx-auto">
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-3 justify-items-center max-w-6xl mx-auto">
                   {rewards.map((reward: Reward, index: number) => {
                     // Extract voucher value from reward name (e.g., "50K", "100K")
                     const voucherMatch = reward.name.match(/(\d+K|\d+k)/i);
@@ -342,7 +342,7 @@ export function DoiQuaPageContent() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: index * 0.1 }}
-                        className={`rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 flex flex-col h-full ${
+                        className={`rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 flex flex-col h-full w-full min-h-[240px] max-h-[280px] md:min-h-[320px] md:max-h-[360px] lg:min-h-[360px] lg:max-h-[400px] ${
                           !canRedeem(reward) ? 'opacity-60' : ''
                         }`}
                         style={{ 
@@ -350,36 +350,34 @@ export function DoiQuaPageContent() {
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           backgroundRepeat: 'no-repeat',
-                          aspectRatio: '3/4',
-                          minHeight: '360px',
-                          maxHeight: '400px'
+                          aspectRatio: '3/4'
                         }}
                       >
                         {/* Voucher Card Content */}
-                        <div className="px-4 py-6 flex flex-col h-full">
+                        <div className="px-2 py-3 md:px-4 md:py-6 flex flex-col h-full">
                           {/* Dashed Border Section */}
-                          <div className="mt-auto mb-4">
+                          <div className="mt-auto mb-2 md:mb-4">
                             {/* Points Requirement */}
                             {reward.id !== 'voucher-1000k' && reward.id !== 'voucher-500k' && (
-                              <div className="text-center mb-2">
-                                <p className="text-white font-nunito font-medium" style={{ fontSize: '18px' }}>
+                              <div className="text-center mb-1 md:mb-2">
+                                <p className="text-white font-nunito font-medium text-xs md:text-base lg:text-lg">
                                   {pointsRequired} Điểm năng lượng
                                 </p>
                               </div>
                             )}
 
                             <div 
-                              className="border-[2px] border-dashed rounded-lg px-2 py-2 mb-3 flex flex-col justify-center"
+                              className="border-[2px] border-dashed rounded-lg px-1 py-1 md:px-2 md:py-2 mb-2 md:mb-3 flex flex-col justify-center"
                               style={{ borderColor: '#FFFFFF' }}
                             >
                             <div className="text-center">
                               {/* VOUCHER Label */}
                               <p 
-                                className="font-prata text-white mb-1"
+                                className="font-prata text-white mb-0.5 md:mb-1"
                                 style={{
                                   fontFamily: 'Prata',
                                   fontWeight: 400,
-                                  fontSize: '22px',
+                                  fontSize: 'clamp(12px, 3vw, 22px)',
                                   letterSpacing: '0.03em',
                                   color: '#FFFFFF',
                                 }}
@@ -389,12 +387,12 @@ export function DoiQuaPageContent() {
 
                               {/* Voucher Value */}
                               <p 
-                                className="font-nunito font-bold mb-1"
+                                className="font-nunito font-bold mb-0.5 md:mb-1"
                                 style={{
                                   fontFamily: 'Nunito',
                                   fontWeight: 700,
-                                  fontSize: '64px',
-                                  lineHeight: '64px',
+                                  fontSize: 'clamp(32px, 8vw, 64px)',
+                                  lineHeight: 'clamp(32px, 8vw, 64px)',
                                   color: '#ADD1EE',
                                 }}
                               >
@@ -407,8 +405,8 @@ export function DoiQuaPageContent() {
                                 style={{
                                   fontFamily: 'Nunito',
                                   fontWeight: 400,
-                                  fontSize: '11px',
-                                  lineHeight: '16px',
+                                  fontSize: 'clamp(8px, 2vw, 11px)',
+                                  lineHeight: 'clamp(12px, 3vw, 16px)',
                                   color: '#FFFFFF',
                                 }}
                               >
@@ -416,7 +414,7 @@ export function DoiQuaPageContent() {
                                   ? 'Dành cho Top 1 Thử thách được lan toả nhất (giới hạn 1 lần/user)'
                                   : reward.id === 'voucher-500k'
                                   ? 'Dành cho Top 2 Thử thách được lan toả nhất (giới hạn 1 lần/user)'
-                                  : 'Cho sản phẩm TIGER (giới hạn 3 lần/user)'
+                                  : 'Cho sản phẩm TIGER (giới hạn 1 lần/user)'
                                 }
                               </p>
                             </div>
@@ -427,14 +425,14 @@ export function DoiQuaPageContent() {
                           <button
                             onClick={() => handleRedeem(reward)}
                             disabled={!canRedeem(reward)}
-                            className={`w-full py-2 rounded-lg font-nunito font-semibold transition-all duration-300 ${
+                            className={`w-full py-1.5 md:py-2 rounded-lg font-nunito font-semibold transition-all duration-300 ${
                               canRedeem(reward)
                                 ? 'bg-white hover:bg-gray-100'
                                 : 'bg-gray-300 cursor-not-allowed'
                             }`}
                             style={{ 
                               color: canRedeem(reward) ? '#284A8F' : '#666666',
-                              fontSize: '14px'
+                              fontSize: 'clamp(10px, 2.5vw, 14px)'
                             }}
                           >
                             Đổi quà ngay
