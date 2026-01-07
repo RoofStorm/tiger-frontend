@@ -94,13 +94,13 @@ export default async function SharePage({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto mt-[64px] xl:mt-[80px]">
         <div className="text-center mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-[#004EA3] via-[#004EA3] to-[#004EA3] bg-clip-text text-transparent mb-4">
-            TIGER Nhịp Sống
+          Cùng TIGER giữ trọn nhịp sống
           </h1>
           <p className="text-lg text-[#004EA3]">
-            Cùng TIGER giữ trọn nhịp sống
+            Mood là khởi đầu - Giữ nhịp là điều bạn tự tạo nên mỗi ngày
           </p>
         </div>
 
