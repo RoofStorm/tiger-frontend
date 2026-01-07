@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Download } from 'lucide-react';
 import { useConfirm } from '@/hooks/useConfirm';
+import { useToast } from '@/hooks/use-toast';
 import apiClient from '@/lib/api';
 import { FilterBar } from '../FilterBar';
 import { Pagination } from '../Pagination';
@@ -31,7 +32,9 @@ interface UsersTabProps {
 
 export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
   const { confirm } = useConfirm();
+  const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
+  const [isExporting, setIsExporting] = useState(false);
   const [userFilters, setUserFilters] = useState<FilterState>({
     role: '',
     status: '',
@@ -69,6 +72,49 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
     }
   }, [currentPage, totalPages]);
 
+  // Handle Excel export
+  const handleExportExcel = async () => {
+    setIsExporting(true);
+    try {
+      const blob = await apiClient.exportUsersExcel();
+
+      // Generate filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      const filename = `users_export_${timestamp}.xlsx`;
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Thành công',
+        description: 'Báo cáo Excel người dùng đã được xuất thành công.',
+        variant: 'success',
+        duration: 3000,
+      });
+    } catch (error: any) {
+      console.error('Error exporting Excel:', error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Có lỗi xảy ra khi xuất báo cáo. Vui lòng thử lại.';
+      toast({
+        title: 'Lỗi',
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 4000,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (usersLoading) {
     return <div className="text-center py-8">Đang tải...</div>;
   }
@@ -77,10 +123,20 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900">Quản lý người dùng</h2>
-        <Button className="bg-blue-500 hover:bg-blue-600">
-          <Plus className="w-4 h-4 mr-2" />
-          Thêm người dùng
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleExportExcel}
+            disabled={isExporting}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {isExporting ? 'Đang xuất...' : 'Xuất Excel'}
+          </Button>
+          <Button className="bg-blue-500 hover:bg-blue-600">
+            <Plus className="w-4 h-4 mr-2" />
+            Thêm người dùng
+          </Button>
+        </div>
       </div>
 
       <FilterBar

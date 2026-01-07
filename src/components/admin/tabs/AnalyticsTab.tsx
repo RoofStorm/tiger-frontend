@@ -10,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import {
   AnalyticsFilterBar,
   AnalyticsFilterState,
@@ -40,6 +41,7 @@ interface AnalysisResponse {
 }
 
 export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
+  const { toast } = useToast();
   const [filters, setFilters] = useState<AnalyticsFilterState>({
     from: '',
     to: '',
@@ -51,6 +53,7 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
     undefined
   );
   const [cursorHistory, setCursorHistory] = useState<string[]>([]); // For back navigation
+  const [isExporting, setIsExporting] = useState(false);
 
   // Debounce filter changes (300-500ms)
   useEffect(() => {
@@ -166,6 +169,76 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
     return `${mins}m ${secs}s`;
   };
 
+  // Handle Excel export
+  const handleExportExcel = async () => {
+    if (!debouncedFilters.from || !debouncedFilters.to) {
+      toast({
+        title: 'Lỗi',
+        description: 'Vui lòng chọn khoảng thời gian trước khi xuất báo cáo.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    if (new Date(debouncedFilters.from) > new Date(debouncedFilters.to)) {
+      toast({
+        title: 'Lỗi',
+        description: 'Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const blob = await apiClient.exportAnalyticsExcel({
+        from: debouncedFilters.from,
+        to: debouncedFilters.to,
+        page: debouncedFilters.page,
+        zone: debouncedFilters.zone,
+      });
+
+      // Generate filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      const pagePart = debouncedFilters.page ? `_${debouncedFilters.page}` : '';
+      const zonePart = debouncedFilters.zone ? `_${debouncedFilters.zone}` : '';
+      const filename = `analytics_${debouncedFilters.from}_to_${debouncedFilters.to}${pagePart}${zonePart}_${timestamp}.xlsx`;
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Thành công',
+        description: 'Báo cáo Excel đã được xuất thành công.',
+        variant: 'success',
+        duration: 3000,
+      });
+    } catch (error: any) {
+      console.error('Error exporting Excel:', error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Có lỗi xảy ra khi xuất báo cáo. Vui lòng thử lại.';
+      toast({
+        title: 'Lỗi',
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 4000,
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (availableDataLoading) {
     return <div className="text-center py-8">Đang tải dữ liệu...</div>;
   }
@@ -178,6 +251,23 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
         setFilters={setFilters}
         availableData={availableData}
       />
+
+      {/* Export Button */}
+      <div className="flex justify-end">
+        <Button
+          onClick={handleExportExcel}
+          disabled={
+            isExporting ||
+            !debouncedFilters.from ||
+            !debouncedFilters.to ||
+            new Date(debouncedFilters.from) > new Date(debouncedFilters.to)
+          }
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          <Download className="w-4 h-4 mr-2" />
+          {isExporting ? 'Đang xuất...' : 'Xuất báo cáo Excel'}
+        </Button>
+      </div>
 
       {/* TABLE 1 - SUMMARY TABLE */}
       <div className="bg-white rounded-xl shadow-lg p-6">

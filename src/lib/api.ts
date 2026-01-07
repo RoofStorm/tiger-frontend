@@ -617,6 +617,27 @@ class ApiClient {
     return response.data?.data || response.data;
   }
 
+  async exportAnalyticsExcel(params: {
+    from?: string;
+    to?: string;
+    page?: string;
+    zone?: string;
+  }): Promise<Blob> {
+    const queryParams = new URLSearchParams();
+    if (params.from) queryParams.append('from', params.from);
+    if (params.to) queryParams.append('to', params.to);
+    if (params.page) queryParams.append('page', params.page);
+    if (params.zone) queryParams.append('zone', params.zone);
+
+    const response = await this.client.get(
+      `/analytics/export-excel?${queryParams.toString()}`,
+      {
+        responseType: 'blob',
+      }
+    );
+    return response.data;
+  }
+
   async getAdminStats(): Promise<any> {
     const response = await this.client.get('/admin/stats');
     return response.data;
@@ -736,6 +757,13 @@ class ApiClient {
     return response.data;
   }
 
+  async exportUsersExcel(): Promise<Blob> {
+    const response = await this.client.get('/admin/users/export-excel', {
+      responseType: 'blob',
+    });
+    return response.data;
+  }
+
   async getAllRedeems(page = 1, limit = 20, status?: string): Promise<any> {
     const params = new URLSearchParams({
       page: page.toString(),
@@ -745,6 +773,13 @@ class ApiClient {
       params.append('status', status);
     }
     const response = await this.client.get(`/redeems/admin?${params}`);
+    return response.data;
+  }
+
+  async exportRedeemsExcel(): Promise<Blob> {
+    const response = await this.client.get('/admin/redeems/export-excel', {
+      responseType: 'blob',
+    });
     return response.data;
   }
 

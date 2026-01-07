@@ -13,7 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MonthlyPostRanking } from '@/types';
-import { Trophy, User, ExternalLink } from 'lucide-react';
+import { Trophy, User, ExternalLink, Download } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface AdminRedeemItem {
   id: string;
@@ -51,6 +52,7 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [selectedRedeemId, setSelectedRedeemId] = useState<string>('');
   const [rejectionReason, setRejectionReason] = useState<string>('');
+  const [isExporting, setIsExporting] = useState(false);
   
   const [rankingPage, setRankingPage] = useState(1);
   const [rankingPerPage] = useState(20);
@@ -173,6 +175,49 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
       status: 'REJECTED',
       rejectionReason: rejectionReason.trim(),
     });
+  };
+
+  // Handle Excel export
+  const handleExportExcel = async () => {
+    setIsExporting(true);
+    try {
+      const blob = await apiClient.exportRedeemsExcel();
+
+      // Generate filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      const filename = `redeems_export_${timestamp}.xlsx`;
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Thành công',
+        description: 'Báo cáo Excel đổi thưởng đã được xuất thành công.',
+        variant: 'success',
+        duration: 3000,
+      });
+    } catch (error: any) {
+      console.error('Error exporting Excel:', error);
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        'Có lỗi xảy ra khi xuất báo cáo. Vui lòng thử lại.';
+      toast({
+        title: 'Lỗi',
+        description: errorMessage,
+        variant: 'destructive',
+        duration: 4000,
+      });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const redeems: AdminRedeemItem[] = redeemData?.data?.data || [];
@@ -315,6 +360,14 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
             Quản lý đổi thưởng
           </h2>
           <div className="flex items-center space-x-4">
+            <Button
+              onClick={handleExportExcel}
+              disabled={isExporting}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {isExporting ? 'Đang xuất...' : 'Xuất Excel'}
+            </Button>
             <Select
               value={redeemStatusFilter || 'all'}
               onValueChange={value => {
