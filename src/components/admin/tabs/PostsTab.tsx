@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Star, StarOff, X, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { Trash2, Star, StarOff, X, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 import { useConfirm } from '@/hooks/useConfirm';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -207,10 +206,6 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
     <div className="bg-white rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900">Quản lý bài viết</h2>
-        <Button className="bg-purple-500 hover:bg-purple-600">
-          <Plus className="w-4 h-4 mr-2" />
-          Thêm bài viết
-        </Button>
       </div>
 
       <FilterBar

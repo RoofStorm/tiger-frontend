@@ -76,7 +76,6 @@ export default function ProfilePage() {
     data: redeemHistoryData,
     isLoading: redeemHistoryLoading,
     error: redeemHistoryError,
-    refetch: _refetchRedeemHistory,
   } = useQuery({
     queryKey: ['redeemHistory', user?.id],
     queryFn: () => apiClient.getRedeemHistory(),
@@ -95,7 +94,6 @@ export default function ProfilePage() {
     data: pointHistoryData,
     isLoading: pointHistoryLoading,
     error: pointHistoryError,
-    refetch: _refetchPointHistory,
   } = useQuery({
     queryKey: ['pointHistory', user?.id],
     queryFn: () => apiClient.getPointHistory(),

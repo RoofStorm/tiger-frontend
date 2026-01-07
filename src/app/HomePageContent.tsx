@@ -168,22 +168,18 @@ export function HomePageContent() {
               }}
             >
               <p>
-                Hơn một thế kỷ trước, chúng tôi chọn một con đường giản dị:
-                giữ lại hơi ấm trong từng khoảnh khắc, để nhịp sống được gìn
-                giữ trọn vẹn.
+              Hơn một thế kỷ trước, TIGER chọn con đường giản dị: giữ nhiệt ổn định cho nhu cầu uống nước rất đời thường, để nhịp sinh hoạt hàng ngày được duy trì trọn vẹn.
               </p>
               <p>
-                Năm 1923, những chiếc bình TIGER vẫn đứng vững sau trận động
-                đất Kanto, trở mang lại niềm tin cho hàng ngàn gia đình Nhật
-                Bản.
+              Năm 1923, sau trận động đất Kanto, nhiều chiếc bình TIGER vẫn còn nguyên vẹn giữa đổ nát, trong khi phần lớn các bình chân không khác bị hư hại nặng nề. Chính độ bền và sự ổn định này đã khiến TIGER dần trở thành lựa chọn quen thuộc của nhiều gia đình Nhật Bản trong giai đoạn đó.
               </p>
               <p>
-                Từ di sản ấy, TIGER tiếp tục sáng tạo nồi cơm điện, hộp cơm,
-                bình nước...
+              Từ di sản ấy, TIGER tiếp tục phát triển nồi cơm điện, hộp cơm, máy xay sinh tố,… 
               </p>
               <p>
-                Dù sản phẩm thay đổi, lời hứa vẫn nguyên vẹn: Giữ ấm từng bữa
-                ăn, giữ trọn từng nhịp sống.
+              Dù sản phẩm thay đổi theo thời gian, lời hứa của TIGER vẫn không đổi: Giữ ấm từng bữa ăn, giữ trọn từng nhịp sống. 
+              </p>
+              <p>TIGER đã giữ nhịp sống trọn vẹn hơn một thế kỷ. Còn nhịp sống hôm nay của bạn thì sao? 
               </p>
             </div>
 

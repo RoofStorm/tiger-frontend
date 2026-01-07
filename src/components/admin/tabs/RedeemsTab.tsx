@@ -203,11 +203,15 @@ export const RedeemsTab: React.FC<RedeemsTabProps> = ({ isAdmin }) => {
         variant: 'success',
         duration: 3000,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error exporting Excel:', error);
       const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
+        (error && typeof error === 'object' && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : undefined) ||
+        (error && typeof error === 'object' && 'message' in error
+          ? (error as { message?: string }).message
+          : undefined) ||
         'Có lỗi xảy ra khi xuất báo cáo. Vui lòng thử lại.';
       toast({
         title: 'Lỗi',
