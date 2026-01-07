@@ -25,7 +25,7 @@ export async function generateMetadata({
   const emojis = emojiIds
     .map(id => EMOJI_OPTIONS.find(emoji => emoji.id === id))
     .filter(Boolean);
-  const emojiLabels = emojis.map(e => e?.label).join(', ');
+  // const emojiLabels = emojis.map(e => e?.label).join(', ');
   const emojiString = emojis.map(e => e?.emoji).join(' ');
 
   // Tạo title từ reminder thay vì emojis
@@ -37,8 +37,8 @@ export async function generateMetadata({
     title = `${shortReminder} - TIGER Nhịp Sống`;
   } else if (whisper) {
     // Fallback về whisper nếu không có reminder
-    const shortWhisper =
-      whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
+    // const shortWhisper =
+    //   whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
     title = `Hôm nay nhịp sống của bạn như thế nào? - Cùng TIGER giữ trọn nhịp sống`;
   } else {
     // Fallback về emoji labels nếu không có cả reminder và whisper

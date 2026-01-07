@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/lib/api';
+import { AnalyticsSummaryResponse } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -17,18 +18,6 @@ import {
 
 interface AnalyticsTabProps {
   isAdmin: boolean;
-}
-
-interface SummaryResponse {
-  dateRange: {
-    from: string;
-    to: string;
-  };
-  totalViews: number;
-  totalClicks: number;
-  avgDuration: number;
-  uniqueSessions: number;
-  totalDurations:number;
 }
 
 interface AnalysisRow {
@@ -139,8 +128,16 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
     enabled: canFetchAnalysis,
   });
 
-  const summary: SummaryResponse | undefined = summaryData;
+  const summary: AnalyticsSummaryResponse | undefined = summaryData;
   const analysis: AnalysisResponse | undefined = analysisData;
+
+  // Calculate derived metrics
+  const totalUniqueUsers = summary
+    ? summary.uniqueUsers + summary.uniqueAnonymousUsers
+    : 0;
+  const conversionRate = summary && totalUniqueUsers > 0
+    ? (summary.uniqueUsers / totalUniqueUsers) * 100
+    : 0;
 
   // Handle next page
   const handleNextPage = () => {
@@ -202,22 +199,34 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date Range
+                    Khoảng thời gian
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total Views
+                    Tổng lượt xem
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total Clicks
+                    Tổng lượt click
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total Durations (s)
+                    Tổng thời gian (s)
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Avg Duration (s)
+                    Thời gian trung bình (s)
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Unique Sessions
+                    Số sessions đã truy cập
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tổng người dùng đã truy cập
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Người dùng đã đăng nhập
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Người dùng ẩn danh
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Tỷ lệ chuyển đổi
                   </th>
                 </tr>
               </thead>
@@ -240,6 +249,18 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                     {summary.uniqueSessions.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                    {totalUniqueUsers.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-blue-600 text-right">
+                    {summary.uniqueUsers.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-600 text-right">
+                    {summary.uniqueAnonymousUsers.toLocaleString()}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                    {conversionRate.toFixed(2)}%
                   </td>
                 </tr>
               </tbody>

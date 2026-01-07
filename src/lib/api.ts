@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getSession } from 'next-auth/react';
+import { AnalyticsSummaryResponse } from '@/types';
 // Note: Auth types are now handled by NextAuth.js
 
 // Global loading state management
@@ -564,17 +565,7 @@ class ApiClient {
     zone?: string;
     from?: string;
     to?: string;
-  }): Promise<{
-    dateRange: {
-      from: string;
-      to: string;
-    };
-    totalViews: number;
-    totalClicks: number;
-    avgDuration: number;
-    uniqueSessions: number;
-    totalDurations:number;
-  }> {
+  }): Promise<AnalyticsSummaryResponse> {
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.append('page', params.page);
     if (params.zone) queryParams.append('zone', params.zone);

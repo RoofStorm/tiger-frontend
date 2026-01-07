@@ -265,7 +265,7 @@ export const AnalyticsFilterBar = memo<AnalyticsFilterBarProps>(
           </div>
 
           {/* Flow Filter - Optional */}
-          {availableData?.commonFunnelSteps &&
+          {/* {availableData?.commonFunnelSteps &&
             availableData.commonFunnelSteps.length > 0 && (
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">
@@ -290,7 +290,7 @@ export const AnalyticsFilterBar = memo<AnalyticsFilterBarProps>(
                   </SelectContent>
                 </Select>
               </div>
-            )}
+            )} */}
         </div>
       </div>
     );

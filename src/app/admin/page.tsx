@@ -74,7 +74,7 @@ export default function AdminPage() {
     { id: 'posts', label: 'Bài viết', icon: MessageSquare },
     { id: 'redeems', label: 'Đổi thưởng', icon: CreditCard },
     { id: 'wishes', label: 'Note giữ nhịp', icon: MessageSquare },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'analytics', label: 'Thống kê', icon: BarChart3 },
     // { id: 'settings', label: 'Cài đặt', icon: Settings },
   ];
 

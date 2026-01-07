@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Gift, Calendar, Star, Home, RefreshCw, ChefHat, Lock } from 'lucide-react';
+import { Gift, Calendar, Star, Home, ChefHat, Lock } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -76,7 +76,7 @@ export default function ProfilePage() {
     data: redeemHistoryData,
     isLoading: redeemHistoryLoading,
     error: redeemHistoryError,
-    refetch: refetchRedeemHistory,
+    refetch: _refetchRedeemHistory,
   } = useQuery({
     queryKey: ['redeemHistory', user?.id],
     queryFn: () => apiClient.getRedeemHistory(),
@@ -86,16 +86,16 @@ export default function ProfilePage() {
   });
 
   // Function to refresh redeem history
-  const handleRefreshRedeemHistory = () => {
-    refetchRedeemHistory();
-  };
+  // const handleRefreshRedeemHistory = () => {
+  //   refetchRedeemHistory();
+  // };
 
   // Fetch point history
   const {
     data: pointHistoryData,
     isLoading: pointHistoryLoading,
     error: pointHistoryError,
-    refetch: refetchPointHistory,
+    refetch: _refetchPointHistory,
   } = useQuery({
     queryKey: ['pointHistory', user?.id],
     queryFn: () => apiClient.getPointHistory(),
@@ -105,9 +105,9 @@ export default function ProfilePage() {
   });
 
   // Function to refresh point history
-  const handleRefreshPointHistory = () => {
-    refetchPointHistory();
-  };
+  // const handleRefreshPointHistory = () => {
+  //   refetchPointHistory();
+  // };
 
   const redeemHistory = Array.isArray(redeemHistoryData?.data?.redeems)
     ? redeemHistoryData.data.redeems

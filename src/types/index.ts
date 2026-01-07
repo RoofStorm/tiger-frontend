@@ -76,6 +76,23 @@ export interface AnalyticsInitOptions {
   referrer?: string;
 }
 
+// Analytics Summary Types
+export interface AnalyticsSummaryResponse {
+  page: string;
+  zone: string;
+  dateRange: {
+    from: string; // YYYY-MM-DD
+    to: string;   // YYYY-MM-DD
+  };
+  totalViews: number;
+  totalClicks: number;
+  totalDurations: number;
+  avgDuration: number;
+  uniqueSessions: number;
+  uniqueUsers: number;              // Logged-in users
+  uniqueAnonymousUsers: number;     // Anonymous users
+}
+
 export interface EmojiSelection {
   id: string;
   emoji: string;
