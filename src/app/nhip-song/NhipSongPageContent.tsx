@@ -234,7 +234,7 @@ export function NhipSongPageContent() {
         }
 
         // Tạo File từ blob
-        const file = new File([blob], `mood-card-${Date.now()}.png`, {
+        const file = new File([blob], `TIGER mood card.png`, {
           type: 'image/png',
         });
 

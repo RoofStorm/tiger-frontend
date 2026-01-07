@@ -13,7 +13,7 @@ export default function PostDetailClient({ post }: PostDetailClientProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-4 mt-[64px] lg:mt-[80px]">
         <article className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Post Image */}
           <div className="aspect-video relative overflow-hidden">

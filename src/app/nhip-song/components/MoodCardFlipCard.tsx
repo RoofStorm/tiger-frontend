@@ -123,7 +123,7 @@ export function MoodCardFlipCard({
       
       // Tạo link download
       const link = document.createElement('a');
-      link.download = `mood-card-${Date.now()}.png`;
+      link.download = `TIGER mood card.png`;
       link.href = imageData;
       link.click();
 

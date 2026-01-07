@@ -70,7 +70,7 @@ export function MoodCardCanvas({
     const imageData = await generateImage();
     if (imageData) {
       const link = document.createElement('a');
-      link.download = `mood-card-${Date.now()}.png`;
+      link.download = `TIGER mood card.png`;
       link.href = imageData;
       link.click();
     }
