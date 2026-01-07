@@ -1,4 +1,5 @@
 import { AnalyticsEvent, AnalyticsInitOptions } from '@/types';
+import { getSession } from 'next-auth/react';
 import apiClient from './api';
 
 // Constants
@@ -115,18 +116,41 @@ class AnalyticsService {
     };
 
     try {
-      if (options?.useBeacon && typeof navigator !== 'undefined' && navigator.sendBeacon) {
-        // Use sendBeacon for page unload
-        const data = JSON.stringify(payload);
-        const blob = new Blob([data], { type: 'application/json' });
+      if (options?.useBeacon && typeof window !== 'undefined') {
+        // Use fetch with keepalive for page unload (supports custom headers unlike sendBeacon)
         const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api'}/analytics/events`;
-        const sent = navigator.sendBeacon(apiUrl, blob);
-        if (!sent) {
-          // Fallback to normal API call if sendBeacon fails
-          await apiClient.trackAnalyticsEvents(payload);
+        
+        // Get session to add Authorization header if logged in
+        const session = await getSession();
+        const headers: HeadersInit = {
+          'Content-Type': 'application/json',
+        };
+        
+        if (session?.user) {
+          // Get accessToken from session
+          const accessToken = session.accessToken;
+          if (accessToken) {
+            headers.Authorization = `Bearer ${accessToken}`;
+          } else if (session.user.id) {
+            // Fallback to user ID if accessToken not available
+            headers.Authorization = `Bearer ${session.user.id}`;
+          }
         }
+        
+        // Use fetch with keepalive (works like sendBeacon but supports headers)
+        fetch(apiUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(payload),
+          keepalive: true, // Ensures request completes even if page is unloading
+        }).catch(error => {
+          // Silently fail for beacon requests - don't log errors on page unload
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Analytics beacon failed:', error);
+          }
+        });
       } else {
-        // Normal API call
+        // Normal API call (will include Authorization header via apiClient interceptor)
         const response = await apiClient.trackAnalyticsEvents(payload);
         // Response: { message: "Events queued", count: number }
         if (process.env.NODE_ENV === 'development') {

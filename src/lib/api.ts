@@ -85,13 +85,13 @@ class ApiClient {
         const publicEndpoints = [
           '/wishes/highlighted',
           '/storage/video', // video streaming endpoints are public
-          '/analytics/events', // analytics events endpoint is public
         ];
 
         // Optional auth endpoints - send token if authenticated, but allow without auth
         const optionalAuthEndpoints = [
           '/posts/highlighted',
           '/rewards', // rewards is hybrid - works with or without auth
+          '/analytics/events', // analytics events: send token if logged in, but allow anonymous
         ];
 
         const isPublicEndpoint = publicEndpoints.some(endpoint =>
