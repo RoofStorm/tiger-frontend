@@ -90,6 +90,12 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     whisper: 'Khi mệt đến mức chỉ muốn tìm một nhịp thở, bạn nhận ra bữa cơm nhà là điều hiếm hoi còn giữ cho lòng mình dịu xuống.',
     reminder: 'Ăn trong không gian yên tĩnh có thể giúp nhịp tim giảm 5-10%, từ đó giúp cơ thể hạ căng thẳng nhanh hơn.',
   },
+  // Card 1 - Tổ hợp 1b (2 emoji thuộc nhóm 1, emoji còn lại nhóm 2)
+  {
+    combinationIds: [1, 2],
+    whisper: 'Áp lực công việc phủ kín cuộc sống của bạn. Deadline, trách nhiệm, những cơn bực dồn nén khiến đầu óc luôn trong trạng thái căng cứng. Sự mệt mỏi không còn là cảm xúc thoáng qua mà trở thành phản xạ thường trực. Bạn không cần thêm động lực, bạn cần một nhịp chậm đủ sâu để cơ thể ngừng tự vệ.',
+    reminder: 'Chỉ 10–15 phút thư giãn có chủ đích mỗi ngày có thể giúp não thoát khỏi trạng thái cảnh giác liên tục, khôi phục cảm giác hiện diện và kết nối với bản thân.',
+  },
   // Card 1 - Tổ hợp 2
   {
     combinationIds: [1, 3, 5],
@@ -101,6 +107,12 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     combinationIds: [1, 4, 5],
     whisper: 'Giữa những áp lực khiến lòng bạn rã rời, bữa cơm ấm chính là nơi để bạn tạm dựa vào và gom mình lại sau những vỡ vụn khó nói thành lời.',
     reminder: 'Ăn cơm cùng người thân giúp cơ thể tiết nhiều oxytocin, từ đó làm bạn cảm thấy bình tĩnh và dễ chịu hơn.',
+  },
+  // Card 1 - Tổ hợp 3b (2 emoji thuộc nhóm 1, emoji còn lại nhóm 4)
+  {
+    combinationIds: [1, 4],
+    whisper: 'Công việc dồn dập, nhưng thứ làm bạn chao đảo hơn là những rạn nứt chưa hàn gắn. Bên trong vỡ tan, hiện thực dở dang. Nỗi buồn lúc này không còn chỗ đặt xuống, chỉ biết phải mang theo và tiếp tục đi. Và đúng vậy, nếu đớn đau vẫn còn, tổn thương vẫn chưa lành, cứ nằm xuống và nghe lòng dậy sóng.',
+    reminder: 'Không phải lúc nào cuộc sống cũng cần câu trả lời. Đôi khi, chỉ cần cho phép mình ở lại với nỗi đau, cho đến khi nó tự đổi hình dạng.',
   },
   // Card 1 - Tổ hợp 4
   {
@@ -191,6 +203,12 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     combinationIds: [1, 3, 4],
     whisper: 'Bạn âm thầm gồng gánh mọi chuyện, giấu kín bao điều chất chứa, để rồi một mình nhặt nhạnh những mảnh vỡ trong lòng.',
     reminder: 'Việc ghi lại suy nghĩ trong 2-3 phút có thể giúp giảm căng thẳng và làm dịu vùng xử lý cảm xúc của não bộ.',
+  },
+  // Card 2 - Tổ hợp 4b (2 emoji đầu cùng nhóm 1, emoji cuối nhóm 3)
+  {
+    combinationIds: [1, 3],
+    whisper: 'Áp lực không còn đến theo từng đợt để bạn kịp chuẩn bị. Bạn tiếp nhận nó mỗi ngày trong im lặng, nhiều đến mức chính cơ thể cũng thôi phản kháng. Dù vậy, TIGER mong rằng sớm mai thức dậy, bạn sẽ giữ cho mình một nhịp sống nhẹ nhàng hơn đôi chút, để ngày mới ôm lấy bạn bằng sự dịu dàng vốn có.',
+    reminder: 'Khi cảm xúc bị kìm nén kéo dài, hệ thần kinh duy trì trạng thái căng thẳng, khiến não tiêu hao năng lượng nhiều hơn, dù khối lượng công việc không hề tăng thêm.',
   },
   // Card 2 - Tổ hợp 5
   {
@@ -449,6 +467,100 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
     return null;
   }
 
+  // Kiểm tra các trường hợp đặc biệt: 2 trong 3 emoji thuộc combination 1, emoji còn lại thuộc combination 2, 3, hoặc 4
+  // Đếm số emoji thuộc các combination
+  let countCombo1 = 0;
+  let countCombo2 = 0;
+  let countCombo3 = 0;
+  let countCombo4 = 0;
+  
+  combinationIdsForEachEmoji.forEach(combos => {
+    if (combos.includes(1)) {
+      countCombo1++;
+    }
+    if (combos.includes(2)) {
+      countCombo2++;
+    }
+    if (combos.includes(3)) {
+      countCombo3++;
+    }
+    if (combos.includes(4)) {
+      countCombo4++;
+    }
+  });
+
+  // Card 1: 2 emoji thuộc combination 1, emoji còn lại thuộc combination 2 -> [1, 2]
+  if (countCombo1 >= 2 && countCombo2 >= 1) {
+    const specialGroup = findCombinationGroup([1, 2]);
+    if (specialGroup) {
+      const card1Combinations = [
+        [1, 2, 5], [1, 3, 5], [1, 4, 5], [1, 2], [1, 4], [2, 3, 5], [2, 5, 7], [3, 4, 5], [3, 5, 6],
+        [3, 5, 7], [3, 5, 8], [3, 6, 7], [3, 7, 8], [4, 5, 6], [4, 5, 7], [5, 6, 7]
+      ];
+      
+      const isCard1 = card1Combinations.some(combo => {
+        const sortedCombo = [...combo].sort();
+        return JSON.stringify(sortedCombo) === JSON.stringify([1, 2]);
+      });
+
+      if (isCard1) {
+        const card = CARD_CONFIGS.find(c => c.cardNumber === 1)!;
+        return {
+          card,
+          combinationGroup: specialGroup,
+        };
+      }
+    }
+  }
+
+  // Card 1: 2 emoji thuộc combination 1, emoji còn lại thuộc combination 4 -> [1, 4]
+  if (countCombo1 >= 2 && countCombo4 >= 1) {
+    const specialGroup = findCombinationGroup([1, 4]);
+    if (specialGroup) {
+      const card1Combinations = [
+        [1, 2, 5], [1, 3, 5], [1, 4, 5], [1, 2], [1, 4], [2, 3, 5], [2, 5, 7], [3, 4, 5], [3, 5, 6],
+        [3, 5, 7], [3, 5, 8], [3, 6, 7], [3, 7, 8], [4, 5, 6], [4, 5, 7], [5, 6, 7]
+      ];
+      
+      const isCard1 = card1Combinations.some(combo => {
+        const sortedCombo = [...combo].sort();
+        return JSON.stringify(sortedCombo) === JSON.stringify([1, 4]);
+      });
+
+      if (isCard1) {
+        const card = CARD_CONFIGS.find(c => c.cardNumber === 1)!;
+        return {
+          card,
+          combinationGroup: specialGroup,
+        };
+      }
+    }
+  }
+
+  // Card 2: 2 emoji thuộc combination 1, emoji còn lại thuộc combination 3 -> [1, 3]
+  if (countCombo1 >= 2 && countCombo3 >= 1) {
+    const specialGroup = findCombinationGroup([1, 3]);
+    if (specialGroup) {
+      const card2Combinations = [
+        [1, 2, 3], [1, 2, 4], [1, 2, 6], [1, 3, 4], [1, 3], [2, 3, 4], [2, 4, 6],
+        [3, 4, 6], [3, 4, 7], [1, 5, 8], [2, 4, 5], [3, 6, 8]
+      ];
+      
+      const isCard2 = card2Combinations.some(combo => {
+        const sortedCombo = [...combo].sort();
+        return JSON.stringify(sortedCombo) === JSON.stringify([1, 3]);
+      });
+
+      if (isCard2) {
+        const card = CARD_CONFIGS.find(c => c.cardNumber === 2)!;
+        return {
+          card,
+          combinationGroup: specialGroup,
+        };
+      }
+    }
+  }
+
   // Tạo tất cả các tổ hợp có thể từ 3 emoji
   // Mỗi emoji có thể thuộc nhiều tổ hợp, nên ta cần tạo tất cả các kết hợp có thể
   const possibleCombinations: CombinationId[][] = [];
@@ -459,7 +571,9 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
   combos1.forEach(combo1 => {
     combos2.forEach(combo2 => {
       combos3.forEach(combo3 => {
-        const combination = [combo1, combo2, combo3].sort((a, b) => a - b);
+        // Loại bỏ trùng lặp trước khi sort (ví dụ: [1, 1, 3] -> [1, 3])
+        const uniqueCombination = Array.from(new Set([combo1, combo2, combo3]));
+        const combination = uniqueCombination.sort((a, b) => a - b);
         // Chỉ thêm nếu chưa có trong danh sách
         const exists = possibleCombinations.some(
           existing => JSON.stringify(existing) === JSON.stringify(combination)
@@ -489,12 +603,12 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
   // Tìm card nào hỗ trợ tổ hợp này
   // Card1 và Card2 hỗ trợ nhiều tổ hợp, Card3/4 hỗ trợ tổ hợp riêng của chúng
   const card1Combinations = [
-    [1, 2, 5], [1, 3, 5], [1, 4, 5], [2, 3, 5], [2, 5, 7], [3, 4, 5], [3, 5, 6],
+    [1, 2, 5], [1, 3, 5], [1, 4, 5], [1, 2], [1, 4], [2, 3, 5], [2, 5, 7], [3, 4, 5], [3, 5, 6],
     [3, 5, 7], [3, 5, 8], [3, 6, 7], [3, 7, 8], [4, 5, 6], [4, 5, 7], [5, 6, 7]
   ];
   
   const card2Combinations = [
-    [1, 2, 3], [1, 2, 4], [1, 2, 6], [1, 3, 4], [2, 3, 4], [2, 4, 6],
+    [1, 2, 3], [1, 2, 4], [1, 2, 6], [1, 3, 4], [1, 3], [2, 3, 4], [2, 4, 6],
     [3, 4, 6], [3, 4, 7], [1, 5, 8], [2, 4, 5], [3, 6, 8]
   ];
   
