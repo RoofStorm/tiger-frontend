@@ -23,8 +23,12 @@ export function LunchboxChallengeIntro() {
             trở thành &quot;nhịp giữ&quot; trong ngày bận rộn.
           </p>
           <p className="text-[14px] text-gray-700 leading-relaxed font-nunito text-justify md:text-center">
-            Hãy lưu giữ và chia sẻ khoảnh khắc trưa nay – để thấy nhịp sống của mình cũng đang hòa chung cùng mọi người.
+            Bạn hãy lưu giữ và chia sẻ khoảnh khắc trưa nay – để thấy nhịp sống của mình cũng đang hòa chung cùng mọi người.
           </p>
+        </div>
+        <div className="px-6 sm:px-8 md:px-0 max-w-4xl mx-auto mt-10">
+          <p className="text-[14px] text-tiger-blue-600 leading-relaxed font-prata text-justify md:text-center"  >
+            Đặc biệt, mỗi tháng TIGER sẽ chọn ra TOP 2 bạn có nhịp sống được lan toả nhất để trao giải thưởng hấp dẫn nhất.</p>
         </div>
       </div>
     </motion.div>

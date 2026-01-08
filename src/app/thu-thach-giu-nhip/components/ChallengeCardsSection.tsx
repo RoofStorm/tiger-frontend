@@ -92,7 +92,7 @@ export function ChallengeCardsSection() {
           {/* Desktop Image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/thuthachnhipsong/note_giu_nhip.svg"
+            src="/thuthachnhipsong/note_giu_nhip.png"
             alt="Note Giữ Nhịp"
             style={{ scale: 0.9 }}
             className="hidden md:block w-full h-full object-contain"
