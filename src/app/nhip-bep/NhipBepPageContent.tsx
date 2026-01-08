@@ -565,7 +565,7 @@ export function NhipBepPageContent() {
           </div>
 
           {/* Timeline Image - Relative on mobile, absolute on desktop */}
-          <div className="relative md:absolute md:bottom-[20px] left-0 w-full z-10">
+          <div className="relative md:absolute lg:bottom-[70px] left-0 w-full z-10">
             {/* Mobile: Static timeline image */}
             <div className="md:hidden">
               <Image

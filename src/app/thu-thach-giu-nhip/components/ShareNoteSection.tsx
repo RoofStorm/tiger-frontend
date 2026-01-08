@@ -560,7 +560,7 @@ export function ShareNoteSection() {
               {/* Note */}
               <div>
                 <p className="text-gray-700 leading-relaxed text-base">
-                Trong bối cảnh thị trường biến động nhanh, việc cập nhật kiến thức, tối ưu quy trình và ra quyết định dựa trên dữ liệu là yếu tố then chốt giúp tổ chức duy trì hiệu quả và phát triển bền vững lâu dài.
+                Mỗi lúc nhịp sống bên ngoài dồn dập, mình nhớ cảm giác quen thuộc của những bữa cơm ấm, những khoảng không yên ả. Mình muốn cùng gia đình hoặc cùng người thương đi đâu đó, mang theo nhịp sống chậm này ra khỏi không gian quen thuộc, để ở bên nhau lâu hơn một chút, trọn vẹn hơn một chút.
                 </p>
               </div>
             </div>
