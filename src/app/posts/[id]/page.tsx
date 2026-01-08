@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Post } from '@/types';
 import { generatePostOGImage } from '@/lib/og-image';
 import PostDetailClient from '@/components/PostDetailClient';
+import { fetchWithCredentials } from '@/lib/fetch';
 
 // Lấy post từ API thực
 async function getPost(postId: string): Promise<Post | null> {
@@ -11,12 +12,16 @@ async function getPost(postId: string): Promise<Post | null> {
     // Use environment variable for backend URL (works in both local and production)
     const apiBaseUrl =
       process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
-    const response = await fetch(`${apiBaseUrl}/posts/${postId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    // Server-side fetch: Next.js sẽ tự động forward cookies nếu có
+    const response = await fetchWithCredentials(
+      `${apiBaseUrl}/posts/${postId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
     if (!response.ok) {
       console.error(

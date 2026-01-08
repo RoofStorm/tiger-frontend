@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { fetchFromServer } from '@/lib/fetch';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,19 +19,23 @@ export async function POST(request: NextRequest) {
     try {
       const apiBaseUrl =
         process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000/api';
-      const response = await fetch(`${apiBaseUrl}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetchFromServer(
+        `${apiBaseUrl}/auth/register`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            name,
+            username,
+            referralCode: referralCode || null,
+          }),
         },
-        body: JSON.stringify({
-          email,
-          password,
-          name,
-          username,
-          referralCode: referralCode || null,
-        }),
-      });
+        request.headers
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({

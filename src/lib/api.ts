@@ -2,6 +2,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getSession } from 'next-auth/react';
 import { AnalyticsSummaryResponse } from '@/types';
+import { fetchWithCredentials } from './fetch';
 // Note: Auth types are now handled by NextAuth.js
 
 // Global loading state management
@@ -234,12 +235,10 @@ class ApiClient {
     }
 
     try {
-      const response = await axios.post(
-        `${this.client.defaults.baseURL}/auth/refresh`,
-        {
-          refreshToken,
-        }
-      );
+      // Sử dụng this.client thay vì axios.post trực tiếp để đảm bảo có withCredentials
+      const response = await this.client.post('/auth/refresh', {
+        refreshToken,
+      });
 
       const { accessToken, refreshToken: newRefreshToken } = response.data;
 
@@ -465,7 +464,7 @@ class ApiClient {
       ? `/api/wishes/highlighted?${queryParams.toString()}`
       : `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/wishes/highlighted?${queryParams.toString()}`;
     
-    const response = await fetch(apiUrl, {
+    const response = await fetchWithCredentials(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

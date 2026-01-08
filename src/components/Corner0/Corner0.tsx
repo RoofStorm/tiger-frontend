@@ -41,7 +41,9 @@ export function Corner0({ onVideoEnded, hideSkip = false, onSkip }: Corner0Props
         const videoFilename =
           process.env.NEXT_PUBLIC_VIDEO_FILENAME || 'exampleclip.mp4';
 
-        const response = await fetch(
+        // Sử dụng apiClient để đảm bảo có credentials
+        const { fetchWithCredentials } = await import('@/lib/fetch');
+        const response = await fetchWithCredentials(
           `${apiUrl}/storage/video-signed/${videoFilename}`
         );
         if (response.ok) {

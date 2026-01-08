@@ -1,6 +1,7 @@
 import { AnalyticsEvent, AnalyticsInitOptions } from '@/types';
 import { getSession } from 'next-auth/react';
 import apiClient from './api';
+import { fetchWithCredentials } from './fetch';
 
 // Constants
 const ANALYTICS_BATCH_SIZE = 15; // Gửi khi queue >= 15 events
@@ -138,7 +139,7 @@ class AnalyticsService {
         }
         
         // Use fetch with keepalive (works like sendBeacon but supports headers)
-        fetch(apiUrl, {
+        fetchWithCredentials(apiUrl, {
           method: 'POST',
           headers,
           body: JSON.stringify(payload),

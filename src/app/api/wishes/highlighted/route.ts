@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { fetchFromServer } from '@/lib/fetch';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,14 +22,15 @@ export async function GET(request: NextRequest) {
 
     console.log(`🔄 Fetching highlighted wishes from Backend API (Cursor-based)`);
 
-    const response = await fetch(
+    const response = await fetchFromServer(
       `${apiBaseUrl}/wishes/highlighted?${queryParams.toString()}`,
       {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-      }
+      },
+      request.headers
     );
 
     if (!response.ok) {

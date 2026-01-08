@@ -4,6 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useOptimizedSession } from './useOptimizedSession';
 import { apiClient } from '@/lib/api';
+import { fetchWithCredentials } from '@/lib/fetch';
 
 interface UseNextAuthReturn {
   user: {
@@ -112,7 +113,7 @@ export function useNextAuth(): UseNextAuthReturn {
     ) => {
       try {
         // Call your custom register API
-        const response = await fetch('/api/auth/register', {
+        const response = await fetchWithCredentials('/api/auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

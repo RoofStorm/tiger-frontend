@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import jwt from 'jsonwebtoken';
+import { fetchWithCredentials } from './fetch';
 
 // Helper function to call backend API for OAuth login
 async function handleOAuthLogin(
@@ -29,7 +30,7 @@ async function handleOAuthLogin(
   }
 
   try {
-    const response = await fetch(oauthUrl, {
+    const response = await fetchWithCredentials(oauthUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -132,7 +133,7 @@ export const authOptions: NextAuthOptions = {
           const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
           try {
-            const response = await fetch(loginUrl, {
+            const response = await fetchWithCredentials(loginUrl, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
