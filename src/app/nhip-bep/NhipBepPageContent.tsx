@@ -194,7 +194,6 @@ export function NhipBepPageContent() {
   const [isMobile, setIsMobile] = useState(false);
   const [isHistoryAutoPlaying, setIsHistoryAutoPlaying] = useState(true);
   const [remainingClicks, setRemainingClicks] = useState<number | null>(null);
-  const remainingClicksRef = useRef<number | null>(null);
   const currentContent = slides[currentSlide];
   const pageRef = useRef<HTMLDivElement>(null);
   const zoneARef = useRef<HTMLDivElement>(null);
@@ -204,7 +203,6 @@ export function NhipBepPageContent() {
   const { trackClick } = useAnalytics();
   const { toast } = useToast();
   const { isAuthenticated } = useNextAuth();
-
   // Track time on Nhip Bep page (Overview)
   useZoneView(pageRef, {
     page: 'nhip-bep',
@@ -274,18 +272,8 @@ export function NhipBepPageContent() {
 
   // Function to send API request with accumulated click count
   const sendProductCardClickAPI = async (clickCount: number) => {
+    console.log('sendProductCardClickAPI', clickCount);
     if (!isAuthenticated) {
-      return;
-    }
-
-    // Check if remainingClicks is 0, if so, don't call API
-    if (remainingClicks !== null && remainingClicks === 0) {
-      // Clear any pending timeout and reset counter
-      if (clickDebounceTimeoutRef.current) {
-        clearTimeout(clickDebounceTimeoutRef.current);
-        clickDebounceTimeoutRef.current = null;
-      }
-      pendingClickCountRef.current = 0;
       return;
     }
 
@@ -299,16 +287,6 @@ export function NhipBepPageContent() {
       // Update remainingClicks from response
       if (response.remainingClicks !== undefined) {
         setRemainingClicks(response.remainingClicks);
-        remainingClicksRef.current = response.remainingClicks;
-        
-        // If remainingClicks is 0, clear any pending timeout and reset counter
-        if (response.remainingClicks === 0) {
-          if (clickDebounceTimeoutRef.current) {
-            clearTimeout(clickDebounceTimeoutRef.current);
-            clickDebounceTimeoutRef.current = null;
-          }
-          pendingClickCountRef.current = 0;
-        }
       }
 
       // Show toast notification with points awarded
@@ -327,6 +305,7 @@ export function NhipBepPageContent() {
   };
 
   const handleProductCardClick = (product: Product, actualIndex: number) => {
+    console.log('handleProductCardClick', remainingClicks, isAuthenticated);
     // Only process if user is authenticated
     if (!isAuthenticated) {
       return;
@@ -345,25 +324,17 @@ export function NhipBepPageContent() {
       clearTimeout(clickDebounceTimeoutRef.current);
     }
 
-    // Set new timeout to send API after 4 seconds of no clicks (debounce)
+    // Set new timeout to send API after 3 seconds of no clicks (debounce)
     clickDebounceTimeoutRef.current = setTimeout(async () => {
-      // Check latest remainingClicks value before sending API
-      if (remainingClicksRef.current !== null && remainingClicksRef.current === 0) {
-        // If remainingClicks is 0, don't send API and reset counter
-        pendingClickCountRef.current = 0;
-        clickDebounceTimeoutRef.current = null;
-        return;
-      }
-
       const currentPendingCount = pendingClickCountRef.current;
       pendingClickCountRef.current = 0; // Reset counter
-      
+      console.log('sendProductCardClickAPI', currentPendingCount);
       if (currentPendingCount > 0) {
         await sendProductCardClickAPI(currentPendingCount);
       }
       
       clickDebounceTimeoutRef.current = null;
-    }, 4000); // 4 seconds debounce
+    }, 3000); // 3 seconds debounce
   };
 
   const nextProductSlide = () => {
@@ -461,21 +432,18 @@ export function NhipBepPageContent() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  // Update ref when remainingClicks changes
+  // Reset remainingClicks and related state when authentication status changes
   useEffect(() => {
-    remainingClicksRef.current = remainingClicks;
-  }, [remainingClicks]);
-
-  // Clear timeout and reset counter when remainingClicks becomes 0
-  useEffect(() => {
-    if (remainingClicks === 0) {
-      if (clickDebounceTimeoutRef.current) {
-        clearTimeout(clickDebounceTimeoutRef.current);
-        clickDebounceTimeoutRef.current = null;
-      }
-      pendingClickCountRef.current = 0;
+    // Reset state when user logs out or logs in (new session)
+    setRemainingClicks(null);
+    pendingClickCountRef.current = 0;
+    
+    // Clear any pending timeout
+    if (clickDebounceTimeoutRef.current) {
+      clearTimeout(clickDebounceTimeoutRef.current);
+      clickDebounceTimeoutRef.current = null;
     }
-  }, [remainingClicks]);
+  }, [isAuthenticated]);
 
   // Cleanup hover timeout and click debounce timeout on unmount
   useEffect(() => {
@@ -485,13 +453,9 @@ export function NhipBepPageContent() {
       }
       if (clickDebounceTimeoutRef.current) {
         clearTimeout(clickDebounceTimeoutRef.current);
-        // Send any pending clicks before unmount (only if remainingClicks > 0)
-        if (pendingClickCountRef.current > 0 && remainingClicks !== null && remainingClicks > 0) {
-          sendProductCardClickAPI(pendingClickCountRef.current);
-        }
       }
     };
-  }, [hoverTimeout, remainingClicks]);
+  }, [hoverTimeout]);
 
   return (
     <div ref={pageRef} className="min-h-screen">
@@ -691,7 +655,7 @@ export function NhipBepPageContent() {
           </div>
 
           {/* Timeline Image - Relative on mobile, absolute on desktop */}
-          <div className="relative md:absolute lg:bottom-[70px] left-0 w-full z-10">
+          <div className="relative md:absolute md:bottom-[70px] left-0 w-full z-10">
             {/* Mobile: Static timeline image */}
             <div className="md:hidden">
               <Image

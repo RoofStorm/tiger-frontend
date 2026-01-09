@@ -17,7 +17,6 @@ import {
   X,
   ChevronDown,
   LogOut,
-  Settings,
   Shield,
 } from 'lucide-react';
 
@@ -366,7 +365,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                             <User className="w-4 h-4 mr-3" />
                             Hồ sơ cá nhân
                           </button>
-                          <Link
+                          {/* <Link
                             href="/settings"
                             onClick={(e) => {
                               e.stopPropagation();
@@ -393,7 +392,7 @@ export function Header({ isDarkMode = false }: HeaderProps = {}) {
                           >
                             <Settings className="w-4 h-4 mr-3" />
                             Cài đặt
-                          </Link>
+                          </Link> */}
                           {isAdmin && (
                             <button
                               onClick={(e) => {
