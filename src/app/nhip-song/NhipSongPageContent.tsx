@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { EmojiSelectionSection } from './components/EmojiSelectionSection';
 import { MoodCardFlipCard } from './components/MoodCardFlipCard';
 import { ShareRegistrationModal } from './components/ShareRegistrationModal';
@@ -15,6 +16,8 @@ import { apiClient } from '@/lib/api';
 import html2canvas from 'html2canvas';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
+import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
+import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 
 const getBackgroundImage = (): string => {
   const now = new Date();
@@ -46,10 +49,14 @@ export function NhipSongPageContent() {
   // Sẽ được set trong useEffect sau khi component mount trên client
   const [backgroundImage, setBackgroundImage] = useState<string>('');
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [createdMoodCardId, setCreatedMoodCardId] = useState<string | null>(null);
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const { setIsDarkMode } = useHeaderDarkMode();
-  const { isAuthenticated } = useNextAuth();
+  const { isAuthenticated, user } = useNextAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { showModal: showShareFacebookModal } = useShareFacebookModal();
+  const { updateUserPoints } = useUpdateUserPoints();
   const pageRef = useRef<HTMLDivElement>(null);
   const { trackClick } = useAnalytics();
 
@@ -128,12 +135,56 @@ export function NhipSongPageContent() {
   const handleReset = () => {
     reset();
     setShowMoodCard(false);
+    setCreatedMoodCardId(null);
   };
 
   const handleMoodCardClose = () => {
     setShowMoodCard(false);
     setShowChallengePopup(true);
   };
+
+  // Share mood card mutation
+  const shareMoodCardMutation = useMutation({
+    mutationFn: ({ cardId, platform }: { cardId: string; platform?: string }) =>
+      apiClient.shareMoodCard(cardId, { ...(platform && { platform }) }),
+    onSuccess: (result) => {
+      // Check response format: could be { data: {...} } or direct {...}
+      const responseData = result?.data || result;
+      const pointsAwarded = responseData?.pointsAwarded === true;
+
+      // Invalidate point logs to refresh point history
+      queryClient.invalidateQueries({ queryKey: ['pointHistory', user?.id] });
+
+      // Update user points immediately if pointsAwarded is true
+      // This ensures header shows the correct points after bonus is awarded
+      if (pointsAwarded) {
+        updateUserPoints(user?.id);
+        setTimeout(() => {
+          showShareFacebookModal();
+        }, 500);
+      } else {
+        // Fallback: invalidate userDetails query to ensure UI is in sync
+        queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
+      }
+
+      // Show success message with points info
+      toast({
+        title: 'Chia sẻ thành công!',
+        description:
+          responseData?.pointsMessage || result?.pointsMessage || 'Mood card đã được chia sẻ thành công.',
+        variant: pointsAwarded ? 'success' : 'default',
+        duration: 4000,
+      });
+    },
+    onError: () => {
+      toast({
+        title: 'Lỗi',
+        description: 'Không thể chia sẻ mood card. Vui lòng thử lại.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+    },
+  });
 
   const handleSaveMoodCard = async () => {
     try {
@@ -243,29 +294,35 @@ export function NhipSongPageContent() {
           const uploadResult = await apiClient.uploadFile(file);
           const imageUrl = uploadResult.data.url;
 
+          // Tạo mood card trước khi share (nếu chưa có)
+          let cardId = createdMoodCardId;
+          if (!cardId && selectedEmojis.length === 3 && moodCardData) {
+            try {
+              // Tạo mood card với thông tin hiện tại
+              const emojiIds = selectedEmojis.map(emoji => emoji.id);
+              const createResult = await apiClient.createMoodCard({
+                emojis: emojiIds,
+                whisper: moodCardData.whisper || '',
+                reminder: moodCardData.reminder || '',
+                imageUrl: imageUrl,
+              });
+              const newCardId = createResult?.data?.id || createResult?.id;
+              if (newCardId) {
+                cardId = newCardId;
+                setCreatedMoodCardId(newCardId);
+              }
+            } catch (error) {
+              console.error('Failed to create mood card:', error);
+              // Tiếp tục share dù không tạo được card
+            }
+          }
+
           // Tạo URL share với meta tags (giống Corner2_2)
           const baseUrl =
             process.env.NEXT_PUBLIC_PUBLIC_URL ||
             (typeof window !== 'undefined' ? window.location.origin : null) ||
             process.env.NEXTAUTH_URL ||
             'https://tiger-corporation-vietnam.vn'; // Fallback to production URL
-          
-          // Tạo title và description cho mood card
-          // const shareTitle = moodCardData?.reminder
-          //   ? (moodCardData.reminder.length > 50
-          //       ? moodCardData.reminder.substring(0, 50) + '...'
-          //       : moodCardData.reminder) + ' - TIGER Nhịp Sống'
-          //   : moodCardData?.whisper
-          //   ? `"${moodCardData.whisper.length > 50 ? moodCardData.whisper.substring(0, 50) + '...' : moodCardData.whisper}" - Tiger Nhịp Sống`
-          //   : 'Mood Card - TIGER Nhịp Sống';
-          
-          // const shareDescription = moodCardData?.whisper && moodCardData?.reminder
-          //   ? `"${moodCardData.whisper}"\n\n${moodCardData.reminder}\n\n#TigerNhịpSống #MoodCard`
-          //   : moodCardData?.whisper
-          //   ? `"${moodCardData.whisper}"\n\n#TigerNhịpSống #MoodCard`
-          //   : moodCardData?.reminder
-          //   ? `${moodCardData.reminder}\n\n#TigerNhịpSống #MoodCard`
-          //   : 'Khám phá cảm xúc của bạn qua mood card. Cùng TIGER tham gia thử thách Giữ Nhịp nhé.';
 
           // Tạo URL của page share với query params (có meta tags)
           const sharePageUrl = `${baseUrl}/nhip-song/share?imageUrl=${encodeURIComponent(imageUrl)}&whisper=${encodeURIComponent(moodCardData?.whisper || '')}&reminder=${encodeURIComponent(moodCardData?.reminder || '')}`;
@@ -294,11 +351,16 @@ export function NhipSongPageContent() {
           // Focus vào popup
           popup.focus();
 
-          toast({
-            title: 'Chia sẻ thành công',
-            description: 'Đang mở Facebook để chia sẻ ảnh của bạn.',
-            duration: 3000,
-          });
+          // Gọi API share với platform facebook để được cộng điểm (nếu có cardId)
+          if (cardId) {
+            shareMoodCardMutation.mutate({ cardId, platform: 'facebook' });
+          } else {
+            toast({
+              title: 'Chia sẻ thành công',
+              description: 'Đang mở Facebook để chia sẻ ảnh của bạn.',
+              duration: 3000,
+            });
+          }
         } catch (uploadError) {
           console.error('❌ [SHARE] Upload image lỗi:', uploadError);
           throw uploadError;
