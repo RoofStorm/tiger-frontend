@@ -222,13 +222,13 @@ export function ShareRegistrationModal({
                 className="font-noto-sans text-center mb-8"
                 style={{
                   fontFamily: 'Noto Sans',
-                  fontWeight: 400,
+                  fontWeight: 600,
                   fontSize: '14px',
                   lineHeight: '20px',
                   color: '#333435',
                 }}
               >
-                Để nhận ngay 200 điểm và đổi quà độc quyền
+                Để nhận ngay 200 điểm năng lượng và đổi voucher ưu đãi
               </p>
 
               {/* Social Login Buttons */}

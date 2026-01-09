@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Gift, Leaf } from 'lucide-react';
@@ -13,6 +13,7 @@ import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 import { RedeemModal } from '@/components/RedeemModal';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
+import { ShareRegistrationModal } from '@/app/nhip-song/components/ShareRegistrationModal';
 
 type TabType = 'doi-qua' | 'the-le' | 'nhip-song' | 'thu-thach' | 'nhip-bep' | 'tc';
 
@@ -26,12 +27,34 @@ export function DoiQuaPageContent() {
   const [activeTab, setActiveTab] = useState<TabType>('doi-qua');
   const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
   const [showRedeemModal, setShowRedeemModal] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
   // Track time on Đổi Quà page (Overview)
   useZoneView(pageRef, {
     page: 'doi-qua',
     zone: 'overview',
   });
+
+  // Show registration modal when user is not authenticated (only once per session)
+  useEffect(() => {
+    // Only check on client side
+    if (typeof window === 'undefined') return;
+
+    // Check if user is not authenticated
+    if (!isAuthenticated) {
+      // Check if modal has already been shown in this session
+      const modalShown = sessionStorage.getItem('doiQuaRegistrationModalShown');
+      
+      if (!modalShown) {
+        // Show modal and mark as shown in sessionStorage
+        setShowRegistrationModal(true);
+        sessionStorage.setItem('doiQuaRegistrationModalShown', 'true');
+      }
+    } else {
+      // If user is authenticated, close modal if it's open
+      setShowRegistrationModal(false);
+    }
+  }, [isAuthenticated]);
 
   // Fetch user details including points
   const { data: userDetails } = useQuery({
@@ -125,6 +148,20 @@ export function DoiQuaPageContent() {
     };
 
     redeemMutation.mutate(data as CreateRedeemData & { receiverEmail: string });
+  };
+
+  const handleRegistrationModalClose = () => {
+    setShowRegistrationModal(false);
+  };
+
+  const handleRegistrationModalRegister = () => {
+    setShowRegistrationModal(false);
+    // Modal will handle the registration flow
+  };
+
+  const handleRegistrationModalLogin = () => {
+    setShowRegistrationModal(false);
+    // Modal will handle the login flow
   };
 
   const canRedeem = (reward: Reward) => {
@@ -578,13 +615,13 @@ export function DoiQuaPageContent() {
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>400 điểm năng lượng</strong> → Voucher 50k Got It
+                          <strong>600 điểm năng lượng</strong> → Voucher 50k Got It
                         </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
-                          <strong>500 điểm năng lượng</strong> → Voucher 100k Got It
+                          <strong>800 điểm năng lượng</strong> → Voucher 100k Got It
                         </span>
                       </li>
                     </ul>
@@ -923,6 +960,15 @@ export function DoiQuaPageContent() {
           </div>
         </div>
       </main>
+
+      {/* Share Registration Modal */}
+      <ShareRegistrationModal
+        isOpen={showRegistrationModal}
+        onClose={handleRegistrationModalClose}
+        onRegister={handleRegistrationModalRegister}
+        onLogin={handleRegistrationModalLogin}
+        initialMode="register"
+      />
     </div>
   );
 }
