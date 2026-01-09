@@ -20,13 +20,13 @@ export async function generateMetadata({
   // Tạo title từ reminder hoặc whisper
   let title = '';
   if (reminder) {
-    const shortReminder = reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
-    title = `${shortReminder} - TIGER Nhịp Sống`;
+    // const shortReminder = reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
+    title = `Hôm nay nhịp sống của bạn như thế nào? - Cùng TIGER giữ trọn nhịp sống`;
   } else if (whisper) {
-    const shortWhisper = whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
-    title = `"${shortWhisper}" - TIGER Nhịp Sống`;
+    // const shortWhisper = whisper.length > 50 ? whisper.substring(0, 50) + '...' : whisper;
+    title = `Hôm nay nhịp sống của bạn như thế nào? - Cùng TIGER giữ trọn nhịp sống`;
   } else {
-    title = 'Mood Card - TIGER Nhịp Sống';
+    title = 'Hôm nay nhịp sống của bạn như thế nào? - Cùng TIGER giữ trọn nhịp sống';
   }
 
   // Tạo description

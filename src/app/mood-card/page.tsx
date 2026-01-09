@@ -32,9 +32,9 @@ export async function generateMetadata({
   let title = '';
   if (reminder) {
     // Cắt reminder nếu quá dài (tối đa 50 ký tự)
-    const shortReminder =
-      reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
-    title = `${shortReminder} - TIGER Nhịp Sống`;
+    // const shortReminder =
+    //   reminder.length > 50 ? reminder.substring(0, 50) + '...' : reminder;
+    title = `Hôm nay nhịp sống của bạn như thế nào? - Cùng TIGER giữ trọn nhịp sống`;
   } else if (whisper) {
     // Fallback về whisper nếu không có reminder
     // const shortWhisper =

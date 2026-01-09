@@ -109,7 +109,7 @@ export async function generateMetadata({
         ? `${post.caption.substring(0, 160)}...`
         : 'Khám phá thế giới cảm xúc qua những emoji đặc biệt. Tạo mood card cá nhân và chia sẻ với cộng đồng.',
       url: postUrl,
-      siteName: 'TIGER Nhịp Sống',
+      siteName: 'Cùng TIGER giữ trọn nhịp sống',
       images: [ogImage],
       locale: 'vi_VN',
       type: 'article',
