@@ -198,8 +198,6 @@ export function NhipBepPageContent() {
   const pageRef = useRef<HTMLDivElement>(null);
   const zoneARef = useRef<HTMLDivElement>(null);
   const zoneBRef = useRef<HTMLDivElement>(null);
-  const clickDebounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const pendingClickCountRef = useRef(0);
   const { trackClick } = useAnalytics();
   const { toast } = useToast();
   const { isAuthenticated } = useNextAuth();
@@ -270,19 +268,20 @@ export function NhipBepPageContent() {
     }
   };
 
-  // Function to send API request with accumulated click count
-  const sendProductCardClickAPI = async (clickCount: number) => {
-    console.log('sendProductCardClickAPI', clickCount);
+  // Function to send API request for product card click
+  const sendProductCardClickAPI = async () => {
     if (!isAuthenticated) {
       return;
     }
 
-    // Limit clickCount to max 100 as per API spec
-    const finalClickCount = Math.min(clickCount, 100);
+    // Check if remainingClicks is 0, if so, don't call API
+    if (remainingClicks !== null && remainingClicks === 0) {
+      return;
+    }
 
     try {
-      // Call API to award points for product card click
-      const response = await apiClient.awardProductCardClick(finalClickCount);
+      // Call API to award points for product card click (1 click at a time)
+      const response = await apiClient.awardProductCardClick(1);
       
       // Update remainingClicks from response
       if (response.remainingClicks !== undefined) {
@@ -305,7 +304,6 @@ export function NhipBepPageContent() {
   };
 
   const handleProductCardClick = (product: Product, actualIndex: number) => {
-    console.log('handleProductCardClick', remainingClicks, isAuthenticated);
     // Only process if user is authenticated
     if (!isAuthenticated) {
       return;
@@ -316,25 +314,8 @@ export function NhipBepPageContent() {
       return;
     }
 
-    // Increment pending click count
-    pendingClickCountRef.current += 1;
-
-    // Clear existing timeout
-    if (clickDebounceTimeoutRef.current) {
-      clearTimeout(clickDebounceTimeoutRef.current);
-    }
-
-    // Set new timeout to send API after 3 seconds of no clicks (debounce)
-    clickDebounceTimeoutRef.current = setTimeout(async () => {
-      const currentPendingCount = pendingClickCountRef.current;
-      pendingClickCountRef.current = 0; // Reset counter
-      console.log('sendProductCardClickAPI', currentPendingCount);
-      if (currentPendingCount > 0) {
-        await sendProductCardClickAPI(currentPendingCount);
-      }
-      
-      clickDebounceTimeoutRef.current = null;
-    }, 3000); // 3 seconds debounce
+    // Call API immediately
+    sendProductCardClickAPI();
   };
 
   const nextProductSlide = () => {
@@ -432,27 +413,17 @@ export function NhipBepPageContent() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  // Reset remainingClicks and related state when authentication status changes
+  // Reset remainingClicks when authentication status changes
   useEffect(() => {
     // Reset state when user logs out or logs in (new session)
     setRemainingClicks(null);
-    pendingClickCountRef.current = 0;
-    
-    // Clear any pending timeout
-    if (clickDebounceTimeoutRef.current) {
-      clearTimeout(clickDebounceTimeoutRef.current);
-      clickDebounceTimeoutRef.current = null;
-    }
   }, [isAuthenticated]);
 
-  // Cleanup hover timeout and click debounce timeout on unmount
+  // Cleanup hover timeout on unmount
   useEffect(() => {
     return () => {
       if (hoverTimeout) {
         clearTimeout(hoverTimeout);
-      }
-      if (clickDebounceTimeoutRef.current) {
-        clearTimeout(clickDebounceTimeoutRef.current);
       }
     };
   }, [hoverTimeout]);
