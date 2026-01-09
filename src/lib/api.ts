@@ -51,6 +51,7 @@ class ApiClient {
           '/analytics/corners', // Corner analytics are background calls
           '/like', // Liking a post is a background action
           '/notifications', // Notifications are background calls
+          '/points/product-card-click', // Product card click is a background action
         ];
 
         const isSilentEndpoint = silentEndpoints.some(endpoint =>
@@ -420,6 +421,19 @@ class ApiClient {
   async getPointHistory(): Promise<any> {
     const response = await this.client.get('/points/history');
     return response.data;
+  }
+
+  async awardProductCardClick(clickCount: number): Promise<{
+    awardedClicks: number;
+    totalPoints: number;
+    remainingClicks: number;
+    currentTotalClicks: number;
+    maxClicks: number;
+  }> {
+    const response = await this.client.post('/points/product-card-click', {
+      clickCount,
+    });
+    return response.data?.data || response.data;
   }
 
   async changePassword(data: any): Promise<any> {
