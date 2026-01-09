@@ -49,7 +49,6 @@ export function NhipSongPageContent() {
   // Sẽ được set trong useEffect sau khi component mount trên client
   const [backgroundImage, setBackgroundImage] = useState<string>('');
   const [isDark, setIsDark] = useState<boolean>(false);
-  const [createdMoodCardId, setCreatedMoodCardId] = useState<string | null>(null);
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const { setIsDarkMode } = useHeaderDarkMode();
   const { isAuthenticated, user } = useNextAuth();
@@ -135,7 +134,19 @@ export function NhipSongPageContent() {
   const handleReset = () => {
     reset();
     setShowMoodCard(false);
-    setCreatedMoodCardId(null);
+  };
+
+  // Generate UUID for cardId
+  const generateCardId = (): string => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    // Fallback: generate UUID-like string
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
   };
 
   const handleMoodCardClose = () => {
@@ -160,7 +171,8 @@ export function NhipSongPageContent() {
       if (pointsAwarded) {
         updateUserPoints(user?.id);
         setTimeout(() => {
-          showShareFacebookModal();
+          // Hide button when sharing mood card
+          showShareFacebookModal(true);
         }, 500);
       } else {
         // Fallback: invalidate userDetails query to ensure UI is in sync
@@ -294,28 +306,8 @@ export function NhipSongPageContent() {
           const uploadResult = await apiClient.uploadFile(file);
           const imageUrl = uploadResult.data.url;
 
-          // Tạo mood card trước khi share (nếu chưa có)
-          let cardId = createdMoodCardId;
-          if (!cardId && selectedEmojis.length === 3 && moodCardData) {
-            try {
-              // Tạo mood card với thông tin hiện tại
-              const emojiIds = selectedEmojis.map(emoji => emoji.id);
-              const createResult = await apiClient.createMoodCard({
-                emojis: emojiIds,
-                whisper: moodCardData.whisper || '',
-                reminder: moodCardData.reminder || '',
-                imageUrl: imageUrl,
-              });
-              const newCardId = createResult?.data?.id || createResult?.id;
-              if (newCardId) {
-                cardId = newCardId;
-                setCreatedMoodCardId(newCardId);
-              }
-            } catch (error) {
-              console.error('Failed to create mood card:', error);
-              // Tiếp tục share dù không tạo được card
-            }
-          }
+          // Auto generate cardId khi share
+          const cardId = generateCardId();
 
           // Tạo URL share với meta tags (giống Corner2_2)
           const baseUrl =
@@ -351,16 +343,9 @@ export function NhipSongPageContent() {
           // Focus vào popup
           popup.focus();
 
-          // Gọi API share với platform facebook để được cộng điểm (nếu có cardId)
-          if (cardId) {
-            shareMoodCardMutation.mutate({ cardId, platform: 'facebook' });
-          } else {
-            toast({
-              title: 'Chia sẻ thành công',
-              description: 'Đang mở Facebook để chia sẻ ảnh của bạn.',
-              duration: 3000,
-            });
-          }
+          // Gọi API share với platform facebook để được cộng điểm
+          // Auto generate cardId khi gửi đi
+          shareMoodCardMutation.mutate({ cardId, platform: 'facebook' });
         } catch (uploadError) {
           console.error('❌ [SHARE] Upload image lỗi:', uploadError);
           throw uploadError;

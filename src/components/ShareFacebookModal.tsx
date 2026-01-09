@@ -6,11 +6,13 @@ import { RewardImageModal } from './RewardImageModal';
 interface ShareFacebookModalProps {
   isOpen: boolean;
   onClose: () => void;
+  hideButton?: boolean;
 }
 
 export function ShareFacebookModal({
   isOpen,
   onClose,
+  hideButton = false,
 }: ShareFacebookModalProps) {
   const router = useRouter();
 
@@ -27,8 +29,8 @@ export function ShareFacebookModal({
       alt="Share Facebook Reward"
       showCloseButton={false}
       closeOnContentClick={true}
-      buttonText="Tham gia ngay"
-      onButtonClick={handleButtonClick}
+      buttonText={hideButton ? undefined : "Tham gia ngay"}
+      onButtonClick={hideButton ? undefined : handleButtonClick}
       buttonClassName="relative -top-[50px]"
     />
   );

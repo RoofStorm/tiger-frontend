@@ -4,7 +4,7 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 import { ShareFacebookModal } from '@/components/ShareFacebookModal';
 
 interface ShareFacebookModalContextType {
-  showModal: () => void;
+  showModal: (hideButton?: boolean) => void;
   hideModal: () => void;
   isOpen: boolean;
 }
@@ -19,8 +19,10 @@ export function ShareFacebookModalProvider({
   children: ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [hideButton, setHideButton] = useState(false);
 
-  const showModal = () => {
+  const showModal = (hideButtonParam: boolean = false) => {
+    setHideButton(hideButtonParam);
     setIsOpen(true);
   };
 
@@ -31,7 +33,7 @@ export function ShareFacebookModalProvider({
   return (
     <ShareFacebookModalContext.Provider value={{ showModal, hideModal, isOpen }}>
       {children}
-      <ShareFacebookModal isOpen={isOpen} onClose={hideModal} />
+      <ShareFacebookModal isOpen={isOpen} onClose={hideModal} hideButton={hideButton} />
     </ShareFacebookModalContext.Provider>
   );
 }
