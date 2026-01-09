@@ -249,6 +249,9 @@ export function NhipBepPageContent() {
     const img = new window.Image();
     img.src = product.image;
     
+    // Call API to award points for product card hover
+    sendProductCardClickAPI();
+    
     // Clear any existing timeout
     if (hoverTimeout) {
       clearTimeout(hoverTimeout);
