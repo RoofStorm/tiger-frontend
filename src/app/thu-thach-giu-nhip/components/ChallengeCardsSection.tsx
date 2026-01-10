@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useCallback, useRef } from 'react';
+import Image from 'next/image';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
 
@@ -54,22 +55,28 @@ export function ChallengeCardsSection() {
       >
         <div className="relative w-full h-full">
           {/* Mobile Image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/thuthachnhipsong/lunchbox_challenge_mobile.png"
-            alt="LunchBox Challenge"
-            className="object-contain md:hidden w-full h-full"
-            fetchPriority="high"
-          />
+          <div className="relative w-full h-full md:hidden">
+            <Image
+              src="/thuthachnhipsong/lunchbox_challenge_mobile.png"
+              alt="LunchBox Challenge"
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 0px"
+              priority
+            />
+          </div>
           {/* Desktop Image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/thuthachnhipsong/lunchbox_challenge.png"
-            style={{ scale: 0.9 }}
-            alt="LunchBox Challenge"
-            className="hidden md:block w-full h-full object-contain"
-            fetchPriority="high"
-          />
+          <div className="relative w-full h-full hidden md:block">
+            <Image
+              src="/thuthachnhipsong/lunchbox_challenge.png"
+              alt="LunchBox Challenge"
+              fill
+              className="object-contain"
+              sizes="(min-width: 768px) 50vw, 0px"
+              style={{ scale: 0.9 }}
+              priority
+            />
+          </div>
         </div>
       </motion.div>
 
@@ -82,22 +89,28 @@ export function ChallengeCardsSection() {
       >
         <div className="relative w-full h-full">
           {/* Mobile Image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/thuthachnhipsong/note_giu_nhip_mobile.png"
-            alt="Note Giữ Nhịp"
-            className="w-full h-full object-contain md:hidden"
-            fetchPriority="high"
-          />
+          <div className="relative w-full h-full md:hidden">
+            <Image
+              src="/thuthachnhipsong/note_giu_nhip_mobile.png"
+              alt="Note Giữ Nhịp"
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 0px"
+              priority
+            />
+          </div>
           {/* Desktop Image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/thuthachnhipsong/note_giu_nhip.png"
-            alt="Note Giữ Nhịp"
-            style={{ scale: 0.9 }}
-            className="hidden md:block w-full h-full object-contain"
-            fetchPriority="high"
-          />
+          <div className="relative w-full h-full hidden md:block">
+            <Image
+              src="/thuthachnhipsong/note_giu_nhip.png"
+              alt="Note Giữ Nhịp"
+              fill
+              className="object-contain"
+              sizes="(min-width: 768px) 50vw, 0px"
+              style={{ scale: 0.9 }}
+              priority
+            />
+          </div>
         </div>
       </motion.div>
     </div>
