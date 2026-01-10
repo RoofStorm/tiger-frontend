@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { EmojiSelectionSection } from './components/EmojiSelectionSection';
 import { MoodCardFlipCard } from './components/MoodCardFlipCard';
@@ -19,21 +20,6 @@ import { useZoneView } from '@/hooks/useZoneView';
 import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
 import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 
-const getBackgroundImage = (): string => {
-  const now = new Date();
-  const hour = now.getHours();
-  const isDark = hour >= 18 || hour < 6;
-  
-  // Thêm timestamp để tránh browser cache (chỉ thay đổi mỗi giờ)
-  const cacheBuster = Math.floor(now.getTime() / (1000 * 60 * 60)); // Thay đổi mỗi giờ
-  
-  const bgImage = isDark 
-    ? `url(/nhipsong/nhipsong_dark_background.jpg?v=${cacheBuster})`
-    : `url(/nhipsong/nhipsong_light_background.jpg?v=${cacheBuster})`;
-    
-  return bgImage;
-};
-
 const isDarkMode = (): boolean => {
   const now = new Date();
   const hour = now.getHours();
@@ -47,7 +33,6 @@ export function NhipSongPageContent() {
   const [showChallengePopup, setShowChallengePopup] = useState(false);
   // Không set initial value từ function để tránh SSR/hydration mismatch trong production
   // Sẽ được set trong useEffect sau khi component mount trên client
-  const [backgroundImage, setBackgroundImage] = useState<string>('');
   const [isDark, setIsDark] = useState<boolean>(false);
   const { navigateWithLoading } = useGlobalNavigationLoading();
   const { setIsDarkMode } = useHeaderDarkMode();
@@ -71,59 +56,19 @@ export function NhipSongPageContent() {
     setIsDarkMode(showShareModal);
   }, [showShareModal, setIsDarkMode]);
 
-
-  // Preload background images với fetchPriority="high" để tối ưu hóa hiệu năng
-  useEffect(() => {
-    const darkBgUrl = '/nhipsong/nhipsong_dark_background.jpg';
-    const lightBgUrl = '/nhipsong/nhipsong_light_background.jpg';
-    
-    // Kiểm tra xem link preload đã tồn tại chưa để tránh duplicate
-    const existingDarkLink = document.querySelector(`link[rel="preload"][href="${darkBgUrl}"]`);
-    const existingLightLink = document.querySelector(`link[rel="preload"][href="${lightBgUrl}"]`);
-    
-    // Tạo link preload với fetchPriority="high" cho cả 2 background images
-    if (!existingDarkLink) {
-      const darkBgLink = document.createElement('link');
-      darkBgLink.rel = 'preload';
-      darkBgLink.as = 'image';
-      darkBgLink.href = darkBgUrl;
-      darkBgLink.setAttribute('fetchpriority', 'high');
-      document.head.appendChild(darkBgLink);
-    }
-    
-    if (!existingLightLink) {
-      const lightBgLink = document.createElement('link');
-      lightBgLink.rel = 'preload';
-      lightBgLink.as = 'image';
-      lightBgLink.href = lightBgUrl;
-      lightBgLink.setAttribute('fetchpriority', 'high');
-      document.head.appendChild(lightBgLink);
-    }
-    
-    // Fallback: Preload bằng Image object để đảm bảo ảnh được cache
-    const darkBg = new Image();
-    darkBg.src = darkBgUrl;
-    
-    const lightBg = new Image();
-    lightBg.src = lightBgUrl;
-  }, []);
-
-  // Cập nhật background image và dark mode dựa trên thời gian
+  // Cập nhật dark mode dựa trên thời gian
   // Chỉ chạy trên client side sau khi component mount để tránh SSR/hydration mismatch
   useEffect(() => {
-    const updateBackground = () => {
-      const newBgImage = getBackgroundImage();
+    const updateDarkMode = () => {
       const newIsDark = isDarkMode();
-      
-      setBackgroundImage(newBgImage);
       setIsDark(newIsDark);
     };
 
     // Cập nhật ngay khi component mount trên client
-    updateBackground();
+    updateDarkMode();
 
-    // Kiểm tra lại mỗi phút để đảm bảo background được cập nhật khi thời gian thay đổi
-    const interval = setInterval(updateBackground, 60000); // 60000ms = 1 phút
+    // Kiểm tra lại mỗi phút để đảm bảo dark mode được cập nhật khi thời gian thay đổi
+    const interval = setInterval(updateDarkMode, 60000); // 60000ms = 1 phút
 
     return () => clearInterval(interval);
   }, []);
@@ -405,17 +350,26 @@ export function NhipSongPageContent() {
 
   return (
     <div ref={pageRef}>
-      <main 
-        style={{
-          backgroundImage: backgroundImage || 'url(/nhipsong/nhipsong_light_background.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: isDark ? 'center' : 'bottom',
-          backgroundRepeat: 'no-repeat',
-          minHeight:'calc(100vh - 80px)'
-        }}
-        className="mt-[64px] xl:mt-[80px] block"
-      >
-        <div className={`max-w-xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex flex-col ${isDark ? 'justify-start py-6' : 'justify-center md:justify-start py-6 2xl:py-12'}`}>
+      <main className="relative min-h-[calc(100vh-80px)] mt-[64px] xl:mt-[80px]">
+        {/* Background Image using Next.js Image component */}
+        <Image
+          src={
+            isDark
+              ? '/nhipsong/nhipsong_dark_background.jpg'
+              : '/nhipsong/nhipsong_light_background.jpg'
+          }
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          style={{
+            objectPosition: isDark ? 'center' : 'bottom',
+          }}
+        />
+        
+        {/* Content with z-index to appear above background */}
+        <div className={`relative z-10 max-w-xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 flex flex-col ${isDark ? 'justify-start py-6' : 'justify-center md:justify-start py-6 2xl:py-12'}`}>
           {!showMoodCard ? (
             <EmojiSelectionSection
               selectedEmojis={selectedEmojis}
