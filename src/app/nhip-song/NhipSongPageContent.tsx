@@ -72,18 +72,40 @@ export function NhipSongPageContent() {
   }, [showShareModal, setIsDarkMode]);
 
 
-  // Preload background images để tối ưu hóa hiệu năng
+  // Preload background images với fetchPriority="high" để tối ưu hóa hiệu năng
   useEffect(() => {
-    // Preload cả 2 background images (dark và light) để tránh delay khi switch
-    const preloadImages = () => {
-      const darkBg = new Image();
-      darkBg.src = '/nhipsong/nhipsong_dark_background.jpg';
-      
-      const lightBg = new Image();
-      lightBg.src = '/nhipsong/nhipsong_light_background.jpg';
-    };
-
-    preloadImages();
+    const darkBgUrl = '/nhipsong/nhipsong_dark_background.jpg';
+    const lightBgUrl = '/nhipsong/nhipsong_light_background.jpg';
+    
+    // Kiểm tra xem link preload đã tồn tại chưa để tránh duplicate
+    const existingDarkLink = document.querySelector(`link[rel="preload"][href="${darkBgUrl}"]`);
+    const existingLightLink = document.querySelector(`link[rel="preload"][href="${lightBgUrl}"]`);
+    
+    // Tạo link preload với fetchPriority="high" cho cả 2 background images
+    if (!existingDarkLink) {
+      const darkBgLink = document.createElement('link');
+      darkBgLink.rel = 'preload';
+      darkBgLink.as = 'image';
+      darkBgLink.href = darkBgUrl;
+      darkBgLink.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(darkBgLink);
+    }
+    
+    if (!existingLightLink) {
+      const lightBgLink = document.createElement('link');
+      lightBgLink.rel = 'preload';
+      lightBgLink.as = 'image';
+      lightBgLink.href = lightBgUrl;
+      lightBgLink.setAttribute('fetchpriority', 'high');
+      document.head.appendChild(lightBgLink);
+    }
+    
+    // Fallback: Preload bằng Image object để đảm bảo ảnh được cache
+    const darkBg = new Image();
+    darkBg.src = darkBgUrl;
+    
+    const lightBg = new Image();
+    lightBg.src = lightBgUrl;
   }, []);
 
   // Cập nhật background image và dark mode dựa trên thời gian
