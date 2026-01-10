@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { RotateCcw, Share2 } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import { useGlobalNavigationLoading } from '@/hooks/useGlobalNavigationLoading';
 
 interface MoodCardFlipCardProps {
   whisper: string;
@@ -44,7 +43,6 @@ export function MoodCardFlipCard({
   const hasAutoFlipped = useRef(false);
   const frontCardRef = useRef<HTMLDivElement>(null);
   const cardContentRef = useRef<HTMLDivElement>(null);
-  const { navigateWithLoading } = useGlobalNavigationLoading();
   // Tự động flip card sau 2 giây khi component được hiển thị
   useEffect(() => {
     if (hasAutoFlipped.current) return;

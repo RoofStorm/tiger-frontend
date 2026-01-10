@@ -72,7 +72,7 @@ export function Modal({
             <div
               className={`flex items-center ${
                 showHeader && headerTitle ? 'justify-between' : 'justify-end'
-              } p-4 ${headerClassName}`}
+              } px-6 py-4 ${headerClassName}`}
             >
               {showHeader && (
                 <div className="flex-1">

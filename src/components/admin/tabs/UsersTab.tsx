@@ -1,14 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
-import { Plus, Edit, Trash2, Eye, Download } from 'lucide-react';
-import { useConfirm } from '@/hooks/useConfirm';
+import { Plus, Eye, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import apiClient from '@/lib/api';
 import { FilterBar } from '../FilterBar';
 import { Pagination } from '../Pagination';
 import { LoginMethodBadge } from '../LoginMethodBadge';
 import { ActionButton } from '../ActionButton';
+import { UserPointHistoryModal } from '../UserPointHistoryModal';
 
 interface User {
   id: string;
@@ -31,7 +31,7 @@ interface UsersTabProps {
 }
 
 export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
-  const { confirm } = useConfirm();
+  // const { confirm } = useConfirm();
   const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [isExporting, setIsExporting] = useState(false);
@@ -39,6 +39,8 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
     role: '',
     status: '',
   });
+  const [isPointHistoryModalOpen, setIsPointHistoryModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Fetch users data with server-side pagination
   const { data: usersData, isLoading: usersLoading } = useQuery({
@@ -242,11 +244,15 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
                     <ActionButton
                       variant="ghost"
                       size="sm"
-                      tooltip="Xem chi tiết"
+                      tooltip="Xem lịch sử điểm thưởng"
+                      onClick={() => {
+                        setSelectedUser(userItem);
+                        setIsPointHistoryModalOpen(true);
+                      }}
                     >
                       <Eye className="w-4 h-4" />
                     </ActionButton>
-                    <ActionButton
+                    {/* <ActionButton
                       variant="ghost"
                       size="sm"
                       tooltip="Chỉnh sửa"
@@ -284,8 +290,8 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
                       }}
                     >
                       <Trash2 className="w-4 h-4" />
-                    </ActionButton>
-                  </div>
+                    </ActionButton> */}
+                  </div> 
                 </td>
               </tr>
             ))}
@@ -298,6 +304,17 @@ export const UsersTab: React.FC<UsersTabProps> = ({ isAdmin }) => {
         onPageChange={setCurrentPage}
         itemsPerPage={10}
       />
+      {selectedUser && (
+        <UserPointHistoryModal
+          isOpen={isPointHistoryModalOpen}
+          onClose={() => {
+            setIsPointHistoryModalOpen(false);
+            setSelectedUser(null);
+          }}
+          userId={selectedUser.id}
+          userName={selectedUser.name}
+        />
+      )}
     </div>
   );
 };

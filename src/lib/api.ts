@@ -424,6 +424,17 @@ class ApiClient {
     return response.data;
   }
 
+  async getUserPointHistory(
+    userId: string,
+    page = 1,
+    limit = 20
+  ): Promise<any> {
+    const response = await this.client.get(
+      `/points/history/${userId}?page=${page}&limit=${limit}`
+    );
+    return response.data;
+  }
+
   async awardProductCardClick(clickCount: number): Promise<{
     awardedClicks: number;
     totalPoints: number;
