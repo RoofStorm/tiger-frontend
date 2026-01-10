@@ -61,8 +61,9 @@ export function DailyLoginModalProvider() {
       const sessionData = await apiClient.getSession();
 
       if (sessionData) {
-        if (sessionData.user?.id) {
-          localStorage.setItem('userId', sessionData.user.id);
+        const userId = sessionData.user?.id;
+        if (userId) {
+          localStorage.setItem('userId', userId);
         }
 
         const currentSession = await getSession();
@@ -78,7 +79,20 @@ export function DailyLoginModalProvider() {
         }
 
         const pointsAwarded = sessionData.pointsAwarded || false;
-        checkAndEnqueueModal(pointsAwarded, sessionData.user?.id);
+        const isFirstLogin = sessionData.isFirstLogin || false;
+
+        // If backend says pointsAwarded = false, mark as shown for today to prevent showing again
+        if (!pointsAwarded && userId) {
+          const today = new Date().toDateString();
+          localStorage.setItem('dailyLoginModalShownDate', today);
+        }
+
+        // If backend says isFirstLogin = false, mark as shown to prevent showing first login modal
+        if (!isFirstLogin && userId) {
+          localStorage.setItem(`firstLoginModalShown_${userId}`, 'true');
+        }
+
+        checkAndEnqueueModal(pointsAwarded, userId);
 
         queryClient.invalidateQueries({ queryKey: ['userDetails'] });
       }

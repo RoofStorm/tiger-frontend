@@ -43,11 +43,24 @@ export async function POST(request: NextRequest) {
         }));
 
         // Extract error message from backend response
-        const errorMessage =
+        let errorMessage =
           errorData.error ||
           errorData.message ||
           errorData.data?.message ||
           `Lỗi API Backend (${response.status})`;
+
+        // Improve error message for common cases
+        if (response.status === 409) {
+          // Conflict - user already exists
+          const lowerErrorMessage = errorMessage.toLowerCase();
+          if (lowerErrorMessage.includes('email')) {
+            errorMessage = 'Email này đã được sử dụng. Vui lòng sử dụng email khác hoặc đăng nhập.';
+          } else if (lowerErrorMessage.includes('username') || lowerErrorMessage.includes('tên đăng nhập')) {
+            errorMessage = 'Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên đăng nhập khác.';
+          } else if (errorMessage === 'Conflict' || lowerErrorMessage === 'conflict') {
+            errorMessage = 'Email hoặc tên đăng nhập đã được sử dụng. Vui lòng thử lại với thông tin khác.';
+          }
+        }
 
         return NextResponse.json(
           { error: errorMessage },

@@ -297,9 +297,10 @@ class ApiClient {
     accessToken: string;
     refreshToken: string;
     pointsAwarded: boolean;
+    isFirstLogin: boolean;
   } | null> {
     const response = await this.client.get('/auth/session');
-    // Backend returns: { success: true, data: { user, expires, accessToken, refreshToken, pointsAwarded } }
+    // Backend returns: { success: true, data: { user, expires, accessToken, refreshToken, pointsAwarded, isFirstLogin } }
     // Return the data object from the response
     return response.data?.data || null;
   }

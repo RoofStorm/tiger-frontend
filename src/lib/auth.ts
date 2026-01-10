@@ -74,6 +74,8 @@ async function handleOAuthLogin(
       refreshToken: responseData.refreshToken,
       // Store pointsAwarded flag to show daily login modal
       pointsAwarded: responseData.pointsAwarded || false,
+      // Store isFirstLogin flag to show first login modal
+      isFirstLogin: responseData.isFirstLogin || false,
     };
   } catch (error) {
     console.error(`❌ Error calling ${provider} OAuth API:`, error);
@@ -203,6 +205,8 @@ export const authOptions: NextAuthOptions = {
               refreshToken: responseData.refreshToken,
               // Store pointsAwarded flag to show daily login modal
               pointsAwarded: responseData.pointsAwarded || false,
+              // Store isFirstLogin flag to show first login modal
+              isFirstLogin: responseData.isFirstLogin || false,
             };
           } catch (fetchError: unknown) {
             clearTimeout(timeoutId);
@@ -267,11 +271,13 @@ export const authOptions: NextAuthOptions = {
             accessToken?: string;
             refreshToken?: string;
             pointsAwarded?: boolean;
+            isFirstLogin?: boolean;
           }
           const userWithTokens = user as typeof user & UserWithTokens;
           userWithTokens.accessToken = backendUser.accessToken;
           userWithTokens.refreshToken = backendUser.refreshToken;
           userWithTokens.pointsAwarded = backendUser.pointsAwarded;
+          userWithTokens.isFirstLogin = backendUser.isFirstLogin;
 
           return true;
         } catch (error) {
@@ -308,11 +314,13 @@ export const authOptions: NextAuthOptions = {
             accessToken?: string;
             refreshToken?: string;
             pointsAwarded?: boolean;
+            isFirstLogin?: boolean;
           }
           const userWithTokens = user as typeof user & UserWithTokens;
           userWithTokens.accessToken = backendUser.accessToken;
           userWithTokens.refreshToken = backendUser.refreshToken;
           userWithTokens.pointsAwarded = backendUser.pointsAwarded;
+          userWithTokens.isFirstLogin = backendUser.isFirstLogin;
 
           return true;
         } catch (error) {
@@ -333,6 +341,7 @@ export const authOptions: NextAuthOptions = {
           accessToken?: string;
           refreshToken?: string;
           pointsAwarded?: boolean;
+          isFirstLogin?: boolean;
         }
         const userWithTokens = user as UserWithTokens;
         if (userWithTokens.accessToken) {
@@ -341,6 +350,8 @@ export const authOptions: NextAuthOptions = {
           token.refreshToken = userWithTokens.refreshToken;
           // Store pointsAwarded flag
           token.pointsAwarded = userWithTokens.pointsAwarded || false;
+          // Store isFirstLogin flag
+          token.isFirstLogin = userWithTokens.isFirstLogin || false;
         } else {
           // For OAuth providers (Google/Facebook), tokens are already provided by backend API
           // AccessToken and refreshToken are attached to user object in signIn callback
@@ -349,6 +360,7 @@ export const authOptions: NextAuthOptions = {
             refreshToken?: string;
             image?: string;
             pointsAwarded?: boolean;
+            isFirstLogin?: boolean;
           }
           const userWithTokens = user as UserWithTokens;
           
@@ -359,6 +371,8 @@ export const authOptions: NextAuthOptions = {
             token.avatarUrl = userWithTokens.image;
             // Store pointsAwarded flag
             token.pointsAwarded = userWithTokens.pointsAwarded || false;
+            // Store isFirstLogin flag
+            token.isFirstLogin = userWithTokens.isFirstLogin || false;
           } else {
             // Fallback: Create JWT token if backend didn't provide one
             // This should not happen if backend API is working correctly
@@ -375,6 +389,7 @@ export const authOptions: NextAuthOptions = {
             token.accessToken = accessToken;
             token.avatarUrl = user.image;
             token.pointsAwarded = false;
+            token.isFirstLogin = false;
           }
         }
       }
@@ -384,6 +399,7 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         const avatarUrl = (token as { avatarUrl?: string }).avatarUrl;
         const pointsAwarded = (token as { pointsAwarded?: boolean }).pointsAwarded;
+        const isFirstLogin = (token as { isFirstLogin?: boolean }).isFirstLogin;
 
         session.user.id = (token as { userId?: string }).userId || token.sub!;
         session.user.role = token.role;
@@ -395,6 +411,8 @@ export const authOptions: NextAuthOptions = {
         ).refreshToken;
         // Store pointsAwarded flag in session
         (session as { pointsAwarded?: boolean }).pointsAwarded = pointsAwarded || false;
+        // Store isFirstLogin flag in session
+        (session as { isFirstLogin?: boolean }).isFirstLogin = isFirstLogin || false;
       }
       return session;
     },

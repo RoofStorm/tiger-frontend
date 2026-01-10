@@ -170,8 +170,8 @@ export function useNextAuth(): UseNextAuthReturn {
           duration: 3000,
         });
 
-        // Navigate to home page
-        router.push('/');
+        // Note: Don't navigate - stay on current page (same as login)
+        // User can continue using the app from where they are
       } catch (error) {
         console.error('Registration failed:', error);
         throw error;
