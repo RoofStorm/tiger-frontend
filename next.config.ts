@@ -73,6 +73,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'tiger-minio.fly.dev',
       },
+      // Development/testing only - should be replaced with proper image URLs
+      {
+        protocol: 'https',
+        hostname: 'example.com',
+      },
     ],
   },
   serverExternalPackages: ['html2canvas'],

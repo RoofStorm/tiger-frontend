@@ -65,43 +65,6 @@ export const SAMPLE_REWARDS = [
   },
 ];
 
-export const SAMPLE_POSTS = [
-  {
-    id: '1',
-    userId: 'user1',
-    user: {
-      id: 'user1',
-      name: 'Nguyễn Văn A',
-      email: 'user1@example.com',
-      avatar: null,
-    },
-    imageUrl: '/images/posts/sunset.jpg',
-    caption: 'Hoàng hôn tuyệt đẹp hôm nay! 🌅',
-    likes: 15,
-    shares: 3,
-    isLiked: false,
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    userId: 'user2',
-    user: {
-      id: 'user2',
-      name: 'Trần Thị B',
-      email: 'user2@example.com',
-      avatar: null,
-    },
-    imageUrl: '/images/posts/coffee.jpg',
-    caption: 'Cà phê sáng và một ngày mới đầy năng lượng! ☕',
-    likes: 8,
-    shares: 1,
-    isLiked: true,
-    createdAt: '2024-01-15T08:15:00Z',
-    updatedAt: '2024-01-15T08:15:00Z',
-  },
-];
-
 export const SAMPLE_USER = {
   id: '1',
   email: 'user@example.com',

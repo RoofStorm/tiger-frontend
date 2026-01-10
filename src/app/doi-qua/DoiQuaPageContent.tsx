@@ -568,6 +568,12 @@ export function DoiQuaPageContent() {
                       <li className="flex items-start gap-3">
                         <span className="text-[#00579F] font-bold mt-1">•</span>
                         <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
+                          Đăng nhập lần đầu: <strong>+200 điểm</strong>
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#00579F] font-bold mt-1">•</span>
+                        <span className="font-noto-sans" style={{ fontFamily: 'var(--font-noto-sans)', fontSize: '16px', color: '#333' }}>
                           Tham gia My lunchbox challenge: <strong>+100 điểm</strong> (Tối đa 1 lần/user/tuần)
                         </span>
                       </li>
