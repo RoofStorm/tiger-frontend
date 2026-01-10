@@ -174,7 +174,7 @@ export function DoiQuaPageContent() {
       <main 
         className="mt-[64px] xl:mt-[80px]"
         style={{ 
-          backgroundImage: 'url(/uudai/traodoinhipsong_background.svg)',
+          backgroundImage: 'url(/uudai/traodoinhipsong_background.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center 0px',
           backgroundRepeat: 'no-repeat',

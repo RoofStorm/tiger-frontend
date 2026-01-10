@@ -201,6 +201,7 @@ export function NhipBepPageContent() {
   const { trackClick } = useAnalytics();
   const { toast } = useToast();
   const { isAuthenticated } = useNextAuth();
+  const hoveredProductsRef = useRef<Set<number>>(new Set());
   // Track time on Nhip Bep page (Overview)
   useZoneView(pageRef, {
     page: 'nhip-bep',
@@ -229,27 +230,33 @@ export function NhipBepPageContent() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Preload only current slide and next slide for optimal performance
   useEffect(() => {
-  // Preload all product images on mount for faster modal loading
-    const uniqueProductImages = Array.from(new Set(baseProducts.map(p => p.image)));
-    uniqueProductImages.forEach(imageSrc => {
-      const img = new window.Image();
-      img.src = imageSrc;
-    });
+    const preloadSlide = (index: number) => {
+      if (slides[index]?.image) {
+        const img = new window.Image();
+        img.src = slides[index].image;
+      }
+    };
 
-     // Preload all slide images on mount for faster slide transitions
-     slides.forEach(slide => {
-      const img = new window.Image();
-      img.src = slide.image;
-    });
-  }, []);
+    // Preload current slide
+    preloadSlide(currentSlide);
+    // Preload next slide
+    preloadSlide((currentSlide + 1) % slides.length);
+  }, [currentSlide]);
 
   const handleProductHover = (product: Product, index: number) => {
+    // Prevent spam: only process once per product
+    if (hoveredProductsRef.current.has(index)) {
+      return;
+    }
+    hoveredProductsRef.current.add(index);
+    
     // Preload product image immediately when hovering
     const img = new window.Image();
     img.src = product.image;
     
-    // Call API to award points for product card hover
+    // Call API to award points for product card hover (only once per product)
     sendProductCardClickAPI();
     
     // Clear any existing timeout
@@ -465,7 +472,7 @@ export function NhipBepPageContent() {
                 width={1920}
                 height={1080}
                 className="w-full h-[500px] md:h-auto max-h-[600px] md:max-h-[750px] object-cover"
-                priority
+                priority={currentSlide === 0}
               />
               {/* Gradient Overlay */}
               <div
@@ -603,7 +610,7 @@ export function NhipBepPageContent() {
         {/* Background Section */}
         <div className="relative w-full min-h-[600px] md:min-h-[800px]">
           <Image
-            src="/nhipbep/nhipbep_background.svg"
+            src="/nhipbep/nhipbep_background.png"
             alt="Nhip Bep Background"
             width={1920}
             height={1080}
@@ -612,7 +619,7 @@ export function NhipBepPageContent() {
           />
 
           {/* Text Content - Absolute, centered overlay */}
-          <div className="absolute top-[15%] md:top-[38%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl px-4">
+          <div className="absolute top-[15%] md:top-[38%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl px-4 z-10">
             <div className="text-center space-y-6">
               {/* Title */}
               <h2 className="text-4xl md:text-5xl font-prata" style={{ color: '#00579F' }}>
@@ -653,12 +660,17 @@ export function NhipBepPageContent() {
           className="relative w-full py-16"
           style={{
             backgroundColor: '#00579F',
-            backgroundImage: 'url(/nhipbep/nhipbep_products_background.svg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
           }}
         >
+          {/* Background Image using Next.js Image */}
+          <Image
+            src="/nhipbep/nhipbep_products_background.png"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover -z-10"
+            style={{ objectPosition: 'center' }}
+          />
           <div className="max-w-7xl mx-auto px-4">
             {/* Header Section */}
             <div className="text-center mb-12 space-y-6">
@@ -692,7 +704,28 @@ export function NhipBepPageContent() {
               {/* Carousel Container */}
               <div className="relative overflow-hidden">
                 <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentProductSlide * (100 / (isMobile ? 1 : 4))}%)` }}>
+                  {/* Only render visible products ±2 around current slide for performance */}
                   {products.map((product, index) => {
+                    // Calculate if product is visible (within ±2 slides from current)
+                    const distance = Math.abs(index - currentProductSlide);
+                    // Also handle wrap-around cases
+                    const wrapDistance = Math.min(
+                      distance,
+                      Math.abs(index - currentProductSlide + products.length),
+                      Math.abs(index - currentProductSlide - products.length)
+                    );
+                    const isVisible = wrapDistance <= 2;
+                    
+                    // Skip rendering if not visible (render placeholder to maintain layout)
+                    if (!isVisible) {
+                      return (
+                        <div
+                          key={index}
+                          className="min-w-full md:min-w-[25%] flex-shrink-0"
+                          aria-hidden="true"
+                        />
+                      );
+                    }
                     // Calculate the actual product index (for background selection)
                     const actualIndex = index % products.length;
                     const backgroundImage = getProductBackgroundImage(actualIndex);
@@ -740,6 +773,7 @@ export function NhipBepPageContent() {
                                   fill
                                   sizes="(max-width: 768px) 180px, 180px"
                                   className="object-contain"
+                                  loading="lazy"
                                 />
                               </div>
 
@@ -917,7 +951,6 @@ export function NhipBepPageContent() {
                             alt={selectedProduct.label}
                             fill
                             className="object-contain"
-                            priority
                             sizes="(max-width: 768px) 180px, 180px"
                           />
                         </motion.div>
