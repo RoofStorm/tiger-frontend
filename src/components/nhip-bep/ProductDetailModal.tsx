@@ -56,11 +56,7 @@ export function ProductDetailModal({
                 ease: [0.4, 0, 0.2, 1],
                 opacity: { delay: 0.6, duration: 0.6 }
               }}
-              style={{ 
-                transformStyle: 'preserve-3d',
-                backfaceVisibility: 'hidden'
-              }}
-              className="pointer-events-auto"
+              className="pointer-events-auto [transform-style:preserve-3d] [backface-visibility:hidden]"
             >
               <div 
                 className="rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] min-h-[550px] relative flex flex-col"
@@ -112,8 +108,7 @@ export function ProductDetailModal({
                   {/* Product Title */}
                   <div className="px-6 pb-2">
                     <motion.h2 
-                      className="text-center font-prata text-2xl md:text-3xl"
-                      style={{ color: '#00579F' }}
+                      className="text-center font-prata text-2xl md:text-3xl text-[#00579F]"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 1.4, duration: 0.5, ease: 'easeOut' }}
@@ -124,8 +119,7 @@ export function ProductDetailModal({
                     {/* Product Branding */}
                     {product.branding && (
                       <motion.p
-                        className="mt-1 text-justify font-nunito text-sm font-medium leading-relaxed"
-                        style={{ color: '#00579F' }}
+                        className="mt-1 text-justify font-nunito text-sm font-medium leading-relaxed text-[#00579F]"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 1.5, duration: 0.5, ease: 'easeOut' }}
@@ -167,13 +161,10 @@ export function ProductDetailModal({
                             className="object-contain"
                           />
                         </div>
-                        {/* Tip Text */}
-                        <p 
-                          className="font-nunito text-sm leading-relaxed"
-                          style={{ color: '#00579F' }}
-                        >
-                          {tip}
-                        </p>
+                            {/* Tip Text */}
+                            <p className="font-nunito text-sm leading-relaxed text-[#00579F]">
+                              {tip}
+                            </p>
                       </motion.div>
                     ))}
                   </div>
@@ -184,11 +175,7 @@ export function ProductDetailModal({
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 1.9, duration: 0.5, ease: 'easeOut' }}
-                      className="w-full py-2.5 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90"
-                      style={{
-                        backgroundColor: '#00579F',
-                        fontSize: '15px',
-                      }}
+                      className="w-full py-2.5 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90 bg-[#00579F] text-[15px]"
                       onClick={() => {
                         // Track "Mua ngay" button click in product modal
                         trackClick('nhip-bep', {

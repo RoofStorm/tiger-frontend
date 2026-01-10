@@ -52,7 +52,7 @@ export function NhipBepPageContent() {
           <div className="absolute top-[15%] md:top-[38%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl px-4 z-10">
             <div className="text-center space-y-6">
               {/* Title */}
-              <h2 className="text-4xl md:text-5xl font-prata" style={{ color: '#00579F' }}>
+              <h2 className="text-4xl md:text-5xl font-prata text-[#00579F]">
                 Cột mốc thời gian
               </h2>
               {/* Body Text */}

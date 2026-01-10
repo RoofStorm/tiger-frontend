@@ -175,15 +175,7 @@ export function HistoryCarousel({ slides, zoneRef }: HistoryCarouselProps) {
               {currentContent.paragraphs.map((paragraph, index) => (
                 <p 
                   key={index}
-                  style={{
-                    fontFamily: 'Nunito',
-                    fontWeight: 400,
-                    fontStyle: 'normal',
-                    fontSize: '18px',
-                    lineHeight: '24px',
-                    letterSpacing: '0%',
-                    textAlign: 'center'
-                  }}
+                  className="font-nunito font-normal text-lg leading-6 text-center"
                 >
                   {paragraph}
                 </p>

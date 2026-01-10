@@ -166,10 +166,7 @@ export function ProductsCarousel({
   return (
     <div 
       ref={zoneRef}
-      className="relative w-full py-16"
-      style={{
-        backgroundColor: '#00579F',
-      }}
+      className="relative w-full py-16 bg-[#00579F]"
     >
       {/* Background Image using Next.js Image */}
       <Image
@@ -177,8 +174,7 @@ export function ProductsCarousel({
         alt=""
         fill
         sizes="100vw"
-        className="object-cover -z-10"
-        style={{ objectPosition: 'center' }}
+        className="object-cover object-center -z-10"
       />
       <div className="max-w-7xl mx-auto px-4">
         {/* Header Section */}
@@ -190,19 +186,7 @@ export function ProductsCarousel({
 
           {/* Description */}
           <div className="max-w-6xl mx-auto">
-            <p 
-              className="mb-4"
-              style={{
-                fontFamily: 'Nunito',
-                fontWeight: 400,
-                fontStyle: 'normal',
-                fontSize: '16px',
-                lineHeight: '24px',
-                letterSpacing: '0',
-                textAlign: 'center',
-                color: '#FFFFFF'
-              }}
-            >
+            <p className="mb-4 font-nunito font-normal text-base leading-6 text-center text-white">
               Gian bếp là nơi nhịp sống được nuôi dưỡng. Ở đó, một mẹo nhỏ, một thói quen đơn giản có thể giữ nhịp cả ngày cho bạn. TIGER đồng hành với bạn trong từng nhịp ấy – bởi TIGER bắt đầu bằng công nghệ giữ nhiệt, rồi phát triển để giữ trọn hương vị, độ ẩm và sự an toàn.
             </p>
           </div>
@@ -319,11 +303,7 @@ export function ProductsCarousel({
                           // Open shopee link in new tab
                           window.open(product.buyLink, '_blank');
                         }}
-                        className="w-full px-4 md:px-6 py-1.5 md:py-2 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90 text-sm md:text-base"
-                        style={{
-                          backgroundColor: 'transparent',
-                          border: '1px solid white',
-                        }}
+                        className="w-full px-4 md:px-6 py-1.5 md:py-2 rounded-lg font-nunito font-semibold text-white transition-all duration-300 hover:opacity-90 text-sm md:text-base bg-transparent border border-white"
                       >
                         Mua ngay
                       </button>
