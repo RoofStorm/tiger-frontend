@@ -320,26 +320,6 @@ export function MoodCardFlipCard({
                           <RotateCcw className="w-4 h-4" style={{ color: textColor }} />
                         </button>
                       </div>
-                      <div className="text-center pb-2">
-                        <button onClick={() => {
-                        navigateWithLoading('/thu-thach-giu-nhip', 'Đang chuyển đến Thử thách giữ nhịp...');
-                        }}>
-                          <motion.span 
-                            style={{ fontSize: '14px', color: textColor }}
-                            animate={{ 
-                              opacity: [0.6, 1, 0.6]
-                            }}
-                            transition={{ 
-                              duration: 2,
-                              repeat: Infinity,
-                              repeatType: "reverse",
-                              ease: "easeInOut"
-                            }}
-                          >
-                            Click để tiếp tục
-                          </motion.span>
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -347,6 +327,42 @@ export function MoodCardFlipCard({
             </motion.div>
           </div>
         </div>
+
+        {/* Click để tiếp tục - Hiển thị bên dưới card, chỉ khi content card đang hiện */}
+        <AnimatePresence>
+          {isCardFlipped && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="text-center mt-4"
+            >
+              <motion.span 
+                style={{ fontSize: '14px', color: '#ffffff', cursor: 'pointer' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onClose) {
+                    onClose();
+                  } else {
+                    onCardFlip(false);
+                  }
+                }}
+                animate={{ 
+                  opacity: [0.6, 1, 0.6]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: "easeInOut"
+                }}
+              >
+                Click để tiếp tục
+              </motion.span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
       {/* Hidden element for download - chỉ chứa Whisper và Reminder với background */}
