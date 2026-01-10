@@ -160,8 +160,8 @@ export function HomePageContent() {
             <div 
               className="font-nunito font-normal space-y-3 md:space-y-4 mb-2 md:mb-4 max-w-xl mx-auto" 
               style={{ 
-                fontSize: '16px',
-                lineHeight: '22px',
+                fontSize: '15px',
+                lineHeight: '18px',
                 letterSpacing: '-0.02em',
                 textAlign: 'justify',
                 color: '#0B4386'
