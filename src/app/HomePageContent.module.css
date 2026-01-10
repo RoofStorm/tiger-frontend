@@ -1,0 +1,15 @@
+.mainContent {
+  background-image: url(/trangchu/trangchu_background_mobile.svg);
+  background-size: contain;
+  background-position: top;
+  background-repeat: no-repeat;
+}
+
+@media (min-width: 768px) {
+  .mainContent {
+    background-image: url(/trangchu/trangchu_background.svg);
+    background-size: cover;
+    background-position: center -70px;
+  }
+}
+
