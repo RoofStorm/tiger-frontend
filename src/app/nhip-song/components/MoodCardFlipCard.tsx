@@ -169,11 +169,11 @@ export function MoodCardFlipCard({
       >
         {/* Flip Card Container */}
         <div
-          className="w-full mx-auto"
-          style={{ perspective: '1000px', minHeight: '550px', height: '77vh', maxWidth: '543px' }}
+          className="w-full mx-auto lg:h-[77vh] h-auto"
+          style={{ perspective: '1000px', minHeight: '550px', maxWidth: '543px' }}
         >
           <div
-            className="relative w-full h-full min-h-[550px] group cursor-pointer"
+            className="relative w-full h-full min-h-[550px] group cursor-pointer lg:h-[77vh]"
             onClick={() => onCardFlip(!isCardFlipped)}
           >
             {/* Card */}
@@ -334,7 +334,7 @@ export function MoodCardFlipCard({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="text-center mt-4"
+              className="text-center lg:mt-4"
             >
               <motion.span 
                 style={{ fontSize: '14px', color: '#ffffff', cursor: 'pointer' }}
