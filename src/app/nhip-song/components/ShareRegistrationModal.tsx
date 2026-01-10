@@ -214,7 +214,7 @@ export function ShareRegistrationModal({
                   color: '#00579F',
                 }}
               >
-                Khám phá và tận hưởng
+                Đăng ký Ngay
               </h2>
 
               {/* Subtitle */}
