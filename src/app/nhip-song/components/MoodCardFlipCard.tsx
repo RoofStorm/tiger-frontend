@@ -356,7 +356,7 @@ export function MoodCardFlipCard({
                   ease: "easeInOut"
                 }}
               >
-                Click để tiếp tục
+                Click ở đây để tiếp tục
               </motion.span>
             </motion.div>
           )}
