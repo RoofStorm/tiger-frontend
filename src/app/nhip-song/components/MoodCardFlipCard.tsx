@@ -170,15 +170,15 @@ export function MoodCardFlipCard({
         {/* Flip Card Container */}
         <div
           className="w-full mx-auto lg:h-[77vh] h-auto"
-          style={{ perspective: '1000px', minHeight: '550px', maxWidth: '543px' }}
+          style={{ perspective: '1000px', minHeight: '500px', maxWidth: '543px' }}
         >
           <div
-            className="relative w-full h-full min-h-[550px] group cursor-pointer lg:h-[77vh]"
+            className="relative w-full h-full min-h-[500px] group cursor-pointer lg:h-[77vh]"
             onClick={() => onCardFlip(!isCardFlipped)}
           >
             {/* Card */}
             <motion.div
-              className="relative w-full h-full min-h-[550px]"
+              className="relative w-full h-full min-h-[500px]"
               style={{
                 transformStyle: 'preserve-3d',
               }}
@@ -195,7 +195,7 @@ export function MoodCardFlipCard({
                 className="absolute inset-0 w-full h-full"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                <div className="relative w-full h-full min-h-[550px]">
+                <div className="relative w-full h-full min-h-[500px]">
                   <Image
                     src={frontImage}
                     alt="Mood Card Back"
@@ -334,7 +334,7 @@ export function MoodCardFlipCard({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="text-center lg:mt-4"
+              className="text-center lg:mt-2 2xl:mt-0"
             >
               <motion.span 
                 style={{ fontSize: '14px', color: '#ffffff', cursor: 'pointer' }}
@@ -374,11 +374,11 @@ export function MoodCardFlipCard({
           visibility: 'hidden',
           pointerEvents: 'none',
           width: '543px',
-          minHeight: '550px',
+          minHeight: '500px',
           zIndex: '-1',
         }}
       >
-        <div className="relative w-full h-full min-h-[550px]">
+        <div className="relative w-full h-full min-h-[500px]">
           <Image
             src={contentImage}
             alt="Card Background"

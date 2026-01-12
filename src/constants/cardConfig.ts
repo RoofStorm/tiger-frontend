@@ -180,6 +180,12 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     whisper: 'Dù đã thấm mệt, bạn vẫn nhận ra hơi ấm vẫn luôn hiện diện trong những khoảnh khắc sum vầy. Sự thảnh thơi ấy không mang lại cảm giác hưng phấn, nhưng đủ để bạn không rơi vào buông xuôi. Đủ để tiếp tục lo liệu, tiếp tục gánh vác, và từng bước đi lên theo nhịp của riêng mình.',
     reminder: 'Những điểm nghỉ cảm xúc nhỏ nhưng đều đặn giúp ngăn chặn tình trạng kiệt sức toàn phần, duy trì khả năng hồi phục dài hạn.',
   },
+  // Card 1 - Tổ hợp 15 (2 emoji thuộc nhóm 3, emoji còn lại nhóm 6) -> [3, 3, 6]
+  {
+    combinationIds: [3, 3, 6],
+    whisper: 'Công việc, tình yêu và những kỳ vọng dồn về phía bạn cùng một lúc đến mức bạn bắt đầu nghi ngờ chính mình: hay là mình kém cỏi thật? Sự mệt mỏi này bào mòn niềm tin từng chút một. Nhưng có những giai đoạn mọi thứ đi ngược hướng không phải để phủ nhận giá trị của bạn, mà để đưa bạn đến một bậc thang mới. TIGER tin bạn đang ở giai đoạn chuyển mình đó.',
+    reminder: 'Mệt mỏi tích lũy làm giảm khả năng nhận diện cảm xúc của não, khiến con người tiếp tục chịu đựng mà không nhận ra mình đã quá tải. Cảm giác "vẫn làm được" không đồng nghĩa với việc cơ thể còn đủ năng lượng',
+  },
   // Card 2 - Tổ hợp 1
   {
     combinationIds: [1, 2, 3],
@@ -263,6 +269,24 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     combinationIds: [3, 6, 8],
     whisper: 'Bạn nhận ra ý nghĩ rời đi không còn là dự định. Bạn đang lên kế hoạch đi đến một nơi khác, không vai trò, không nghĩa vụ, để cơ thể được nghỉ trước khi tinh thần gãy hẳn. Để rồi chồi non sẽ lại đơm hoa. Vì sẽ chẳng có cơn mưa nào không ngừng đổ sau chuỗi ngày phong ba.',
     reminder: 'Nghiên cứu về stress mãn tính cho thấy khi mức cortisol duy trì cao trong nhiều ngày, não sẽ tự động tăng nhu cầu rút lui xã hội để giảm kích thích. Đây là phản xạ sinh tồn của hệ thần kinh, không phải sự lạnh nhạt về mặt tình cảm.',
+  },
+  // Card 2 - Tổ hợp 12 (2 emoji thuộc nhóm 3, emoji còn lại nhóm 4) -> [3, 3, 4]
+  {
+    combinationIds: [3, 3, 4],
+    whisper: 'Mọi thứ đang thực sự tệ. Nỗi buồn này không thoáng qua, mà là cảm giác bị dồn đến chân tường. Bạn vẫn làm việc đấy, vẫn cười nói trước bao người, nhưng cảm xúc đã vỡ thành từng mảnh. Dẫu thế, TIGER tin rằng, vì bạn có khả năng vượt qua nên thử thách này mới xuất hiện. Vỗ tay bạn cho những nỗ lực dù là nhỏ bé nhất <3.',
+    reminder: 'Khi cảm xúc bị kìm nén kéo dài, não tăng hoạt động ở vùng xử lý đau cảm xúc, khiến cảm giác tổn thương trở nên rõ rệt hơn dù không có tác nhân mới.',
+  },
+  // Card 2 - Tổ hợp 13 (2 emoji thuộc nhóm 3, emoji còn lại nhóm 8) -> [3, 3, 8]
+  {
+    combinationIds: [3, 3, 8],
+    whisper: 'Bạn không còn muốn ở yên trong không gian cũ, nơi mọi cảm xúc phải chen chúc để tồn tại. Bạn cần đi đâu đó, không phải để trốn chạy, mà để được hít thở trọn vẹn, được trút bỏ những vai diễn mà mình đã giữ quá lâu, và chạm lại vào nguồn năng lượng đã bị bỏ quên. Và đi đâu thì đi, đừng quên TIGER nhen ^.^',
+    reminder: 'Chỉ cần 2-3 ngày thay đổi môi trường, đặc biệt là không gian có yếu tố thiên nhiên (ánh sáng tự nhiên, cây xanh, mặt nước), nhịp tim lúc nghỉ và mức cortisol có thể giảm đến 30%, giúp hệ thần kinh quay lại trạng thái cân bằng nhanh',
+  },
+  // Card 2 - Tổ hợp 14 (2 emoji thuộc nhóm 2, emoji còn lại nhóm 5) -> [2, 2, 5]
+  {
+    combinationIds: [2, 2, 5],
+    whisper: 'Bạn đang ở trong một nhịp sống dễ chịu hiếm hoi. Sự thảnh thơi này mang lại đầy cảm hứng sống. TIGER chúc bạn sẽ đi cùng trạng thái này thêm chút nữa. Và những điều đẹp nhất thường bắt đầu từ đây.',
+    reminder: 'Giữ nhịp này bằng một việc rất nhỏ hôm nay:\n- Ngủ sớm hơn 20 phút, ăn chậm một bữa, hoặc không nhận thêm việc mới.\n- Bình yên cần được bảo vệ, không phải tiêu hao.',
   },
   // Card 3 - Tổ hợp 1
   {
@@ -348,6 +372,42 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     whisper: 'Có những vết xước trong gia đình không đủ lớn để gọi tên, nhưng đủ sâu để làm mình muốn bước ra ngoài một chút. Không phải bỏ đi, chỉ là cần không gian để vết thương không tiếp tục cọ xát mỗi ngày. Đổi gió, lúc này, là một cách giữ gìn mối quan hệ còn lại.',
     reminder: 'Khi cảm xúc tổn thương chưa được xử lý, việc tiếp xúc liên tục có thể làm tăng phản ứng stress tới 30%, khiến xung đột lặp lại dù không có nguyên nhân mới.',
   },
+  // Card 3 - Tổ hợp 14 (2 emoji thuộc nhóm 3, emoji còn lại nhóm 5) -> [3, 3, 5]
+  {
+    combinationIds: [3, 3, 5],
+    whisper: 'Một bữa ăn cùng gia đình, một khoảnh khắc ngồi cạnh người thương là điều bạn muốn ngay lúc này. Giữa những tổn thương chưa kịp gọi tên, chỉ cần được đến gần và chạm vào sự thân thuộc đó, cũng đủ để xua tan mọi buồn đau ngoài kia. TIGER chúc những tình yêu và những người đồng hành ấy sẽ luôn là điểm tựa trên hành trình sống của bạn.',
+    reminder: 'Những nghi thức sinh hoạt lặp lại như ăn uống đúng giờ giúp hệ thần kinh phó giao cảm hoạt động mạnh hơn, làm giảm mức cortisol.',
+  },
+  // Card 3 - Tổ hợp 15 (2 emoji thuộc nhóm 5, emoji còn lại nhóm 1) -> [5, 5, 1]
+  {
+    combinationIds: [5, 5, 1],
+    whisper: 'Giữa một ngày bị bủa vây bởi áp lực và những cảm xúc dễ bùng nổ, đừng quên rằng mình có một điểm tựa. Đó là bàn ăn quen thuộc, nơi bạn không cần phải gồng mình hay phòng thủ. Ở đó, bạn có thể buông xuôi một cách an toàn, để hơi ấm và sự bình yên ôm ấp những tổn thương ngoài kia. Hãy để mình được trở về.',
+    reminder: 'Chỉ 15 phút thảnh thơi trong bữa cơm ấm có thể giảm hơn 30% phản ứng căng thẳng của cơ thể. Vì sự ấm áp và an toàn ở đó giúp kích hoạt cơ chế "nghỉ ngơi", làm dịu nhịp tim và xoa dịu cảm xúc của bạn.',
+  },
+  // Card 3 - Tổ hợp 16 (2 emoji thuộc nhóm 5, emoji còn lại nhóm 2) -> [5, 5, 2]
+  {
+    combinationIds: [5, 5, 2],
+    whisper: 'Bạn đang ở trong một nhịp sống dễ chịu hiếm hoi. Cơ thể nhẹ tênh, lòng không còn gấp gáp. Những bữa ăn ấm áp, không khí gia đình thân thuộc, và cảm giác bên cạnh người thương khiến bạn thấy mình đủ đầy theo cách rất giản dị. Chỉ cần ở yên trong khoảnh khắc này cũng đã là một dạng hạnh phúc.',
+    reminder: 'Khi ăn trong trạng thái thư thái, hệ thần kinh phó giao cảm được kích hoạt, giúp cơ thể tiêu hoá tốt hơn và mức căng thẳng giảm rõ rệt chỉ sau 15-20 phút. Bình yên đôi khi bắt đầu từ một bữa ăn không vội.',
+  },
+  // Card 3 - Tổ hợp 17 (2 emoji thuộc nhóm 5, emoji còn lại nhóm 3) -> [5, 5, 3]
+  {
+    combinationIds: [5, 5, 3],
+    whisper: 'Sau tất cả những gì đã trải qua, điều bạn trân trọng nhất lúc này là sự thảnh thơi. Ngoài những bữa cơm quen thuộc và nhịp sinh hoạt chậm rãi, bạn muốn mang nếp sống ấy sang một không gian khác - nơi cảm giác an yên được mở rộng, không còn bị bó hẹp trong bốn bức tường quen thuộc.',
+    reminder: 'Các nghiên cứu cho thấy khi con người chủ động thay đổi bối cảnh sống trong trạng thái cảm xúc ổn định, não tăng khả năng thích nghi tích cực và duy trì động lực lâu hơn so với thay đổi mang tính phản ứng.',
+  },
+  // Card 3 - Tổ hợp 18 (2 emoji thuộc nhóm 5, emoji còn lại nhóm 4) -> [5, 5, 4]
+  {
+    combinationIds: [5, 5, 4],
+    whisper: 'Sau những tổn thương, bạn đã thôi không tìm đến sự ồn ào nữa. Chính những bữa cơm ấm với người mình yêu, với gia đình là nguồn năng lượng mạnh mẽ tiếp sức cho bạn bước tiếp trên hành trình của mình.',
+    reminder: 'Cảm giác an toàn cảm xúc kích hoạt hệ thần kinh phó giao cảm, giúp tái tạo năng lượng tinh thần bền vững hơn so với các kích thích ngắn hạn.',
+  },
+  // Card 3 - Tổ hợp 19 (2 emoji thuộc nhóm 5, emoji còn lại nhóm 6) -> [5, 5, 6]
+  {
+    combinationIds: [5, 5, 6],
+    whisper: 'Giữa những bộn bề mệt mỏi ngày cuối năm, bạn tìm thấy điểm tựa ở những điều nhỏ bé: một bữa cơm ấm, một cái ôm, một khoảnh khắc hít thở sâu. TIGER chúc bạn thấy niềm vui trong từng buổi sáng, thấy cơ hội trong mỗi thử thách và thấy hi vọng ngay cả khi mọi thứ chưa thành hình.',
+    reminder: 'Những sinh hoạt quen thuộc mang tính nhịp điệu (ăn uống, nghỉ ngơi đúng giờ) không chỉ nuôi cơ thể, mà còn giúp não tìm lại cảm giác an toàn.',
+  },
   // Card 4 - Tổ hợp 1
   {
     combinationIds: [1, 6, 7],
@@ -420,6 +480,30 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     whisper: 'Bình yên nhưng không đứng yên - năng lượng trong bạn đang cháy rực. Mọi thứ đã vào đúng vị trí: tâm thế vững vàng, động lực đủ đầy, và khát khao chinh phục những đỉnh cao mới đã sẵn sàng dẫn lối. TIGER chúc hành trình tiếp theo của bạn thật rực rỡ.',
     reminder: 'Khi tinh thần ổn định và năng lượng nội tại ở mức cao, não bộ bước vào trạng thái hiệu suất cao - khả năng học hỏi, ra quyết định và dấn thân tăng rõ rệt. Đây là thời điểm tốt nhất để bắt đầu điều mới, đi xa hơn, hoặc chinh phục một đỉnh cao tiếp theo.',
   },
+  // Card 4 - Tổ hợp 4 (2 emoji thuộc nhóm 3, emoji còn lại nhóm 2) -> [3, 3, 2]
+  {
+    combinationIds: [3, 3, 2],
+    whisper: 'Bạn chọn im lặng không phải vì bạn né tránh hay không muốn cố gắng, mà vì bình yên này quá quý giá để đánh đổi. Còn nhiều điều nặng lòng, còn vương lại đâu đó, và chưa thể nói ra ngay. Bạn cho mình quyền được yên thêm một chút - để không phải tự làm đau mình nữa. Với TIGER, đây chỉ là một dấu phẩy nhỏ, để bạn tiếp tục viết tiếp câu chuyện hạnh phúc sau này.',
+    reminder: 'Nghiên cứu về self-regulation cho thấy, khi con người chọn im lặng để giữ trạng thái ổn định, não bộ đang ưu tiên vùng kiểm soát cảm xúc để tránh xung đột nội tâm. Bình yên này không giả tạo - nó là cơ chế tự bảo vệ.',
+  },
+  // Card 4 - Tổ hợp 5 (2 emoji thuộc nhóm 3, emoji còn lại nhóm 7) -> [3, 3, 7]
+  {
+    combinationIds: [3, 3, 7],
+    whisper: 'Bạn đang quá tải vì cố gắng cân bằng mọi thứ. Những gì từng được nuốt vào trong dần chuyển thành mỏi mệt, rồi thành bực tức như muốn nổ tung. Càng kìm nén, thôi thúc phải làm điều gì đó khác đi càng trở nên rõ ràng và dữ dội. TIGER chúc bạn luôn tin tưởng vào bản thân và mỗi bước đi tiếp theo đều gặp may mắn.',
+    reminder: 'Các nghiên cứu về động lực cho thấy, khi cá nhân giữ được kiểm soát trong thời gian dài, khả năng bùng phát hành động có chủ đích sẽ mạnh mẽ hơn khi thời điểm phù hợp xuất hiện.',
+  },
+  // Card 4 - Tổ hợp 6 (2 emoji thuộc nhóm 5, emoji còn lại nhóm 7) -> [5, 5, 7]
+  {
+    combinationIds: [5, 5, 7],
+    whisper: 'Bạn đang ở trong một trạng thái dễ chịu hiếm hoi: không áp lực, không vội vã. Chính sự thảnh thơi này sẽ giúp bạn có thêm động lực to lớn và tạo ra năng lượng bền bỉ để tiếp tục sống theo cách mình muốn. TIGER ủng hộ bạn sống mạnh mẽ hơn, quyết liệt hơn, và tin rằng bất cứ điều gì bạn chọn lúc này đều sẽ cháy tới cùng.',
+    reminder: 'Thư giãn đều đặn giúp dopamine duy trì ổn định, tạo động lực bền hơn ~30% so với hưng phấn ngắn hạn. Năng lượng được giữ lâu hơn thay vì chớm nở rồi tắt.',
+  },
+  // Card 4 - Tổ hợp 7 (2 emoji thuộc nhóm 5, emoji còn lại nhóm 8) -> [5, 5, 8]
+  {
+    combinationIds: [5, 5, 8],
+    whisper: 'Khoảng thời gian này với bạn thật sự dễ chịu. Nhịp sống vừa vặn, tâm trí thoáng đãng và đủ bình yên. Một chuyến du lịch hoặc một quyết định thay đổi môi trường mới  sẽ làm cho những ngày đẹp này trở nên đáng nhớ hơn. Một nơi có núi để mở rộng tầm nhìn, có biển để thả lỏng nhịp thở, hoặc là một nơi bạn giúp bạn khám phá điều mới và phát huy được thêm những khả năng khác chính là điều bạn cần.',
+    reminder: 'Các môi trường mới giúp não tăng khả năng ghi nhớ cảm xúc tích cực lên khoảng 25-30%, đồng thời kích thích tư duy linh hoạt và sáng tạo cao hơn so với khi ở không gian quen thuộc.',
+  },
 ];
 
 /**
@@ -464,6 +548,16 @@ export function findCombinationGroup(combinationIds: CombinationId[]): EmojiComb
   return EMOJI_COMBINATION_GROUPS.find(group => {
     const sortedGroupIds = [...group.combinationIds].sort();
     return JSON.stringify(sortedGroupIds) === JSON.stringify(sortedIds);
+  }) || null;
+}
+
+/**
+ * Tìm EmojiCombinationGroup với exact match (không sort) - dùng cho các trường hợp đặc biệt
+ * như [5, 5, 1] vs [1, 1, 5] để phân biệt số lượng emoji trong mỗi nhóm
+ */
+export function findCombinationGroupExact(combinationIds: CombinationId[]): EmojiCombinationGroup | null {
+  return EMOJI_COMBINATION_GROUPS.find(group => {
+    return JSON.stringify(group.combinationIds) === JSON.stringify(combinationIds);
   }) || null;
 }
 
@@ -652,6 +746,18 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
     }
   }
 
+  // Card 1: 2 emoji thuộc combination 3, emoji còn lại thuộc combination 6 -> [3, 3, 6]
+  if (countCombo3 >= 2 && countCombo6 >= 1) {
+    const specialGroup = findCombinationGroupExact([3, 3, 6]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 1)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
   // Card 2: 2 emoji thuộc combination 1, emoji còn lại thuộc combination 3 -> [1, 3]
   if (countCombo1 >= 2 && countCombo3 >= 1) {
     const specialGroup = findCombinationGroup([1, 3]);
@@ -724,13 +830,122 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
     }
   }
 
+  // Card 2: 2 emoji thuộc combination 3, emoji còn lại thuộc combination 4 -> [3, 3, 4]
+  if (countCombo3 >= 2 && countCombo4 >= 1) {
+    const specialGroup = findCombinationGroupExact([3, 3, 4]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 2)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 2: 2 emoji thuộc combination 3, emoji còn lại thuộc combination 8 -> [3, 3, 8]
+  if (countCombo3 >= 2 && countCombo8 >= 1) {
+    const specialGroup = findCombinationGroupExact([3, 3, 8]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 2)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 2: 2 emoji thuộc combination 2, emoji còn lại thuộc combination 5 -> [2, 2, 5]
+  if (countCombo2 >= 2 && countCombo5 >= 1) {
+    const specialGroup = findCombinationGroupExact([2, 2, 5]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 2)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 3: 2 emoji thuộc combination 3, emoji còn lại thuộc combination 5 -> [3, 3, 5]
+  if (countCombo3 >= 2 && countCombo5 >= 1) {
+    const specialGroup = findCombinationGroupExact([3, 3, 5]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 3)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 3: 2 emoji thuộc combination 5, emoji còn lại thuộc combination 1 -> [5, 5, 1]
+  if (countCombo5 >= 2 && countCombo1 >= 1) {
+    const specialGroup = findCombinationGroupExact([5, 5, 1]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 3)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 3: 2 emoji thuộc combination 5, emoji còn lại thuộc combination 2 -> [5, 5, 2]
+  if (countCombo5 >= 2 && countCombo2 >= 1) {
+    const specialGroup = findCombinationGroupExact([5, 5, 2]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 3)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 3: 2 emoji thuộc combination 5, emoji còn lại thuộc combination 3 -> [5, 5, 3]
+  if (countCombo5 >= 2 && countCombo3 >= 1) {
+    const specialGroup = findCombinationGroupExact([5, 5, 3]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 3)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 3: 2 emoji thuộc combination 5, emoji còn lại thuộc combination 4 -> [5, 5, 4]
+  if (countCombo5 >= 2 && countCombo4 >= 1) {
+    const specialGroup = findCombinationGroupExact([5, 5, 4]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 3)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 3: 2 emoji thuộc combination 5, emoji còn lại thuộc combination 6 -> [5, 5, 6]
+  if (countCombo5 >= 2 && countCombo6 >= 1) {
+    const specialGroup = findCombinationGroupExact([5, 5, 6]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 3)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
   // Card 3: 2 emoji thuộc combination 1, emoji còn lại thuộc combination 5 -> [1, 5]
   if (countCombo1 >= 2 && countCombo5 >= 1) {
     const specialGroup = findCombinationGroup([1, 5]);
     if (specialGroup) {
       const card3Combinations = [
         [1, 2, 8], [1, 7, 8], [2, 3, 8], [2, 5, 6], [2, 5, 8], [2, 6, 7],
-        [2, 7, 8], [4, 6, 7], [4, 6, 8], [5, 6, 8], [5, 7, 8], [4, 5, 8], [4, 7, 8], [1, 5]
+        [2, 7, 8], [4, 6, 7], [4, 6, 8], [5, 6, 8], [5, 7, 8], [4, 5, 8], [4, 7, 8], [1, 5],
+        [3, 5], [5, 1], [5, 2], [5, 3], [5, 4], [5, 6]
       ];
       
       const isCard3 = card3Combinations.some(combo => {
@@ -840,6 +1055,54 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
     }
   }
 
+  // Card 4: 2 emoji thuộc combination 3, emoji còn lại thuộc combination 2 -> [3, 3, 2]
+  if (countCombo3 >= 2 && countCombo2 >= 1) {
+    const specialGroup = findCombinationGroupExact([3, 3, 2]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 4)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 4: 2 emoji thuộc combination 3, emoji còn lại thuộc combination 7 -> [3, 3, 7]
+  if (countCombo3 >= 2 && countCombo7 >= 1) {
+    const specialGroup = findCombinationGroupExact([3, 3, 7]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 4)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 4: 2 emoji thuộc combination 5, emoji còn lại thuộc combination 7 -> [5, 5, 7]
+  if (countCombo5 >= 2 && countCombo7 >= 1) {
+    const specialGroup = findCombinationGroupExact([5, 5, 7]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 4)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
+  // Card 4: 2 emoji thuộc combination 5, emoji còn lại thuộc combination 8 -> [5, 5, 8]
+  if (countCombo5 >= 2 && countCombo8 >= 1) {
+    const specialGroup = findCombinationGroupExact([5, 5, 8]);
+    if (specialGroup) {
+      const card = CARD_CONFIGS.find(c => c.cardNumber === 4)!;
+      return {
+        card,
+        combinationGroup: specialGroup,
+      };
+    }
+  }
+
   // Tạo tất cả các tổ hợp có thể từ 3 emoji
   // Mỗi emoji có thể thuộc nhiều tổ hợp, nên ta cần tạo tất cả các kết hợp có thể
   const possibleCombinations: CombinationId[][] = [];
@@ -893,7 +1156,8 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
   
   const card3Combinations = [
     [1, 2, 8], [1, 7, 8], [2, 3, 8], [2, 5, 6], [2, 5, 8], [2, 6, 7],
-    [2, 7, 8], [4, 6, 7], [4, 6, 8], [5, 6, 8], [5, 7, 8], [4, 5, 8], [4, 7, 8], [1, 5]
+    [2, 7, 8], [4, 6, 7], [4, 6, 8], [5, 6, 8], [5, 7, 8], [4, 5, 8], [4, 7, 8], [1, 5],
+    [3, 5], [5, 1], [5, 2], [5, 3], [5, 4], [5, 6]
   ];
   
   const card4Combinations = [
