@@ -186,6 +186,24 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     whisper: 'Công việc, tình yêu và những kỳ vọng dồn về phía bạn cùng một lúc đến mức bạn bắt đầu nghi ngờ chính mình: hay là mình kém cỏi thật? Sự mệt mỏi này bào mòn niềm tin từng chút một. Nhưng có những giai đoạn mọi thứ đi ngược hướng không phải để phủ nhận giá trị của bạn, mà để đưa bạn đến một bậc thang mới. TIGER tin bạn đang ở giai đoạn chuyển mình đó.',
     reminder: 'Mệt mỏi tích lũy làm giảm khả năng nhận diện cảm xúc của não, khiến con người tiếp tục chịu đựng mà không nhận ra mình đã quá tải. Cảm giác "vẫn làm được" không đồng nghĩa với việc cơ thể còn đủ năng lượng',
   },
+  // Card 1 - Tổ hợp 16
+  {
+    combinationIds: [1, 3, 8],
+    whisper: 'Công việc siết chặt từng ngày, deadline nối tiếp deadline, bực bội cứ thế dâng lên nhưng bạn vẫn cố nuốt lại bên trong. Mọi thứ mắc kẹt ở đó quá lâu. Đến lúc này, bạn không thể tiếp tục ngồi yên. Bạn muốn rời khỏi nhịp sống cũ, đi đâu đó thật mới - không phải để trốn chạy, mà để lấy lại hơi thở và cho mình được sống theo bản năng.',
+    reminder: 'Các nghiên cứu về stress mãn tính cho thấy khi áp lực công việc kéo dài trên 6-8 tuần, mức cortisol cao liên tục làm giảm khả năng điều tiết cảm xúc. Việc thay đổi môi trường ngắn hạn (2-4 ngày) cải thiện trạng thái tinh thần chỉ sau 48 giờ',
+  },
+  // Card 1 - Tổ hợp 17
+  {
+    combinationIds: [1, 5, 7],
+    whisper: 'Giữa một ngày bị bủa vây bởi áp lực và những cảm xúc dễ bùng nổ, bạn đừng quên rằng mình có một điểm tựa. Đó là bàn ăn quen thuộc, nơi bạn không cần phải gồng mình hay phòng thủ. Ở đó, bạn có thể buông xuôi một cách an toàn, để hơi ấm và sự bình yên từ từ len lỏi, hàn gắn lại những mệt mỏi đã tích tụ. Hãy để mình được trở về.',
+    reminder: 'Chỉ 15 phút thảnh thơi trong bữa cơm ấm có thể giảm hơn 30% phản ứng căng thẳng của cơ thể. Vì sự ấm áp và an toàn ở đó giúp kích hoạt cơ chế "nghỉ ngơi", làm dịu nhịp tim và xoa dịu cảm xúc của bạn.',
+  },
+  // Card 1 - Tổ hợp 18
+  {
+    combinationIds: [1, 4, 7],
+    whisper: 'Vết thương tình chưa kịp lành thì công việc đã dí tới tấp. Vậy mà phải vừa đau lòng, phải vừa chạy đua với cuộc sống. Trong mớ hỗn độn đó, cảm giác bực đến phát điên là có thật. Cơn giận không còn âm ỉ nữa, nó nóng, gắt và khó kiểm soát. Dựa núi núi sẽ đổ, dựa người người sẽ đi, bản thân mình chính là chỗ dựa vững vàng nhất.',
+    reminder: 'Khi stress kéo dài kèm tổn thương cảm xúc, não tiết cortisol và adrenaline nhiều hơn bình thường, làm khả năng kiểm soát cảm xúc. Đây là phản xạ sinh tồn của cơ thể.',
+  },
   // Card 2 - Tổ hợp 1
   {
     combinationIds: [1, 2, 3],
@@ -287,6 +305,18 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
     combinationIds: [2, 2, 5],
     whisper: 'Bạn đang ở trong một nhịp sống dễ chịu hiếm hoi. Sự thảnh thơi này mang lại đầy cảm hứng sống. TIGER chúc bạn sẽ đi cùng trạng thái này thêm chút nữa. Và những điều đẹp nhất thường bắt đầu từ đây.',
     reminder: 'Giữ nhịp này bằng một việc rất nhỏ hôm nay:\n- Ngủ sớm hơn 20 phút, ăn chậm một bữa, hoặc không nhận thêm việc mới.\n- Bình yên cần được bảo vệ, không phải tiêu hao.',
+  },
+  // Card 2 - Tổ hợp 15
+  {
+    combinationIds: [2, 4, 8],
+    whisper: 'Bình yên hiện tại không còn đủ rộng để ôm trọn những vỡ vụn bên trong, và bạn biết mình cần một không gian khác để hít thở trọn vẹn hơn. Một điểm đến tĩnh lặng chính là câu trả lời - nơi bạn có thể thả lỏng tâm trí, đổi mới góc nhìn, và kéo dài cảm giác thư thái để khai phóng toàn bộ tiềm năng bên trong.',
+    reminder: 'Thay đổi môi trường sống tạm thời giúp giảm trạng thái cảnh giác liên tục của não sau 48-72 giờ, kể cả khi không có hoạt động nghỉ dưỡng mạnh.',
+  },
+  // Card 2 - Tổ hợp 16
+  {
+    combinationIds: [6, 7, 8],
+    whisper: 'Bạn đi hết một năm bằng tất cả những gì mình có. Mệt thật nhưng ngọn lửa cống hiến chưa bao giờ ngừng tắt. TIGER chúc mừng bạn đã trải qua 365 ngày bằng tất cả nỗ lực và lòng biết ơn. Mong bạn sẽ có hành trình mới đầy hy vọng và rực rỡ.',
+    reminder: 'Năm mới không cần bắt đầu bằng việc chạy nhanh hơn. Chỉ cần bước sang với một nhịp thở đầy đủ hơn. Khi năng lượng được tái tạo, mọi hành trình phía trước đều có lý do để nở hoa.',
   },
   // Card 3 - Tổ hợp 1
   {
@@ -1146,12 +1176,12 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
   // Card1 và Card2 hỗ trợ nhiều tổ hợp, Card3/4 hỗ trợ tổ hợp riêng của chúng
   const card1Combinations = [
     [1, 2, 5], [1, 3, 5], [1, 4, 5], [1, 2], [1, 4], [2, 3, 5], [2, 5, 7], [3, 4, 5], [3, 5, 6],
-    [3, 5, 7], [3, 5, 8], [3, 6, 7], [3, 7, 8], [4, 5, 6], [4, 5, 7], [5, 6, 7]
+    [3, 5, 7], [3, 5, 8], [3, 6, 7], [3, 7, 8], [4, 5, 6], [4, 5, 7], [5, 6, 7], [1, 3, 8], [1, 5, 7], [1, 4, 7]
   ];
   
   const card2Combinations = [
     [1, 2, 3], [1, 2, 4], [1, 2, 6], [1, 3, 4], [1, 3], [1, 6], [2, 3, 4], [2, 3], [2, 4, 6],
-    [3, 4, 6], [3, 4, 7], [1, 5, 8], [2, 4, 5], [3, 6, 8]
+    [3, 4, 6], [3, 4, 7], [1, 5, 8], [2, 4, 5], [3, 6, 8], [2, 4, 8], [6, 7, 8]
   ];
   
   const card3Combinations = [

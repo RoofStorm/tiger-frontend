@@ -169,11 +169,11 @@ export function MoodCardFlipCard({
       >
         {/* Flip Card Container */}
         <div
-          className="w-full mx-auto lg:h-[77vh] h-auto"
-          style={{ perspective: '1000px', minHeight: '500px', maxWidth: '543px' }}
+          className="w-full mx-auto"
+          style={{ perspective: '1000px', maxWidth: '543px', aspectRatio: '543 / 700', }}
         >
           <div
-            className="relative w-full h-full min-h-[500px] group cursor-pointer lg:h-[77vh]"
+            className="relative w-full h-full group cursor-pointer"
             onClick={() => onCardFlip(!isCardFlipped)}
           >
             {/* Card */}
@@ -195,7 +195,7 @@ export function MoodCardFlipCard({
                 className="absolute inset-0 w-full h-full"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                <div className="relative w-full h-full min-h-[500px]">
+                <div className="relative w-full h-full">
                   <Image
                     src={frontImage}
                     alt="Mood Card Back"
@@ -229,12 +229,10 @@ export function MoodCardFlipCard({
                       <h3 className="font-bold mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)', color: textColor }}>
                         Whisper:
                       </h3>
-                      <p className="max-w-[300px] md:max-w-none mx-auto" style={{ 
+                      <p className="max-w-[300px] md:max-w-none mx-auto lg:text-[14px] text-[12px] lg:leading-[16px] leading-[14px]" style={{ 
                         fontFamily: 'Nunito',
                         fontWeight: 400,
                         fontStyle: 'normal',
-                        fontSize: '14px',
-                        lineHeight: '16px',
                         textAlign: 'center',
                         color: textColor
                       }}>
@@ -247,12 +245,10 @@ export function MoodCardFlipCard({
                     <h3 className="font-bold mb-2 text-xs md:text-base" style={{ fontSize: 'clamp(12px, 3vw, 16px)', color: textColor }}>
                     Reminder:
                       </h3>
-                      <p className="max-w-[300px] md:max-w-none mx-auto" style={{ 
+                      <p className="max-w-[300px] md:max-w-none mx-auto lg:text-[14px] text-[12px] lg:leading-[16px] leading-[14px]" style={{ 
                         fontFamily: 'Nunito',
                         fontWeight: 400,
                         fontStyle: 'normal',
-                        fontSize: '14px',
-                        lineHeight: '16px',
                         textAlign: 'center',
                         color: textColor
                       }}>
