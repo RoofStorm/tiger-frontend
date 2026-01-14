@@ -181,6 +181,28 @@ export function HistoryCarousel({ slides, zoneRef }: HistoryCarouselProps) {
                 </p>
               ))}
             </div>
+
+            {/* Learn More Link */}
+            <div className="mt-2 text-center">
+              <a
+                href={currentContent.learnMoreLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-nunito font-normal text-lg text-white underline inline-block"
+                onClick={() => {
+                  trackClick('nhip-bep', {
+                    zone: 'zoneA',
+                    component: 'learn_more_link',
+                    metadata: { 
+                      slideIndex: currentSlide,
+                      dates: currentContent.dates,
+                    },
+                  });
+                }}
+              >
+                Tìm hiểu thêm
+              </a>
+            </div>
           </motion.div>
         </AnimatePresence>
 

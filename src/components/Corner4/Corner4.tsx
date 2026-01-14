@@ -324,10 +324,10 @@ export function Corner4() {
                             }}
                           >
                             {reward.id === 'voucher-1000k' 
-                              ? 'Dành cho Top 1 Thử thách được lan toả nhất (giới hạn 1 lần/user)'
+                              ? 'Dành cho Top 1 Nhịp sống được lan toả nhất tháng tại Thử thách giữ nhịp'
                               : reward.id === 'voucher-500k'
-                              ? 'Dành cho Top 2 Thử thách được lan toả nhất (giới hạn 1 lần/user)'
-                              : 'Cho sản phẩm TIGER (giới hạn 3 lần/user)'
+                              ? 'Dành cho Top 2 Nhịp sống được lan toả nhất tháng tại Thử thách giữ nhịp'
+                              : 'Cho sản phẩm TIGER (giới hạn 1 lần/user)'
                             }
                           </p>
                         </div>

@@ -26,10 +26,10 @@ export const isSpecialVoucher = (rewardId: string): boolean => {
  */
 export const getRewardDescription = (rewardId: string): string => {
   if (rewardId === SPECIAL_VOUCHER_IDS.TOP_1) {
-    return 'Dành cho Top 1 Thử thách được lan toả nhất (giới hạn 1 lần/user)';
+    return 'Dành cho Top 1 Nhịp sống được lan toả nhất tháng tại Thử thách giữ nhịp';
   }
   if (rewardId === SPECIAL_VOUCHER_IDS.TOP_2) {
-    return 'Dành cho Top 2 Thử thách được lan toả nhất (giới hạn 1 lần/user)';
+    return 'Dành cho Top 2 Nhịp sống được lan toả nhất tháng tại Thử thách giữ nhịp';
   }
   return 'Cho sản phẩm TIGER (giới hạn 1 lần/user)';
 };

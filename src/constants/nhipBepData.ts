@@ -12,6 +12,7 @@ export interface SlideContent {
   subtitle: string;
   paragraphs: string[];
   image: string;
+  learnMoreLink: string;
 }
 
 export interface Product {
@@ -34,17 +35,19 @@ export const slides: SlideContent[] = [
       'Tiger bắt đầu sản xuất và kinh doanh bình chân không tại Nhật Bản.',
       'Trở thành nhà máy đầu tiên trong ngành được MITI (nay là METI) chứng nhận đạt chuẩn JIS.'
     ],
-    image: '/nhipbep/history_1923_1959_background.jpg'
+    image: '/nhipbep/history_1923_1959_background.jpg',
+    learnMoreLink: 'https://www.tiger-corporation.com/en/vnm/about-us/history/'
   },
   {
-    dates: '1960 – 1970',
+    dates: '1960 – 1979',
     subtitle: 'Mở rộng và Phát triển',
     paragraphs: [
       'Kỷ niệm 45 năm thành lập, ông Takenori Kikuchi được bổ nhiệm làm Chủ tịch HĐQT, ông Yoshito Kikuchi giữ vai trò Chủ tịch Điều hành.',
       'Thành lập Tiger Bussan Co., Ltd. tại Hiroshima.',
       'Hoàn thành mở rộng Trụ sở chính (Tòa nhà thứ ba).'
     ],
-    image: '/nhipbep/history_1960_1970_background.jpg'
+    image: '/nhipbep/history_1960_1970_background.jpg',
+    learnMoreLink: 'https://www.tiger-corporation.com/en/vnm/about-us/history/1960-1979/'
   },
   {
     dates: '1980 – 1999',
@@ -54,7 +57,8 @@ export const slides: SlideContent[] = [
       'Kỷ niệm 60 năm thành lập và chính thức đổi tên thành Tiger Corporation.',
       'Hoàn thành Trung tâm Bình chân không Kadoma và xây dựng nhà xưởng đúc.'
     ],
-    image: '/nhipbep/history_1980_1999_background.jpg'
+    image: '/nhipbep/history_1980_1999_background.jpg',
+    learnMoreLink: 'https://www.tiger-corporation.com/en/vnm/about-us/history/1980-1999/'
   },
   {
     dates: '2000 – 2019',
@@ -63,7 +67,8 @@ export const slides: SlideContent[] = [
       'Trụ sở chính đạt chứng nhận ISO 9001. Thành lập Công ty TNHH TIGER Việt Nam.',
       'Tiger Corporation nhận Giải thưởng Bộ trưởng Bộ Giáo dục, Văn hóa, Thể thao, Khoa học & Công nghệ Nhật Bản tại Giải thưởng Công nghệ Công nghiệp Nhật Bản lần thứ 48.'
     ],
-    image: '/nhipbep/history_2000_2019_background.jpg'
+    image: '/nhipbep/history_2000_2019_background.jpg',
+    learnMoreLink: 'https://www.tiger-corporation.com/en/vnm/about-us/history/2000-2019/'
   },
   {
     dates: '2020 – Nay',
@@ -72,7 +77,8 @@ export const slides: SlideContent[] = [
       'Thành lập Công ty TNHH TIGER MARKETING Việt Nam.',
       'Tập đoàn Tiger kỷ niệm 100 năm hoạt động, khẳng định vị thế thương hiệu gia dụng hàng đầu Nhật Bản.'
     ],
-    image: '/nhipbep/history_2020_nay_background.jpg'
+    image: '/nhipbep/history_2020_nay_background.jpg',
+    learnMoreLink: 'https://www.tiger-corporation.com/en/vnm/about-us/history/2020-latest/'
   }
 ];
 
