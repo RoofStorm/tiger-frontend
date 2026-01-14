@@ -464,6 +464,12 @@ export const EMOJI_COMBINATION_GROUPS: EmojiCombinationGroup[] = [
   },
   // Card 4 - Tổ hợp 5
   {
+    combinationIds: [1, 2, 7],
+    whisper: 'Áp lực chồng chất khiến bạn chỉ muốn tìm một khoảng lặng, để những xúc cảm đang thắt nghẹn trong tim có chỗ dịu đi. Nhưng TIGER ở đây để nói rằng, TIGER tự hào bởi vì bạn đã sống sót qua những ngày tồi tệ nhất cuộc đời, những ngày mà bạn chỉ muốn chạy trốn.',
+    reminder: 'Thả lỏng vai và cơ mặt 10 giây có thể giúp não giảm phản ứng căng thẳng nhanh hơn.',
+  },
+  // Card 4 - Tổ hợp 5b
+  {
     combinationIds: [2, 6, 8],
     whisper: 'Nhịp sống vẫn êm đềm, nhưng cảm giác không rõ ràng và mỏi âm ỉ khiến bạn chậm lại trước những câu hỏi quan trọng: mình đang muốn gì, và nên đi tiếp theo hướng nào. Ý định đổi môi trường xuất hiện rất tự nhiên - không phải để trốn tránh, mà để tách khỏi những nhiễu động quen thuộc, cho đầu óc đủ khoảng trống nhìn lại chính mình và chọn ra điều thật sự cần làm.',
     reminder: 'Việc đổi môi trường trong khoảng 5-7 ngày giúp não thoát khỏi vòng lặp thói quen, từ đó tăng khả năng tự suy ngẫm và đưa ra quyết định rõ ràng hơn so với ở trong  không gian quen thuộc.',
@@ -998,7 +1004,7 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
     const specialGroup = findCombinationGroup([1, 7]);
     if (specialGroup) {
       const card4Combinations = [
-        [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
+        [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [1, 2, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
       ];
       
       const isCard4 = card4Combinations.some(combo => {
@@ -1021,7 +1027,7 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
     const specialGroup = findCombinationGroup([1, 8]);
     if (specialGroup) {
       const card4Combinations = [
-        [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
+        [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [1, 2, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
       ];
       
       const isCard4 = card4Combinations.some(combo => {
@@ -1044,7 +1050,7 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
     const specialGroup = findCombinationGroup([2, 4]);
     if (specialGroup) {
       const card4Combinations = [
-        [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
+        [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [1, 2, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
       ];
       
       const isCard4 = card4Combinations.some(combo => {
@@ -1067,7 +1073,7 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
     const specialGroup = findCombinationGroup([2, 7]);
     if (specialGroup) {
       const card4Combinations = [
-        [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
+        [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [1, 2, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
       ];
       
       const isCard4 = card4Combinations.some(combo => {
@@ -1191,7 +1197,7 @@ export function findCardByEmojis(selectedEmojiIds: string[]): {
   ];
   
   const card4Combinations = [
-    [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
+    [1, 6, 7], [2, 3, 6], [2, 3, 7], [2, 4, 7], [1, 2, 7], [2, 6, 8], [3, 4, 8], [1, 3, 6], [1, 3, 7], [1, 7], [1, 8], [2, 4], [2, 7]
   ];
   
   const sortedMatchedIds = [...matchedGroup.combinationIds].sort();
