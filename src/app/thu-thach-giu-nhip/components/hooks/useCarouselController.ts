@@ -28,8 +28,9 @@ export function useCarouselController({
   const lastPrependCountRef = useRef(0);
 
   const config = isMobile ? CAROUSEL_CONFIG.mobile : CAROUSEL_CONFIG.desktop;
-  const { transitionDuration, autoPlayInterval, minSwipeDistance } = CAROUSEL_CONFIG.animation;
+  const { transitionDuration, autoPlayInterval } = CAROUSEL_CONFIG.animation;
   const { visibleThreshold, bufferSize } = CAROUSEL_CONFIG.fetch;
+  const { minSwipeDistance } = CAROUSEL_CONFIG.swipe;
 
   // Adjust currentIndex when prepending data
   useEffect(() => {
