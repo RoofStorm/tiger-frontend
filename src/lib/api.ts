@@ -325,7 +325,29 @@ class ApiClient {
     direction?: 'next' | 'prev';
     limit?: number;
     type?: string;
-  }): Promise<any> {
+  }): Promise<{
+    success: boolean;
+    data: {
+      posts: Array<{
+        id: string;
+        caption?: string;
+        imageUrl?: string;
+        likeCount?: number;
+        isLiked?: boolean;
+        user?: {
+          name?: string;
+          avatarUrl?: string;
+        };
+      }>;
+      pagination: {
+        hasNext: boolean;
+        hasPrev: boolean;
+        nextCursor?: string;
+        prevCursor?: string;
+      };
+    };
+    message: string;
+  }> {
     const queryParams = new URLSearchParams();
     if (params.cursor) queryParams.append('cursor', params.cursor);
     if (params.direction) queryParams.append('direction', params.direction);
