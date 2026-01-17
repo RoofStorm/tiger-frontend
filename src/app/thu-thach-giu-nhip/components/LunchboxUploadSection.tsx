@@ -15,6 +15,7 @@ import { useShareFacebookModal } from '@/contexts/ShareFacebookModalContext';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
 import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
+import { CropModal } from './CropModal';
 
 
 export function LunchboxUploadSection() {
@@ -40,6 +41,9 @@ export function LunchboxUploadSection() {
   const [uploadedCaption, setUploadedCaption] = useState<string>('');
   const [createdPostId, setCreatedPostId] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropOriginalFileName, setCropOriginalFileName] = useState<string>('');
 
   // Track time on Zone B.1
   useZoneView(zoneB1Ref, {
@@ -84,10 +88,20 @@ export function LunchboxUploadSection() {
     // Track upload start (funnel step 1)
     trackFunnelStep('challenge', 'zoneB1', 'upload', 'start');
 
-    // Set selected file and create preview
-    setSelectedFile(file);
+    // SVG files cannot be cropped with canvas, so skip crop modal
+    if (file.type === 'image/svg+xml') {
+      setSelectedFile(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      setUploadProgress(0);
+      return;
+    }
+
+    // Open crop modal for other image types (PNG, JPG, JPEG)
     const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
+    setCropImageSrc(url);
+    setCropOriginalFileName(file.name);
+    setShowCropModal(true);
     setUploadProgress(0);
   };
 
@@ -132,13 +146,45 @@ export function LunchboxUploadSection() {
       URL.revokeObjectURL(previewUrl);
       setPreviewUrl(null);
     }
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc);
+      setCropImageSrc(null);
+    }
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
     setUploadProgress(0);
     setShowCaptionModal(false);
+    setShowCropModal(false);
     setCaption('');
     setCreatedPostId(null);
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    // Set the cropped file as selected file
+    setSelectedFile(croppedFile);
+    // Create preview from cropped file
+    const url = URL.createObjectURL(croppedFile);
+    setPreviewUrl(url);
+    // Clean up crop modal image
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc);
+      setCropImageSrc(null);
+    }
+    setShowCropModal(false);
+  };
+
+  const handleCropCancel = () => {
+    // Clean up crop modal image
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc);
+      setCropImageSrc(null);
+    }
+    setShowCropModal(false);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleUploadPost = async () => {
@@ -202,7 +248,13 @@ export function LunchboxUploadSection() {
       const postId = responseData?.id || createPostResult?.id || null;
       setCreatedPostId(postId);
 
-      // Invalidate queries
+      // Invalidate queries để refetch lại danh sách posts
+      queryClient.invalidateQueries({
+        queryKey: ['highlighted-posts-carousel'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['grid-posts'],
+      });
       queryClient.invalidateQueries({
         queryKey: ['highlighted-posts-challenge', user?.id],
       });
@@ -685,6 +737,17 @@ export function LunchboxUploadSection() {
             </div>
           </div>
         </Modal>
+
+        {/* Crop Modal */}
+        {cropImageSrc && (
+          <CropModal
+            isOpen={showCropModal}
+            onClose={handleCropCancel}
+            imageSrc={cropImageSrc}
+            onCropComplete={handleCropComplete}
+            originalFileName={cropOriginalFileName}
+          />
+        )}
 
         {/* Success Modal */}
         <AnimatePresence>
