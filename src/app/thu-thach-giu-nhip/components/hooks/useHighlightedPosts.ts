@@ -56,13 +56,15 @@ export function useHighlightedPosts() {
     refetch,
   } = useInfiniteQuery<PostsFeedResponse>({
     queryKey: ['highlighted-posts-carousel'],
-    queryFn: ({ pageParam }) =>
-      apiClient.getPostsFeed({
-        cursor: pageParam?.cursor,
-        direction: pageParam?.direction,
+    queryFn: ({ pageParam }) => {
+      const param = pageParam as { cursor?: string; direction?: 'next' | 'prev' } | undefined;
+      return apiClient.getPostsFeed({
+        cursor: param?.cursor,
+        direction: param?.direction,
         limit: 10,
         type: 'IMAGE',
-      }) as Promise<PostsFeedResponse>,
+      }) as Promise<PostsFeedResponse>;
+    },
     initialPageParam: { cursor: undefined, direction: 'next' as const },
     getNextPageParam: (lastPage) =>
       lastPage?.data?.pagination?.hasNext
