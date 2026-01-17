@@ -95,7 +95,7 @@ export function CropModal({
       onClose={handleCancel}
       showCloseButton={true}
       showHeader={true}
-      headerTitle="Crop"
+      headerTitle=""
       maxWidth="lg"
       closeOnBackdropClick={false}
     >
@@ -127,11 +127,11 @@ export function CropModal({
         </div> */}
         
         {/* Hiển thị thông báo tỉ lệ cố định */}
-        <div className="text-center">
+        {/* <div className="text-center">
           <p className="text-sm font-medium text-gray-700">
             Tỉ lệ: 3:4 (Dọc)
           </p>
-        </div>
+        </div> */}
 
         {/* Cropper Container */}
         <div className="relative w-full" style={{ height: '400px' }}>
