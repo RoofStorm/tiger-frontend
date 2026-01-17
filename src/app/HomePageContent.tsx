@@ -26,7 +26,7 @@ export function HomePageContent() {
         {showVideo && (
           <motion.div
             key="video-player"
-            exit={{ y: '-100%' }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
             className="fixed inset-0 z-[70]"
           >
@@ -41,8 +41,8 @@ export function HomePageContent() {
         {!showVideo && (
           <motion.main
             key="main-content"
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
             className={`relative flex flex-col md:block mt-[64px] xl:mt-[80px] ${styles.mainContent}`}
           >

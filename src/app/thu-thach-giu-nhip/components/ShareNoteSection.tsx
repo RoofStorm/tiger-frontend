@@ -247,7 +247,7 @@ export function ShareNoteSection() {
         updateUserPoints(user?.id);
         setTimeout(() => {
           showShareFacebookModal();
-        }, 500);
+        }, 3000);
       } else {
         // Fallback: invalidate userDetails query to ensure UI is in sync
         queryClient.invalidateQueries({ queryKey: ['userDetails'] });

@@ -77,7 +77,7 @@ export function useShareMoodCard({
         setTimeout(() => {
           // Hide button when sharing mood card
           showShareFacebookModal(true);
-        }, 500);
+        }, 3000);
       } else {
         // Fallback: invalidate userDetails query to ensure UI is in sync
         queryClient.invalidateQueries({ queryKey: ['userDetails', user?.id] });
