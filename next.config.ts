@@ -7,7 +7,15 @@ const nextConfig: NextConfig = {
   // Fix warning about multiple lockfiles by explicitly setting the workspace root
   outputFileTracingRoot: process.cwd(),
   images: {
-    qualities: [75, 90, 100],
+    // Cache images for 31 days to reduce transformations and cache writes
+    minimumCacheTTL: 2678400,
+    // Use only WebP format to reduce number of transformations
+    // Removing AVIF reduces transformations by ~50%
+    formats: ['image/webp'],
+    // Reduce quality options to minimize transformations
+    // Using 75 and 90 instead of 75, 90, 100 reduces possible combinations
+    qualities: [75, 90],
+    // Configure remote patterns allowlist to limit unnecessary optimizations
     remotePatterns: [
       {
         protocol: 'https',
