@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Nunito, Noto_Sans, Prata } from 'next/font/google';
 import { Suspense } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import { AuthSuccessHandler } from '@/components/AuthSuccessHandler';
@@ -48,6 +49,7 @@ export default function RootLayout({
           <HeaderWrapper />
           {children}
           <Footer />
+          <SpeedInsights />
         </Providers>
       </body>
     </html>
