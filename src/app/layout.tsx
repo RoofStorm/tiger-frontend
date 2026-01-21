@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Nunito, Noto_Sans, Prata } from 'next/font/google';
 import { Suspense } from 'react';
+import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import { Providers } from '@/components/Providers';
@@ -49,6 +50,7 @@ export default function RootLayout({
           <HeaderWrapper />
           {children}
           <Footer />
+          <Analytics />
           <SpeedInsights />
         </Providers>
       </body>
