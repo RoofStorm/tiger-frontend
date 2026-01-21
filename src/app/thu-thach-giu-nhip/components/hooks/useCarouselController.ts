@@ -6,6 +6,7 @@ interface UseCarouselControllerOptions {
   posts: Post[];
   isMobile: boolean;
   hasNextPage: boolean;
+  hasPreviousPage: boolean;
   fetchNextPage: () => void;
   fetchPreviousPage: () => void;
 }
@@ -17,6 +18,7 @@ export function useCarouselController({
   posts,
   isMobile,
   hasNextPage,
+  hasPreviousPage,
   fetchNextPage,
   fetchPreviousPage,
 }: UseCarouselControllerOptions) {
@@ -25,27 +27,34 @@ export function useCarouselController({
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  const lastPrependCountRef = useRef(0);
+  const shouldShiftForPrependRef = useRef(false);
+  const lastPostsCountRef = useRef(0);
+  const hasUserNavigatedBackwardRef = useRef(false);
 
   const config = isMobile ? CAROUSEL_CONFIG.mobile : CAROUSEL_CONFIG.desktop;
   const { transitionDuration, autoPlayInterval } = CAROUSEL_CONFIG.animation;
   const { visibleThreshold, bufferSize } = CAROUSEL_CONFIG.fetch;
   const { minSwipeDistance } = CAROUSEL_CONFIG.swipe;
 
-  // Adjust currentIndex when prepending data
+  // Adjust currentIndex only when we actually prepended items (triggered by fetchPreviousPage)
   useEffect(() => {
     if (posts.length === 0) return;
 
-    const currentFirstPageCount = posts.length;
-    if (lastPrependCountRef.current > 0 && currentFirstPageCount > lastPrependCountRef.current) {
-      const addedCount = currentFirstPageCount - lastPrependCountRef.current;
-      setCurrentIndex((prev) => prev + addedCount);
-    }
-    lastPrependCountRef.current = currentFirstPageCount;
+    const previousCount = lastPostsCountRef.current;
+    const currentCount = posts.length;
+    lastPostsCountRef.current = currentCount;
+
+    if (!shouldShiftForPrependRef.current) return;
+    if (previousCount === 0 || currentCount <= previousCount) return;
+
+    const addedCount = currentCount - previousCount;
+    setCurrentIndex(prev => prev + addedCount);
+    shouldShiftForPrependRef.current = false;
   }, [posts.length]);
 
   // Fetch thresholds
   useEffect(() => {
+    if (posts.length === 0) return;
     const visible = isMobile ? visibleThreshold.mobile : visibleThreshold.desktop;
 
     // Fetch Next
@@ -57,10 +66,28 @@ export function useCarouselController({
     }
 
     // Fetch Prev
-    if (currentIndex <= bufferSize) {
+    // Only prefetch previous pages after the user has actually navigated backward.
+    // This avoids an immediate "prev" request on first load (currentIndex=0),
+    // which also caused index shifting and made the carousel not start at the first post after refresh.
+    if (
+      hasPreviousPage &&
+      hasUserNavigatedBackwardRef.current &&
+      currentIndex <= bufferSize
+    ) {
+      shouldShiftForPrependRef.current = true;
       fetchPreviousPage();
     }
-  }, [currentIndex, posts.length, hasNextPage, isMobile, visibleThreshold, bufferSize, fetchNextPage, fetchPreviousPage]);
+  }, [
+    currentIndex,
+    posts.length,
+    hasNextPage,
+    hasPreviousPage,
+    isMobile,
+    visibleThreshold,
+    bufferSize,
+    fetchNextPage,
+    fetchPreviousPage,
+  ]);
 
   // Navigation functions
   const nextSlide = useCallback(() => {
@@ -76,6 +103,7 @@ export function useCarouselController({
     if (isTransitioning || posts.length === 0) return;
     if (currentIndex <= 0) return;
 
+    hasUserNavigatedBackwardRef.current = true;
     setIsTransitioning(true);
     setCurrentIndex((prev) => prev - 1);
     setTimeout(() => setIsTransitioning(false), transitionDuration);
@@ -147,6 +175,7 @@ export function useCarouselController({
       nextSlide();
     }
     if (isRightSwipe) {
+      hasUserNavigatedBackwardRef.current = true;
       prevSlide();
     }
   }, [touchStart, touchEnd, nextSlide, prevSlide, minSwipeDistance]);

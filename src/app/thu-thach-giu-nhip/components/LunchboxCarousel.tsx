@@ -69,6 +69,7 @@ export function LunchboxCarousel() {
     posts: highlightedPosts,
     isMobile,
     hasNextPage,
+    hasPreviousPage,
     fetchNextPage,
     fetchPreviousPage,
   });
