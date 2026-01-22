@@ -308,7 +308,7 @@ export const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ isAdmin }) => {
                     Thời gian trung bình (s)
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Số sessions đã truy cập
+                    Tổng phiên đã truy cập
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Tổng người dùng đã truy cập
