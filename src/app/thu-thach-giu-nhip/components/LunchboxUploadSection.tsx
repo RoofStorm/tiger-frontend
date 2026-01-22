@@ -16,6 +16,7 @@ import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
 import { useUpdateUserPoints } from '@/hooks/useUpdateUserPoints';
 import { CropModal } from './CropModal';
+import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from '@/constants/upload';
 
 
 export function LunchboxUploadSection() {
@@ -85,6 +86,17 @@ export function LunchboxUploadSection() {
       return;
     }
 
+    // Validate file size (10MB limit)
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: 'File quá lớn',
+        description: `Kích thước file không được vượt quá ${MAX_FILE_SIZE_MB}MB. File hiện tại: ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
     // Track upload start (funnel step 1)
     trackFunnelStep('challenge', 'zoneB1', 'upload', 'start');
 
@@ -124,6 +136,17 @@ export function LunchboxUploadSection() {
     const file = e.dataTransfer.files?.[0];
     
     if (!file || isTextarea) {
+      return;
+    }
+
+    // Validate file size (10MB limit) before processing
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: 'File quá lớn',
+        description: `Kích thước file không được vượt quá ${MAX_FILE_SIZE_MB}MB. File hiện tại: ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+        variant: 'destructive',
+        duration: 4000,
+      });
       return;
     }
 
@@ -509,7 +532,7 @@ export function LunchboxUploadSection() {
                   </div>
                 </div>
                 <p className="font-medium mb-2" style={{ color: '#DCDCDC', fontSize: '12px' }}>
-                  Nhấn tải ảnh hoặc kéo ảnh lên
+                  Nhấn tải ảnh hoặc kéo ảnh lên (dung lượng file không vượt quá {MAX_FILE_SIZE_MB}MB)
                 </p>
                 <p className="text-sm" style={{ color: '#DCDCDC', fontSize: '12px' }}>SVG, PNG, JPG</p>
               </div>

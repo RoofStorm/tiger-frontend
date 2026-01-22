@@ -3,6 +3,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { getSession } from 'next-auth/react';
 import { AnalyticsSummaryResponse } from '@/types';
 import { fetchWithCredentials } from './fetch';
+import { MAX_UPLOAD_TIMEOUT } from '@/constants/upload';
 // Note: Auth types are now handled by NextAuth.js
 
 // Global loading state management
@@ -558,6 +559,7 @@ class ApiClient {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
+      timeout: MAX_UPLOAD_TIMEOUT, // 60 seconds timeout for file uploads
     });
     return response.data;
   }

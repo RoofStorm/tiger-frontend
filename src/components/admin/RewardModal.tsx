@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { UseMutationResult } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 import apiClient from '@/lib/api';
+import { MAX_FILE_SIZE, MAX_FILE_SIZE_MB } from '@/constants/upload';
 
 interface Reward {
   id: string;
@@ -87,6 +88,17 @@ export const RewardModal: React.FC<RewardModalProps> = ({
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (file) {
+        // Validate file size (10MB limit)
+        if (file.size > MAX_FILE_SIZE) {
+          toast({
+            title: 'File quá lớn',
+            description: `Kích thước file không được vượt quá ${MAX_FILE_SIZE_MB}MB. File hiện tại: ${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+            variant: 'destructive',
+            duration: 4000,
+          });
+          return;
+        }
+
         setSelectedImageFile(file);
         const reader = new FileReader();
         reader.onload = e => {
@@ -95,7 +107,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({
         reader.readAsDataURL(file);
       }
     },
-    [setSelectedImageFile, setImagePreview]
+    [setSelectedImageFile, setImagePreview, toast]
   );
 
   const handleImageUpload = useCallback(async () => {
