@@ -10,6 +10,8 @@ const MIN_ZONE_VIEW_DURATION = 1500; // 1.5 giây minimum để tính là view
 
 // Session ID storage key
 const SESSION_ID_KEY = 'analytics_session_id';
+const SESSION_TIMESTAMP_KEY = 'analytics_session_timestamp';
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 phút - session expire sau 30 phút không hoạt động
 
 class AnalyticsService {
   private sessionId: string | null = null;
@@ -234,6 +236,7 @@ class AnalyticsService {
 
   /**
    * Get or create session ID (UUID format)
+   * Session sẽ expire sau 30 phút không hoạt động
    */
   static getOrCreateSessionId(): string {
     if (typeof window === 'undefined') {
@@ -241,23 +244,43 @@ class AnalyticsService {
       return `server-${Date.now()}`;
     }
 
-    let sessionId = localStorage.getItem(SESSION_ID_KEY);
-
-    if (!sessionId) {
-      // Generate UUID v4 format
-      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-        // Use native crypto.randomUUID if available
-        sessionId = crypto.randomUUID();
-      } else {
-        // Fallback: generate UUID-like string
-        sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-          const r = (Math.random() * 16) | 0;
-          const v = c === 'x' ? r : (r & 0x3) | 0x8;
-          return v.toString(16);
-        });
+    const now = Date.now();
+    const storedSessionId = localStorage.getItem(SESSION_ID_KEY);
+    const storedTimestamp = localStorage.getItem(SESSION_TIMESTAMP_KEY);
+    
+    // Kiểm tra nếu sessionId tồn tại và chưa expire
+    if (storedSessionId && storedTimestamp) {
+      const sessionAge = now - parseInt(storedTimestamp, 10);
+      
+      // Nếu session còn hiệu lực (< 30 phút), dùng lại
+      if (sessionAge < SESSION_TIMEOUT_MS) {
+        // Cập nhật timestamp mỗi lần truy cập để reset timeout
+        localStorage.setItem(SESSION_TIMESTAMP_KEY, now.toString());
+        return storedSessionId;
       }
-      localStorage.setItem(SESSION_ID_KEY, sessionId);
+      
+      // Session đã expire, xóa và tạo mới
+      localStorage.removeItem(SESSION_ID_KEY);
+      localStorage.removeItem(SESSION_TIMESTAMP_KEY);
     }
+
+    // Tạo sessionId mới
+    let sessionId: string;
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      // Use native crypto.randomUUID if available
+      sessionId = crypto.randomUUID();
+    } else {
+      // Fallback: generate UUID-like string
+      sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
+    
+    // Lưu sessionId và timestamp
+    localStorage.setItem(SESSION_ID_KEY, sessionId);
+    localStorage.setItem(SESSION_TIMESTAMP_KEY, now.toString());
 
     return sessionId;
   }
@@ -268,6 +291,7 @@ class AnalyticsService {
   static clearSessionId(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(SESSION_ID_KEY);
+      localStorage.removeItem(SESSION_TIMESTAMP_KEY);
     }
   }
 
@@ -277,6 +301,7 @@ class AnalyticsService {
   resetSession(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(SESSION_ID_KEY);
+      localStorage.removeItem(SESSION_TIMESTAMP_KEY);
       this.sessionId = AnalyticsService.getOrCreateSessionId();
     }
   }

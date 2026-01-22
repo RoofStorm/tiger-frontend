@@ -22,7 +22,7 @@ export function useCarouselController({
   fetchNextPage,
   fetchPreviousPage,
 }: UseCarouselControllerOptions) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(3);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -30,11 +30,21 @@ export function useCarouselController({
   const shouldShiftForPrependRef = useRef(false);
   const lastPostsCountRef = useRef(0);
   const hasUserNavigatedBackwardRef = useRef(false);
+  const isInitializedRef = useRef(false);
 
   const config = isMobile ? CAROUSEL_CONFIG.mobile : CAROUSEL_CONFIG.desktop;
   const { transitionDuration, autoPlayInterval } = CAROUSEL_CONFIG.animation;
   const { visibleThreshold, bufferSize } = CAROUSEL_CONFIG.fetch;
   const { minSwipeDistance } = CAROUSEL_CONFIG.swipe;
+
+  // Initialize currentIndex to 3 when posts are first loaded, but ensure it's within bounds
+  useEffect(() => {
+    if (isInitializedRef.current || posts.length === 0) return;
+    
+    const initialIndex = Math.min(3, Math.max(0, posts.length - 1));
+    setCurrentIndex(initialIndex);
+    isInitializedRef.current = true;
+  }, [posts.length]);
 
   // Adjust currentIndex only when we actually prepended items (triggered by fetchPreviousPage)
   useEffect(() => {

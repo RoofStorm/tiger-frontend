@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Children, isValidElement } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
@@ -58,22 +58,46 @@ interface FooterSectionProps {
 }
 
 function FooterSection({ title, children, isOpen, onToggle, isLast = false, titleLink }: FooterSectionProps) {
-  const handleTitleClick = (e: React.MouseEvent) => {
+  // Check if children has actual content (not just empty ul or comments)
+  const hasContent = (() => {
+    const childrenArray = Children.toArray(children);
+    for (const child of childrenArray) {
+      if (isValidElement(child) && child.type === 'ul') {
+        const props = child.props as { children?: React.ReactNode };
+        const ulChildren = Children.toArray(props.children || []);
+        for (const li of ulChildren) {
+          if (isValidElement(li) && li.type === 'li') {
+            const liProps = li.props as { children?: React.ReactNode };
+            const liChildren = Children.toArray(liProps.children || []);
+            const hasRealContent = liChildren.some((c) => {
+              if (typeof c === 'string') {
+                const trimmed = c.trim();
+                return trimmed.length > 0 && !trimmed.startsWith('{/*');
+              }
+              return isValidElement(c);
+            });
+            if (hasRealContent) return true;
+          }
+        }
+      }
+    }
+    return false;
+  })();
+
+  const handleMobileClick = (e: React.MouseEvent) => {
+    // If title has a link, open it on mobile
     if (titleLink) {
       e.preventDefault();
       window.open(titleLink, '_blank', 'noopener,noreferrer');
+    } else {
+      // Otherwise, toggle section
+      onToggle();
     }
-  };
-
-  const handleMobileClick = () => {
-    // On mobile, only toggle section, don't open link
-    onToggle();
   };
 
   const titleElement = titleLink ? (
     <a
       href={titleLink}
-      onClick={handleTitleClick}
       className="font-bold text-white mb-4 hover:underline cursor-pointer block"
       target="_blank"
       rel="noopener noreferrer"
@@ -88,33 +112,69 @@ function FooterSection({ title, children, isOpen, onToggle, isLast = false, titl
   return (
     <div className={`text-center md:text-left pb-4 md:pb-0 ${isLast ? 'pb-0' : ''}`}>
       {/* Mobile: Button with dropdown */}
-      <button
-        onClick={handleMobileClick}
-        className="md:hidden w-full flex items-center justify-center font-bold text-white py-3 relative"
-      >
-        <span>{title}</span>
-        <ChevronDown
-          className={`absolute right-0 w-5 h-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-        />
-      </button>
+      <div className="md:hidden w-full flex items-center justify-center font-bold text-white py-3 relative gap-2">
+        {titleLink ? (
+          <>
+            <button
+              onClick={() => {
+                window.open(titleLink, '_blank', 'noopener,noreferrer');
+              }}
+              className={hasContent ? "flex-1 text-center hover:underline cursor-pointer" : "w-full text-center hover:underline cursor-pointer"}
+              style={{ background: 'none', border: 'none', padding: 0 }}
+            >
+              {title}
+            </button>
+            {hasContent && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggle();
+                }}
+                className="flex-shrink-0 p-1"
+                aria-label="Toggle section"
+                style={{ background: 'none', border: 'none' }}
+              >
+                <ChevronDown
+                  className={`w-5 h-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+            )}
+          </>
+        ) : (
+          <button
+            onClick={handleMobileClick}
+            className="w-full flex items-center justify-center relative"
+            style={{ background: 'none', border: 'none' }}
+          >
+            <span>{title}</span>
+            {hasContent && (
+              <ChevronDown
+                className={`absolute right-0 w-5 h-5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+              />
+            )}
+          </button>
+        )}
+      </div>
       
       {/* Desktop: Static heading */}
       <div className="hidden md:block">{titleElement}</div>
       
       {/* Mobile: Collapsible content */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden overflow-hidden"
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {hasContent && (
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden overflow-hidden"
+            >
+              {children}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
       
       {/* Desktop: Always visible content */}
       <div className="hidden md:block">{children}</div>
