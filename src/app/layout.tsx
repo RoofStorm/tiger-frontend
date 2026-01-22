@@ -3,6 +3,7 @@ import { Inter, Nunito, Noto_Sans, Prata } from 'next/font/google';
 import { Suspense } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import { AuthSuccessHandler } from '@/components/AuthSuccessHandler';
@@ -52,6 +53,7 @@ export default function RootLayout({
           <Footer />
           <Analytics />
           <SpeedInsights />
+          <Analytics />
         </Providers>
       </body>
     </html>
