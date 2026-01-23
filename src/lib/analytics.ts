@@ -4,7 +4,7 @@ import apiClient from './api';
 import { fetchWithCredentials } from './fetch';
 
 // Constants
-const ANALYTICS_BATCH_SIZE = 15; // Gửi khi queue >= 15 events
+const ANALYTICS_BATCH_SIZE = 30; // Gửi khi queue >= 30 events
 const ANALYTICS_BATCH_DELAY = 15000; // 15 giây
 const MIN_ZONE_VIEW_DURATION = 1500; // 1.5 giây minimum để tính là view
 
