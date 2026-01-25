@@ -45,26 +45,32 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     Analytics.updateUserId(userId);
   }, [session?.user?.id]);
 
-  // Track page view (Time on Page) khi route change
+  // Track page view khi route change
   useEffect(() => {
     if (!pathname) return;
 
     const currentPage = getPageFromPathname(pathname);
     if (!currentPage) return;
 
-    // 1. Bắt đầu đếm giờ cho trang mới
+    // 1. Gửi page_view ngay khi vào trang (để đảm bảo có event gửi đi, backend có thể đếm session)
+    Analytics.track({
+      page: currentPage,
+      action: 'page_view',
+    });
+
+    // 2. Bắt đầu đếm giờ cho trang mới (để track duration khi rời trang)
     const timerKey = `page:${currentPage}`;
     Analytics.startTimer(timerKey);
 
     return () => {
-      // 2. Khi rời trang (unmount hoặc pathname change), gửi page_view kèm duration
+      // 3. Khi rời trang (unmount hoặc pathname change), gửi page_view_end kèm duration
       const duration = Analytics.endTimer(timerKey);
       
-      // Chỉ gửi nếu có thời gian hợp lệ (ví dụ > 1s)
+      // Chỉ gửi nếu có thời gian hợp lệ (>= 1s) để track time on page
       if (duration !== null && duration >= 1) {
         Analytics.track({
           page: currentPage,
-          action: 'page_view',
+          action: 'page_view_end',
           value: duration,
         });
       }
