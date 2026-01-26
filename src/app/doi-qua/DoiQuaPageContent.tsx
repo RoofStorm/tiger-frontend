@@ -249,7 +249,7 @@ export function DoiQuaPageContent() {
                       className="w-full h-auto object-contain max-w-[90vw]"
                       quality={100}
                       sizes="(max-width: 768px) 90vw, 1200px"
-                      priority
+                      unoptimized
                       // style={{ transform: 'scale(1)' }}
                     />
                   </motion.div>
