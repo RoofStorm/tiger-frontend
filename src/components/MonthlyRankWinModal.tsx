@@ -68,7 +68,7 @@ export function MonthlyRankWinModal({
           </h2>
           
           <p className="text-lg text-gray-300 mb-6">
-            Bạn đã đạt <span className="text-[#FFD700] font-bold">Hạng {rank}</span> bài viết nhiều like nhất <span className="text-white font-semibold">tháng {formatDate(month)}</span>
+            Bạn đã đạt <span className="text-blue-600 font-bold">Hạng {rank}</span> bài viết nhiều like nhất <span className="text-white font-semibold">tháng {formatDate(month)}</span>
           </p>
 
           <div className="w-full bg-[#2a2a2a] rounded-2xl p-6 mb-8 border border-white/5">
@@ -78,7 +78,7 @@ export function MonthlyRankWinModal({
 
           <button
             onClick={handleButtonClick}
-            className="w-full py-4 bg-[#FFD700] text-black font-bold rounded-xl text-lg hover:bg-[#ffed4a] transition-colors shadow-[0_10px_20px_rgba(255,215,0,0.2)]"
+            className="w-full py-4 bg-blue-600 text-white font-bold rounded-xl text-lg hover:bg-blue-500 transition-colors shadow-[0_10px_20px_rgba(59,130,246,0.3)]"
           >
             Đổi quà
           </button>
