@@ -7,7 +7,8 @@ import { CornerChallenge } from './components/CornerChallenge';
 import { useZoneView } from '@/hooks/useZoneView';
 
 export function ThuThachGiuNhipPageContent() {
-  const [showVideo, setShowVideo] = useState(true);
+  // Tạm thời ẩn clip khi vào trang (không load video). Đổi lại true khi cần bật.
+  const [showVideo, setShowVideo] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
 
