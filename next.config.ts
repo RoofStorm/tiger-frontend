@@ -6,6 +6,41 @@ const nextConfig: NextConfig = {
   ...(process.env.NODE_ENV === 'production' ? { output: 'standalone' as const } : {}),
   // Fix warning about multiple lockfiles by explicitly setting the workspace root
   outputFileTracingRoot: process.cwd(),
+
+  async headers() {
+    return [
+      // Static assets in public/
+      {
+        source: '/icons/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/images/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // Next static
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
+
   images: {
     // Cache images for 31 days to reduce transformations and cache writes
     minimumCacheTTL: 2678400,
