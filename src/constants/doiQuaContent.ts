@@ -51,8 +51,8 @@ export const THE_LE_SECTIONS = [
     title: '2. Đổi Điểm năng lượng → Quà tặng đến từ TIGER',
     description: null,
     bullets: [
-      '600 điểm năng lượng → Voucher 50k Got It',
-      '800 điểm năng lượng → Voucher 100k Got It',
+      '500 điểm năng lượng → Voucher 50k Got It',
+      '700 điểm năng lượng → Voucher 100k Got It',
     ],
   },
   {
