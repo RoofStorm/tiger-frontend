@@ -63,7 +63,7 @@ export function RewardCard({ reward, canRedeem, onRedeem, index }: RewardCardPro
                   color: '#FFFFFF',
                 }}
               >
-                VOUCHER
+                VOUCHER GOT IT
               </p>
 
               {/* Voucher Value */}

@@ -90,7 +90,7 @@ export function RewardModal({
                     color: '#FFFFFF',
                   }}
                 >
-                  VOUCHER
+                  VOUCHER GOT IT
                 </p>
                 <p 
                   className="font-nunito font-bold mb-2"
