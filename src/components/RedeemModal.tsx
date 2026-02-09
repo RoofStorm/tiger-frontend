@@ -78,7 +78,7 @@ export function RedeemModal({
             width={800}
             height={900}
             className="w-full h-auto object-contain max-w-5xl relative scale-[2] top-[-100px] sm:scale-100 sm:top-0"
-            quality={100}
+            quality={90}
           />
         </div>
 
