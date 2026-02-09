@@ -82,7 +82,7 @@ export function RewardCard({ reward, canRedeem, onRedeem, index }: RewardCardPro
 
               {/* Description - fixed height so all cards align */}
               <p 
-                className="font-nunito text-center min-h-[2.5em] line-clamp-2"
+                className="font-nunito text-center min-h-[32px] line-clamp-2"
                 style={{
                   fontFamily: 'Nunito',
                   fontWeight: 400,
