@@ -295,7 +295,7 @@ export function Corner4() {
                               color: '#FFFFFF',
                             }}
                           >
-                            VOUCHER
+                            VOUCHER GOT IT
                           </p>
 
                           {/* Voucher Value */}
@@ -327,7 +327,7 @@ export function Corner4() {
                               ? 'Dành cho Top 1 Nhịp sống được lan toả nhất tháng tại Thử thách giữ nhịp'
                               : reward.id === 'voucher-500k'
                               ? 'Dành cho Top 2 Nhịp sống được lan toả nhất tháng tại Thử thách giữ nhịp'
-                              : 'Cho sản phẩm TIGER (giới hạn 1 lần/user)'
+                              : 'Giới hạn 1 lần/user'
                             }
                           </p>
                         </div>

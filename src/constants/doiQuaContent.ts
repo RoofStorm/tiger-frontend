@@ -31,7 +31,7 @@ export const getRewardDescription = (rewardId: string): string => {
   if (rewardId === SPECIAL_VOUCHER_IDS.TOP_2) {
     return 'Dành cho Top 2 Nhịp sống được lan toả nhất tháng tại Thử thách giữ nhịp';
   }
-  return 'Cho sản phẩm TIGER (giới hạn 1 lần/user)';
+  return 'Giới hạn 1 lần/user';
 };
 
 export const THE_LE_SECTIONS = [
