@@ -166,12 +166,13 @@ export function RedeemModal({
           </div>
         </div>
 
-        {/* Submit Button - enable when at least phone or email is filled */}
+        {/* Submit Button - enable only when both phone and email are filled */}
         <div className="flex justify-center w-full">
           <Button
             onClick={handleSubmit}
             disabled={
-              (!redeemForm.receiverPhone.trim() && !redeemForm.receiverEmail.trim()) ||
+              !redeemForm.receiverPhone.trim() ||
+              !redeemForm.receiverEmail.trim() ||
               isPending
             }
             className="bg-blue-600 hover:bg-blue-700 text-white py-3 text-lg rounded-xl shadow-lg hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
