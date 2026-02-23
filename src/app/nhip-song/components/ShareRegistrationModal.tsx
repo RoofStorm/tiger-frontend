@@ -420,7 +420,7 @@ export function ShareRegistrationModal({
                   {/* Register Button */}
                   <button
                     type="submit"
-                    disabled={loading || !ageConfirmed || !termsAccepted}
+                    disabled={loading || !ageConfirmed || !termsAccepted || true}
                     className="w-full py-3 px-4 rounded-lg text-white font-nunito font-semibold transition-all duration-300 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
                       backgroundColor: '#00579F',
@@ -592,6 +592,7 @@ export function ShareRegistrationModal({
                   </span>
                   <button 
                     className="font-nunito underline"
+                    disabled={true}
                     onClick={() => setIsLoginMode(false)}
                     style={{
                       fontFamily: 'Nunito',
