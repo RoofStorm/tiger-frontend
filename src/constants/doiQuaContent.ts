@@ -68,6 +68,32 @@ export const THE_LE_SECTIONS = [
       'Số lượt tym cao thứ hai mỗi tháng sẽ nhận được voucher Got It trị giá 500,000 VND',
     ],
   },
+  {
+    title: '4. QUY ĐỊNH CHUNG:',
+    description: null,
+    bullets: [
+      'Hình ảnh tham gia cần rõ nét, đủ ánh sáng, không quá mờ',
+      'Hình ảnh phải là chủ sở hữu của tài khoản tham gia. Mọi hình thức sao chép, sử dụng hình ảnh của người khác, tải hình ảnh từ Internet hoặc sử dụng công nghệ ghép mặt đều được coi là không hợp lệ.',
+      'Các bài dự thi vi phạm tác quyền, trái với thuần phong mỹ tục Việt Nam (nội dung tiêu cực, bạo lực, lăng mạ,...) hoặc chứa hình ảnh nhạy cảm sẽ bị tước quyền tham gia ngay lập tức.',
+      'Trong hình ảnh dự thi không được xuất hiện hình ảnh, logo hoặc sản phẩm của các nhãn hàng khác.',
+      'Nghiêm cấm sử dụng tài khoản Facebook/Google ảo để tham gia.',
+      'Bất kỳ trường hợp nào bị phát hiện gian lận như sử dụng phần mềm thứ 3 TIGER sẽ tự động hủy bỏ tư cách tham gia mà không cần báo trước.',
+    ],
+  },
+  {
+    title: '5. LƯU Ý CHUNG:',
+    description: null,
+    bullets: [
+      'Mỗi người chơi chỉ được nhận tối đa 1 giải thưởng trong suốt thời gian diễn ra chương trình.',
+      'Khi tham gia chương trình, người chơi mặc nhiên chấp nhận toàn bộ các thể lệ, quy định cũng như các quyết định của Ban tổ chức.',
+      'Người tham gia có nghĩa vụ đọc kỹ và hiểu rõ thể lệ mà Ban tổ chức đã đưa ra. Ban tổ chức không chịu trách nhiệm trong trường hợp người tham gia vi phạm do chưa hiểu rõ quy định.',
+      'Ban tổ chức sẽ không chịu trách nhiệm nếu phần thưởng bị thất lạc hoặc không thể trao do người tham gia cung cấp sai thông tin cá nhân/liên lạc.',
+      'Ban tổ chức có quyền thu hồi giải thưởng và hủy bỏ kết quả đối với những trường hợp phát hiện vi phạm thể lệ cuộc thi (kể cả sau khi đã công bố giải).',
+      'Trong mọi trường hợp xảy ra tranh chấp, quyết định của Ban tổ chức là quyết định cuối cùng.',
+      'Tham gia chương trình đồng nghĩa với việc người chơi cho phép TIGER sử dụng hình ảnh và thông tin tham dự cho mục đích quảng bá thương hiệu trên các phương tiện truyền thông mà không cần trả bất kỳ khoản phí nào.',
+      'Bằng việc tham gia và chấp nhận giải thưởng, người chơi đồng ý rằng TIGER, các đối tác liên kết, đơn vị quảng cáo và toàn bộ nhân viên liên quan sẽ được miễn trừ trách nhiệm đối với bất kỳ khiếu nại, tổn thất hoặc thiệt hại nào (trực tiếp hoặc gián tiếp) phát sinh từ việc tham gia cuộc thi, việc chấp nhận, sở hữu hoặc sử dụng giải thưởng (ngoại trừ các trách nhiệm không thể miễn trừ theo quy định của pháp luật).',
+    ],
+  },
 ] as const;
 
 export const THE_LE_DISCLAIMER = '*Mỗi user có thể nhận được tối đa một giải thưởng trên mỗi hạng mục giải thưởng xuyên suốt thời gian diễn ra chương trình';
