@@ -159,7 +159,7 @@ export function TheLeTab({ onNavigateToDoiQua, onNavigateToChallenge }: TheLeTab
             fontStyle: 'italic',
           }}
         >
-          {THE_LE_DISCLAIMER}
+          {/* {THE_LE_DISCLAIMER} */}
         </p>
       </motion.div>
     </motion.div>
