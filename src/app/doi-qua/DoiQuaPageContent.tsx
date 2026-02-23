@@ -14,6 +14,7 @@ import { RedeemModal } from '@/components/RedeemModal';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useZoneView } from '@/hooks/useZoneView';
 import { ShareRegistrationModal } from '@/app/nhip-song/components/ShareRegistrationModal';
+import { SPECIAL_VOUCHER_IDS } from '@/constants/doiQuaContent';
 import { TabNavigation } from '@/components/doi-qua/TabNavigation';
 import { DoiQuaTab } from '@/components/doi-qua/DoiQuaTab';
 import { TheLeTab } from '@/components/doi-qua/TheLeTab';
@@ -170,6 +171,7 @@ export function DoiQuaPageContent() {
 
   const canRedeem = (reward: Reward) => {
     if (!isAuthenticated) return false;
+    if (reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_100K) return false;
     return reward.isActive && reward.canRedeem;
   };
 

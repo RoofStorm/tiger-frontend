@@ -12,6 +12,7 @@
 export const SPECIAL_VOUCHER_IDS = {
   TOP_1: 'voucher-1000k',
   TOP_2: 'voucher-500k',
+  VOUCHER_100K: 'voucher-100k',
 } as const;
 
 /**
@@ -30,6 +31,9 @@ export const getRewardDescription = (rewardId: string): string => {
   }
   if (rewardId === SPECIAL_VOUCHER_IDS.TOP_2) {
     return 'Dành cho Top 2 Nhịp sống được lan toả nhất tháng tại Thử thách giữ nhịp';
+  }
+  if (rewardId === SPECIAL_VOUCHER_IDS.VOUCHER_100K) {
+    return 'Giới hạn 1 lần/user: Đã hết voucher';
   }
   return 'Giới hạn 1 lần/user';
 };

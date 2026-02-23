@@ -7,6 +7,7 @@ import { Gift, Star, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Reward, CreateRedeemData } from '@/types';
 
+import { SPECIAL_VOUCHER_IDS } from '@/constants/doiQuaContent';
 import apiClient from '@/lib/api';
 import { useNextAuth } from '@/hooks/useNextAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -128,6 +129,7 @@ export function Corner4() {
 
   const canRedeem = (reward: Reward) => {
     if (!isAuthenticated) return false;
+    if (reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_100K) return false;
     return reward.isActive && reward.canRedeem;
   };
 
