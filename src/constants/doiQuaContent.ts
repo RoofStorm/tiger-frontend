@@ -66,7 +66,7 @@ export const THE_LE_SECTIONS = [
     ],
   },
   {
-    title: '4. QUY ĐỊNH CHUNG:',
+    title: '4. QUY ĐỊNH CHUNG',
     description: null,
     bullets: [
       'Hình ảnh tham gia cần rõ nét, đủ ánh sáng, không quá mờ',
@@ -78,7 +78,7 @@ export const THE_LE_SECTIONS = [
     ],
   },
   {
-    title: '5. LƯU Ý CHUNG:',
+    title: '5. LƯU Ý CHUNG',
     description: null,
     bullets: [
       'Mỗi người chơi chỉ được nhận tối đa 1 giải thưởng trong suốt thời gian diễn ra chương trình.',
