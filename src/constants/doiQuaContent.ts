@@ -13,6 +13,7 @@ export const SPECIAL_VOUCHER_IDS = {
   TOP_1: 'voucher-1000k',
   TOP_2: 'voucher-500k',
   VOUCHER_100K: 'voucher-100k',
+  VOUCHER_50K: 'voucher-50k',
 } as const;
 
 /**

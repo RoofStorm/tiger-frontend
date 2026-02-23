@@ -171,7 +171,7 @@ export function DoiQuaPageContent() {
 
   const canRedeem = (reward: Reward) => {
     if (!isAuthenticated) return false;
-    if (reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_100K) return false;
+    if (reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_100K || reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_50K) return false;
     return reward.isActive && reward.canRedeem;
   };
 
