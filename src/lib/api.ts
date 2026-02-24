@@ -745,6 +745,7 @@ class ApiClient {
       year?: number;
       sortBy?: string;
       sortOrder?: 'asc' | 'desc';
+      search?: string;
     }
   ): Promise<any> {
     const params = new URLSearchParams({
@@ -759,6 +760,8 @@ class ApiClient {
     if (options?.year) params.append('year', options.year.toString());
     if (options?.sortBy) params.append('sortBy', options.sortBy);
     if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
+    if (options?.search?.trim())
+      params.append('search', options.search.trim());
 
     const response = await this.client.get(`/admin/posts?${params.toString()}`);
     return response.data;

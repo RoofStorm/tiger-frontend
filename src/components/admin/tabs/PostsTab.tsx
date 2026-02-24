@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Trash2, Star, StarOff, X, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { Trash2, Star, StarOff, X, ArrowUp, ArrowDown, ArrowUpDown, Search } from 'lucide-react';
 import { useConfirm } from '@/hooks/useConfirm';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -47,6 +47,8 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [postFilters, setPostFilters] = useState<FilterState>({
     month: '',
     year: '',
@@ -54,6 +56,14 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
     sortBy: '',
     sortOrder: 'desc',
   });
+
+  // Debounce search (400ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
   const [highlightingPosts, setHighlightingPosts] = useState<Set<string>>(
     new Set()
   );
@@ -61,7 +71,7 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
 
   // Fetch posts data with server-side pagination
   const { data: postsData, isLoading: postsLoading } = useQuery({
-    queryKey: ['admin-posts', currentPage, postFilters],
+    queryKey: ['admin-posts', currentPage, postFilters, debouncedSearch],
     queryFn: () =>
       apiClient.getAdminPosts(currentPage, 10, {
         highlighted:
@@ -74,6 +84,7 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
         year: postFilters.year ? parseInt(postFilters.year) : undefined,
         sortBy: postFilters.sortBy || undefined,
         sortOrder: postFilters.sortOrder || undefined,
+        search: debouncedSearch || undefined,
       }),
     enabled: isAdmin,
     staleTime: 0,
@@ -85,10 +96,10 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
   const totalPosts = useMemo(() => postsData?.data?.total || 0, [postsData]);
   const totalPages = useMemo(() => Math.ceil(totalPosts / 10), [totalPosts]);
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 when filters or search change
   useEffect(() => {
     setCurrentPage(1);
-  }, [postFilters]);
+  }, [postFilters, debouncedSearch]);
 
   // Reset to page 1 if current page is greater than total pages
   useEffect(() => {
@@ -204,8 +215,19 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <h2 className="text-xl font-bold text-gray-900">Quản lý bài viết</h2>
+        <div className="relative min-w-[200px] max-w-[320px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm kiếm bài viết..."
+            className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            aria-label="Tìm kiếm bài viết"
+          />
+        </div>
       </div>
 
       <FilterBar
@@ -217,7 +239,8 @@ export const PostsTab: React.FC<PostsTabProps> = ({ isAdmin }) => {
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-600">
           Hiển thị {posts.length} trong tổng số {totalPosts} bài viết
-          {postFilters.type && ' (đã lọc)'}
+          {(postFilters.month || postFilters.year || postFilters.isHighlighted || debouncedSearch) &&
+            ' (đã lọc)'}
         </p>
         {posts.length === 0 && totalPosts > 0 && (
           <p className="text-sm text-amber-600">
