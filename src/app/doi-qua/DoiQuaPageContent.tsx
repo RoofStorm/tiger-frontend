@@ -126,6 +126,19 @@ export function DoiQuaPageContent() {
       return;
     }
 
+    if (
+      reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_50K ||
+      reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_100K
+    ) {
+      toast({
+        title: 'Không khả dụng',
+        description: 'Phần quà này hiện không thể đổi qua kênh này.',
+        variant: 'destructive',
+        duration: 4000,
+      });
+      return;
+    }
+
     if (!reward.canRedeem) {
       toast({
         title: 'Không khả dụng',
@@ -171,7 +184,12 @@ export function DoiQuaPageContent() {
 
   const canRedeem = (reward: Reward) => {
     if (!isAuthenticated) return false;
-    // if (reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_100K || reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_50K) return false;
+    if (
+      reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_50K ||
+      reward.id === SPECIAL_VOUCHER_IDS.VOUCHER_100K
+    ) {
+      return false;
+    }
     return reward.isActive && reward.canRedeem;
   };
 
